@@ -677,13 +677,20 @@
     align-items:flex-end;
     gap:10px;
   }
-  .edit-fab{
-    width:56px; height:56px; border-radius:50%; border:none;
-    background:var(--navy); color:#fff; font-size:22px; cursor:pointer;
+  .edit-unlock-toast{
+    background:var(--navy);
+    color:#fff;
+    font-weight:700;
+    font-size:13px;
+    padding:10px 16px;
+    border-radius:999px;
     box-shadow:0 10px 22px rgba(18,34,74,.3);
-    transition:transform .16s ease, background .16s ease;
+    animation: toastPop .25s ease;
   }
-  .edit-fab:hover{ background:var(--blue); transform:translateY(-2px); }
+  @keyframes toastPop{
+    from{ opacity:0; transform:translateY(8px) scale(.95); }
+    to{ opacity:1; transform:translateY(0) scale(1); }
+  }
   .edit-panel{
     background:#fff; border:1px solid var(--card-border); border-radius:16px;
     box-shadow:var(--shadow); padding:14px; display:flex; flex-direction:column; gap:8px; width:240px;
@@ -777,12 +784,12 @@
 </div>
 
 <div id="editToolbar">
-  <button id="editToggleBtn" class="edit-fab" title="Editar contenido">✏️</button>
   <div id="editPanel" class="edit-panel" hidden>
     <div class="edit-panel-title">Modo edición activo</div>
     <button id="saveHtmlBtn" class="edit-panel-btn save" type="button">💾 Guardar y descargar HTML</button>
     <button id="exitEditBtn" class="edit-panel-btn exit" type="button">Salir de edición</button>
   </div>
+  <div id="editUnlockToast" class="edit-unlock-toast" hidden>✏️ Modo edición activado</div>
 </div>
 
 <script id="mainScript">
@@ -1207,25 +1214,48 @@
     }
   });
 
-  // ---------- Edit mode toggle + export ----------
-  const editToggleBtn = document.getElementById('editToggleBtn');
+  // ---------- Edit mode: unlocked by tapping any robot 10 times ----------
   const editPanel = document.getElementById('editPanel');
+  const editUnlockToast = document.getElementById('editUnlockToast');
 
-  editToggleBtn.addEventListener('click', () => {
+  function enterEditMode(){
+    if(editModeOn) return;
     editModeOn = true;
     document.body.classList.add('edit-mode');
     editPanel.hidden = false;
-    editToggleBtn.hidden = true;
+    editUnlockToast.hidden = false;
+    setTimeout(() => { editUnlockToast.hidden = true; }, 2200);
     if(lastOpened) renderSession(lastOpened.unitKey, lastOpened.num);
-  });
+  }
 
   document.getElementById('exitEditBtn').addEventListener('click', () => {
     if(document.activeElement) document.activeElement.blur();
     editModeOn = false;
     document.body.classList.remove('edit-mode');
     editPanel.hidden = true;
-    editToggleBtn.hidden = false;
     if(lastOpened) renderSession(lastOpened.unitKey, lastOpened.num);
+  });
+
+  // Secret gesture: tap any robot image 10 times within 4 seconds.
+  // Deliberately does NOT stop the click from also bubbling into
+  // whatever normal handler it lands on (e.g. "tap anywhere to
+  // continue" on the home screen) - a real single tap on the robot
+  // should keep behaving exactly like a tap anywhere else. Only rapid
+  // repeated taps (which will have long since navigated away from a
+  // one-shot handler like that) accumulate into an unlock.
+  let robotTapCount = 0;
+  let robotTapResetTimer = null;
+  document.addEventListener('click', e => {
+    if(editModeOn) return;
+    if(!e.target.closest('.robot-wrap')) return;
+    robotTapCount++;
+    clearTimeout(robotTapResetTimer);
+    robotTapResetTimer = setTimeout(() => { robotTapCount = 0; }, 4000);
+    if(robotTapCount >= 10){
+      robotTapCount = 0;
+      clearTimeout(robotTapResetTimer);
+      enterEditMode();
+    }
   });
 
   document.getElementById('saveHtmlBtn').addEventListener('click', () => {
@@ -1248,8 +1278,8 @@
     clone.classList.remove('edit-mode');
     const clonePanel = clone.querySelector('#editPanel');
     if(clonePanel) clonePanel.hidden = true;
-    const cloneToggle = clone.querySelector('#editToggleBtn');
-    if(cloneToggle) cloneToggle.hidden = false;
+    const cloneToast = clone.querySelector('#editUnlockToast');
+    if(cloneToast) cloneToast.hidden = true;
 
     const scriptEl = clone.querySelector('#mainScript');
     let scriptText = mainScriptEl.textContent;

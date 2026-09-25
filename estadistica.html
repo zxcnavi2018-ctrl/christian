@@ -1,0 +1,1739 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estadística · Capítulo de resultados</title>
+<style>
+  :root{
+    --navy:#12224a; --navy-2:#1c2f5e; --blue:#2f6fed; --cyan:#38d1f5;
+    --bg1:#eaf2ff; --bg2:#dff3ff; --card:#ffffff; --border:#dfe8fb; --line:#e6ebf5;
+    --muted:#5a6a94; --ink:#1b2440; --input:#fffbe6; --input-border:#f0dca0; --calc:#f3f5f9;
+    --ok:#1f8a4c; --ok-bg:#e6f4ea; --warn:#a86a10; --warn-bg:#fff4e0; --bad:#c0392b; --bad-bg:#fdeceb;
+    --shadow:0 10px 26px rgba(18,34,74,.10); --radius:18px;
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ margin:0; padding:0; }
+  body{
+    font-family:'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
+    color:var(--ink);
+    background:radial-gradient(circle at 12% 0%, #fff 0%, transparent 40%), linear-gradient(160deg, var(--bg1), var(--bg2));
+    min-height:100vh;
+  }
+  button{ font:inherit; }
+  button:focus{ outline:none; }
+  button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible{ outline:2px solid var(--blue); outline-offset:2px; }
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    position:sticky; top:0; z-index:40;
+    display:flex; align-items:center; gap:14px;
+    padding:10px 18px;
+    background:rgba(255,255,255,.88); backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .brand{ display:flex; align-items:center; gap:10px; min-width:0; }
+  .brand-logo{
+    width:38px; height:38px; border-radius:12px; flex-shrink:0;
+    background:linear-gradient(135deg, var(--blue), var(--cyan));
+    display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800;
+  }
+  .brand-text{ min-width:0; }
+  .brand-title{ font-weight:800; color:var(--navy); font-size:15px; }
+  .brand-sub{ font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:52vw; }
+  .top-actions{ margin-left:auto; display:flex; gap:8px; align-items:center; position:relative; }
+  .btn{
+    display:inline-flex; align-items:center; gap:6px;
+    border:1px solid var(--border); background:#fff; color:var(--navy-2);
+    padding:8px 13px; border-radius:10px; font-weight:700; font-size:13px; cursor:pointer;
+    transition:transform .14s ease, box-shadow .14s ease, background .14s ease;
+    white-space:nowrap;
+  }
+  .btn:hover{ transform:translateY(-1px); box-shadow:0 6px 14px rgba(18,34,74,.12); }
+  .btn.primary{ background:linear-gradient(135deg, var(--blue), var(--cyan)); color:#fff; border:none; }
+  .btn.small{ padding:6px 10px; font-size:12px; border-radius:8px; }
+  .btn.danger{ color:var(--bad); }
+  .menu{
+    position:absolute; right:0; top:calc(100% + 8px); width:280px;
+    background:#fff; border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow);
+    padding:6px; display:flex; flex-direction:column;
+  }
+  .menu[hidden]{ display:none; }
+  .menu button{
+    text-align:left; background:none; border:none; padding:10px 12px; border-radius:9px;
+    font-size:13.5px; color:var(--ink); cursor:pointer;
+  }
+  .menu button:hover{ background:#f1f5ff; }
+  .menu hr{ border:none; border-top:1px solid var(--line); margin:4px 6px; }
+
+  /* ---------- Layout ---------- */
+  .layout{ display:flex; align-items:flex-start; max-width:1320px; margin:0 auto; }
+  .sidenav{
+    position:sticky; top:59px; width:230px; flex-shrink:0;
+    padding:18px 10px 18px 16px; max-height:calc(100vh - 59px); overflow:auto;
+  }
+  .nav-group{ font-size:11px; font-weight:800; letter-spacing:.8px; text-transform:uppercase; color:#8b9ac1; margin:16px 10px 6px; }
+  .nav-group:first-child{ margin-top:0; }
+  .nav-btn{
+    display:flex; align-items:center; gap:10px; width:100%;
+    border:none; background:none; text-align:left; cursor:pointer;
+    padding:9px 12px; border-radius:11px; font-size:14px; color:var(--navy-2); font-weight:600;
+  }
+  .nav-btn .ico{ width:26px; height:26px; border-radius:8px; display:flex; align-items:center; justify-content:center; background:#fff; border:1px solid var(--border); font-size:13px; flex-shrink:0; }
+  .nav-btn:hover{ background:rgba(255,255,255,.7); }
+  .nav-btn.active{ background:var(--navy); color:#fff; box-shadow:0 8px 18px rgba(18,34,74,.2); }
+  .nav-btn.active .ico{ background:rgba(255,255,255,.15); border-color:transparent; }
+  main{ flex:1; min-width:0; padding:22px 22px 80px; }
+  .panel{ display:none; animation:fadeIn .25s ease; }
+  .panel.active{ display:block; }
+  @keyframes fadeIn{ from{ opacity:0; transform:translateY(6px);} to{ opacity:1; transform:none; } }
+
+  .sheet-head{ margin:0 0 16px; }
+  .sheet-head h1{ margin:0 0 4px; font-size:clamp(20px,3vw,26px); color:var(--navy); }
+  .sheet-head p{ margin:0; color:var(--muted); font-size:14px; line-height:1.5; }
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:20px 22px; margin-bottom:16px;
+  }
+  .card h2{ margin:0 0 14px; font-size:17px; color:var(--navy); display:flex; align-items:center; gap:10px; }
+  .step-n{
+    width:28px; height:28px; border-radius:9px; display:inline-flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg, var(--blue), var(--cyan)); color:#fff; font-size:13px; font-weight:800; flex-shrink:0;
+  }
+  .hint{ font-size:12.5px; color:var(--muted); line-height:1.45; }
+  .grid-form{ display:grid; grid-template-columns:minmax(180px, 280px) 1fr; gap:10px 16px; align-items:center; }
+  .grid-form label{ font-size:13.5px; font-weight:600; color:var(--navy-2); }
+  .field-note{ grid-column:2; margin-top:-6px; }
+  input.in, select.in, textarea.in{
+    font:inherit; font-size:14px; color:var(--ink);
+    background:var(--input); border:1px solid var(--input-border); border-radius:9px; padding:8px 10px; width:100%;
+  }
+  input.in.num{ width:90px; text-align:center; }
+  textarea.in{ resize:vertical; min-height:70px; line-height:1.45; }
+  .calc-box{ background:var(--calc); border:1px solid var(--line); border-radius:9px; padding:8px 10px; font-size:13.5px; }
+  .inline{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .pill{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-size:12.5px; font-weight:700; }
+  .pill.ok{ background:var(--ok-bg); color:var(--ok); }
+  .pill.warn{ background:var(--warn-bg); color:var(--warn); }
+  .pill.bad{ background:var(--bad-bg); color:var(--bad); }
+  table.ui{ width:100%; border-collapse:collapse; font-size:13.5px; }
+  table.ui th{ text-align:left; font-size:12px; color:var(--muted); font-weight:700; padding:8px; border-bottom:2px solid var(--line); background:#f7f9fd; }
+  table.ui td{ padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  table.ui td.c{ text-align:center; }
+  .scroll-x{ overflow-x:auto; }
+  .legend{ display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; color:var(--muted); align-items:center; }
+  .sw{ display:inline-block; width:14px; height:14px; border-radius:4px; vertical-align:-2px; margin-right:4px; border:1px solid var(--input-border); background:var(--input); }
+  .sw.calc{ background:var(--calc); border-color:var(--line); }
+  .sw.bad{ background:var(--bad-bg); border-color:#f3b8b1; }
+  .sw.warn{ background:#ffe3b3; border-color:#f0c070; }
+
+  /* ---------- Inicio ---------- */
+  .hero{
+    background:linear-gradient(135deg, var(--navy), var(--navy-2)); color:#fff; border-radius:22px; padding:26px 26px 22px;
+    box-shadow:var(--shadow); margin-bottom:16px;
+  }
+  .hero .kicker{ font-size:12px; letter-spacing:1px; text-transform:uppercase; font-weight:800; opacity:.75; }
+  .hero h1{ margin:8px 0 6px; font-size:clamp(18px,2.6vw,24px); line-height:1.35; }
+  .hero .author{ opacity:.8; font-size:14px; }
+  .steps{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:16px; }
+  .step-card{
+    background:#fff; border:1px solid var(--border); border-radius:16px; padding:16px; cursor:pointer; box-shadow:var(--shadow);
+    transition:transform .14s ease;
+  }
+  .step-card:hover{ transform:translateY(-3px); }
+  .step-card b{ display:block; color:var(--navy); margin:8px 0 4px; }
+  .step-card span.go{ display:inline-block; margin-top:8px; color:var(--blue); font-weight:700; font-size:13px; }
+  .status-grid{ display:grid; grid-template-columns:220px 1fr; gap:8px 14px; font-size:14px; }
+  .status-grid .k{ color:var(--muted); font-weight:600; }
+  .idx-list{ display:flex; flex-direction:column; gap:4px; }
+  .idx-list button{
+    text-align:left; background:none; border:none; padding:7px 10px; border-radius:9px; cursor:pointer; color:var(--navy-2); font-size:13.5px;
+  }
+  .idx-list button:hover{ background:#f1f5ff; color:var(--blue); }
+
+  /* ---------- Data grid ---------- */
+  .grid-toolbar{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:12px; }
+  .grid-wrap{ overflow:auto; max-height:70vh; border:1px solid var(--border); border-radius:14px; background:#fff; }
+  table.dg{ border-collapse:separate; border-spacing:0; font-size:13px; }
+  table.dg th{
+    position:sticky; background:#f5f8ff; color:var(--navy-2); font-weight:700; font-size:12px;
+    border-bottom:1px solid var(--line); border-right:1px solid var(--line); padding:5px 4px; text-align:center; white-space:nowrap; z-index:2;
+  }
+  table.dg thead tr:nth-child(1) th{ top:0; }
+  table.dg thead tr:nth-child(2) th{ top:27px; }
+  table.dg thead tr:nth-child(3) th{ top:54px; }
+  table.dg th.grp1{ background:#e8efff; }
+  table.dg th.grp2{ background:#eaf7f1; }
+  table.dg th.grpc{ background:#eef0f5; color:var(--muted); }
+  table.dg td{ border-bottom:1px solid var(--line); border-right:1px solid var(--line); padding:0; text-align:center; }
+  table.dg .stick1{ position:sticky; left:0; z-index:3; background:#fff; }
+  table.dg .stick2{ position:sticky; left:44px; z-index:3; background:#fff; }
+  table.dg th.stick1, table.dg th.stick2{ z-index:5; background:#f5f8ff; }
+  table.dg td.rn{ width:44px; min-width:44px; font-weight:700; color:var(--muted); font-size:12px; }
+  table.dg input.gc{
+    width:42px; border:none; background:var(--input); text-align:center; padding:7px 2px; font:inherit; font-size:13px; color:var(--ink);
+  }
+  table.dg input.gc.sec{ width:96px; text-align:left; padding-left:6px; }
+  table.dg input.gc:focus{ outline:2px solid var(--blue); outline-offset:-2px; background:#fff; }
+  table.dg input.gc.warn{ background:#ffe3b3; }
+  table.dg tr.bad td.rn, table.dg tr.bad td.stick2 input{ background:var(--bad-bg); color:var(--bad); }
+  table.dg td.calc{ background:var(--calc); color:var(--navy-2); padding:0 8px; min-width:62px; font-size:12.5px; }
+  .dg-status{ font-size:13px; }
+
+  /* ---------- Paper (thesis output) ---------- */
+  .paper{
+    background:#fff; border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow);
+    padding:28px clamp(16px,4vw,44px); margin-bottom:18px;
+    font-family:'Times New Roman', Times, serif; color:#111;
+  }
+  .paper .blk-head{ display:flex; justify-content:space-between; gap:10px; align-items:flex-start; flex-wrap:wrap; font-family:'Segoe UI', system-ui, sans-serif; margin-bottom:10px; }
+  .paper .blk-tag{ font-size:11px; font-weight:800; letter-spacing:.8px; text-transform:uppercase; color:var(--blue); }
+  .copy-row{ display:flex; gap:6px; flex-wrap:wrap; }
+  .t-num{ font-weight:bold; font-size:16px; margin:0; }
+  .t-title{ font-style:italic; font-size:16px; margin:2px 0 8px; }
+  .t-note{ font-size:14px; margin:6px 0 0; }
+  .desc-label{ font-weight:bold; margin:14px 0 4px; font-size:15px; }
+  .desc-text{ font-size:15px; line-height:1.6; margin:0; text-align:justify; }
+  .pair{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.15fr); gap:28px; align-items:start; }
+  .fig-wrap{ position:relative; }
+  .fig-wrap svg{ width:100%; height:auto; display:block; }
+  .fig-wrap .bar{ cursor:pointer; transition:opacity .12s ease; }
+  .fig-wrap svg:hover .bar{ opacity:.55; }
+  .fig-wrap svg .bar:hover{ opacity:1; }
+  .tip{
+    position:absolute; pointer-events:none; background:var(--navy); color:#fff; font-family:'Segoe UI', system-ui, sans-serif;
+    font-size:12.5px; padding:6px 9px; border-radius:8px; white-space:nowrap; transform:translate(-50%, -110%); box-shadow:0 6px 14px rgba(0,0,0,.2);
+  }
+  .tip[hidden]{ display:none; }
+  .hyp-top{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .red{ color:#c0392b; font-weight:bold; }
+  .empty-note{ font-family:'Segoe UI', system-ui, sans-serif; color:var(--muted); font-size:14px; }
+
+  .toast{
+    position:fixed; left:50%; bottom:22px; transform:translateX(-50%); z-index:100;
+    background:var(--navy); color:#fff; padding:10px 18px; border-radius:999px; font-size:14px; font-weight:600;
+    box-shadow:0 10px 24px rgba(0,0,0,.25);
+  }
+  .toast[hidden]{ display:none; }
+  .banner{
+    background:var(--warn-bg); border:1px solid #f0d5a0; color:#7a4a12; border-radius:14px; padding:12px 16px; margin-bottom:14px; font-size:14px;
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+  }
+  .banner[hidden]{ display:none; }
+
+  @media (max-width: 960px){
+    .layout{ display:block; }
+    .sidenav{
+      position:sticky; top:59px; z-index:30; width:auto; max-height:none; padding:8px 10px;
+      display:flex; gap:6px; overflow-x:auto; background:rgba(234,242,255,.95); backdrop-filter:blur(8px);
+      border-bottom:1px solid var(--border);
+    }
+    .nav-group{ display:none; }
+    .nav-btn{ width:auto; white-space:nowrap; padding:7px 11px; font-size:13px; }
+    .nav-btn .ico{ display:none; }
+    main{ padding:16px 12px 80px; }
+    .steps{ grid-template-columns:1fr; }
+    .pair, .hyp-top{ grid-template-columns:1fr; }
+    .grid-form{ grid-template-columns:1fr; }
+    .field-note{ grid-column:1; }
+    .status-grid{ grid-template-columns:1fr; gap:2px 0; }
+    .status-grid .k{ margin-top:8px; }
+    .brand-sub{ max-width:40vw; }
+    .top-actions .btn .lbl{ display:none; }
+  }
+
+  @media print{
+    .topbar, .sidenav, .copy-row, .blk-head .copy-row, .toast, .banner{ display:none !important; }
+    body{ background:#fff; }
+    main{ padding:0; }
+    body.print-all .panel.out{ display:block !important; }
+    body.print-all .panel:not(.out){ display:none !important; }
+    .paper{ box-shadow:none; border:none; page-break-inside:avoid; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-logo">Σ</div>
+    <div class="brand-text">
+      <div class="brand-title">Capítulo de resultados</div>
+      <div class="brand-sub" id="brandSub"></div>
+    </div>
+  </div>
+  <div class="top-actions">
+    <button class="btn primary" id="btnSave" type="button" title="Descarga este archivo HTML con todos tus datos dentro">💾 <span class="lbl">Guardar HTML</span></button>
+    <button class="btn" id="btnMenu" type="button" aria-haspopup="true">☰ <span class="lbl">Más</span></button>
+    <div class="menu" id="menu" hidden>
+      <button type="button" data-act="importXlsx">📥 Importar mi Plantilla Excel (.xlsx)</button>
+      <button type="button" data-act="exportJson">⬇️ Exportar respaldo (.json)</button>
+      <button type="button" data-act="importJson">⬆️ Importar respaldo (.json)</button>
+      <button type="button" data-act="csv">📄 Descargar base de datos (.csv)</button>
+      <hr>
+      <button type="button" data-act="print">🖨️ Imprimir / Guardar PDF de resultados</button>
+      <hr>
+      <button type="button" data-act="example">↺ Cargar datos de ejemplo</button>
+      <button type="button" data-act="blank">🧹 Nuevo estudio en blanco</button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidenav" id="sidenav" aria-label="Hojas"></nav>
+  <main>
+    <div class="banner" id="restoreBanner" hidden>
+      <span>🔄 Se restauraron los cambios que guardaste en este navegador.</span>
+      <button class="btn small" type="button" id="btnDiscardLocal">Usar los datos del archivo</button>
+    </div>
+    <section class="panel out" id="p-inicio"></section>
+    <section class="panel" id="p-config"></section>
+    <section class="panel" id="p-diseno"></section>
+    <section class="panel" id="p-datos"></section>
+    <section class="panel out" id="p-confiab"></section>
+    <section class="panel out" id="p-desc"></section>
+    <section class="panel out" id="p-niveles"></section>
+    <section class="panel out" id="p-dimv1"></section>
+    <section class="panel out" id="p-dimv2"></section>
+    <section class="panel out" id="p-hipo"></section>
+    <section class="panel" id="p-matrices"></section>
+  </main>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+<input type="file" id="fileJson" accept="application/json,.json" hidden>
+<input type="file" id="fileXlsx" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden>
+
+<script id="mainScript">
+const PAGE_SNAPSHOT = document.documentElement.outerHTML;
+/*STATE_START*/const EMBEDDED = {"docId": "803c19c512ed", "savedAt": 0, "state": {"config": {"titulo": "Título de tu investigación", "autor": "Nombre del autor(a)", "fuente": "Elaborado por el investigador", "decimal": ".", "v1": {"name": "Variable 1", "min": 1, "max": 5, "nItems": 18, "levels": 3, "levelNames": ["Bajo", "Medio", "Alto", "Muy alto"], "dims": [{"name": "Dimensión 1", "n": 6}, {"name": "Dimensión 2", "n": 6}, {"name": "Dimensión 3", "n": 6}]}, "v2": {"name": "Variable 2", "min": 0, "max": 1, "nItems": 20, "levels": 3, "levelNames": ["Bajo", "Medio", "Alto", "Muy alto"], "dims": [{"name": "Capacidad 1", "n": 4}, {"name": "Capacidad 2", "n": 4}, {"name": "Capacidad 3", "n": 4}, {"name": "Capacidad 4", "n": 4}, {"name": "Capacidad 5", "n": 4}]}, "hypMode": "A"}, "design": {"poblacion": "estudiantes de V ciclo de educación primaria", "ambito": "una institución educativa privada", "lugar": "Tacna", "anio": "2026", "verbo": "Determinar", "descriptivos": "Sí", "enfoque": "Cuantitativo", "tipo": "Básica", "nivel": "Correlacional", "diseno": "No experimental de corte transversal", "poblacionN": "100", "muestreo": "No probabilístico por conveniencia", "tecnica": "Encuesta", "instV1": "Cuestionario", "instV2": "Cuestionario", "tituloOpcion": 4, "defConc": ["", ""], "indicadores": [[], []]}, "data": [{"sec": "Sección A", "v1": [5, 3, 2, 5, 5, 4, 3, 4, 4, 5, 3, 5, 3, 4, 3, 5, 4, 5], "v2": [0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]}, {"sec": "Sección B", "v1": [4, 5, 4, 4, 4, 5, 5, 5, 5, 4, 3, 5, 4, 4, 5, 3, 4, 5], "v2": [0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0]}, {"sec": "Sección A", "v1": [2, 3, 3, 2, 2, 2, 2, 3, 2, 4, 4, 3, 4, 5, 4, 4, 3, 3], "v2": [1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}, {"sec": "Sección B", "v1": [1, 1, 1, 2, 1, 1, 3, 2, 2, 2, 2, 2, 1, 2, 2, 2, 1, 1], "v2": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"sec": "Sección A", "v1": [5, 5, 5, 5, 5, 4, 5, 4, 5, 4, 5, 5, 4, 4, 3, 3, 2, 5], "v2": [0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1]}, {"sec": "Sección B", "v1": [5, 4, 4, 4, 4, 5, 5, 4, 5, 5, 5, 4, 2, 4, 4, 3, 2, 3], "v2": [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1]}, {"sec": "Sección A", "v1": [1, 2, 1, 2, 3, 2, 4, 3, 2, 2, 3, 3, 1, 2, 2, 2, 2, 3], "v2": [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1]}, {"sec": "Sección B", "v1": [4, 4, 5, 5, 5, 4, 4, 4, 4, 3, 3, 3, 3, 4, 2, 2, 2, 2], "v2": [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0]}, {"sec": "Sección A", "v1": [4, 4, 4, 4, 4, 4, 5, 5, 5, 4, 4, 4, 4, 4, 4, 3, 4, 3], "v2": [1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0]}, {"sec": "Sección B", "v1": [3, 5, 4, 3, 5, 5, 4, 4, 4, 5, 4, 5, 4, 5, 5, 4, 5, 3], "v2": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1]}, {"sec": "Sección A", "v1": [4, 4, 3, 5, 5, 3, 5, 5, 5, 5, 5, 5, 3, 3, 3, 3, 4, 4], "v2": [1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1]}, {"sec": "Sección B", "v1": [4, 4, 3, 4, 4, 5, 3, 3, 3, 3, 3, 2, 4, 4, 3, 3, 3, 4], "v2": [0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1]}, {"sec": "Sección A", "v1": [3, 1, 3, 1, 3, 3, 2, 1, 2, 3, 2, 2, 3, 2, 1, 2, 2, 1], "v2": [1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 0]}, {"sec": "Sección B", "v1": [3, 2, 4, 5, 2, 3, 5, 4, 4, 5, 5, 4, 3, 3, 2, 3, 3, 2], "v2": [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0]}, {"sec": "Sección A", "v1": [3, 4, 3, 5, 3, 3, 4, 2, 3, 3, 2, 1, 2, 3, 3, 4, 2, 1], "v2": [0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1]}, {"sec": "Sección B", "v1": [3, 2, 2, 2, 2, 2, 2, 3, 4, 3, 3, 3, 4, 4, 3, 3, 4, 2], "v2": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0]}, {"sec": "Sección A", "v1": [3, 3, 3, 3, 3, 4, 4, 2, 4, 4, 3, 5, 2, 1, 2, 1, 2, 4], "v2": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1]}, {"sec": "Sección B", "v1": [3, 3, 3, 3, 2, 3, 3, 3, 3, 5, 3, 4, 3, 3, 2, 2, 2, 4], "v2": [0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0]}, {"sec": "Sección A", "v1": [1, 1, 2, 2, 1, 1, 3, 2, 1, 2, 3, 1, 3, 4, 2, 3, 3, 4], "v2": [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"sec": "Sección B", "v1": [4, 4, 2, 4, 3, 2, 3, 3, 4, 4, 4, 3, 3, 1, 1, 1, 3, 2], "v2": [0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1]}, {"sec": "Sección A", "v1": [3, 3, 3, 2, 4, 3, 4, 4, 2, 5, 5, 3, 3, 3, 1, 2, 4, 4], "v2": [0, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1]}, {"sec": "Sección B", "v1": [3, 4, 3, 4, 3, 4, 4, 5, 3, 3, 3, 4, 2, 1, 2, 3, 1, 2], "v2": [0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0]}, {"sec": "Sección A", "v1": [5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 5, 5, 5, 5, 5, 4, 5], "v2": [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1]}, {"sec": "Sección B", "v1": [5, 5, 4, 5, 4, 4, 5, 5, 5, 5, 4, 5, 3, 4, 4, 4, 4, 4], "v2": [0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0]}, {"sec": "Sección A", "v1": [1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "v2": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"sec": "Sección B", "v1": [1, 2, 1, 4, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 2, 2, 2, 1], "v2": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"sec": "Sección A", "v1": [3, 3, 1, 3, 3, 2, 4, 3, 3, 3, 3, 4, 5, 4, 4, 5, 4, 5], "v2": [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}, {"sec": "Sección B", "v1": [2, 2, 1, 2, 2, 1, 4, 4, 3, 4, 4, 5, 3, 4, 3, 4, 4, 2], "v2": [1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0]}, {"sec": "Sección A", "v1": [4, 5, 4, 5, 5, 5, 4, 3, 4, 5, 5, 5, 4, 3, 4, 5, 5, 5], "v2": [0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0]}, {"sec": "Sección B", "v1": [4, 4, 3, 4, 5, 3, 3, 2, 2, 2, 3, 3, 3, 4, 4, 5, 5, 3], "v2": [1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1]}, {"sec": "Sección A", "v1": [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 4, 5, 5, 5], "v2": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}, {"sec": "Sección B", "v1": [3, 2, 3, 3, 2, 3, 2, 1, 2, 3, 1, 2, 2, 4, 3, 4, 4, 2], "v2": [0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"sec": "Sección A", "v1": [2, 2, 3, 3, 2, 3, 3, 2, 2, 3, 2, 4, 2, 2, 3, 3, 3, 2], "v2": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 0]}, {"sec": "Sección B", "v1": [5, 5, 5, 5, 5, 5, 5, 4, 5, 5, 5, 5, 5, 5, 4, 4, 5, 5], "v2": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}, {"sec": "Sección A", "v1": [4, 3, 3, 4, 4, 5, 4, 5, 4, 4, 3, 4, 4, 5, 5, 5, 4, 5], "v2": [1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1]}, {"sec": "Sección B", "v1": [5, 4, 4, 3, 5, 4, 5, 2, 3, 2, 3, 4, 5, 4, 4, 4, 5, 4], "v2": [1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1]}, {"sec": "Sección A", "v1": [3, 4, 1, 3, 2, 3, 3, 4, 4, 3, 4, 4, 3, 1, 3, 2, 2, 3], "v2": [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1]}, {"sec": "Sección B", "v1": [1, 2, 2, 2, 2, 1, 2, 1, 1, 2, 1, 4, 2, 3, 3, 1, 2, 1], "v2": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"sec": "Sección A", "v1": [2, 4, 3, 2, 4, 3, 4, 3, 3, 4, 2, 3, 3, 4, 2, 4, 3, 2], "v2": [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1]}, {"sec": "Sección B", "v1": [5, 4, 5, 3, 4, 4, 5, 3, 4, 4, 5, 4, 4, 5, 3, 4, 3, 5], "v2": [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1]}]}};/*STATE_END*/
+const EXAMPLE_DATA = {"config": {"titulo": "Título de tu investigación", "autor": "Nombre del autor(a)", "fuente": "Elaborado por el investigador", "decimal": ".", "v1": {"name": "Variable 1", "min": 1, "max": 5, "nItems": 18, "levels": 3, "levelNames": ["Bajo", "Medio", "Alto", "Muy alto"], "dims": [{"name": "Dimensión 1", "n": 6}, {"name": "Dimensión 2", "n": 6}, {"name": "Dimensión 3", "n": 6}]}, "v2": {"name": "Variable 2", "min": 0, "max": 1, "nItems": 20, "levels": 3, "levelNames": ["Bajo", "Medio", "Alto", "Muy alto"], "dims": [{"name": "Capacidad 1", "n": 4}, {"name": "Capacidad 2", "n": 4}, {"name": "Capacidad 3", "n": 4}, {"name": "Capacidad 4", "n": 4}, {"name": "Capacidad 5", "n": 4}]}, "hypMode": "A"}, "design": {"poblacion": "estudiantes de V ciclo de educación primaria", "ambito": "una institución educativa privada", "lugar": "Tacna", "anio": "2026", "verbo": "Determinar", "descriptivos": "Sí", "enfoque": "Cuantitativo", "tipo": "Básica", "nivel": "Correlacional", "diseno": "No experimental de corte transversal", "poblacionN": "100", "muestreo": "No probabilístico por conveniencia", "tecnica": "Encuesta", "instV1": "Cuestionario", "instV2": "Cuestionario", "tituloOpcion": 4, "defConc": ["", ""], "indicadores": [[], []]}, "data": [{"sec": "Sección A", "v1": [5, 3, 2, 5, 5, 4, 3, 4, 4, 5, 3, 5, 3, 4, 3, 5, 4, 5], "v2": [0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]}, {"sec": "Sección B", "v1": [4, 5, 4, 4, 4, 5, 5, 5, 5, 4, 3, 5, 4, 4, 5, 3, 4, 5], "v2": [0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0]}, {"sec": "Sección A", "v1": [2, 3, 3, 2, 2, 2, 2, 3, 2, 4, 4, 3, 4, 5, 4, 4, 3, 3], "v2": [1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}, {"sec": "Sección B", "v1": [1, 1, 1, 2, 1, 1, 3, 2, 2, 2, 2, 2, 1, 2, 2, 2, 1, 1], "v2": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"sec": "Sección A", "v1": [5, 5, 5, 5, 5, 4, 5, 4, 5, 4, 5, 5, 4, 4, 3, 3, 2, 5], "v2": [0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1]}, {"sec": "Sección B", "v1": [5, 4, 4, 4, 4, 5, 5, 4, 5, 5, 5, 4, 2, 4, 4, 3, 2, 3], "v2": [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1]}, {"sec": "Sección A", "v1": [1, 2, 1, 2, 3, 2, 4, 3, 2, 2, 3, 3, 1, 2, 2, 2, 2, 3], "v2": [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1]}, {"sec": "Sección B", "v1": [4, 4, 5, 5, 5, 4, 4, 4, 4, 3, 3, 3, 3, 4, 2, 2, 2, 2], "v2": [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0]}, {"sec": "Sección A", "v1": [4, 4, 4, 4, 4, 4, 5, 5, 5, 4, 4, 4, 4, 4, 4, 3, 4, 3], "v2": [1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0]}, {"sec": "Sección B", "v1": [3, 5, 4, 3, 5, 5, 4, 4, 4, 5, 4, 5, 4, 5, 5, 4, 5, 3], "v2": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1]}, {"sec": "Sección A", "v1": [4, 4, 3, 5, 5, 3, 5, 5, 5, 5, 5, 5, 3, 3, 3, 3, 4, 4], "v2": [1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1]}, {"sec": "Sección B", "v1": [4, 4, 3, 4, 4, 5, 3, 3, 3, 3, 3, 2, 4, 4, 3, 3, 3, 4], "v2": [0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1]}, {"sec": "Sección A", "v1": [3, 1, 3, 1, 3, 3, 2, 1, 2, 3, 2, 2, 3, 2, 1, 2, 2, 1], "v2": [1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 0]}, {"sec": "Sección B", "v1": [3, 2, 4, 5, 2, 3, 5, 4, 4, 5, 5, 4, 3, 3, 2, 3, 3, 2], "v2": [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0]}, {"sec": "Sección A", "v1": [3, 4, 3, 5, 3, 3, 4, 2, 3, 3, 2, 1, 2, 3, 3, 4, 2, 1], "v2": [0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1]}, {"sec": "Sección B", "v1": [3, 2, 2, 2, 2, 2, 2, 3, 4, 3, 3, 3, 4, 4, 3, 3, 4, 2], "v2": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0]}, {"sec": "Sección A", "v1": [3, 3, 3, 3, 3, 4, 4, 2, 4, 4, 3, 5, 2, 1, 2, 1, 2, 4], "v2": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1]}, {"sec": "Sección B", "v1": [3, 3, 3, 3, 2, 3, 3, 3, 3, 5, 3, 4, 3, 3, 2, 2, 2, 4], "v2": [0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0]}, {"sec": "Sección A", "v1": [1, 1, 2, 2, 1, 1, 3, 2, 1, 2, 3, 1, 3, 4, 2, 3, 3, 4], "v2": [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"sec": "Sección B", "v1": [4, 4, 2, 4, 3, 2, 3, 3, 4, 4, 4, 3, 3, 1, 1, 1, 3, 2], "v2": [0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1]}, {"sec": "Sección A", "v1": [3, 3, 3, 2, 4, 3, 4, 4, 2, 5, 5, 3, 3, 3, 1, 2, 4, 4], "v2": [0, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1]}, {"sec": "Sección B", "v1": [3, 4, 3, 4, 3, 4, 4, 5, 3, 3, 3, 4, 2, 1, 2, 3, 1, 2], "v2": [0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0]}, {"sec": "Sección A", "v1": [5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 5, 5, 5, 5, 5, 4, 5], "v2": [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1]}, {"sec": "Sección B", "v1": [5, 5, 4, 5, 4, 4, 5, 5, 5, 5, 4, 5, 3, 4, 4, 4, 4, 4], "v2": [0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0]}, {"sec": "Sección A", "v1": [1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "v2": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"sec": "Sección B", "v1": [1, 2, 1, 4, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 2, 2, 2, 1], "v2": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"sec": "Sección A", "v1": [3, 3, 1, 3, 3, 2, 4, 3, 3, 3, 3, 4, 5, 4, 4, 5, 4, 5], "v2": [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}, {"sec": "Sección B", "v1": [2, 2, 1, 2, 2, 1, 4, 4, 3, 4, 4, 5, 3, 4, 3, 4, 4, 2], "v2": [1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0]}, {"sec": "Sección A", "v1": [4, 5, 4, 5, 5, 5, 4, 3, 4, 5, 5, 5, 4, 3, 4, 5, 5, 5], "v2": [0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0]}, {"sec": "Sección B", "v1": [4, 4, 3, 4, 5, 3, 3, 2, 2, 2, 3, 3, 3, 4, 4, 5, 5, 3], "v2": [1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1]}, {"sec": "Sección A", "v1": [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 4, 5, 5, 5], "v2": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}, {"sec": "Sección B", "v1": [3, 2, 3, 3, 2, 3, 2, 1, 2, 3, 1, 2, 2, 4, 3, 4, 4, 2], "v2": [0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"sec": "Sección A", "v1": [2, 2, 3, 3, 2, 3, 3, 2, 2, 3, 2, 4, 2, 2, 3, 3, 3, 2], "v2": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 0]}, {"sec": "Sección B", "v1": [5, 5, 5, 5, 5, 5, 5, 4, 5, 5, 5, 5, 5, 5, 4, 4, 5, 5], "v2": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}, {"sec": "Sección A", "v1": [4, 3, 3, 4, 4, 5, 4, 5, 4, 4, 3, 4, 4, 5, 5, 5, 4, 5], "v2": [1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1]}, {"sec": "Sección B", "v1": [5, 4, 4, 3, 5, 4, 5, 2, 3, 2, 3, 4, 5, 4, 4, 4, 5, 4], "v2": [1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1]}, {"sec": "Sección A", "v1": [3, 4, 1, 3, 2, 3, 3, 4, 4, 3, 4, 4, 3, 1, 3, 2, 2, 3], "v2": [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1]}, {"sec": "Sección B", "v1": [1, 2, 2, 2, 2, 1, 2, 1, 1, 2, 1, 4, 2, 3, 3, 1, 2, 1], "v2": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"sec": "Sección A", "v1": [2, 4, 3, 2, 4, 3, 4, 3, 3, 4, 2, 3, 3, 4, 2, 4, 3, 2], "v2": [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1]}, {"sec": "Sección B", "v1": [5, 4, 5, 3, 4, 4, 5, 3, 4, 4, 5, 4, 4, 5, 3, 4, 3, 5], "v2": [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1]}]};
+
+/* ===================== Motor estadístico ===================== */
+const Stat = (() => {
+  // --- Normal CDF via complementary error function (Chebyshev, ~1e-16) ---
+  const ERFC_COF = [-1.3026537197817094, 6.4196979235649026e-1,
+    1.9476473204185836e-2, -9.561514786808631e-3, -9.46595344482036e-4,
+    3.66839497852761e-4, 4.2523324806907e-5, -2.0278578112534e-5,
+    -1.624290004647e-6, 1.303655835580e-6, 1.5626441722e-8, -8.5238095915e-8,
+    6.529054439e-9, 5.059343495e-9, -9.91364156e-10, -2.27365122e-10,
+    9.6467911e-11, 2.394038e-12, -6.886027e-12, 8.94487e-13, 3.13092e-13,
+    -1.12708e-13, 3.81e-16, 7.106e-15, -1.523e-15, -9.4e-17, 1.21e-16, -2.8e-17];
+  function erfccheb(z) {
+    let d = 0, dd = 0;
+    const t = 2 / (2 + z), ty = 4 * t - 2;
+    for (let j = ERFC_COF.length - 1; j > 0; j--) {
+      const tmp = d; d = ty * d - dd + ERFC_COF[j]; dd = tmp;
+    }
+    return t * Math.exp(-z * z + 0.5 * (ERFC_COF[0] + ty * d) - dd);
+  }
+  function erfc(x) { return x >= 0 ? erfccheb(x) : 2 - erfccheb(-x); }
+  function normCdf(z) { return 0.5 * erfc(-z / Math.SQRT2); }
+
+  // --- Inverse normal CDF: Wichura AS241 (PPND16) ---
+  function normInv(p) {
+    if (p <= 0 || p >= 1) return NaN;
+    const q = p - 0.5;
+    let r, val;
+    if (Math.abs(q) <= 0.425) {
+      r = 0.180625 - q * q;
+      val = q * (((((((r * 2509.0809287301226727 + 33430.575583588128105) * r + 67265.770927008700853) * r
+        + 45921.953931549871457) * r + 13731.693765509461125) * r + 1971.5909503065514427) * r + 133.14166789178437745) * r
+        + 3.387132872796366608)
+        / (((((((r * 5226.495278852545925 + 28729.085735721942674) * r + 39307.89580009271061) * r
+        + 21213.794301586595867) * r + 5394.1960214247511077) * r + 687.1870074920579083) * r + 42.313330701600911252) * r + 1);
+      return val;
+    }
+    r = q < 0 ? p : 1 - p;
+    r = Math.sqrt(-Math.log(r));
+    if (r <= 5) {
+      r -= 1.6;
+      val = (((((((r * 7.7454501427834140764e-4 + 0.0227238449892691845833) * r + 0.24178072517745061177) * r
+        + 1.27045825245236838258) * r + 3.64784832476320460504) * r + 5.7694972214606914055) * r
+        + 4.6303378461565452959) * r + 1.42343711074968357734)
+        / (((((((r * 1.05075007164441684324e-9 + 5.475938084995344946e-4) * r + 0.0151986665636164571966) * r
+        + 0.14810397642748007459) * r + 0.68976733498510000455) * r + 1.6763848301838038494) * r
+        + 2.05319162663775882187) * r + 1);
+    } else {
+      r -= 5;
+      val = (((((((r * 2.01033439929228813265e-7 + 2.71155556874348757815e-5) * r + 0.0012426609473880784386) * r
+        + 0.026532189526576123093) * r + 0.29656057182850489123) * r + 1.7848265399172913358) * r
+        + 5.4637849111641143699) * r + 6.6579046435011037772)
+        / (((((((r * 2.04426310338993978564e-15 + 1.4215117583164458887e-7) * r + 1.8463183175100546818e-5) * r
+        + 7.868691311456132591e-4) * r + 0.0148753612908506148525) * r + 0.13692988092273580531) * r
+        + 0.59983220655588793769) * r + 1);
+    }
+    return q < 0 ? -val : val;
+  }
+
+  // --- Student t two-tailed p (Excel TDIST(|t|, df, 2)) via incomplete beta ---
+  function lgamma(x) {
+    const g = [57.1562356658629235, -59.5979603554754912, 14.1360979747417471,
+      -0.491913816097620199, 0.339946499848118887e-4, 0.465236289270485756e-4,
+      -0.983744753048795646e-4, 0.158088703224912494e-3, -0.210264441724104883e-3,
+      0.217439618115212643e-3, -0.164318106536763890e-3, 0.844182239838527433e-4,
+      -0.261908384015814087e-4, 0.368991826595316234e-5];
+    let y = x, tmp = x + 5.24218750000000000;
+    tmp = (x + 0.5) * Math.log(tmp) - tmp;
+    let ser = 0.999999999999997092;
+    for (let j = 0; j < 14; j++) ser += g[j] / ++y;
+    return tmp + Math.log(2.5066282746310005 * ser / x);
+  }
+  function betacf(a, b, x) {
+    const FPMIN = 1e-300, EPS = 1e-16;
+    const qab = a + b, qap = a + 1, qam = a - 1;
+    let c = 1, d = 1 - qab * x / qap;
+    if (Math.abs(d) < FPMIN) d = FPMIN;
+    d = 1 / d;
+    let h = d;
+    for (let m = 1; m < 10000; m++) {
+      const m2 = 2 * m;
+      let aa = m * (b - m) * x / ((qam + m2) * (a + m2));
+      d = 1 + aa * d; if (Math.abs(d) < FPMIN) d = FPMIN;
+      c = 1 + aa / c; if (Math.abs(c) < FPMIN) c = FPMIN;
+      d = 1 / d; h *= d * c;
+      aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
+      d = 1 + aa * d; if (Math.abs(d) < FPMIN) d = FPMIN;
+      c = 1 + aa / c; if (Math.abs(c) < FPMIN) c = FPMIN;
+      d = 1 / d;
+      const del = d * c;
+      h *= del;
+      if (Math.abs(del - 1) <= EPS) break;
+    }
+    return h;
+  }
+  function betai(a, b, x) {
+    if (x <= 0) return 0;
+    if (x >= 1) return 1;
+    const bt = Math.exp(lgamma(a + b) - lgamma(a) - lgamma(b) + a * Math.log(x) + b * Math.log(1 - x));
+    if (x < (a + 1) / (a + b + 2)) return bt * betacf(a, b, x) / a;
+    return 1 - bt * betacf(b, a, 1 - x) / b;
+  }
+  function tdist2(t, df) {
+    t = Math.abs(t);
+    return betai(df / 2, 0.5, df / (df + t * t));
+  }
+
+  // --- Basic descriptives ---
+  const sum = a => a.reduce((s, v) => s + v, 0);
+  const mean = a => sum(a) / a.length;
+  function devsq(a) { const m = mean(a); return a.reduce((s, v) => s + (v - m) * (v - m), 0); }
+  function variance(a) { return a.length < 2 ? NaN : devsq(a) / (a.length - 1); }
+  function stdev(a) { return Math.sqrt(variance(a)); }
+  function pearson(x, y) {
+    const n = x.length;
+    if (n < 2 || n !== y.length) return NaN;
+    const mx = mean(x), my = mean(y);
+    let sxy = 0, sxx = 0, syy = 0;
+    for (let i = 0; i < n; i++) {
+      const dx = x[i] - mx, dy = y[i] - my;
+      sxy += dx * dy; sxx += dx * dx; syy += dy * dy;
+    }
+    if (sxx === 0 || syy === 0) return NaN;
+    return sxy / Math.sqrt(sxx * syy);
+  }
+  function avgRanks(a) {
+    const idx = a.map((v, i) => [v, i]).sort((p, q) => p[0] - q[0]);
+    const ranks = new Array(a.length);
+    for (let i = 0; i < idx.length;) {
+      let j = i;
+      while (j + 1 < idx.length && idx[j + 1][0] === idx[i][0]) j++;
+      const r = (i + j) / 2 + 1;
+      for (let k = i; k <= j; k++) ranks[idx[k][1]] = r;
+      i = j + 1;
+    }
+    return ranks;
+  }
+  const spearman = (x, y) => pearson(avgRanks(x), avgRanks(y));
+
+  // --- Shapiro-Wilk (Royston 1995), replica exacta de la hoja del Excel ---
+  function shapiroWilk(values) {
+    const n = values.length;
+    if (n < 3) return null;
+    const x = values.slice().sort((a, b) => a - b);
+    const m = [];
+    for (let i = 1; i <= n; i++) m.push(normInv((i - 0.375) / (n + 0.25)));
+    const sm2 = m.reduce((s, v) => s + v * v, 0);
+    const u = 1 / Math.sqrt(n);
+    const cn = m[n - 1] / Math.sqrt(sm2), cn1 = m[n - 2] / Math.sqrt(sm2);
+    const an = n === 3 ? Math.sqrt(0.5)
+      : -2.706056 * u ** 5 + 4.434685 * u ** 4 - 2.07119 * u ** 3 - 0.147981 * u ** 2 + 0.221157 * u + cn;
+    const an1 = -3.582633 * u ** 5 + 5.682633 * u ** 4 - 1.752461 * u ** 3 - 0.293762 * u ** 2 + 0.042981 * u + cn1;
+    const phi = n <= 5
+      ? (sm2 - 2 * m[n - 1] ** 2) / (1 - 2 * an ** 2)
+      : (sm2 - 2 * m[n - 1] ** 2 - 2 * m[n - 2] ** 2) / (1 - 2 * an ** 2 - 2 * an1 ** 2);
+    let num = 0;
+    for (let i = 1; i <= n; i++) {
+      let a;
+      if (i === n) a = an;
+      else if (i === 1) a = -an;
+      else if (n > 5 && i === n - 1) a = an1;
+      else if (n > 5 && i === 2) a = -an1;
+      else a = m[i - 1] / Math.sqrt(phi);
+      num += a * x[i - 1];
+    }
+    const ss = devsq(x);
+    if (!(ss > 0)) return null;
+    const W = num * num / ss;
+    let p;
+    if (n === 3) {
+      p = Math.max(0, Math.min(1, 6 / Math.PI * (Math.asin(Math.sqrt(Math.max(W, 0.75))) - Math.asin(Math.sqrt(0.75)))));
+    } else {
+      const ln = Math.log(n);
+      const mu = n <= 11 ? 0.544 - 0.39978 * n + 0.025054 * n ** 2 - 0.0006714 * n ** 3
+        : -1.5861 - 0.31082 * ln - 0.083751 * ln ** 2 + 0.0038915 * ln ** 3;
+      const sigma = n <= 11 ? Math.exp(1.3822 - 0.77857 * n + 0.062767 * n ** 2 - 0.0020322 * n ** 3)
+        : Math.exp(-0.4803 - 0.082676 * ln + 0.00303 * ln ** 2);
+      const y = n <= 11 ? -Math.log((-2.273 + 0.459 * n) - Math.log(1 - W)) : Math.log(1 - W);
+      const z = (y - mu) / sigma;
+      p = 1 - normCdf(z);
+    }
+    if (!isFinite(W) || !isFinite(p)) return null;
+    return { W, p, df: n };
+  }
+
+  return { normCdf, normInv, tdist2, mean, variance, stdev, devsq, pearson, spearman, avgRanks, shapiroWilk };
+})();
+
+/* ===================== Cálculo completo del estudio ===================== */
+function computeStudy(st) {
+  const cfg = st.config, dz = st.design;
+  const EPS = 1e-9;
+  const R = { warnings: [] };
+
+  const vars = [cfg.v1, cfg.v2].map((v, vi) => {
+    const dims = v.dims.filter(d => d.name.trim() !== '' || d.n > 0).map((d, i) => ({ ...d, n: Math.max(0, Math.floor(+d.n || 0)) }))
+      .filter(d => d.n > 0);
+    let from = 1;
+    dims.forEach(d => { d.from = from; d.to = from + d.n - 1; from += d.n; });
+    const k = dims.reduce((s, d) => s + d.n, 0);
+    return { ...v, idx: vi + 1, dims, k, prefix: vi === 0 ? 'P' : 'I', min: +v.min, max: +v.max, levels: +v.levels === 4 ? 4 : 3 };
+  });
+  R.vars = vars;
+  const [V1, V2] = vars;
+
+  // --- Casos válidos / incompletos ---
+  const isNum = x => typeof x === 'number' && isFinite(x);
+  const rowsInfo = st.data.map((row, ri) => {
+    const a = V1.k ? row.v1.slice(0, V1.k) : [];
+    const b = V2.k ? row.v2.slice(0, V2.k) : [];
+    const hasData = row.v1.concat(row.v2).some(isNum);
+    const valid = V1.k > 0 && V2.k > 0 && a.length === V1.k && b.length === V2.k && a.every(isNum) && b.every(isNum);
+    const outOfRange = [];
+    a.forEach((x, i) => { if (isNum(x) && (x < V1.min || x > V1.max)) outOfRange.push('v1:' + i); });
+    b.forEach((x, i) => { if (isNum(x) && (x < V2.min || x > V2.max)) outOfRange.push('v2:' + i); });
+    return { ri, hasData, valid, outOfRange, a, b, sec: row.sec };
+  });
+  const valid = rowsInfo.filter(r => r.valid);
+  R.rowsInfo = rowsInfo;
+  R.N = valid.length;
+  R.incomplete = rowsInfo.filter(r => r.hasData && !r.valid).length;
+  R.outOfRangeCount = rowsInfo.reduce((s, r) => s + r.outOfRange.length, 0);
+
+  // --- Nivel (baremo) de un puntaje ---
+  function levelIndex(score, k, v) {
+    const w = k * (v.max - v.min) / v.levels;
+    if (!(w > 0)) return null;
+    return Math.min(v.levels, Math.floor((score - k * v.min) / w + EPS) + 1);
+  }
+  function baremo(k, v) {
+    if (!k) return [];
+    const w = k * (v.max - v.min) / v.levels, lo0 = k * v.min, out = [];
+    for (let j = 1; j <= v.levels; j++) {
+      const lo = Math.ceil(lo0 + (j - 1) * w - EPS);
+      const hi = j === v.levels ? k * v.max : Math.ceil(lo0 + j * w - EPS) - 1;
+      out.push({ lo, hi, label: lo + ' – ' + hi });
+    }
+    return out;
+  }
+
+  // --- Totales y nivel por participante (columnas automáticas de la base de datos) ---
+  rowsInfo.forEach(r => {
+    if (!r.valid) return;
+    r.t1 = r.a.reduce((s, x) => s + x, 0);
+    r.t2 = r.b.reduce((s, x) => s + x, 0);
+    const l1 = levelIndex(r.t1, V1.k, V1), l2 = levelIndex(r.t2, V2.k, V2);
+    r.l1 = l1 ? V1.levelNames[l1 - 1] : '';
+    r.l2 = l2 ? V2.levelNames[l2 - 1] : '';
+  });
+
+  // --- Bloques: V1 total, dimensiones V1, V2 total, dimensiones V2 ---
+  const blocks = [];
+  vars.forEach(v => {
+    const key = 'v' + v.idx;
+    const mk = (isTotal, dim, di) => {
+      const from = isTotal ? 1 : dim.from, to = isTotal ? v.k : dim.to;
+      const k = to - from + 1;
+      const scores = valid.map(r => {
+        const arr = v.idx === 1 ? r.a : r.b;
+        let s = 0; for (let i = from - 1; i < to; i++) s += arr[i];
+        return s;
+      });
+      return {
+        var: v.idx, isTotal, dimIndex: isTotal ? 0 : di + 1,
+        name: isTotal ? v.name : dim.name,
+        label: isTotal ? v.name : 'D' + (di + 1) + ': ' + dim.name,
+        tipo: isTotal ? 'variable' : 'dimensión',
+        from, to, k, scores
+      };
+    };
+    blocks.push(mk(true, null, 0));
+    v.dims.forEach((d, di) => blocks.push(mk(false, d, di)));
+  });
+
+  const nD1 = V1.dims.length, nD2 = V2.dims.length;
+  const isKR = v => v.min === 0 && v.max === 1;
+
+  // --- Estadísticos por ítem (para confiabilidad) ---
+  const itemStats = vars.map(v => {
+    const n = R.N;
+    const totals = valid.map(r => { const arr = v.idx === 1 ? r.a : r.b; return arr.reduce((s, x) => s + x, 0); });
+    const mT = n ? Stat.mean(totals) : NaN;
+    const varT = Stat.variance(totals);
+    const items = [];
+    for (let i = 0; i < v.k; i++) {
+      const col = valid.map(r => (v.idx === 1 ? r.a : r.b)[i]);
+      const m = n ? Stat.mean(col) : NaN;
+      const vi = n > 1 ? col.reduce((s, x) => s + (x - m) ** 2, 0) / (n - 1) : NaN;
+      const cov = n > 1 ? col.reduce((s, x, j) => s + (x - m) * (totals[j] - mT), 0) / (n - 1) : NaN;
+      const denomVar = varT + vi - 2 * cov;
+      const rit = (cov - vi) / Math.sqrt(vi * denomVar);
+      const dimIdx = v.dims.findIndex(d => i + 1 >= d.from && i + 1 <= d.to);
+      items.push({ label: v.prefix + (i + 1), dim: 'D' + (dimIdx + 1), mean: m, variance: vi, cov, rit, alphaIfDeleted: NaN });
+    }
+    const sumVar = items.reduce((s, it) => s + it.variance, 0);
+    items.forEach(it => {
+      if (v.k > 2) it.alphaIfDeleted = (v.k - 1) / (v.k - 2) * (1 - (sumVar - it.variance) / (varT + it.variance - 2 * it.cov));
+    });
+    return { var: v.idx, name: v.name, items };
+  });
+  R.itemStats = itemStats;
+
+  // --- Rellenar cada bloque ---
+  let tableNo = {}, figNo = {};
+  blocks.forEach(b => {
+    const v = vars[b.var - 1];
+    const s = b.scores, n = s.length;
+    b.N = n;
+    b.min = n ? Math.min(...s) : null;
+    b.max = n ? Math.max(...s) : null;
+    b.mean = n ? Stat.mean(s) : null;
+    b.sd = n >= 2 ? Stat.stdev(s) : null;
+    const sw = Stat.shapiroWilk(s);
+    b.W = sw ? sw.W : null; b.p = sw ? sw.p : null;
+    b.normal = b.p == null ? null : b.p >= 0.05;
+    // niveles
+    b.levelNames = v.levelNames.slice(0, v.levels);
+    b.counts = b.levelNames.map(() => 0);
+    s.forEach(x => { const li = levelIndex(x, b.k, v); if (li) b.counts[li - 1]++; });
+    b.pcts = b.counts.map(c => n ? c / n : 0);
+    b.baremo = baremo(b.k, v);
+    // confiabilidad
+    const its = itemStats[b.var - 1].items.slice(b.from - 1, b.to);
+    const sumVar = its.reduce((a, it) => a + it.variance, 0);
+    b.coef = isKR(v) ? 'KR-20' : 'Alfa de Cronbach';
+    b.alpha = (b.k >= 2 && b.sd) ? b.k / (b.k - 1) * (1 - sumVar / (b.sd * b.sd)) : null;
+    b.alphaInterp = b.alpha == null ? '' : b.alpha >= 0.9 ? 'Excelente' : b.alpha >= 0.8 ? 'Bueno' : b.alpha >= 0.7 ? 'Aceptable'
+      : b.alpha >= 0.6 ? 'Cuestionable' : b.alpha >= 0.5 ? 'Pobre' : 'Inaceptable';
+    // numeración de tablas y figuras
+    if (b.var === 1 && b.isTotal) { b.table = 3; b.fig = 1; }
+    else if (b.var === 2 && b.isTotal) { b.table = 4; b.fig = 2; }
+    else if (b.var === 1) { b.table = 4 + b.dimIndex; b.fig = 2 + b.dimIndex; }
+    else { b.table = 4 + nD1 + b.dimIndex; b.fig = 2 + nD1 + b.dimIndex; }
+  });
+  R.blocks = blocks;
+  R.V1total = blocks.find(b => b.var === 1 && b.isTotal);
+  R.V2total = blocks.find(b => b.var === 2 && b.isTotal);
+
+  // --- Textos de niveles (réplica de las fórmulas del Excel) ---
+  const F2 = x => fmtNum(x * 100, 2, st) + '%';
+  blocks.forEach(b => {
+    if (!b.N) { b.textTable = ''; b.textFig = ''; return; }
+    const L = b.levelNames, c = b.counts, P = b.pcts, nl = L.length;
+    b.textTable = 'En la tabla ' + b.table + ' se aprecia que, de los ' + b.N + ' encuestados, ' + c[0] + ' (' + F2(P[0]) + ') se ubican en el nivel ' + L[0]
+      + ', ' + c[1] + ' (' + F2(P[1]) + ') en el nivel ' + L[1]
+      + (nl === 4 ? ', ' + c[2] + ' (' + F2(P[2]) + ') en el nivel ' + L[2] + ' y ' + c[3] + ' (' + F2(P[3]) + ') en el nivel ' + L[3]
+        : ' y ' + c[2] + ' (' + F2(P[2]) + ') en el nivel ' + L[2])
+      + ' de la ' + b.tipo + ' ' + b.name + '.';
+    const order = L.map((name, i) => ({ name, p: P[i], sc: P[i] + (10 - i) * EPS })).sort((a, z) => z.sc - a.sc);
+    const eq = (a, z) => Math.round(a * 1e6) === Math.round(z * 1e6);
+    const [t1, t2, t3, t4] = order;
+    let txt;
+    if (eq(t1.p, t2.p)) {
+      txt = 'En la figura ' + b.fig + ' se observa una distribución equitativa entre los niveles ' + t1.name + ' y ' + t2.name + ' de la ' + b.tipo + ' ' + b.name
+        + ', que concentran ' + F2(t1.p) + ' de los encuestados cada uno'
+        + (nl === 4 ? ', mientras que los niveles ' + t3.name + ' (' + F2(t3.p) + ') y ' + t4.name + ' (' + F2(t4.p) + ') presentan menor proporción.'
+          : ' y el nivel ' + t3.name + ' presenta menor proporción (' + F2(t3.p) + ').');
+    } else {
+      txt = 'En la figura ' + b.fig + ' se observa que el nivel predominante en la ' + b.tipo + ' ' + b.name + ' es ' + t1.name + ' (' + F2(t1.p) + ')';
+      if (nl === 4) {
+        if (eq(t3.p, t4.p)) txt += ', seguido del nivel ' + t2.name + ' (' + F2(t2.p) + ') y de los niveles ' + t3.name + ' y ' + t4.name + ', con ' + F2(t3.p) + ' cada uno.';
+        else if (eq(t2.p, t3.p)) txt += ', seguido de los niveles ' + t2.name + ' y ' + t3.name + ' (' + F2(t2.p) + ' cada uno) y, en menor proporción, del nivel ' + t4.name + ' (' + F2(t4.p) + ').';
+        else txt += ', seguido del nivel ' + t2.name + ' (' + F2(t2.p) + '), del nivel ' + t3.name + ' (' + F2(t3.p) + ') y, en menor proporción, del nivel ' + t4.name + ' (' + F2(t4.p) + ').';
+      } else {
+        if (eq(t2.p, t3.p)) txt += ', seguido de los niveles ' + t2.name + ' y ' + t3.name + ', con ' + F2(t2.p) + ' cada uno.';
+        else txt += ', seguido del nivel ' + t2.name + ' (' + F2(t2.p) + ') y, en menor proporción, del nivel ' + t3.name + ' (' + F2(t3.p) + ').';
+      }
+      txt += ' Esto evidencia una tendencia de los encuestados hacia el nivel ' + t1.name + '.';
+    }
+    b.textFig = txt;
+  });
+
+  // --- Frases del diseño ---
+  const pob = dz.poblacion.trim() || '[población]', amb = dz.ambito.trim() || '[ámbito]',
+    lug = dz.lugar.trim() || '[lugar]', anio = String(dz.anio).trim() || '[año]';
+  const ctx = ' en ' + pob + ' de ' + amb + ', ' + lug + ', ' + anio;
+  R.ctx = ctx;
+
+  // --- Hipótesis ---
+  const modeA = cfg.hypMode !== 'B';
+  const hyps = [];
+  const pair = (X, Y) => ({ X, Y });
+  hyps.push({ code: 'HG', label: 'hipótesis general', ...pair(R.V1total, R.V2total) });
+  if (modeA) V1.dims.forEach((d, i) => hyps.push({ code: 'HE' + (i + 1), label: 'hipótesis específica ' + (i + 1), ...pair(blocks.find(b => b.var === 1 && b.dimIndex === i + 1), R.V2total) }));
+  else V2.dims.forEach((d, i) => hyps.push({ code: 'HE' + (i + 1), label: 'hipótesis específica ' + (i + 1), ...pair(R.V1total, blocks.find(b => b.var === 2 && b.dimIndex === i + 1)) }));
+  hyps.forEach((h, c) => {
+    h.num = c;
+    h.table = 4 + nD1 + nD2 + 1 + c;
+    h.xName = h.X ? h.X.name : ''; h.yName = h.Y ? h.Y.name : '';
+    h.H1 = 'Existe relación significativa entre ' + h.xName + ' y ' + h.yName + ctx + '.';
+    h.H0 = 'No existe relación significativa entre ' + h.xName + ' y ' + h.yName + ctx + '.';
+    h.question = '¿Qué relación existe entre ' + h.xName + ' y ' + h.yName + ctx + '?';
+    h.objective = (c === 0 ? (dz.verbo || 'Determinar') : 'Establecer') + ' la relación que existe entre ' + h.xName + ' y ' + h.yName + ctx + '.';
+    const n = R.N;
+    const xs = h.X ? h.X.scores : [], ys = h.Y ? h.Y.scores : [];
+    h.pearson = Stat.pearson(xs, ys);
+    h.spearman = Stat.spearman(xs, ys);
+    h.bothNormal = h.X && h.Y && h.X.normal === true && h.Y.normal === true;
+    h.stat = h.bothNormal ? 'r de Pearson' : 'rho de Spearman';
+    h.symbol = h.bothNormal ? 'r' : 'rho';
+    const r = h.bothNormal ? h.pearson : h.spearman;
+    h.r = isFinite(r) ? r : null;
+    h.N = n;
+    if (h.r == null || n < 3) { h.p = null; h.t = null; }
+    else if (Math.abs(h.r) >= 1) { h.t = null; h.p = 0; }
+    else { h.t = h.r * Math.sqrt((n - 2) / (1 - h.r * h.r)); h.p = Stat.tdist2(h.t, n - 2); }
+    if (h.r != null) {
+      const a = Math.abs(h.r);
+      h.magnitude = a < 0.1 ? 'nula' : a < 0.25 ? 'muy débil' : a < 0.5 ? 'débil' : a < 0.75 ? 'media' : a < 0.9 ? 'considerable' : a < 1 ? 'muy fuerte' : 'perfecta';
+      h.direction = h.r >= 0 ? 'positiva' : 'negativa';
+      h.sig = h.p != null && h.p < 0.05;
+      h.stars = h.p == null ? '' : h.p < 0.01 ? '**' : h.p < 0.05 ? '*' : '';
+      h.valueTxt = fmtNum(h.r, 3, st) + h.stars;
+      h.description = 'Los resultados obtenidos demuestran que ' + h.xName + ' y ' + h.yName + ' presentan una correlación ' + h.direction + ' ' + h.magnitude
+        + (h.sig ? ' y significativa' : ' y no significativa') + ' (' + h.symbol + ' = ' + fmtNum(h.r, 3, st) + '; p = ' + fmtNum(h.p, 3, st)
+        + (h.sig ? ' < ' : ' ≥ ') + fmtNum(0.05, 2, st) + ').'
+        + (h.sig ? ' En consecuencia, se rechaza la hipótesis nula (H0) y se acepta la hipótesis alterna (H1): ' + lowerFirst(h.H1)
+          : ' En consecuencia, no se rechaza la hipótesis nula (H0): ' + lowerFirst(h.H0));
+      h.conclusion = 'Conclusión: ' + (h.sig ? 'se comprueba' : 'no se comprueba') + ' estadísticamente la ' + h.label + ' para un nivel de significación α = 5 %.';
+      h.decision = h.sig ? '✔ Se acepta H1' : '✖ Se acepta H0';
+    } else {
+      h.description = '⚠ No es posible calcular esta correlación: se necesitan al menos 3 casos válidos y que ambas series presenten variabilidad (no todos con el mismo puntaje).';
+      h.conclusion = ''; h.decision = ''; h.valueTxt = ''; h.sig = null;
+    }
+  });
+  R.hyps = hyps;
+  R.modeA = modeA;
+
+  // --- Textos generales ---
+  const nonNormal = blocks.filter(b => b.normal === false).map(b => b.label);
+  R.normalityText = R.N < 3 ? 'Registra al menos 3 casos para calcular la prueba de normalidad.'
+    : (nonNormal.length === 0
+      ? 'Se aprecia en la tabla 2 que todas las variables y dimensiones presentan una distribución normal, ya que su significancia es mayor o igual al α = 5 %.'
+      : 'Se aprecia en la tabla 2 que ' + nonNormal.join('; ') + ' presentan valores que no provienen de una distribución normal, ya que su significancia es menor al α = 5 %, mientras que las demás variables y dimensiones sí presentan distribución normal.')
+      + ' Por ello, en cada hipótesis se aplica la prueba paramétrica r de Pearson cuando ambas series son normales y la prueba no paramétrica rho de Spearman en caso contrario.'
+      + (R.N >= 50 ? ' (Con n ≥ 50 también se reporta con frecuencia Kolmogorov-Smirnov; consulta con tu asesor).' : '');
+  const T1 = R.V1total, T2 = R.V2total;
+  R.descText = R.N < 1 ? '' : 'En la tabla 1 se observa que la variable ' + T1.name + ' obtuvo una media de ' + fmtNum(T1.mean, 2, st) + ' (DE = ' + fmtNum(T1.sd, 2, st)
+    + '; mín. = ' + fmtNum(T1.min, null, st) + ', máx. = ' + fmtNum(T1.max, null, st) + '), mientras que la variable ' + T2.name + ' obtuvo una media de ' + fmtNum(T2.mean, 2, st)
+    + ' (DE = ' + fmtNum(T2.sd, 2, st) + '; mín. = ' + fmtNum(T2.min, null, st) + ', máx. = ' + fmtNum(T2.max, null, st) + '), en una muestra de ' + R.N + ' participantes.';
+  R.reliabilityText = R.N < 3 ? 'Registra al menos 3 casos para estimar la confiabilidad.'
+    : 'La confiabilidad de los instrumentos se estimó mediante el coeficiente ' + T1.coef + ' para la variable ' + T1.name + ' y ' + T2.coef + ' para la variable ' + T2.name
+      + '. El instrumento de ' + T1.name + ' (' + T1.k + ' ítems) obtuvo un valor de ' + fmtNum(T1.alpha, 3, st) + ', considerado ' + (T1.alphaInterp || '').toLowerCase()
+      + ', y el de ' + T2.name + ' (' + T2.k + ' ítems) obtuvo ' + fmtNum(T2.alpha, 3, st) + ', considerado ' + (T2.alphaInterp || '').toLowerCase()
+      + ', según los criterios de George y Mallery (2003).'
+      + ((T1.alpha >= 0.7 && T2.alpha >= 0.7) ? ' Por tanto, ambos instrumentos presentan una confiabilidad adecuada para su aplicación.'
+        : ' Se recomienda revisar los ítems con baja correlación elemento-total antes de la aplicación definitiva.');
+
+  // --- Diseño: títulos, problemas, objetivos ---
+  const n1 = V1.name, n2 = V2.name;
+  const tail = ' en ' + pob + ' de ' + amb + ', ' + lug + ', ' + anio;
+  const titleOpts = [
+    { est: n1 + ' y ' + n2, t: n1 + ' y ' + n2 + tail, obs: 'El más usado en tesis correlacionales (el más corto y seguro).' },
+    { est: n1 + ' y su relación con ' + n2, t: n1 + ' y su relación con ' + n2 + tail, obs: 'Explicita la relación sin insinuar causa.' },
+    { est: 'Relación entre ' + n1 + ' y ' + n2, t: 'Relación entre ' + n1 + ' y ' + n2 + tail, obs: 'Variante formal, también muy frecuente.' },
+    { est: n1 + ' como factor asociado a ' + n2, t: n1 + ' como factor asociado a ' + n2 + tail, obs: 'Solo si tu diseño plantea una variable como predictora; en correlacional simple puede observarse.' },
+    { est: 'Nivel de ' + n1 + ' y ' + n2, t: 'Nivel de ' + n1 + ' y ' + n2 + tail, obs: 'Úsalo si además tienes objetivos descriptivos de nivel.' }
+  ];
+  titleOpts.forEach(o => {
+    o.words = o.t.trim().split(/\s+/).length;
+    const has = s => o.t.toLowerCase().includes(String(s).toLowerCase());
+    o.check = o.words > 20 ? '⚠ Pasa de 20 palabras' : (!has(pob) || !has(lug) || !has(anio)) ? '⚠ Falta población, lugar o año' : '✔ Correcto';
+  });
+  R.titleOpts = titleOpts;
+  const chosen = titleOpts[Math.min(4, Math.max(0, (+dz.tituloOpcion || 1) - 1))];
+  R.title = chosen.t || cfg.titulo;
+  R.titleCheck = chosen.check === '✔ Correcto' ? '✔ Cumple: variables, población, lugar, año y menos de 20 palabras' : chosen.check;
+  R.descriptivos = dz.descriptivos === 'Sí';
+  R.descProblems = R.descriptivos ? ['¿Cuál es el nivel de ' + n1 + ctx + '?', '¿Cuál es el nivel de ' + n2 + ctx + '?'] : [];
+  R.descObjectives = R.descriptivos ? ['Identificar el nivel de ' + n1 + ctx + '.', 'Identificar el nivel de ' + n2 + ctx + '.'] : [];
+  const nSpec = hyps.length - 1, dimsForHyp = modeA ? nD1 : nD2;
+  R.coherence = {
+    dims: dimsForHyp, nSpec,
+    ok: nSpec > 0 && nSpec === dimsForHyp
+  };
+  R.opDef = vars.map(v => 'Puntaje obtenido del instrumento de ' + v.name + ', conformado por ' + v.k + ' ítems distribuidos en ' + v.dims.length
+    + ' dimensiones, con escala de ' + v.min + ' a ' + v.max + ', cuyos puntajes se clasifican en ' + v.levels + ' niveles según los baremos establecidos.');
+  R.itemsCheck = vars.map(v => v.k > 0 && v.k === +v.nItems ? '✔ Coincide con tu instrumento' : '⚠ Configuraste ' + v.k + ' de ' + (+v.nItems || 0) + ' ítems');
+  return R;
+}
+
+function lowerFirst(s) { return s ? s.charAt(0).toLowerCase() + s.slice(1) : s; }
+function fmtNum(x, dec, st) {
+  if (x == null || !isFinite(x)) return '';
+  let s = dec == null ? String(Math.round(x * 1e6) / 1e6) : x.toFixed(dec);
+  if (s === '-0.000' || s === '-0.00') s = s.slice(1);
+  if (st && st.config && st.config.decimal === ',') s = s.replace('.', ',');
+  return s;
+}
+
+if (typeof module !== 'undefined') module.exports = { Stat, computeStudy, fmtNum };
+
+
+/* ===================== Utilidades ===================== */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const clone = o => JSON.parse(JSON.stringify(o));
+let S = null, R = null;
+const f = (x, d) => fmtNum(x, d, S);
+const pct = x => fmtNum(x * 100, 2, S) + '%';
+
+function toast(msg){
+  const t = $('#toast'); t.textContent = msg; t.hidden = false;
+  clearTimeout(toast._t); toast._t = setTimeout(() => { t.hidden = true; }, 1800);
+}
+function getPath(obj, path){ return path.split('.').reduce((o, k) => o == null ? o : o[k], obj); }
+function setPath(obj, path, val){
+  const ks = path.split('.'); let o = obj;
+  for(let i = 0; i < ks.length - 1; i++){ if(o[ks[i]] == null) o[ks[i]] = /^\d+$/.test(ks[i + 1]) ? [] : {}; o = o[ks[i]]; }
+  o[ks[ks.length - 1]] = val;
+}
+function parseCell(v){
+  if(v == null) return null;
+  const s = String(v).trim().replace(',', '.');
+  if(s === '') return null;
+  const n = Number(s);
+  return isFinite(n) ? n : null;
+}
+function download(name, content, type){
+  const blob = content instanceof Blob ? content : new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+
+/* ===================== Estado ===================== */
+function defaultDesign(){
+  return { poblacion:'', ambito:'', lugar:'', anio:String(new Date().getFullYear()), verbo:'Determinar', descriptivos:'Sí',
+    enfoque:'Cuantitativo', tipo:'Básica', nivel:'Correlacional', diseno:'No experimental de corte transversal',
+    poblacionN:'', muestreo:'No probabilístico por conveniencia', tecnica:'Encuesta', instV1:'Cuestionario', instV2:'Cuestionario',
+    tituloOpcion:1, defConc:['', ''], indicadores:[[], []] };
+}
+function blankState(){
+  return {
+    config:{ titulo:'Título de tu investigación', autor:'Nombre del autor(a)', fuente:'Elaborado por el investigador', decimal:'.',
+      v1:{ name:'Variable 1', min:1, max:5, nItems:18, levels:3, levelNames:['Bajo','Medio','Alto','Muy alto'],
+        dims:[{ name:'Dimensión 1', n:6 }, { name:'Dimensión 2', n:6 }, { name:'Dimensión 3', n:6 }] },
+      v2:{ name:'Variable 2', min:1, max:5, nItems:18, levels:3, levelNames:['Bajo','Medio','Alto','Muy alto'],
+        dims:[{ name:'Dimensión 1', n:6 }, { name:'Dimensión 2', n:6 }, { name:'Dimensión 3', n:6 }] },
+      hypMode:'A' },
+    design: defaultDesign(),
+    data: Array.from({ length:20 }, () => ({ sec:'', v1:[], v2:[] }))
+  };
+}
+function normalizeState(s){
+  const b = blankState();
+  s = s || b;
+  s.config = Object.assign(b.config, s.config || {});
+  ['v1','v2'].forEach(k => {
+    s.config[k] = Object.assign(clone(b.config[k]), s.config[k] || {});
+    const ln = s.config[k].levelNames || [];
+    s.config[k].levelNames = [0,1,2,3].map(i => ln[i] != null ? ln[i] : b.config[k].levelNames[i]);
+    s.config[k].dims = (s.config[k].dims || []).map(d => ({ name:d.name || '', n:+d.n || 0 }));
+  });
+  s.design = Object.assign(defaultDesign(), s.design || {});
+  if(!Array.isArray(s.design.defConc)) s.design.defConc = ['', ''];
+  if(!Array.isArray(s.design.indicadores)) s.design.indicadores = [[], []];
+  s.data = (s.data || []).map(r => ({ sec:r.sec || '', v1:(r.v1 || []).map(parseCell), v2:(r.v2 || []).map(parseCell) }));
+  if(!s.data.length) s.data = b.data;
+  return s;
+}
+
+const DOC_ID = EMBEDDED.docId;
+const LS_KEY = 'estadistica-tesis:' + DOC_ID;
+let saveTimer = null;
+function scheduleSave(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    try{ localStorage.setItem(LS_KEY, JSON.stringify({ savedAt:Date.now(), state:S })); }catch(e){}
+  }, 400);
+}
+
+/* ===================== Navegación ===================== */
+const PANELS = [
+  { group:'Empieza aquí' },
+  { id:'inicio', label:'Inicio', ico:'🏠' },
+  { id:'config', label:'Configuración', ico:'1' },
+  { id:'diseno', label:'Diseño', ico:'✎' },
+  { id:'datos', label:'Base de datos', ico:'2' },
+  { group:'Resultados' },
+  { id:'confiab', label:'Confiabilidad', ico:'α' },
+  { id:'desc', label:'Descriptivos', ico:'x̄' },
+  { id:'niveles', label:'Niveles', ico:'▥' },
+  { id:'dimv1', label:'Dimensiones V1', ico:'▦' },
+  { id:'dimv2', label:'Dimensiones V2', ico:'▦' },
+  { id:'hipo', label:'Hipótesis', ico:'r' },
+  { group:'Anexos' },
+  { id:'matrices', label:'Matrices', ico:'▤' }
+];
+let active = 'inicio';
+const dirty = {};
+function buildNav(){
+  $('#sidenav').innerHTML = PANELS.map(p => p.group
+    ? `<div class="nav-group">${p.group}</div>`
+    : `<button type="button" class="nav-btn" data-nav="${p.id}"><span class="ico">${p.ico}</span>${p.label}</button>`).join('');
+}
+function showPanel(id, anchor){
+  active = id;
+  $$('.panel').forEach(p => p.classList.toggle('active', p.id === 'p-' + id));
+  $$('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.nav === id));
+  const nb = $(`.nav-btn[data-nav="${id}"]`);
+  if(nb && window.innerWidth <= 960) nb.scrollIntoView({ inline:'center', block:'nearest' });
+  if(dirty[id] !== false) renderPanel(id);
+  if(anchor){ const a = document.getElementById(anchor); if(a) a.scrollIntoView({ behavior:'smooth', block:'start' }); }
+  else window.scrollTo({ top:0 });
+  try{ history.replaceState(null, '', '#' + id); }catch(e){}
+}
+function renderPanel(id){
+  ({ inicio:renderInicio, config:renderConfig, diseno:renderDiseno, datos:renderGrid, confiab:renderConfiab,
+     desc:renderDesc, niveles:renderNiveles, dimv1:() => renderDims(1), dimv2:() => renderDims(2),
+     hipo:renderHipo, matrices:renderMatrices })[id]();
+  dirty[id] = false;
+}
+
+/* ===================== Recalcular ===================== */
+let recalcTimer = null;
+function changed(opts = {}){
+  clearTimeout(recalcTimer);
+  recalcTimer = setTimeout(() => {
+    R = computeStudy(S);
+    PANELS.forEach(p => { if(p.id && p.id !== active) dirty[p.id] = true; });
+    if(opts.grid) dirty.datos = true;
+    const out = $('#p-' + active).classList.contains('out');
+    if(out) renderPanel(active);
+    else refreshDerived(active);
+    $('#brandSub').textContent = R.title;
+    scheduleSave();
+  }, opts.now ? 0 : 120);
+}
+function refreshDerived(id){
+  if(id === 'config') refreshConfigDerived();
+  if(id === 'diseno') refreshDisenoDerived();
+  if(id === 'datos') refreshGridDerived();
+}
+
+/* ===================== Copiar a Word ===================== */
+const copyStore = new Map();
+let copySeq = 0;
+function registerCopy(html, text){ const id = 'c' + (++copySeq); copyStore.set(id, { html, text }); return id; }
+async function copyHTML(html, text){
+  try{
+    if(navigator.clipboard && window.ClipboardItem){
+      await navigator.clipboard.write([new ClipboardItem({
+        'text/html': new Blob([html], { type:'text/html' }), 'text/plain': new Blob([text || ''], { type:'text/plain' }) })]);
+      toast('✔ Copiado. Pégalo en Word'); return;
+    }
+  }catch(e){}
+  const div = document.createElement('div');
+  div.contentEditable = 'true'; div.innerHTML = html;
+  Object.assign(div.style, { position:'fixed', left:'-9999px', top:'0' });
+  document.body.appendChild(div);
+  const range = document.createRange(); range.selectNodeContents(div);
+  const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range);
+  try{ document.execCommand('copy'); toast('✔ Copiado. Pégalo en Word'); }catch(e){ toast('No se pudo copiar'); }
+  sel.removeAllRanges(); div.remove();
+}
+function copyBtns(id, extra = ''){
+  return `<div class="copy-row"><button type="button" class="btn small" data-copy="${id}">📋 Copiar</button>${extra}</div>`;
+}
+
+/* ===================== Tablas APA (estilos en línea para Word) ===================== */
+const TF = "font-family:'Times New Roman',Times,serif;font-size:12pt;color:#000;";
+const B_TOP = 'border-top:1px solid #000;', B_BOT = 'border-bottom:1px solid #000;';
+function apaTable({ num, title, head, rows, note, foot, id, align }){
+  const cols = head[head.length - 1].length;
+  const cellAlign = i => (align && align[i]) || (i === 0 ? 'left' : 'center');
+  let h = `<table style="${TF}border-collapse:collapse;width:100%;margin:0">`;
+  head.forEach((hr, ri) => {
+    h += '<tr>' + hr.map(c => {
+      const o = typeof c === 'object' && c ? c : { t:c };
+      const st = `${TF}font-weight:normal;padding:4px 8px;text-align:${o.align || 'center'};${ri === 0 ? B_TOP : ''}${ri === head.length - 1 ? B_BOT : ''}${o.under ? B_BOT : ''}`;
+      return `<th ${o.cs ? `colspan="${o.cs}"` : ''} ${o.rs ? `rowspan="${o.rs}"` : ''} style="${st}">${esc(o.t)}</th>`;
+    }).join('') + '</tr>';
+  });
+  rows.forEach((r, ri) => {
+    h += '<tr>' + r.map((c, ci) => {
+      const o = typeof c === 'object' && c ? c : { t:c };
+      const st = `${TF}padding:4px 8px;text-align:${o.align || cellAlign(ci)};${ri === rows.length - 1 ? B_BOT : ''}${o.bold ? 'font-weight:bold;' : ''}${o.red ? 'color:#c0392b;font-weight:bold;' : ''}`;
+      return `<td ${o.cs ? `colspan="${o.cs}"` : ''} ${o.rs ? `rowspan="${o.rs}"` : ''} style="${st}">${esc(o.t)}</td>`;
+    }).join('') + '</tr>';
+  });
+  h += '</table>';
+  const top = `<p style="${TF}font-weight:bold;margin:0">${esc(num)}</p><p style="${TF}font-style:italic;margin:2px 0 8px">${esc(title)}</p>`;
+  const bottom = (note ? `<p style="${TF}font-size:11pt;margin:6px 0 0">${esc(note)}</p>` : '') + (foot ? `<p style="${TF}font-size:10pt;margin:2px 0 0">${esc(foot)}</p>` : '');
+  const full = top + h + bottom;
+  const text = [num, title].concat(head.map(r => r.map(c => (c && c.t) != null ? c.t : c).join('\t')), rows.map(r => r.map(c => (c && c.t) != null ? c.t : c).join('\t')), note ? [note] : []).join('\n');
+  const cid = registerCopy(full, text);
+  return `<div class="tbl-blk" ${id ? `id="${id}"` : ''}><div class="blk-head"><span class="blk-tag">${esc(num)}</span>${copyBtns(cid)}</div><div class="scroll-x">${full}</div></div>`;
+}
+function descBlock(text, label = 'Descripción:'){
+  if(!text) return '';
+  const cid = registerCopy(`<p style="${TF}line-height:1.5;text-align:justify">${esc(text)}</p>`, text);
+  return `<div class="blk-head" style="margin:14px 0 0"><span class="desc-label" style="font-family:'Times New Roman',serif;color:#111;font-size:15px;letter-spacing:0;text-transform:none">${esc(label)}</span>${copyBtns(cid)}</div><p class="desc-text">${esc(text)}</p>`;
+}
+
+/* ===================== Figura: barras de niveles (SVG) ===================== */
+function barSVG(b){
+  const W = 560, H = 320, m = { t:34, r:18, b:52, l:54 };
+  const pw = W - m.l - m.r, ph = H - m.t - m.b, n = b.levelNames.length;
+  const maxP = Math.max(0, ...b.pcts) * 100;
+  const top = Math.min(100, Math.max(10, Math.ceil(maxP / 10) * 10 + (maxP % 10 === 0 && maxP < 100 ? 10 : 0)));
+  const step = top <= 50 ? 10 : 20;
+  const font = "font-family=\"Times New Roman, Times, serif\"";
+  let s = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Figura ${b.fig}: ${esc(b.isTotal ? 'Nivel de ' + b.name : 'Nivel de la dimensión ' + b.name)}">`;
+  s += `<rect x="0" y="0" width="${W}" height="${H}" fill="#ffffff"/>`;
+  for(let v = 0; v <= top; v += step){
+    const y = m.t + ph - ph * v / top;
+    s += `<line x1="${m.l}" x2="${W - m.r}" y1="${y}" y2="${y}" stroke="${v === 0 ? '#555' : '#e3e6ee'}" stroke-width="1"/>`;
+    s += `<text x="${m.l - 8}" y="${y + 4}" text-anchor="end" font-size="13" fill="#444" ${font}>${v}%</text>`;
+  }
+  const slot = pw / n, bw = Math.min(78, slot * 0.56);
+  b.pcts.forEach((p, i) => {
+    const hgt = ph * (p * 100) / top, x = m.l + slot * i + (slot - bw) / 2, y = m.t + ph - hgt, r = Math.min(4, hgt);
+    const d = hgt <= 0 ? '' : `M${x},${m.t + ph} L${x},${y + r} Q${x},${y} ${x + r},${y} L${x + bw - r},${y} Q${x + bw},${y} ${x + bw},${y + r} L${x + bw},${m.t + ph} Z`;
+    if(d) s += `<path class="bar" d="${d}" fill="#2f6fed" data-tip="${esc(b.levelNames[i])}: ${b.counts[i]} (${esc(pct(p))})"/>`;
+    s += `<text x="${x + bw / 2}" y="${y - 7}" text-anchor="middle" font-size="14" fill="#111" ${font}>${esc(pct(p))}</text>`;
+    s += `<text x="${x + bw / 2}" y="${m.t + ph + 22}" text-anchor="middle" font-size="14" fill="#111" ${font}>${esc(b.levelNames[i])}</text>`;
+  });
+  s += `<text x="16" y="${m.t + ph / 2}" transform="rotate(-90 16 ${m.t + ph / 2})" text-anchor="middle" font-size="13" fill="#444" ${font}>Porcentaje</text>`;
+  return s + '</svg>';
+}
+function svgToPngBlob(svg, scale = 2){
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = img.width * scale; c.height = img.height * scale;
+      const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      c.toBlob(b => b ? resolve(b) : reject(new Error('png')), 'image/png');
+    };
+    img.onerror = reject;
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  });
+}
+const figStore = new Map();
+function figureBlock(b){
+  const svg = barSVG(b);
+  const title = b.isTotal ? 'Nivel de ' + b.name : 'Nivel de la dimensión ' + b.name;
+  const fid = 'f' + (++copySeq);
+  figStore.set(fid, { svg, name:'Figura ' + b.fig + ' - ' + title });
+  return `<div class="fig-blk" id="fig-${b.fig}">
+    <div class="blk-head"><span class="blk-tag">Figura ${b.fig}</span>
+      <div class="copy-row"><button type="button" class="btn small" data-figcopy="${fid}">📋 Copiar imagen</button><button type="button" class="btn small" data-figpng="${fid}">⬇️ PNG</button></div></div>
+    <p class="t-num">Figura ${b.fig}</p><p class="t-title">${esc(title)}</p>
+    <div class="fig-wrap">${svg}<div class="tip" hidden></div></div>
+    <p class="t-note">Nota: ${esc(S.config.fuente)}</p>
+  </div>`;
+}
+
+/* ===================== Panel: Inicio ===================== */
+function renderInicio(){
+  const V1 = R.vars[0], V2 = R.vars[1];
+  const T1 = R.V1total, T2 = R.V2total;
+  const hypRows = R.hyps.map(h => [h.code, h.xName + '  ↔  ' + h.yName, h.stat, h.valueTxt, h.p == null ? '' : f(h.p, 3), h.decision]);
+  const idx = [];
+  idx.push(['desc', 't-1', 'Tabla 1 · Estadísticos descriptivos de las variables y dimensiones']);
+  idx.push(['desc', 't-2', 'Tabla 2 · Prueba de normalidad de las variables y dimensiones']);
+  R.blocks.forEach(b => idx.push([b.isTotal ? 'niveles' : (b.var === 1 ? 'dimv1' : 'dimv2'), 't-' + b.table,
+    'Tabla ' + b.table + ' · ' + (b.isTotal ? 'Nivel de ' + b.name : 'Nivel de la dimensión ' + b.name) + '   |   Figura ' + b.fig]));
+  R.hyps.forEach(h => idx.push(['hipo', 't-' + h.table, 'Tabla ' + h.table + ' · Correlación entre ' + h.xName + ' y ' + h.yName]));
+  const pill = (ok, t) => `<span class="pill ${ok ? 'ok' : 'warn'}">${esc(t)}</span>`;
+  $('#p-inicio').innerHTML = `
+    <div class="hero">
+      <div class="kicker">Plantilla automatizada · Capítulo de resultados</div>
+      <h1>${esc(R.title)}</h1>
+      <div class="author">Autor(a): ${esc(S.config.autor)}</div>
+    </div>
+    <div class="steps">
+      <div class="step-card" data-nav="config"><span class="step-n">1</span><b>Configura tu estudio</b><span class="hint">Nombres de variables, dimensiones, ítems, niveles y tipo de hipótesis.</span><br><span class="go">Ir a Configuración ›</span></div>
+      <div class="step-card" data-nav="datos"><span class="step-n">2</span><b>Ingresa tus datos</b><span class="hint">Escribe (o pega desde Excel) las respuestas de cada participante en las celdas amarillas.</span><br><span class="go">Ir a Base de datos ›</span></div>
+      <div class="step-card" data-nav="desc"><span class="step-n">3</span><b>Copia tus resultados</b><span class="hint">Tablas, figuras e interpretaciones listas para pegar en tu tesis.</span><br><span class="go">Ir a Resultados ›</span></div>
+    </div>
+    <div class="card">
+      <h2>Estado de tu estudio</h2>
+      <div class="status-grid">
+        <div class="k">Participantes registrados (N)</div>
+        <div>${R.N} casos válidos ${R.incomplete ? `<span class="pill bad">⚠ ${R.incomplete} caso(s) incompleto(s) excluido(s): revisa las filas en rojo</span>` : ''} ${R.outOfRangeCount ? `<span class="pill warn">⚠ ${R.outOfRangeCount} valor(es) fuera de la escala</span>` : ''}</div>
+        <div class="k">${esc(V1.name)}</div><div>${V1.dims.length} dimensiones · ${pill(R.itemsCheck[0].startsWith('✔'), R.itemsCheck[0])}</div>
+        <div class="k">${esc(V2.name)}</div><div>${V2.dims.length} dimensiones · ${pill(R.itemsCheck[1].startsWith('✔'), R.itemsCheck[1])}</div>
+        <div class="k">Hipótesis específicas</div><div>${R.modeA ? 'Cada dimensión de la Variable 1 con la Variable 2' : 'La Variable 1 con cada dimensión de la Variable 2'}</div>
+        <div class="k">Confiabilidad</div><div>${R.N < 3 ? 'Registra al menos 3 casos' : `${esc(T1.coef)} V1 = ${f(T1.alpha, 3)} (${esc(T1.alphaInterp)}) &nbsp;·&nbsp; ${esc(T2.coef)} V2 = ${f(T2.alpha, 3)} (${esc(T2.alphaInterp)})`}</div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Resumen del contraste de hipótesis</h2>
+      <div class="scroll-x"><table class="ui">
+        <tr><th>Hip.</th><th>Relación analizada</th><th>Estadístico</th><th>Coef.</th><th>Sig.</th><th>Decisión</th></tr>
+        ${hypRows.map(r => `<tr>${r.map((c, i) => `<td class="${i >= 3 ? 'c' : ''}">${i === 5 && c ? `<span class="pill ${c.startsWith('✔') ? 'ok' : 'bad'}">${esc(c)}</span>` : esc(c)}</td>`).join('')}</tr>`).join('')}
+      </table></div>
+    </div>
+    <div class="card">
+      <h2>Índice de tablas y figuras <span class="hint" style="font-weight:400">(clic para ir)</span></h2>
+      <div class="idx-list">${idx.map(([p, a, t]) => `<button type="button" data-nav="${p}" data-anchor="${a}">› ${esc(t)}</button>`).join('')}</div>
+    </div>
+    <div class="card">
+      <h2>Leyenda</h2>
+      <div class="legend"><span><span class="sw"></span>Celda amarilla = aquí escribes tú</span><span><span class="sw calc"></span>Celda gris = automática</span></div>
+      <p class="hint" style="margin:10px 0 0">Todo se recalcula al instante. La normalidad se evalúa con Shapiro-Wilk (algoritmo de Royston, igual que SPSS) y el coeficiente se elige solo: r de Pearson si ambas series son normales, rho de Spearman si no. Tus cambios se guardan automáticamente en este navegador; usa «💾 Guardar HTML» para llevarte el archivo con tus datos dentro.</p>
+    </div>`;
+}
+
+/* ===================== Panel: Configuración ===================== */
+function inText(path, cls = ''){ return `<input class="in ${cls}" data-bind="${path}" value="${esc(getPath(S, path))}">`; }
+function inNum(path, extra = ''){ return `<input class="in num" inputmode="decimal" data-bind="${path}" data-type="num" ${extra} value="${esc(getPath(S, path))}">`; }
+function sel(path, opts, extra = ''){
+  const v = String(getPath(S, path));
+  return `<select class="in" data-bind="${path}" ${extra}>${opts.map(o => `<option ${String(o) === v ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>`;
+}
+function varCard(vi){
+  const k = 'v' + vi, v = S.config[k], step = vi === 1 ? 2 : 4;
+  return `<div class="card"><h2><span class="step-n">${step}</span> Variable ${vi}</h2>
+    <div class="grid-form">
+      <label>Nombre de la Variable ${vi}</label>${inText('config.' + k + '.name')}
+      <div class="hint field-note">Escríbelo tal como irá en los títulos de tablas (ej.: «Desempeño docente»).</div>
+      <label>Escala de respuesta de cada ítem</label>
+      <div class="inline">mín. ${inNum('config.' + k + '.min', 'data-grid="1"')} hasta máx. ${inNum('config.' + k + '.max', 'data-grid="1"')}</div>
+      <div class="hint field-note">Likert 1 a 5 → 1 y 5 · Prueba correcto/incorrecto → 0 y 1 (se reporta KR-20) · Escala 1 a 3 → 1 y 3.</div>
+      <label>¿Cuántas preguntas (ítems) tiene tu instrumento?</label>${inNum('config.' + k + '.nItems')}
+    </div>
+    <div class="scroll-x" style="margin-top:14px"><table class="ui">
+      <tr><th style="width:40px">N.°</th><th>Nombre de la dimensión / capacidad</th><th style="width:110px">N.° de ítems</th><th>Desde</th><th>Hasta</th><th>Rango</th><th></th></tr>
+      ${v.dims.map((d, i) => `<tr>
+        <td class="c">${i + 1}</td>
+        <td>${inText('config.' + k + '.dims.' + i + '.name')}</td>
+        <td>${inNum('config.' + k + '.dims.' + i + '.n', 'data-grid="1"')}</td>
+        <td class="c" data-d="${k}-from-${i}"></td><td class="c" data-d="${k}-to-${i}"></td><td class="c" data-d="${k}-rng-${i}"></td>
+        <td><button type="button" class="btn small danger" data-act="delDim" data-v="${k}" data-i="${i}" title="Quitar dimensión">✕</button></td></tr>`).join('')}
+      <tr><td></td><td><b>Total de ítems configurados</b></td><td class="c"><b data-d="${k}-total"></b></td><td colspan="4" data-d="${k}-check"></td></tr>
+    </table></div>
+    ${v.dims.length < 8 ? `<button type="button" class="btn small" style="margin-top:10px" data-act="addDim" data-v="${k}">+ Agregar dimensión</button>` : ''}
+  </div>
+  <div class="card"><h2><span class="step-n">${step + 1}</span> Niveles (baremos) de la Variable ${vi}</h2>
+    <div class="grid-form">
+      <label>¿Cuántos niveles usarás?</label>${sel('config.' + k + '.levels', [3, 4], 'data-rerender="1" data-type="num" style="width:90px"')}
+      <label>Nombre de cada nivel (de menor a mayor)</label>
+      <div class="inline">${[0, 1, 2, 3].map(i => `<input class="in" style="width:120px" data-bind="config.${k}.levelNames.${i}" value="${esc(v.levelNames[i])}" ${i === 3 && +v.levels === 3 ? 'disabled' : ''}>`).join('')}</div>
+      <div class="hint field-note">3 niveles (ej.: Bajo, Medio, Alto) o 4 (ej.: Inicio, Proceso, Logro esperado, Logro destacado). Los rangos se calculan en partes iguales.</div>
+    </div>
+  </div>`;
+}
+function renderConfig(){
+  $('#p-config').innerHTML = `
+    <div class="sheet-head"><h1>Configuración del estudio</h1><p>Completa solo las celdas amarillas, en orden (Paso 1 → Paso 6). Todo se ajusta automáticamente.</p></div>
+    <div class="card"><h2><span class="step-n">1</span> Datos del estudio</h2>
+      <div class="grid-form">
+        <label>Autor(a)</label>${inText('config.autor')}
+        <label>Texto de la fuente</label>${inText('config.fuente')}
+        <div class="hint field-note">Aparece debajo de cada tabla y figura. Ej.: «Elaborado por la investigadora».</div>
+        <label>Separador decimal en tablas</label>${sel('config.decimal', ['.', ','], 'style="width:90px"')}
+        <div class="hint field-note">El título de la investigación se arma en la hoja «Diseño».</div>
+      </div>
+    </div>
+    ${varCard(1)}${varCard(2)}
+    <div class="card"><h2><span class="step-n">6</span> Hipótesis específicas</h2>
+      <div class="grid-form">
+        <label>¿Qué se correlaciona en tus hipótesis específicas?</label>
+        <select class="in" data-bind="config.hypMode">
+          <option value="A" ${S.config.hypMode !== 'B' ? 'selected' : ''}>Cada dimensión de la Variable 1 con la Variable 2</option>
+          <option value="B" ${S.config.hypMode === 'B' ? 'selected' : ''}>La Variable 1 con cada dimensión de la Variable 2</option>
+        </select>
+        <div class="hint field-note">Revisa tu matriz de consistencia. La hipótesis general siempre es: Variable 1 con Variable 2.</div>
+      </div>
+    </div>
+    <div class="card"><h2>Baremos generados automáticamente</h2>
+      <p class="hint" style="margin-top:-6px">Rango de puntajes por nivel. Puedes copiarlos a tu capítulo de metodología.</p>
+      <div data-d="baremos"></div>
+    </div>`;
+  refreshConfigDerived();
+}
+function refreshConfigDerived(){
+  const box = $('#p-config');
+  R.vars.forEach(v => {
+    const k = 'v' + v.idx, raw = S.config[k].dims;
+    let from = 1;
+    raw.forEach((d, i) => {
+      const n = Math.max(0, Math.floor(+d.n || 0));
+      const to = from + n - 1;
+      const set = (s, t) => { const e = box.querySelector(`[data-d="${k}-${s}-${i}"]`); if(e) e.textContent = t; };
+      set('from', n ? from : '—'); set('to', n ? to : '—'); set('rng', n ? `${v.prefix}${from} a ${v.prefix}${to}` : '—');
+      from += n;
+    });
+    const t = box.querySelector(`[data-d="${k}-total"]`); if(t) t.textContent = v.k;
+    const c = box.querySelector(`[data-d="${k}-check"]`);
+    if(c){ const ok = R.itemsCheck[v.idx - 1].startsWith('✔'); c.innerHTML = `<span class="pill ${ok ? 'ok' : 'warn'}">${esc(R.itemsCheck[v.idx - 1])}</span>`; }
+  });
+  const bar = box.querySelector('[data-d="baremos"]');
+  if(bar){
+    bar.innerHTML = R.vars.map(v => {
+      const bs = R.blocks.filter(b => b.var === v.idx);
+      return `<h3 style="font-size:14px;color:var(--navy);margin:12px 0 6px">${esc(v.name)}</h3><div class="scroll-x"><table class="ui">
+        <tr><th>Variable / dimensión</th><th>Puntaje mín.</th><th>Puntaje máx.</th>${v.levelNames.slice(0, v.levels).map(n => `<th>${esc(n)}</th>`).join('')}</tr>
+        ${bs.map(b => `<tr><td>${esc(b.isTotal ? 'V' + v.idx + ' · ' + b.name : 'D' + b.dimIndex + ' · ' + b.name)}</td><td class="c">${b.k * v.min}</td><td class="c">${b.k * v.max}</td>${b.baremo.map(x => `<td class="c">${esc(x.label)}</td>`).join('')}</tr>`).join('')}
+      </table></div>`;
+    }).join('');
+  }
+}
+
+/* ===================== Panel: Diseño ===================== */
+function renderDiseno(){
+  $('#p-diseno').innerHTML = `
+    <div class="sheet-head"><h1>Diseño de la investigación</h1><p>Escribe las piezas una sola vez: el título, las preguntas, los objetivos y las hipótesis se arman solos.</p></div>
+    <div class="card"><h2><span class="step-n">A</span> Datos del estudio</h2>
+      <div class="grid-form">
+        <label>Población / unidad de estudio</label>${inText('design.poblacion')}
+        <div class="hint field-note">Sin mayúscula inicial. Ej.: «niños de 4 años», «docentes de secundaria».</div>
+        <label>Ámbito o institución</label>${inText('design.ambito')}
+        <div class="hint field-note">Anonimiza si no tienes autorización para nombrarla.</div>
+        <label>Lugar</label>${inText('design.lugar')}
+        <label>Año del estudio</label>${inText('design.anio')}
+        <label>Verbo del objetivo general</label>${sel('design.verbo', ['Determinar', 'Establecer', 'Analizar', 'Identificar'])}
+        <label>¿Incluir objetivos descriptivos de nivel?</label>${sel('design.descriptivos', ['Sí', 'No'])}
+      </div>
+    </div>
+    <div class="card"><h2><span class="step-n">B</span> Metodología (para la matriz de consistencia)</h2>
+      <div class="grid-form">
+        <label>Enfoque</label>${sel('design.enfoque', ['Cuantitativo', 'Cualitativo', 'Mixto'])}
+        <div class="hint field-note">Los estudios correlacionales suelen tener enfoque cuantitativo.</div>
+        <label>Tipo de investigación</label>${sel('design.tipo', ['Básica', 'Aplicada'])}
+        <label>Nivel o alcance</label>${sel('design.nivel', ['Correlacional', 'Descriptivo-correlacional', 'Descriptivo'])}
+        <label>Diseño</label>${sel('design.diseno', ['No experimental de corte transversal', 'No experimental longitudinal'])}
+        <label>Población (N.°)</label>${inText('design.poblacionN')}
+        <label>Muestreo</label>${sel('design.muestreo', ['No probabilístico por conveniencia', 'Probabilístico aleatorio simple', 'Censal'])}
+        <label>Técnica</label>${inText('design.tecnica')}
+        <label>Instrumento de la Variable 1</label>${inText('design.instV1')}
+        <label>Instrumento de la Variable 2</label>${inText('design.instV2')}
+        <label>Muestra (se toma de tus datos)</label><div class="calc-box" data-d="muestra"></div>
+      </div>
+    </div>
+    <div class="card"><h2><span class="step-n">C</span> Opciones de título <span class="hint" style="font-weight:400">(elige una)</span></h2><div data-d="titles"></div></div>
+    <div class="card"><h2><span class="step-n">D</span> Formulación del problema</h2><div data-d="problems"></div></div>
+    <div class="card"><h2><span class="step-n">E</span> Objetivos</h2><div data-d="objectives"></div></div>
+    <div class="card"><h2><span class="step-n">F</span> Hipótesis</h2><div data-d="hyps"></div></div>
+    <div class="card"><h2>Revisión de coherencia <span class="hint" style="font-weight:400">(lo que más observa el jurado)</span></h2><div data-d="coh"></div></div>`;
+  refreshDisenoDerived();
+}
+function textRows(rows){
+  return `<table class="ui">${rows.map(([k, t]) => `<tr><td style="width:190px;font-weight:600;color:var(--navy-2)">${esc(k)}</td><td>${esc(t)}</td><td style="width:60px">${t ? `<button type="button" class="btn small" data-copy="${registerCopy(`<p style="${TF}">${esc(t)}</p>`, t)}">📋</button>` : ''}</td></tr>`).join('')}</table>`;
+}
+function refreshDisenoDerived(){
+  const box = $('#p-diseno'); if(!box.innerHTML) return;
+  const d = sel => box.querySelector(`[data-d="${sel}"]`);
+  d('muestra').textContent = R.N + ' participantes';
+  const cur = +S.design.tituloOpcion || 1;
+  d('titles').innerHTML = `<div class="scroll-x"><table class="ui">
+    <tr><th></th><th>Estructura</th><th>Título generado</th><th>Palabras</th><th>Revisión</th></tr>
+    ${R.titleOpts.map((o, i) => `<tr><td><input type="radio" name="titopt" data-bind="design.tituloOpcion" data-type="num" value="${i + 1}" ${cur === i + 1 ? 'checked' : ''}></td>
+      <td>${esc(o.est)}<div class="hint">${esc(o.obs)}</div></td><td>${esc(o.t)}</td><td class="c">${o.words}</td>
+      <td><span class="pill ${o.check.startsWith('✔') ? 'ok' : 'warn'}">${esc(o.check)}</span></td></tr>`).join('')}
+  </table></div><p class="hint" style="margin:10px 0 0"><b>Título elegido:</b> ${esc(R.title)}</p>`;
+  const H = R.hyps;
+  d('problems').innerHTML = textRows([['Problema general', H[0].question], ...H.slice(1).map((h, i) => ['Problema específico ' + (i + 1), h.question]),
+    ...R.descProblems.map((t, i) => ['Problema descriptivo ' + (i + 1), t])]);
+  d('objectives').innerHTML = textRows([['Objetivo general', H[0].objective], ...H.slice(1).map((h, i) => ['Objetivo específico ' + (i + 1), h.objective]),
+    ...R.descObjectives.map((t, i) => ['Objetivo descriptivo ' + (i + 1), t])]);
+  d('hyps').innerHTML = textRows([['Hipótesis general (H1)', H[0].H1], ['Hipótesis nula (H0)', H[0].H0], ...H.slice(1).map((h, i) => ['H específica ' + (i + 1) + ' (H1)', h.H1])]);
+  const c = R.coherence;
+  d('coh').innerHTML = `<div class="status-grid">
+    <div class="k">Dimensiones configuradas para las hipótesis</div><div>${c.dims}</div>
+    <div class="k">Problemas / objetivos / hipótesis específicos</div><div>${c.nSpec} / ${c.nSpec} / ${c.nSpec}</div>
+    <div class="k">¿Coinciden entre sí?</div><div><span class="pill ${c.ok ? 'ok' : 'warn'}">${c.ok ? '✔ Sí: cada dimensión tiene su problema, objetivo e hipótesis' : '⚠ Revisa tus dimensiones en Configuración'}</span></div>
+    <div class="k">Título elegido</div><div><span class="pill ${R.titleCheck.startsWith('✔') ? 'ok' : 'warn'}">${esc(R.titleCheck)}</span></div>
+  </div>`;
+}
+
+/* ===================== Panel: Base de datos ===================== */
+function gridCols(){
+  const [V1, V2] = R.vars, cols = [{ t:'sec' }];
+  for(let i = 0; i < V1.k; i++) cols.push({ t:'v1', i });
+  for(let i = 0; i < V2.k; i++) cols.push({ t:'v2', i });
+  return cols;
+}
+function renderGrid(){
+  const [V1, V2] = R.vars, cols = gridCols();
+  const cellVal = (row, c) => { const v = c.t === 'sec' ? row.sec : row[c.t][c.i]; return v == null ? '' : String(v).replace('.', S.config.decimal); };
+  const dimHead = v => v.dims.map((d, i) => `<th colspan="${d.n}" class="grp${v.idx}" title="${esc(d.name)}">D${i + 1}</th>`).join('');
+  const itemHead = v => Array.from({ length:v.k }, (_, i) => `<th class="grp${v.idx}">${v.prefix}${i + 1}</th>`).join('');
+  const body = S.data.map((row, ri) => `<tr data-row="${ri}">
+      <td class="rn stick1">${ri + 1}</td>
+      ${cols.map((c, ci) => `<td class="${ci === 0 ? 'stick2' : ''}"><input class="gc ${ci === 0 ? 'sec' : ''}" ${ci ? 'inputmode="decimal"' : ''} data-r="${ri}" data-c="${ci}" value="${esc(cellVal(row, c))}"></td>`).join('')}
+      <td class="calc" data-calc="t1"></td><td class="calc" data-calc="l1"></td><td class="calc" data-calc="t2"></td><td class="calc" data-calc="l2"></td>
+    </tr>`).join('');
+  $('#p-datos').innerHTML = `
+    <div class="sheet-head"><h1>Base de datos</h1><p>Escribe las respuestas de cada participante en las celdas amarillas. También puedes <b>copiar un bloque desde Excel</b> y pegarlo en la primera celda (se reparte solo en filas y columnas).</p></div>
+    <div class="card" style="padding:14px 16px">
+      <div class="grid-toolbar">
+        <button type="button" class="btn small" data-act="addRows" data-n="1">+ 1 fila</button>
+        <button type="button" class="btn small" data-act="addRows" data-n="10">+ 10 filas</button>
+        <button type="button" class="btn small" data-act="trimRows">Quitar filas vacías</button>
+        <button type="button" class="btn small danger" data-act="clearData">Borrar todos los datos</button>
+        <span class="dg-status" data-d="dgstatus"></span>
+      </div>
+      <div class="legend" style="margin-bottom:10px"><span><span class="sw"></span>Escribes tú</span><span><span class="sw calc"></span>Automático</span><span><span class="sw bad"></span>Fila incompleta (se excluye)</span><span><span class="sw warn"></span>Valor fuera de la escala</span></div>
+      <div class="grid-wrap"><table class="dg">
+        <thead>
+          <tr><th rowspan="3" class="stick1">N°</th><th rowspan="3" class="stick2">Sección</th>
+            <th colspan="${Math.max(V1.k, 1)}" class="grp1">Ítems de la Variable 1: ${esc(V1.name)} (${V1.min} a ${V1.max})</th>
+            <th colspan="${Math.max(V2.k, 1)}" class="grp2">Ítems de la Variable 2: ${esc(V2.name)} (${V2.min} a ${V2.max})</th>
+            <th colspan="4" class="grpc">Resultado (automático)</th></tr>
+          <tr>${dimHead(V1)}${dimHead(V2)}<th rowspan="2" class="grpc">Total V1</th><th rowspan="2" class="grpc">Nivel V1</th><th rowspan="2" class="grpc">Total V2</th><th rowspan="2" class="grpc">Nivel V2</th></tr>
+          <tr>${itemHead(V1)}${itemHead(V2)}</tr>
+        </thead>
+        <tbody>${body}</tbody>
+      </table></div>
+    </div>`;
+  refreshGridDerived();
+}
+function refreshGridDerived(){
+  const box = $('#p-datos'); if(!box.innerHTML) return;
+  R.rowsInfo.forEach(info => {
+    const tr = box.querySelector(`tr[data-row="${info.ri}"]`); if(!tr) return;
+    tr.classList.toggle('bad', info.hasData && !info.valid);
+    const set = (k, v) => { const e = tr.querySelector(`[data-calc="${k}"]`); if(e) e.textContent = v == null ? '' : v; };
+    set('t1', info.valid ? f(info.t1) : ''); set('l1', info.valid ? info.l1 : '');
+    set('t2', info.valid ? f(info.t2) : ''); set('l2', info.valid ? info.l2 : '');
+    const warnSet = new Set(info.outOfRange);
+    tr.querySelectorAll('input.gc').forEach(inp => {
+      const ci = +inp.dataset.c; if(!ci) return;
+      const k1 = R.vars[0].k;
+      const key = ci <= k1 ? 'v1:' + (ci - 1) : 'v2:' + (ci - 1 - k1);
+      inp.classList.toggle('warn', warnSet.has(key));
+    });
+  });
+  const st = box.querySelector('[data-d="dgstatus"]');
+  if(st) st.innerHTML = `<span class="pill ok">✔ ${R.N} casos válidos</span> ${R.incomplete ? `<span class="pill bad">${R.incomplete} incompleto(s)</span>` : ''} ${R.outOfRangeCount ? `<span class="pill warn">${R.outOfRangeCount} fuera de escala</span>` : ''}`;
+}
+function setGridCell(ri, ci, raw){
+  const cols = gridCols(), c = cols[ci]; if(!c) return;
+  while(S.data.length <= ri) S.data.push({ sec:'', v1:[], v2:[] });
+  const row = S.data[ri];
+  if(c.t === 'sec') row.sec = String(raw || '').trim();
+  else { while(row[c.t].length <= c.i) row[c.t].push(null); row[c.t][c.i] = parseCell(raw); }
+}
+
+/* ===================== Panel: Confiabilidad ===================== */
+function renderConfiab(){
+  const rows = R.blocks.map(b => [b.label, b.coef, String(b.k), f(b.alpha, 3), b.alphaInterp]);
+  const itemTable = (is, vi) => {
+    const v = R.vars[vi];
+    if(!is.items.length) return '';
+    return `<div class="paper"><div class="blk-head"><span class="blk-tag">Estadísticas de total de elemento · Variable ${vi + 1}: ${esc(v.name)}</span></div>
+      <p class="empty-note" style="margin:0 0 10px">Útil para la prueba piloto: ítems con correlación elemento-total corregida &lt; 0,20 (en rojo) conviene revisarlos con tu asesor.</p>
+      ${apaTable({ num:'Tabla __', title:'Estadísticas de total de elemento de ' + v.name,
+        head:[['Ítem', 'Dimensión', 'Media', 'Varianza', 'Correlación elemento-total corregida', 'Alfa si se elimina el ítem']],
+        rows:is.items.map(it => [it.label, it.dim, f(it.mean, 2), f(it.variance, 3), { t:f(it.rit, 3), red:it.rit < 0.2 }, f(it.alphaIfDeleted, 3)]),
+        note:'Fuente: ' + S.config.fuente })}</div>`;
+  };
+  $('#p-confiab').innerHTML = `
+    <div class="sheet-head"><h1>Confiabilidad de los instrumentos</h1><p>Normalmente va en el capítulo de Metodología (numera la tabla según tu capítulo).</p></div>
+    <div class="paper">
+      ${apaTable({ num:'Tabla __', title:'Estadísticas de fiabilidad de los instrumentos', head:[['Variable / Dimensión', 'Coeficiente', 'N de elementos', 'Valor', 'Interpretación']],
+        rows, note:'Fuente: ' + S.config.fuente, id:'t-conf' })}
+      ${descBlock(R.reliabilityText)}
+      <p class="t-note" style="margin-top:14px;color:#555">Escala: ≥ 0,90 excelente · ≥ 0,80 bueno · ≥ 0,70 aceptable · ≥ 0,60 cuestionable · ≥ 0,50 pobre · &lt; 0,50 inaceptable (George y Mallery, 2003). Con escala 0-1 se reporta KR-20 automáticamente.</p>
+    </div>
+    ${itemTable(R.itemStats[0], 0)}${itemTable(R.itemStats[1], 1)}`;
+}
+
+/* ===================== Panel: Descriptivos ===================== */
+function renderDesc(){
+  const rows1 = R.blocks.map(b => [b.label, String(b.N), f(b.min), f(b.max), f(b.mean, 2), f(b.sd, 2)]);
+  const rows2 = R.blocks.map(b => [b.label, f(b.W, 3), b.W == null ? '' : String(b.N), f(b.p, 3)]);
+  $('#p-desc').innerHTML = `
+    <div class="sheet-head"><h1>Descriptivos y prueba de normalidad</h1><p>Tabla 1 · Estadísticos descriptivos &nbsp;|&nbsp; Tabla 2 · Prueba de normalidad.</p></div>
+    <div class="paper">
+      ${apaTable({ num:'Tabla 1', title:'Estadísticos descriptivos de las variables y dimensiones', head:[['Variable / Dimensión', 'N', 'Mínimo', 'Máximo', 'Media', 'Desv. estándar']],
+        rows:rows1, note:'Fuente: ' + S.config.fuente, id:'t-1' })}
+      ${descBlock(R.descText)}
+    </div>
+    <div class="paper">
+      ${apaTable({ num:'Tabla 2', title:'Prueba de normalidad de las variables y dimensiones',
+        head:[[{ t:'Variables', rs:2, align:'left' }, { t:'Shapiro-Wilk', cs:3, under:true }], ['Estadístico', 'gl', 'Sig.']],
+        rows:rows2, note:'Fuente: ' + S.config.fuente, id:'t-2' })}
+      ${descBlock(R.normalityText)}
+    </div>`;
+}
+
+/* ===================== Paneles: Niveles y dimensiones ===================== */
+function levelBlock(b){
+  if(!b.N) return `<div class="paper"><p class="empty-note">Registra datos válidos para ver el nivel de ${esc(b.name)}.</p></div>`;
+  const title = b.isTotal ? 'Nivel de ' + b.name : 'Nivel de la dimensión ' + b.name;
+  const rows = b.levelNames.map((n, i) => [n, String(b.counts[i]), pct(b.pcts[i])]).concat([[{ t:'Total' }, String(b.N), pct(1)]]);
+  return `<div class="paper"><div class="pair">
+      <div>${apaTable({ num:'Tabla ' + b.table, title, head:[['', 'Frecuencia', 'Porcentaje']], rows, note:'Fuente: ' + S.config.fuente, id:'t-' + b.table })}
+        ${descBlock(b.textTable)}</div>
+      <div>${figureBlock(b)}${descBlock(b.textFig)}</div>
+    </div></div>`;
+}
+function renderNiveles(){
+  $('#p-niveles').innerHTML = `
+    <div class="sheet-head"><h1>Nivel general de las variables</h1><p>Frecuencias y porcentajes según los baremos de Configuración.</p></div>
+    <h2 style="color:var(--navy);font-size:16px;margin:6px 0 10px">Variable 1: ${esc(R.V1total.name)}</h2>${levelBlock(R.V1total)}
+    <h2 style="color:var(--navy);font-size:16px;margin:6px 0 10px">Variable 2: ${esc(R.V2total.name)}</h2>${levelBlock(R.V2total)}`;
+}
+function renderDims(vi){
+  const v = R.vars[vi - 1], bs = R.blocks.filter(b => b.var === vi && !b.isTotal);
+  $('#p-dimv' + vi).innerHTML = `
+    <div class="sheet-head"><h1>Nivel por dimensión · Variable ${vi}</h1><p>Dimensiones de la variable: ${esc(v.name)}.</p></div>
+    ${bs.length ? bs.map(levelBlock).join('') : '<div class="paper"><p class="empty-note">No hay dimensiones configuradas para esta variable.</p></div>'}`;
+}
+
+/* ===================== Panel: Hipótesis ===================== */
+function renderHipo(){
+  const scale = [['1,00', 'Perfecta'], ['0,90 – 0,99', 'Muy fuerte'], ['0,75 – 0,89', 'Considerable'], ['0,50 – 0,74', 'Media'], ['0,25 – 0,49', 'Débil'], ['0,10 – 0,24', 'Muy débil'], ['0,00 – 0,09', 'Nula']];
+  const blocks = R.hyps.map((h, i) => {
+    const head = i === 0 ? 'En cuanto al objetivo general:' : 'En cuanto al objetivo específico ' + i + ':';
+    const tbl = h.r == null ? '' : apaTable({ num:'Tabla ' + h.table, title:'Correlación entre ' + h.xName + ' y ' + h.yName,
+      head:[['', '', '', h.yName]],
+      rows:[[{ t:h.stat, rs:3, align:'left' }, { t:h.xName, rs:3, align:'left' }, { t:'Coeficiente de correlación', align:'left' }, h.valueTxt],
+            [{ t:'Sig. (bilateral)', align:'left' }, f(h.p, 3)], [{ t:'N', align:'left' }, String(h.N)]],
+      note:'Fuente: ' + S.config.fuente, foot:'**. La correlación es significativa en el nivel 0,01 (bilateral).  *. La correlación es significativa en el nivel 0,05 (bilateral).', id:'t-' + h.table });
+    return `<div class="paper">
+      <p style="font-weight:bold;margin:0 0 6px">${esc(head)}</p>
+      <p style="margin:0 0 2px">H1: ${esc(h.H1)}</p><p style="margin:0 0 14px">H0: ${esc(h.H0)}</p>
+      ${tbl}${descBlock(h.description)}
+      ${h.conclusion ? `<p class="desc-text" style="margin-top:10px"><b>${esc(h.conclusion)}</b></p>` : ''}
+    </div>`;
+  }).join('');
+  $('#p-hipo').innerHTML = `
+    <div class="sheet-head"><h1>Prueba de hipótesis</h1><p>Correlación con selección automática: r de Pearson (ambas normales) o rho de Spearman (al menos una no normal).</p></div>
+    <div class="hyp-top">
+      <div class="card"><h2>Escala de interpretación del coeficiente</h2>
+        <table class="ui"><tr><th>Valor (±)</th><th>Correlación</th></tr>${scale.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>
+        <p class="hint" style="margin:8px 0 0">Nota: adaptado de Hernández et al. (2014). El signo indica el sentido (+ directa, − inversa).</p></div>
+      <div class="card"><h2>Regla de decisión</h2>
+        <p style="margin:0;line-height:1.7">Si Sig. (p) &lt; 0,05 → se rechaza H0 y se acepta H1.<br>Si Sig. (p) ≥ 0,05 → no se rechaza H0.<br>Nivel de significación: α = 5 %.</p></div>
+    </div>
+    ${blocks}`;
+}
+
+/* ===================== Panel: Matrices ===================== */
+function renderMatrices(){
+  const H = R.hyps, cell = t => `<td style="${TF}border:1px solid #000;padding:6px;vertical-align:top;white-space:pre-line">${esc(t)}</td>`;
+  const dz = S.design, V1 = R.vars[0], V2 = R.vars[1];
+  const varsTxt = R.vars.map(v => 'VARIABLE ' + v.idx + ': ' + v.name + '\n' + v.dims.map(d => '   • ' + d.name).join('\n')).join('\n\n');
+  const metTxt = `Enfoque: ${dz.enfoque}\nTipo: ${dz.tipo}\nNivel: ${dz.nivel}\nDiseño: ${dz.diseno}\n\nPoblación: ${dz.poblacionN}\nMuestra: ${R.N}\nMuestreo: ${dz.muestreo}\n\nTécnica: ${dz.tecnica}\nInstrumentos:\n   • ${dz.instV1} de ${V1.name}\n   • ${dz.instV2} de ${V2.name}\n\nEstadística: Shapiro-Wilk para normalidad; r de Pearson o rho de Spearman según corresponda.`;
+  const nRows = H.length + (R.descriptivos ? 1 : 0);
+  let rowsHtml = `<tr>${cell('PROBLEMA GENERAL\n' + H[0].question)}${cell('OBJETIVO GENERAL\n' + H[0].objective)}${cell('HIPÓTESIS GENERAL\n' + H[0].H1 + '\n' + H[0].H0)}<td rowspan="${nRows}" style="${TF}border:1px solid #000;padding:6px;vertical-align:top;white-space:pre-line">${esc(varsTxt)}</td><td rowspan="${nRows}" style="${TF}border:1px solid #000;padding:6px;vertical-align:top;white-space:pre-line">${esc(metTxt)}</td></tr>`;
+  H.slice(1).forEach((h, i) => { rowsHtml += `<tr>${cell('PROBLEMA ESPECÍFICO ' + (i + 1) + '\n' + h.question)}${cell('OBJETIVO ESPECÍFICO ' + (i + 1) + '\n' + h.objective)}${cell('HIPÓTESIS ESPECÍFICA ' + (i + 1) + '\n' + h.H1)}</tr>`; });
+  if(R.descriptivos) rowsHtml += `<tr>${cell('PROBLEMAS DESCRIPTIVOS\n' + R.descProblems.join('\n'))}${cell('OBJETIVOS DESCRIPTIVOS\n' + R.descObjectives.join('\n'))}${cell('')}</tr>`;
+  const th = t => `<th style="${TF}border:1px solid #000;padding:6px;background:#f2f2f2">${t}</th>`;
+  const cons = `<p style="${TF}font-weight:bold;margin:0 0 4px">MATRIZ DE CONSISTENCIA</p><p style="${TF}margin:0 0 8px"><b>Título:</b> ${esc(R.title)}</p>
+    <table style="${TF}border-collapse:collapse;width:100%"><tr>${th('Problemas')}${th('Objetivos')}${th('Hipótesis')}${th('Variables y dimensiones')}${th('Metodología')}</tr>${rowsHtml}</table>`;
+  const consId = registerCopy(cons, '');
+  const opRows = R.vars.map((v, vi) => {
+    const bs = R.blocks.filter(b => b.var === v.idx && !b.isTotal);
+    return bs.map((b, di) => `<tr>
+      ${di === 0 ? `<td rowspan="${bs.length}" style="${TF}border:1px solid #000;padding:6px;vertical-align:top"><b>${esc(v.name)}</b></td>
+        <td rowspan="${bs.length}" style="border:1px solid #000;padding:6px;vertical-align:top"><textarea class="in" rows="6" data-bind="design.defConc.${vi}" placeholder="Escribe aquí la definición conceptual (Autor, año).">${esc(S.design.defConc[vi] || '')}</textarea></td>
+        <td rowspan="${bs.length}" style="${TF}border:1px solid #000;padding:6px;vertical-align:top">${esc(R.opDef[vi])}</td>` : ''}
+      <td style="${TF}border:1px solid #000;padding:6px;vertical-align:top">${esc(b.name)}</td>
+      <td style="border:1px solid #000;padding:6px;vertical-align:top"><textarea class="in" rows="3" data-bind="design.indicadores.${vi}.${di}" placeholder="Indicadores...">${esc((S.design.indicadores[vi] || [])[di] || '')}</textarea></td>
+      <td style="${TF}border:1px solid #000;padding:6px;vertical-align:top;white-space:nowrap">${v.prefix}${b.from} a ${v.prefix}${b.to}</td>
+      <td style="${TF}border:1px solid #000;padding:6px;vertical-align:top">${esc(b.baremo.map(x => x.label).join('  |  '))}</td></tr>`).join('');
+  }).join('');
+  $('#p-matrices').innerHTML = `
+    <div class="sheet-head"><h1>Matrices de la investigación</h1><p>Se arman solas desde Configuración y Diseño. En Word pega en una hoja horizontal.</p></div>
+    <div class="paper"><div class="blk-head"><span class="blk-tag">Matriz de consistencia</span>${copyBtns(consId)}</div><div class="scroll-x">${cons}</div></div>
+    <div class="paper"><div class="blk-head"><span class="blk-tag">Matriz de operacionalización de variables</span><div class="copy-row"><button type="button" class="btn small" data-act="copyOp">📋 Copiar</button></div></div>
+      <p class="empty-note" style="margin:0 0 10px">Escribe tú la definición conceptual con su cita de autor y los indicadores (celdas amarillas). Lo demás se arma solo.</p>
+      <div class="scroll-x"><table id="opTable" style="${TF}border-collapse:collapse;width:100%;min-width:900px">
+        <tr>${th('Variable')}${th('Definición conceptual')}${th('Definición operacional')}${th('Dimensiones')}${th('Indicadores')}${th('Ítems')}${th('Niveles y rangos')}</tr>
+        ${opRows}</table></div></div>`;
+}
+function copyOperacionalizacion(){
+  const t = $('#opTable').cloneNode(true);
+  t.querySelectorAll('textarea').forEach(ta => { const td = ta.parentElement; td.setAttribute('style', TF + 'border:1px solid #000;padding:6px;vertical-align:top;white-space:pre-line'); td.textContent = ta.value; });
+  copyHTML(t.outerHTML, t.innerText);
+}
+
+/* ===================== Importar Plantilla Excel (.xlsx) ===================== */
+async function unzipEntries(buf){
+  const dv = new DataView(buf), u8 = new Uint8Array(buf);
+  let eocd = -1;
+  for(let i = buf.byteLength - 22; i >= Math.max(0, buf.byteLength - 70000); i--){ if(dv.getUint32(i, true) === 0x06054b50){ eocd = i; break; } }
+  if(eocd < 0) throw new Error('No es un archivo .xlsx válido');
+  const count = dv.getUint16(eocd + 10, true);
+  let p = dv.getUint32(eocd + 16, true);
+  const out = {}, dec = new TextDecoder();
+  for(let e = 0; e < count; e++){
+    if(dv.getUint32(p, true) !== 0x02014b50) break;
+    const method = dv.getUint16(p + 10, true), csize = dv.getUint32(p + 20, true);
+    const nlen = dv.getUint16(p + 28, true), xlen = dv.getUint16(p + 30, true), clen = dv.getUint16(p + 32, true);
+    const lho = dv.getUint32(p + 42, true);
+    const name = dec.decode(u8.subarray(p + 46, p + 46 + nlen));
+    out[name] = { method, csize, lho };
+    p += 46 + nlen + xlen + clen;
+  }
+  return { read: async name => {
+    const ent = out[name]; if(!ent) return null;
+    const l = ent.lho, start = l + 30 + dv.getUint16(l + 26, true) + dv.getUint16(l + 28, true);
+    const data = u8.subarray(start, start + ent.csize);
+    if(ent.method === 0) return dec.decode(data);
+    const ds = new DecompressionStream('deflate-raw');
+    const txt = await new Response(new Blob([data]).stream().pipeThrough(ds)).arrayBuffer();
+    return dec.decode(txt);
+  }, names:Object.keys(out) };
+}
+function xmlUnescape(s){ return s.replace(/&(#x?[0-9a-fA-F]+|amp|lt|gt|quot|apos);/g, (m, g) => g === 'amp' ? '&' : g === 'lt' ? '<' : g === 'gt' ? '>' : g === 'quot' ? '"' : g === 'apos' ? "'" : String.fromCodePoint(g[1] === 'x' ? parseInt(g.slice(2), 16) : parseInt(g.slice(1), 10))); }
+async function readXlsx(buf){
+  const z = await unzipEntries(buf);
+  const wb = await z.read('xl/workbook.xml'), rels = await z.read('xl/_rels/workbook.xml.rels');
+  const ssx = await z.read('xl/sharedStrings.xml');
+  const shared = ssx ? Array.from(ssx.matchAll(/<si>([\s\S]*?)<\/si>/g)).map(m => xmlUnescape(Array.from(m[1].matchAll(/<t[^>]*>([\s\S]*?)<\/t>/g)).map(t => t[1]).join(''))) : [];
+  const relMap = {};
+  Array.from(rels.matchAll(/<Relationship\b[^>]*>/g)).forEach(m => { const id = /Id="([^"]+)"/.exec(m[0]), tg = /Target="([^"]+)"/.exec(m[0]); if(id && tg) relMap[id[1]] = tg[1]; });
+  const sheets = {};
+  for(const m of wb.matchAll(/<sheet\b[^>]*>/g)){
+    const name = xmlUnescape(/name="([^"]+)"/.exec(m[0])[1]), rid = /r:id="([^"]+)"/.exec(m[0])[1];
+    let target = relMap[rid]; if(!target) continue;
+    target = target.replace(/^\//, ''); if(!target.startsWith('xl/')) target = 'xl/' + target;
+    const xml = await z.read(target); if(!xml) continue;
+    const cells = {};
+    for(const c of xml.matchAll(/<c\b([^>]*?)(?:\/>|>([\s\S]*?)<\/c>)/g)){
+      const attrs = c[1], inner = c[2] || '';
+      const ref = /r="([A-Z]+\d+)"/.exec(attrs); if(!ref) continue;
+      const t = (/t="([^"]+)"/.exec(attrs) || [])[1];
+      let v = null;
+      if(t === 'inlineStr'){ v = xmlUnescape(Array.from(inner.matchAll(/<t[^>]*>([\s\S]*?)<\/t>/g)).map(x => x[1]).join('')); }
+      else { const vm = /<v>([\s\S]*?)<\/v>/.exec(inner); if(vm){ v = xmlUnescape(vm[1]); if(t === 's') v = shared[+v]; else if(t !== 'str' && t !== 'e' && t !== 'b') v = Number(v); } }
+      if(v !== null && v !== '') cells[ref[1]] = v;
+    }
+    sheets[name] = cells;
+  }
+  return sheets;
+}
+function colName(n){ let s = ''; n++; while(n > 0){ const m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = Math.floor((n - 1) / 26); } return s; }
+function stateFromPlantilla(sh){
+  const C = sh['Configuración'], D = sh['Diseño'] || {}, B = sh['Base de Datos'], M = sh['Matrices'] || {};
+  if(!C || !B) throw new Error('No se encontraron las hojas «Configuración» y «Base de Datos».');
+  const str = v => v == null ? '' : String(v), num = (v, d) => (typeof v === 'number' ? v : (v == null || v === '' ? d : +v));
+  const readVar = (r0) => ({
+    name:str(C['D' + r0]) || 'Variable', min:num(C['D' + (r0 + 1)], 1), max:num(C['F' + (r0 + 1)], 5), nItems:num(C['D' + (r0 + 2)], 0),
+    dims:[0, 1, 2, 3, 4, 5].map(i => ({ name:str(C['C' + (r0 + (r0 === 10 ? 4 : 4) + i)]), n:num(C['D' + (r0 + 4 + i)], 0) })).filter(d => d.n > 0),
+    levels:num(C['D' + (r0 + 13)], 3) === 4 ? 4 : 3,
+    levelNames:['D', 'E', 'F', 'G'].map(c => str(C[c + (r0 + 14)]))
+  });
+  const v1 = readVar(10), v2 = readVar(27);
+  const st = normalizeState({
+    config:{ titulo:str(C.D5), autor:str(C.D6), fuente:str(C.D7) || 'Elaborado por el investigador', decimal:'.', v1, v2,
+      hypMode:str(C.D44).startsWith('Cada') ? 'A' : 'B' },
+    design:{ poblacion:str(D.D5), ambito:str(D.D6), lugar:str(D.D7), anio:str(D.D8), verbo:str(D.D9) || 'Determinar', descriptivos:str(D.D10) || 'Sí',
+      enfoque:str(D.D13) || 'Cuantitativo', tipo:str(D.D14) || 'Básica', nivel:str(D.D15) || 'Correlacional', diseno:str(D.D16) || 'No experimental de corte transversal',
+      poblacionN:str(D.D17), muestreo:str(D.D18) || 'No probabilístico por conveniencia', tecnica:str(D.D19) || 'Encuesta', instV1:str(D.D20) || 'Cuestionario', instV2:str(D.D21) || 'Cuestionario',
+      tituloOpcion:parseInt(str(D.D32).slice(-1), 10) || 1,
+      defConc:[str(M.C22).startsWith('Escribe aquí') ? '' : str(M.C22), str(M.C28).startsWith('Escribe aquí') ? '' : str(M.C28)],
+      indicadores:[[0, 1, 2, 3, 4, 5].map(i => str(M['F' + (22 + i)])), [0, 1, 2, 3, 4, 5].map(i => str(M['F' + (28 + i)]))] },
+    data:[]
+  });
+  const rows = [];
+  for(let r = 4; r <= 103; r++){
+    const sec = str(B['B' + r]);
+    const a = Array.from({ length:24 }, (_, i) => { const v = B[colName(2 + i) + r]; return typeof v === 'number' ? v : parseCell(v); });
+    const b = Array.from({ length:24 }, (_, i) => { const v = B[colName(34 + i) + r]; return typeof v === 'number' ? v : parseCell(v); });
+    rows.push({ sec, v1:a, v2:b, empty:!sec && a.concat(b).every(x => x == null) });
+  }
+  while(rows.length && rows[rows.length - 1].empty) rows.pop();
+  st.data = rows.map(({ sec, v1, v2 }) => ({ sec, v1, v2 }));
+  if(!st.data.length) st.data = blankState().data;
+  return st;
+}
+
+/* ===================== Guardar / importar ===================== */
+function saveHtml(){
+  const payload = JSON.stringify({ docId:DOC_ID, savedAt:Date.now(), state:S }).replace(/<\/script/gi, '<\\/script');
+  const html = '<!DOCTYPE html>\n' + PAGE_SNAPSHOT.replace(/\/\*STATE_START\*\/[\s\S]*?\/\*STATE_END\*\//, () => '/*STATE_START*/const EMBEDDED = ' + payload + ';/*STATE_END*/');
+  const slug = (R.vars[0].name + '-' + R.vars[1].name).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'estudio';
+  download('resultados-' + slug + '.html', html, 'text/html');
+  toast('💾 Archivo HTML descargado con tus datos');
+}
+function loadState(st, msg){
+  S = normalizeState(st);
+  R = computeStudy(S);
+  PANELS.forEach(p => { if(p.id) dirty[p.id] = true; });
+  $('#brandSub').textContent = R.title;
+  renderPanel(active);
+  scheduleSave();
+  if(msg) toast(msg);
+}
+function toCSV(){
+  const [V1, V2] = R.vars;
+  const head = ['N', 'Seccion'].concat(Array.from({ length:V1.k }, (_, i) => V1.prefix + (i + 1)), Array.from({ length:V2.k }, (_, i) => 'V2_' + V2.prefix + (i + 1)), ['Total_V1', 'Nivel_V1', 'Total_V2', 'Nivel_V2']);
+  const q = v => { const s = v == null ? '' : String(v); return /[",;\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  const lines = [head.join(',')];
+  S.data.forEach((r, i) => {
+    const info = R.rowsInfo[i];
+    if(!info.hasData && !r.sec) return;
+    lines.push([i + 1, r.sec].concat(Array.from({ length:V1.k }, (_, j) => r.v1[j]), Array.from({ length:V2.k }, (_, j) => r.v2[j]),
+      info.valid ? [info.t1, info.l1, info.t2, info.l2] : ['', '', '', '']).map(q).join(','));
+  });
+  return '﻿' + lines.join('\r\n');
+}
+function printAll(){
+  ['inicio', 'confiab', 'desc', 'niveles', 'dimv1', 'dimv2', 'hipo'].forEach(id => { if(dirty[id] !== false) renderPanel(id); });
+  document.body.classList.add('print-all');
+  setTimeout(() => { window.print(); document.body.classList.remove('print-all'); }, 150);
+}
+
+/* ===================== Eventos ===================== */
+document.addEventListener('click', async e => {
+  const nav = e.target.closest('[data-nav]');
+  if(nav){ showPanel(nav.dataset.nav, nav.dataset.anchor); $('#menu').hidden = true; return; }
+  const cp = e.target.closest('[data-copy]');
+  if(cp){ const it = copyStore.get(cp.dataset.copy); if(it) copyHTML(it.html, it.text); return; }
+  const fc = e.target.closest('[data-figcopy]'), fp = e.target.closest('[data-figpng]');
+  if(fc || fp){
+    const it = figStore.get((fc || fp).dataset.figcopy || (fp && fp.dataset.figpng));
+    if(!it) return;
+    try{
+      const blob = await svgToPngBlob(it.svg);
+      if(fc && navigator.clipboard && window.ClipboardItem){
+        try{ await navigator.clipboard.write([new ClipboardItem({ 'image/png':blob })]); toast('✔ Imagen copiada. Pégala en Word'); return; }
+        catch(err){ toast('Tu navegador no permite copiar imágenes: se descargará el PNG'); }
+      }
+      download(it.name.replace(/[^\wÁÉÍÓÚáéíóúñÑ -]+/g, '') + '.png', blob);
+    }catch(err){ toast('No se pudo generar la imagen'); }
+    return;
+  }
+  if(e.target.closest('#btnMenu')){ $('#menu').hidden = !$('#menu').hidden; return; }
+  if(!e.target.closest('#menu')) $('#menu').hidden = true;
+  if(e.target.closest('#btnSave')){ saveHtml(); return; }
+  if(e.target.closest('#btnDiscardLocal')){
+    $('#restoreBanner').hidden = true;
+    try{ localStorage.removeItem(LS_KEY); }catch(err){}
+    loadState(EMBEDDED.state, 'Se cargaron los datos del archivo');
+    return;
+  }
+  const act = e.target.closest('[data-act]');
+  if(!act) return;
+  const a = act.dataset.act;
+  $('#menu').hidden = true;
+  if(a === 'addDim'){ const v = S.config[act.dataset.v]; v.dims.push({ name:'Dimensión ' + (v.dims.length + 1), n:1 }); R = computeStudy(S); renderConfig(); changed({ grid:true, now:true }); }
+  if(a === 'delDim'){ const v = S.config[act.dataset.v]; v.dims.splice(+act.dataset.i, 1); R = computeStudy(S); renderConfig(); changed({ grid:true, now:true }); }
+  if(a === 'addRows'){ for(let i = 0; i < +act.dataset.n; i++) S.data.push({ sec:'', v1:[], v2:[] }); R = computeStudy(S); renderGrid(); changed({ now:true }); }
+  if(a === 'trimRows'){ S.data = S.data.filter(r => r.sec || r.v1.concat(r.v2).some(x => x != null)); if(!S.data.length) S.data.push({ sec:'', v1:[], v2:[] }); R = computeStudy(S); renderGrid(); changed({ now:true }); }
+  if(a === 'clearData'){ if(confirm('¿Borrar todas las respuestas de la base de datos? Esta acción no se puede deshacer (salvo que tengas un respaldo).')){ S.data = blankState().data; R = computeStudy(S); renderGrid(); changed({ now:true }); } }
+  if(a === 'copyOp') copyOperacionalizacion();
+  if(a === 'exportJson') download('respaldo-estadistica.json', JSON.stringify(S, null, 1), 'application/json');
+  if(a === 'importJson') $('#fileJson').click();
+  if(a === 'importXlsx') $('#fileXlsx').click();
+  if(a === 'csv') download('base-de-datos.csv', toCSV(), 'text/csv');
+  if(a === 'print') printAll();
+  if(a === 'example'){ if(confirm('¿Reemplazar todo con los datos de ejemplo?')) loadState(clone(EXAMPLE_DATA), 'Datos de ejemplo cargados'); }
+  if(a === 'blank'){ if(confirm('¿Empezar un estudio nuevo en blanco? Se reemplazará lo actual (descarga antes un respaldo si lo necesitas).')) loadState(blankState(), 'Estudio en blanco listo'); }
+});
+
+function onBindInput(t){
+  const path = t.dataset.bind;
+  let v = t.type === 'radio' ? (t.checked ? t.value : null) : t.value;
+  if(v === null) return;
+  if(t.dataset.type === 'num'){ const n = parseCell(v); v = n == null ? (t.tagName === 'SELECT' ? 3 : 0) : n; }
+  setPath(S, path, v);
+  if(t.dataset.rerender){ R = computeStudy(S); renderConfig(); }
+  changed({ grid:!!t.dataset.grid });
+}
+document.addEventListener('input', e => {
+  const t = e.target;
+  if(t.matches('input.gc')){ setGridCell(+t.dataset.r, +t.dataset.c, t.value); changed(); return; }
+  if(t.dataset.bind && t.tagName !== 'SELECT' && t.type !== 'radio') onBindInput(t);
+});
+document.addEventListener('change', e => {
+  const t = e.target;
+  if(t.dataset.bind && (t.tagName === 'SELECT' || t.type === 'radio')) onBindInput(t);
+});
+document.addEventListener('keydown', e => {
+  const t = e.target;
+  if(!t.matches || !t.matches('input.gc')) return;
+  const r = +t.dataset.r, c = +t.dataset.c;
+  let nr = null;
+  if(e.key === 'Enter' || e.key === 'ArrowDown') nr = r + 1;
+  else if(e.key === 'ArrowUp') nr = r - 1;
+  if(nr == null) return;
+  const nx = $(`#p-datos input.gc[data-r="${nr}"][data-c="${c}"]`);
+  if(nx){ e.preventDefault(); nx.focus(); nx.select(); }
+});
+document.addEventListener('paste', e => {
+  const t = e.target;
+  if(!t.matches || !t.matches('input.gc')) return;
+  const text = (e.clipboardData || window.clipboardData).getData('text');
+  if(!/[\t\n]/.test(text.replace(/\r?\n$/, ''))) return;
+  e.preventDefault();
+  const lines = text.replace(/\r/g, '').replace(/\n$/, '').split('\n');
+  const r0 = +t.dataset.r, c0 = +t.dataset.c, ncols = gridCols().length;
+  lines.forEach((line, i) => line.split('\t').forEach((val, j) => { if(c0 + j < ncols) setGridCell(r0 + i, c0 + j, val); }));
+  R = computeStudy(S); renderGrid(); changed({ now:true });
+  toast(`✔ Se pegaron ${lines.length} fila(s)`);
+});
+document.addEventListener('mousemove', e => {
+  const bar = e.target.closest && e.target.closest('.fig-wrap .bar');
+  $$('.fig-wrap .tip').forEach(tp => { if(!bar || !tp.parentElement.contains(bar)) tp.hidden = true; });
+  if(!bar) return;
+  const wrap = bar.closest('.fig-wrap'), tip = wrap.querySelector('.tip'), rc = wrap.getBoundingClientRect();
+  tip.textContent = bar.dataset.tip; tip.hidden = false;
+  tip.style.left = (e.clientX - rc.left) + 'px'; tip.style.top = (e.clientY - rc.top - 6) + 'px';
+});
+$('#fileJson').addEventListener('change', async e => {
+  const file = e.target.files[0]; e.target.value = ''; if(!file) return;
+  try{ loadState(JSON.parse(await file.text()), '✔ Respaldo importado'); }catch(err){ alert('No se pudo leer el respaldo: ' + err.message); }
+});
+$('#fileXlsx').addEventListener('change', async e => {
+  const file = e.target.files[0]; e.target.value = ''; if(!file) return;
+  try{
+    if(typeof DecompressionStream === 'undefined') throw new Error('Tu navegador es muy antiguo para leer .xlsx. Actualízalo o copia y pega los datos.');
+    const st = stateFromPlantilla(await readXlsx(await file.arrayBuffer()));
+    loadState(st, `✔ Plantilla importada: ${st.data.length} filas`);
+    showPanel('inicio');
+  }catch(err){ alert('No se pudo importar el Excel: ' + err.message); }
+});
+window.addEventListener('beforeprint', () => { ['inicio', 'confiab', 'desc', 'niveles', 'dimv1', 'dimv2', 'hipo'].forEach(id => { if(dirty[id] !== false) renderPanel(id); }); });
+
+/* ===================== Inicio ===================== */
+(function init(){
+  let st = EMBEDDED.state, restored = false;
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw){ const loc = JSON.parse(raw); if(loc && loc.state && loc.savedAt > (EMBEDDED.savedAt || 0)){ st = loc.state; restored = true; } }
+  }catch(e){}
+  S = normalizeState(clone(st));
+  R = computeStudy(S);
+  buildNav();
+  $('#brandSub').textContent = R.title;
+  if(restored) $('#restoreBanner').hidden = false;
+  const h = (location.hash || '').slice(1);
+  showPanel(PANELS.some(p => p.id === h) ? h : 'inicio');
+})();
+</script>
+</body>
+</html>

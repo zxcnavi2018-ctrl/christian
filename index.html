@@ -17,7 +17,12 @@
     --shadow: 0 14px 30px rgba(18,34,74,.14);
     --radius: 22px;
   }
-  *{box-sizing:border-box;}
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  button, a, [onclick], .robot-wrap, .home-content, .hint, .session-btn{
+    -webkit-touch-callout:none;
+  }
+  button:focus, a:focus{ outline:none; }
+  button:focus-visible, a:focus-visible{ outline:2px solid var(--blue); outline-offset:2px; }
   html,body{
     margin:0;
     padding:0;
@@ -207,42 +212,60 @@
     display:flex;
     flex-direction:column;
     align-items:center;
-    gap:6px;
+    gap:22px;
     width:100%;
   }
-  .bubble{
+  .menu-bubble{
     position:relative;
     background:var(--card);
     border:2px solid var(--card-border);
     border-radius:22px;
     padding:20px 22px;
     box-shadow:var(--shadow);
-    margin-top:20px;
     width:100%;
     max-width:380px;
     text-align:center;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+    animation:fadeIn .3s ease;
   }
-  .bubble::before{
+  .menu-bubble::after{
     content:"";
     position:absolute;
-    top:-11px;
+    bottom:-11px;
     left:50%;
     transform:translateX(-50%) rotate(45deg);
     width:20px;height:20px;
     background:var(--card);
-    border-left:2px solid var(--card-border);
-    border-top:2px solid var(--card-border);
+    border-right:2px solid var(--card-border);
+    border-bottom:2px solid var(--card-border);
   }
-  .bubble-question{
-    margin:0 0 16px;
-    font-size:clamp(16px,3.4vw,19px);
+  .bubble-text{
+    margin:0;
+    min-height:26px;
+    font-size:clamp(15px,3.2vw,18px);
     font-weight:700;
     color:var(--navy-2);
+    line-height:1.4;
   }
   .bubble-choices{
     display:flex;
     flex-direction:column;
     gap:12px;
+    margin-top:16px;
+    cursor:default;
+  }
+  .typing-dots{ display:inline-flex; gap:5px; align-items:center; padding:6px 0; }
+  .typing-dots span{
+    width:8px; height:8px; border-radius:50%;
+    background:var(--blue);
+    animation:typingPulse 1.2s infinite ease-in-out;
+  }
+  .typing-dots span:nth-child(2){ animation-delay:.2s; }
+  .typing-dots span:nth-child(3){ animation-delay:.4s; }
+  @keyframes typingPulse{
+    0%,60%,100%{ opacity:.3; transform:scale(.7); }
+    30%{ opacity:1; transform:scale(1); }
   }
   .choice-btn{
     display:flex;
@@ -344,6 +367,26 @@
   }
   .session-btn:hover .dot{ background:#fff; color:var(--navy); }
   .session-btn:active{ transform:translateY(-1px) scale(.97); }
+  .add-session-btn{
+    background:transparent;
+    border:2px dashed #b7c6ea;
+    box-shadow:none;
+    color:var(--blue);
+  }
+  .add-session-btn .dot{
+    background:transparent;
+    border:2px dashed var(--blue);
+    color:var(--blue);
+    font-size:20px;
+    font-weight:800;
+  }
+  .add-session-btn:hover{
+    background:#f4f8ff;
+    border-color:var(--blue);
+    transform:translateY(-3px);
+    box-shadow:0 10px 18px rgba(47,111,237,.15);
+  }
+  .add-session-btn:hover .dot{ background:transparent; color:var(--blue); }
 
   /* ---------- SESSION: header (robot + badge + title) ---------- */
   .session-header{
@@ -731,10 +774,9 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l-7 7 7 7"/><path d="M2 12h20"/></svg>
     </button>
     <div class="menu-wrap">
-      <div class="robot-slot robot-slot--menu robot-float" data-robot></div>
-      <div class="bubble">
-        <p class="bubble-question">¿Qué unidad deseas aprender? 🤖</p>
-        <div class="bubble-choices">
+      <div class="menu-bubble" id="menuBubble">
+        <p class="bubble-text" id="menuBubbleText"></p>
+        <div class="bubble-choices" id="menuBubbleChoices" hidden>
           <button class="choice-btn" onclick="goTo('unit7')">
             <span class="choice-num">7</span>
             <span class="choice-text"><b>Unidad 7</b><small>Microorganismos en acción</small></span>
@@ -745,6 +787,7 @@
           </button>
         </div>
       </div>
+      <div class="robot-slot robot-slot--menu robot-float" data-robot></div>
     </div>
   </section>
 
@@ -1226,6 +1269,8 @@
     editUnlockToast.hidden = false;
     setTimeout(() => { editUnlockToast.hidden = true; }, 2200);
     if(lastOpened) renderSession(lastOpened.unitKey, lastOpened.num);
+    buildSessions('unit7');
+    buildSessions('unit8');
   }
 
   document.getElementById('exitEditBtn').addEventListener('click', () => {
@@ -1234,6 +1279,8 @@
     document.body.classList.remove('edit-mode');
     editPanel.hidden = true;
     if(lastOpened) renderSession(lastOpened.unitKey, lastOpened.num);
+    buildSessions('unit7');
+    buildSessions('unit8');
   });
 
   // Secret gesture: tap any robot image 10 times within 4 seconds.
@@ -1303,11 +1350,12 @@
     setTimeout(() => URL.revokeObjectURL(url), 4000);
   });
 
-  // ---------- Build the 8 session buttons for each unit ----------
+  // ---------- Build the session buttons for each unit ----------
   function buildSessions(unitKey){
     const grid = document.getElementById('grid-' + unitKey);
     grid.innerHTML = '';
-    for(let i = 1; i <= 8; i++){
+    const nums = Object.keys(sessionData[unitKey]).map(Number).sort((a, b) => a - b);
+    nums.forEach(i => {
       const btn = document.createElement('div');
       btn.className = 'session-btn';
       const d = sessionData[unitKey][i];
@@ -1317,10 +1365,64 @@
         '<span class="dot">' + i + '</span><span>Sesión ' + i + '</span>';
       btn.onclick = () => openSession(unitKey, i);
       grid.appendChild(btn);
+    });
+    if(editModeOn){
+      const addBtn = document.createElement('div');
+      addBtn.className = 'session-btn add-session-btn';
+      addBtn.innerHTML = '<span class="dot">+</span><span>Añadir sesión</span>';
+      addBtn.onclick = () => addSession(unitKey);
+      grid.appendChild(addBtn);
     }
   }
+
+  function addSession(unitKey){
+    const nums = Object.keys(sessionData[unitKey]).map(Number);
+    const next = nums.length ? Math.max(...nums) + 1 : 1;
+    sessionData[unitKey][next] = blankSession();
+    buildSessions(unitKey);
+  }
+
   buildSessions('unit7');
   buildSessions('unit8');
+
+  // ---------- Menu screen: staged conversational speech bubble ----------
+  let menuStage = 0; // 0 = "...", 1 = greeting, 2 = greeting + unit choices
+  let menuAutoTimer = null;
+  const menuBubbleEl = document.getElementById('menuBubble');
+  const menuBubbleTextEl = document.getElementById('menuBubbleText');
+  const menuBubbleChoicesEl = document.getElementById('menuBubbleChoices');
+
+  function renderMenuBubble(){
+    if(menuStage === 0){
+      menuBubbleTextEl.innerHTML = '<span class="typing-dots"><span></span><span></span><span></span></span>';
+      menuBubbleChoicesEl.hidden = true;
+    } else if(menuStage === 1){
+      menuBubbleTextEl.textContent = '¡Hola, estimado(a) estudiante! ¿Cómo estás? El día de hoy, ¿qué unidad deseas aprender?';
+      menuBubbleChoicesEl.hidden = true;
+    } else {
+      menuBubbleTextEl.textContent = '¡Elige una unidad! 🤖';
+      menuBubbleChoicesEl.hidden = false;
+    }
+  }
+
+  function advanceMenuStage(){
+    if(menuStage >= 2) return;
+    clearTimeout(menuAutoTimer);
+    menuStage++;
+    renderMenuBubble();
+  }
+
+  function resetMenuStage(){
+    menuStage = 0;
+    renderMenuBubble();
+    clearTimeout(menuAutoTimer);
+    menuAutoTimer = setTimeout(() => { if(menuStage === 0) advanceMenuStage(); }, 900);
+  }
+
+  menuBubbleEl.addEventListener('click', advanceMenuStage);
+  document.querySelector('.menu-wrap').addEventListener('click', e => {
+    if(e.target.closest('.robot-wrap')) advanceMenuStage();
+  });
 
   // ---------- Navigation with history stack ----------
   const stack = [];
@@ -1330,6 +1432,7 @@
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('screen-' + id).classList.add('active');
     current = id;
+    if(id === 'menu') resetMenuStage();
   }
 
   function goTo(id){

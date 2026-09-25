@@ -440,6 +440,38 @@
   .flipped-btn.download{ background:linear-gradient(135deg,#f5a623,#f57c23); color:#fff; }
   .flipped-btn:hover{ transform:translateY(-2px); box-shadow:0 8px 16px rgba(150,100,20,.25); }
 
+  .activity-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    flex-wrap:wrap;
+    background:var(--card);
+    border:1px solid var(--card-border);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:22px 24px;
+  }
+  .activity-row-text .activity-tag{ margin-bottom:4px; }
+  .activity-row-text h3{ margin:0; font-size:clamp(17px,3vw,20px); color:var(--navy); }
+  .activity-row-ficha{ display:flex; flex-direction:column; align-items:flex-start; gap:10px; }
+  .ficha-actions{ display:flex; gap:10px; flex-wrap:wrap; }
+  .ficha-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:8px 14px;
+    border-radius:10px;
+    font-weight:700;
+    font-size:13px;
+    text-decoration:none;
+    white-space:nowrap;
+    transition:transform .16s ease, box-shadow .16s ease;
+  }
+  .ficha-btn.view{ background:#f4f8ff; color:var(--blue); border:1px solid var(--card-border); }
+  .ficha-btn.download{ background:linear-gradient(135deg, var(--blue), var(--cyan)); color:#fff; }
+  .ficha-btn:hover{ transform:translateY(-2px); box-shadow:0 8px 16px rgba(47,111,237,.25); }
+
   .activity-card{
     background:var(--card);
     border:1px solid var(--card-border);
@@ -770,117 +802,32 @@
             </div>
           </div>
 
-          <div class="activity-card">
-            <div class="activity-head">
+          <div class="activity-row">
+            <div class="activity-row-text">
               <span class="activity-tag">Actividad 1</span>
               <h3>Analizo y clasifico enfermedades</h3>
+            </div>
+            <div class="activity-row-ficha">
               <span class="ficha-badge">Ficha · Actividad 01</span>
+              <div class="ficha-actions">
+                <a class="ficha-btn view" href="ficha-actividad-01.pdf" target="_blank" rel="noopener">👁️ Ver ficha</a>
+                <a class="ficha-btn download" href="ficha-actividad-01.pdf" download="Ficha - Actividad 01.pdf">⬇️ Descargar</a>
+              </div>
             </div>
-
-            <p class="ws-instruction">Lee cada situación:</p>
-            <ul class="case-list">
-              <li><b>Caso 1. Influenza:</b> Lucía presenta fiebre, tos y dolor de garganta. El médico explica que tiene influenza, una enfermedad causada por un virus.</li>
-              <li><b>Caso 2. Dengue:</b> Mariana tiene fiebre alta y dolor muscular. El médico explica que presenta dengue, una enfermedad causada por un virus que puede llegar a las personas mediante la picadura de un mosquito infectado.</li>
-              <li><b>Caso 3. Diabetes:</b> Carlos debe controlar regularmente la cantidad de glucosa en su sangre porque tiene diabetes. Esta enfermedad no es causada por virus, bacterias, hongos ni parásitos.</li>
-              <li><b>Caso 4. Anemia por falta de hierro:</b> Pedro presenta cansancio frecuente. Los análisis muestran que tiene anemia relacionada con una cantidad insuficiente de hierro en su organismo.</li>
-            </ul>
-
-            <p class="ws-instruction">1. Completa:</p>
-            <div class="table-scroll">
-              <table class="ws-table">
-                <thead>
-                  <tr>
-                    <th>Caso</th>
-                    <th>¿Qué enfermedad presenta?</th>
-                    <th>¿Qué la causa?</th>
-                    <th>¿Interviene un agente infeccioso?</th>
-                    <th>Tipo de enfermedad</th>
-                    <th>¿Qué dato del caso te permitió decidir?</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr><td>Lucía</td><td></td><td></td><td></td><td></td><td></td></tr>
-                  <tr><td>Mariana</td><td></td><td></td><td></td><td></td><td></td></tr>
-                  <tr><td>Carlos</td><td></td><td></td><td></td><td></td><td></td></tr>
-                  <tr><td>Pedro</td><td></td><td></td><td></td><td></td><td></td></tr>
-                </tbody>
-              </table>
-            </div>
-
-            <p class="ws-instruction">2. A partir de los casos, completa:</p>
-            <div class="table-scroll">
-              <table class="ws-table">
-                <thead>
-                  <tr>
-                    <th>Una enfermedad es</th>
-                    <th>Una enfermedad infecciosa se caracteriza por</th>
-                    <th>Una enfermedad no infecciosa se caracteriza por</th>
-                  </tr>
-                </thead>
-                <tbody><tr><td></td><td></td><td></td></tr></tbody>
-              </table>
-            </div>
-
-            <p class="ws-instruction">3. Explica: ¿Qué diferencia principal encuentras entre una enfermedad infecciosa y una no infecciosa?</p>
-            <div class="write-lines three"></div>
           </div>
 
-          <div class="activity-card">
-            <div class="activity-head">
+          <div class="activity-row">
+            <div class="activity-row-text">
               <span class="activity-tag">Actividad 2</span>
               <h3>Comité médico: clasificamos, comparamos y explicamos</h3>
+            </div>
+            <div class="activity-row-ficha">
               <span class="ficha-badge">Ficha · Actividad 02</span>
+              <div class="ficha-actions">
+                <a class="ficha-btn view" href="ficha-actividad-02.pdf" target="_blank" rel="noopener">👁️ Ver ficha</a>
+                <a class="ficha-btn download" href="ficha-actividad-02.pdf" download="Ficha - Actividad 02.pdf">⬇️ Descargar</a>
+              </div>
             </div>
-
-            <p class="ws-team">Equipo: <span class="fill-blank"></span></p>
-            <p class="ws-instruction">Reto:</p>
-            <p class="ws-text">Un centro de salud necesita organizar diferentes casos para explicar a las familias que no todas las enfermedades tienen la misma causa. Su equipo deberá clasificarlas y elaborar una explicación clara.</p>
-
-            <p class="ws-instruction">1. Clasificamos — Lean las 6 tarjetas:</p>
-            <div class="cards-grid">
-              <div class="mini-card"><b>Influenza:</b> Enfermedad causada por un virus. Puede propagarse entre personas mediante gotitas respiratorias.</div>
-              <div class="mini-card"><b>Tuberculosis:</b> Enfermedad causada por una bacteria. Puede transmitirse a través del aire cuando una persona enferma tose o estornuda.</div>
-              <div class="mini-card"><b>Dengue:</b> Enfermedad causada por un virus que puede transmitirse mediante la picadura de un mosquito infectado.</div>
-              <div class="mini-card"><b>Diabetes:</b> Enfermedad relacionada con dificultades del organismo para regular la glucosa en la sangre. No es causada por un agente infeccioso.</div>
-              <div class="mini-card"><b>Asma:</b> Enfermedad que afecta las vías respiratorias y puede dificultar la respiración. No es causada por un agente infeccioso.</div>
-              <div class="mini-card"><b>Anemia por deficiencia de hierro:</b> Enfermedad relacionada con una cantidad insuficiente de hierro en el organismo. No es causada por un agente infeccioso.</div>
-            </div>
-
-            <p class="ws-instruction">Colóquenlas en la categoría correspondiente:</p>
-            <div class="table-scroll">
-              <table class="ws-table">
-                <thead><tr><th>Enfermedades infecciosas</th><th>Enfermedades no infecciosas</th></tr></thead>
-                <tbody><tr><td></td><td></td></tr></tbody>
-              </table>
-            </div>
-            <p class="ws-hint">Para cada caso completen oralmente: <i>"La clasificamos como ____ porque ____."</i></p>
-
-            <p class="ws-instruction">2. Comparamos — Elijan una enfermedad infecciosa y una no infecciosa:</p>
-            <div class="table-scroll">
-              <table class="ws-table">
-                <thead><tr><th>Aspecto</th><th>Enfermedad infecciosa</th><th>Enfermedad no infecciosa</th></tr></thead>
-                <tbody>
-                  <tr><td>Nombre</td><td></td><td></td></tr>
-                  <tr><td>Causa</td><td></td><td></td></tr>
-                  <tr><td>¿Interviene un agente infeccioso?</td><td></td><td></td></tr>
-                  <tr><td>¿Puede propagarse?</td><td></td><td></td></tr>
-                  <tr><td>Evidencia que permite clasificarla</td><td></td><td></td></tr>
-                </tbody>
-              </table>
-            </div>
-
-            <p class="ws-instruction">3. Elaboramos nuestra explicación — ¿Cuál es la diferencia principal entre una enfermedad infecciosa y una no infecciosa?</p>
-            <div class="support-box">
-              <p>Ambas son enfermedades porque ____________________.</p>
-              <p>Sin embargo, se diferencian en que ____________________.</p>
-              <p>Por ejemplo, ____________ es infecciosa porque ____________, mientras que ____________ es no infecciosa porque ____________.</p>
-            </div>
-            <p class="ws-instruction">Explicación del equipo:</p>
-            <div class="write-lines three"></div>
-
-            <p class="ws-instruction">4. Revisamos otra explicación (Retroalimentación) — Lean la producción de otro equipo:</p>
-            <div class="write-lines"><span class="wl-label">Una fortaleza</span></div>
-            <div class="write-lines" style="margin-top:22px;"><span class="wl-label">Una pregunta para mejorar</span></div>
           </div>
         </div>
       `,
@@ -896,117 +843,31 @@
             </div>
           </div>
 
-          <div class="activity-card">
-            <div class="activity-head">
+          <div class="activity-row">
+            <div class="activity-row-text">
               <span class="activity-tag">Actividad 1</span>
               <h3>Observamos y registramos la actividad de la levadura</h3>
-              <span class="ficha-badge">Ficha · Actividad 01</span>
             </div>
-
-            <p class="ws-instruction">1. Antes de comenzar:</p>
-            <div class="table-scroll">
-              <table class="ws-table">
-                <thead>
-                  <tr>
-                    <th>¿Qué cambio crees que observarás en la mezcla?</th>
-                    <th>¿Qué cambio podrías medir con una regla?</th>
-                  </tr>
-                </thead>
-                <tbody><tr><td></td><td></td></tr></tbody>
-              </table>
-            </div>
-
-            <p class="ws-instruction">2. Registramos los cambios: observa la mezcla en cada momento y completa la tabla.</p>
-            <div class="table-scroll">
-              <table class="ws-table">
-                <thead>
-                  <tr><th>Tiempo</th><th>Altura de la espuma</th><th>Burbujas observadas</th><th>Descripción del cambio</th></tr>
-                </thead>
-                <tbody>
-                  <tr><td>0 min</td><td></td><td></td><td></td></tr>
-                  <tr><td>5 min</td><td></td><td></td><td></td></tr>
-                  <tr><td>10 min</td><td></td><td></td><td></td></tr>
-                  <tr><td>15 min</td><td></td><td></td><td></td></tr>
-                  <tr><td>20 min</td><td></td><td></td><td></td></tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="tip-box">
-              <b style="color:#7a5c14;">Recuerda</b>
-              <ul>
-                <li>Medir implica utilizar un instrumento y registrar una cantidad con su unidad.</li>
-                <li>Describir implica señalar lo que observas sin explicar todavía por qué ocurre.</li>
-              </ul>
-            </div>
-
-            <p class="ws-instruction">3. Analizamos lo observado</p>
-            <p class="ws-text"><b>a.</b> ¿Qué cambio principal observaste?</p>
-            <div class="write-lines"></div>
-            <p class="ws-text"><b>b.</b> Escribe dos datos de la tabla que demuestren ese cambio.</p>
-            <div class="write-lines"></div>
-            <div class="write-lines" style="margin-top:22px;"></div>
-            <p class="ws-text"><b>c.</b> ¿Cuánto cambió la altura de la espuma entre el inicio y los 20 minutos?</p>
-            <ul class="fill-list">
-              <li>Altura a los 20 min: <span class="fill-blank small"></span><span class="unit">cm</span></li>
-              <li>Altura inicial: <span class="fill-blank small"></span><span class="unit">cm</span></li>
-              <li>Cálculo: <span class="fill-blank"></span></li>
-              <li>Diferencia: <span class="fill-blank small"></span><span class="unit">cm</span></li>
-            </ul>
-
-            <p class="ws-instruction">4. Leemos información científica:</p>
-            <div class="reading-box">
-              <p>La levadura es un microorganismo formado por una sola célula. Cuando tiene agua, azúcar y una temperatura adecuada, puede realizar <b>fermentación</b>.</p>
-              <p>Durante este proceso se produce un <b>gas</b> llamado <b>dióxido de carbono</b>. Las burbujas de este gas ayudan a formar la espuma que observamos.</p>
-              <p>La levadura utilizada para preparar pan (<i>Saccharomyces cerevisiae</i>) suele tener mayor actividad cerca de los 30 °C. Con temperaturas más bajas puede actuar más lentamente, mientras que temperaturas muy altas pueden reducir su actividad o dañarla.</p>
-              <p>También podemos observar cómo cambia la mezcla con el paso del tiempo, por ejemplo, si aumenta la espuma o aparecen más burbujas.</p>
-              <span class="reading-source">Fuente: Adaptado de Khan Academy, Fermentación y respiración anaeróbica, y de Salvadó et al. (2011), estudio sobre la respuesta de Saccharomyces cerevisiae a la temperatura.</span>
-            </div>
-            <p class="ws-text">Después de leer, responde:</p>
-            <p class="ws-text"><b>a.</b> ¿Qué gas libera la levadura durante la fermentación?</p>
-            <div class="write-lines"></div>
-            <p class="ws-text"><b>b.</b> ¿Cómo se relaciona este gas con las burbujas y la espuma observada?</p>
-            <div class="write-lines"></div>
-
-            <p class="ws-instruction">5. Explicamos el fenómeno: completa la explicación utilizando tus datos y la información científica.</p>
-            <div class="support-box">
-              <p>La altura de la espuma cambió de _____ cm a _____ cm.</p>
-              <p>Este cambio ocurrió porque la levadura utilizó el azúcar y liberó ________________________________.</p>
-              <p>Las burbujas de este gas contribuyeron a ________________________________________________.</p>
+            <div class="activity-row-ficha">
+              <span class="ficha-badge">Ficha · Sesión 2</span>
+              <div class="ficha-actions">
+                <a class="ficha-btn view" href="ficha-sesion2.pdf" target="_blank" rel="noopener">👁️ Ver ficha</a>
+                <a class="ficha-btn download" href="ficha-sesion2.pdf" download="Ficha - Sesion 2.pdf">⬇️ Descargar</a>
+              </div>
             </div>
           </div>
 
-          <div class="activity-card">
-            <div class="activity-head">
+          <div class="activity-row">
+            <div class="activity-row-text">
               <span class="activity-tag">Actividad 2</span>
               <h3>De los datos a una relación investigable</h3>
-              <span class="ficha-badge">Ficha · Actividad 02</span>
             </div>
-
-            <p class="ws-instruction">6. Identificamos una relación que podemos investigar</p>
-            <p class="ws-text"><b>a.</b> Piensa en la experiencia:</p>
-            <ul class="case-list">
-              <li>¿Qué aspecto podríamos cambiar intencionalmente en una nueva experiencia?</li>
-              <li>¿Qué efecto podríamos observar o medir para saber qué ocurrió?</li>
-              <li>¿Con qué instrumento podríamos medirlo?</li>
-            </ul>
-
-            <p class="ws-text"><b>b.</b> Completa:</p>
-            <div class="table-scroll">
-              <table class="ws-table">
-                <thead>
-                  <tr><th>Factor que podría modificarse</th><th>Efecto que podría medirse</th><th>Instrumento para medirlo</th></tr>
-                </thead>
-                <tbody><tr><td></td><td></td><td></td></tr></tbody>
-              </table>
-            </div>
-
-            <p class="ws-text"><b>c.</b> Escribe otros dos factores que podrían modificar la actividad de la levadura.</p>
-            <div class="write-lines"></div>
-            <div class="write-lines" style="margin-top:22px;"></div>
-
-            <p class="ws-text"><b>d.</b> Relación que retomaremos en la siguiente sesión. Completa:</p>
-            <div class="support-box">
-              <p>Posible relación entre la ______________________________ del agua y la ______________________________ de la espuma.</p>
+            <div class="activity-row-ficha">
+              <span class="ficha-badge">Ficha · Sesión 2</span>
+              <div class="ficha-actions">
+                <a class="ficha-btn view" href="ficha-sesion2.pdf" target="_blank" rel="noopener">👁️ Ver ficha</a>
+                <a class="ficha-btn download" href="ficha-sesion2.pdf" download="Ficha - Sesion 2.pdf">⬇️ Descargar</a>
+              </div>
             </div>
           </div>
         </div>

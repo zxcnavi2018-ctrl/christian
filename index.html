@@ -21,7 +21,6 @@
   html,body{
     margin:0;
     padding:0;
-    height:100%;
     font-family:'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
     background:
       radial-gradient(circle at 15% 10%, #ffffff 0%, transparent 45%),
@@ -49,6 +48,10 @@
     animation:fadeIn .45s ease;
   }
   .screen.active{display:flex;}
+  /* content taller than the viewport (e.g. a worksheet) must not be
+     vertically centered, or the flex algorithm pushes its top half above
+     y=0 where it's clipped and invisible */
+  .screen.top-align{ justify-content:flex-start; padding-top:8px; }
   @keyframes fadeIn{
     from{opacity:0; transform:translateY(14px);}
     to{opacity:1; transform:translateY(0);}
@@ -328,21 +331,16 @@
   .session-btn:hover .dot{ background:#fff; color:var(--navy); }
   .session-btn:active{ transform:translateY(-1px) scale(.97); }
 
-  /* ---------- SESSION CONTENT ---------- */
-  .session-content{
-    background:var(--card);
-    border:1px solid var(--card-border);
-    border-radius:var(--radius);
-    box-shadow:var(--shadow);
-    padding:36px 30px;
-    text-align:center;
-    max-width:560px;
-    width:100%;
+  /* ---------- SESSION: header (robot + badge + title) ---------- */
+  .session-header{
     display:flex;
     flex-direction:column;
     align-items:center;
+    text-align:center;
+    margin-bottom:24px;
   }
-  .session-content .badge{
+  .session-header .robot-slot{ margin-bottom:12px; }
+  .session-header .badge{
     display:inline-block;
     padding:6px 16px;
     border-radius:999px;
@@ -351,11 +349,206 @@
     font-weight:700;
     font-size:13px;
     letter-spacing:1px;
-    margin-bottom:14px;
+    margin-bottom:10px;
   }
-  .session-content h2{ margin:0 0 10px; color:var(--navy); }
-  .session-content p{ color:#5a6a94; line-height:1.5; margin:0; }
-  .session-content .robot-slot{ margin-bottom:14px; }
+  .session-header h2{ margin:0; color:var(--navy); }
+
+  #sessionBody{ width:100%; display:flex; justify-content:center; }
+
+  .session-placeholder{
+    background:var(--card);
+    border:1px solid var(--card-border);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:36px 30px;
+    text-align:center;
+    max-width:560px;
+    width:100%;
+  }
+  .session-placeholder p{ color:#5a6a94; line-height:1.5; margin:0; }
+
+  /* ---------- SESSION: worksheet (rich per-session content) ---------- */
+  .worksheet{
+    width:100%;
+    max-width:820px;
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+  }
+  .meta-box{
+    background:linear-gradient(135deg, var(--navy), var(--navy-2));
+    color:#fff;
+    border-radius:var(--radius);
+    padding:22px 26px;
+    box-shadow:var(--shadow);
+  }
+  .meta-label{
+    display:inline-block;
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    background:rgba(255,255,255,.18);
+    padding:4px 12px;
+    border-radius:999px;
+    margin-bottom:10px;
+  }
+  .meta-text{ margin:0 0 14px; font-size:clamp(15px,2.6vw,18px); font-weight:600; line-height:1.45; }
+  .criteria-chips{ display:flex; flex-wrap:wrap; gap:8px; }
+  .chip{
+    background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.35);
+    padding:6px 14px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:600;
+  }
+  .flipped-card{
+    background:linear-gradient(135deg,#fff4e0,#ffe9c7);
+    border:1px solid #f0d5a0;
+    border-radius:var(--radius);
+    padding:22px 24px;
+    box-shadow:var(--shadow);
+  }
+  .flipped-badge{
+    display:inline-block;
+    background:#f5a623;
+    color:#fff;
+    font-weight:800;
+    font-size:12px;
+    letter-spacing:1px;
+    padding:5px 12px;
+    border-radius:999px;
+    margin-bottom:10px;
+  }
+  .flipped-card h3{ margin:6px 0 10px; color:#7a4a12; font-size:clamp(17px,3vw,20px); }
+  .flipped-card .ws-text{ color:#8a6a2e; margin:0 0 16px; }
+  .flipped-actions{ display:flex; gap:12px; flex-wrap:wrap; }
+  .flipped-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 18px;
+    border-radius:12px;
+    font-weight:700;
+    font-size:14px;
+    text-decoration:none;
+    cursor:pointer;
+    transition:transform .16s ease, box-shadow .16s ease;
+  }
+  .flipped-btn.view{ background:#fff; color:#a86a10; border:1px solid #f0d5a0; }
+  .flipped-btn.download{ background:linear-gradient(135deg,#f5a623,#f57c23); color:#fff; }
+  .flipped-btn:hover{ transform:translateY(-2px); box-shadow:0 8px 16px rgba(150,100,20,.25); }
+
+  .activity-card{
+    background:var(--card);
+    border:1px solid var(--card-border);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:26px 24px;
+  }
+  .activity-head{ margin-bottom:16px; }
+  .activity-tag{
+    display:block;
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:var(--blue);
+    margin-bottom:4px;
+  }
+  .activity-head h3{ margin:0 0 10px; font-size:clamp(17px,3vw,21px); color:var(--navy); }
+  .ficha-badge{
+    display:inline-block;
+    background:linear-gradient(135deg, var(--blue), var(--cyan));
+    color:#fff;
+    font-weight:700;
+    font-size:12.5px;
+    padding:5px 12px;
+    border-radius:999px;
+  }
+  .ws-instruction{ font-weight:700; color:var(--navy-2); margin:20px 0 10px; }
+  .ws-instruction:first-of-type{ margin-top:6px; }
+  .ws-text{ color:#5a6a94; line-height:1.55; margin:0 0 6px; }
+  .case-list{ margin:0 0 6px; padding-left:20px; color:#3a4a72; line-height:1.55; }
+  .case-list li{ margin-bottom:10px; }
+  .case-list b{ color:var(--navy); }
+  .table-scroll{ overflow-x:auto; border-radius:12px; border:1px solid var(--card-border); }
+  .ws-table{ width:100%; border-collapse:collapse; min-width:520px; font-size:13.5px; }
+  .ws-table th{
+    background:#eef4ff;
+    color:var(--navy);
+    text-align:left;
+    padding:10px 12px;
+    font-size:12.5px;
+    border-bottom:2px solid var(--card-border);
+  }
+  .ws-table td{
+    padding:16px 12px;
+    border-bottom:1px solid var(--card-border);
+    color:#5a6a94;
+  }
+  .ws-table tr:last-child td{ border-bottom:none; }
+  .ws-table td:first-child{ font-weight:700; color:var(--navy-2); }
+  .ws-team{ font-weight:600; color:var(--navy-2); margin:0; }
+  .fill-blank{ display:inline-block; min-width:200px; border-bottom:2px solid var(--card-border); }
+  .cards-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:10px 0; }
+  .mini-card{
+    background:#f4f8ff;
+    border:1px solid var(--card-border);
+    border-radius:12px;
+    padding:12px 14px;
+    font-size:13px;
+    color:#3a4a72;
+    line-height:1.5;
+  }
+  .mini-card b{ color:var(--navy); }
+  .ws-hint{ font-size:13.5px; color:#5a6a94; margin:10px 0 0; }
+  .support-box{
+    background:#f4f8ff;
+    border:1px dashed #c7d3ea;
+    border-radius:14px;
+    padding:16px 18px;
+  }
+  .support-box p{ margin:0 0 8px; font-style:italic; color:#3a4a72; font-size:13.5px; }
+  .support-box p:last-child{ margin-bottom:0; }
+  .tip-box{
+    background:#fff7e6;
+    border:1px solid #f3dfa8;
+    border-radius:14px;
+    padding:14px 18px;
+    margin:10px 0;
+  }
+  .tip-box ul{ margin:0; padding-left:20px; color:#7a5c14; font-size:13.5px; line-height:1.6; }
+  .tip-box li{ margin-bottom:4px; }
+  .reading-box{
+    background:#f4f8ff;
+    border-left:4px solid var(--blue);
+    border-radius:0 14px 14px 0;
+    padding:16px 20px;
+    margin:10px 0;
+  }
+  .reading-box p{ margin:0 0 10px; color:#3a4a72; line-height:1.6; font-size:14px; }
+  .reading-box p:last-of-type{ margin-bottom:0; }
+  .reading-source{ display:block; margin-top:10px; font-size:11.5px; font-style:italic; color:#8b9ac1; }
+  .fill-list{ list-style:none; margin:10px 0; padding:0; display:flex; flex-direction:column; gap:10px; }
+  .fill-list li{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; color:#3a4a72; font-size:14px; }
+  .fill-blank.small{ min-width:90px; }
+  .unit{ color:#8b9ac1; font-size:13px; }
+  .write-lines{ position:relative; border-bottom:2px solid var(--card-border); min-height:34px; margin:14px 0 10px; }
+  .write-lines.three{ min-height:96px; }
+  .wl-label{
+    position:absolute;
+    top:-10px;
+    left:0;
+    background:var(--card);
+    padding:0 6px;
+    font-size:11.5px;
+    font-weight:700;
+    color:var(--blue);
+    text-transform:uppercase;
+    letter-spacing:.5px;
+  }
 
   /* ---------- Mobile tweaks ---------- */
   @media (max-width:560px){
@@ -364,6 +557,9 @@
     .back-btn{ width:48px; height:48px; top:14px; left:14px; }
     .back-btn svg{ width:22px; height:22px; }
     #app{ padding:16px 14px 40px; }
+    .cards-grid{ grid-template-columns:1fr; }
+    .activity-card{ padding:20px 16px; }
+    .meta-box{ padding:18px 18px; }
   }
 </style>
 </head>
@@ -429,12 +625,12 @@
     <button class="back-btn" onclick="goBack()" aria-label="Regresar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l-7 7 7 7"/><path d="M2 12h20"/></svg>
     </button>
-    <div class="session-content">
+    <div class="session-header">
       <div class="robot-slot robot-slot--session" data-robot></div>
       <div class="badge" id="sessionUnitLabel">UNIDAD</div>
       <h2 id="sessionTitle">Sesión 1</h2>
-      <p>El contenido de esta sesión se agregará próximamente. Vuelve pronto 🚀</p>
     </div>
+    <div id="sessionBody"></div>
   </section>
 
 </div>
@@ -549,10 +745,288 @@
     showScreen(prev);
   }
 
+  // ---------- Rich content for specific sessions ----------
+  const sessionExtra = {
+    unit7: {
+      1: `
+        <div class="worksheet">
+          <div class="meta-box">
+            <span class="meta-label">🎯 Meta</span>
+            <p class="meta-text">Explicar qué es una enfermedad y diferenciar sus tipos a partir de una situación.</p>
+            <div class="criteria-chips">
+              <span class="chip">Identificar</span>
+              <span class="chip">Analizar</span>
+              <span class="chip">Clasificar</span>
+            </div>
+          </div>
+
+          <div class="flipped-card">
+            <span class="flipped-badge">🔄 FLIPPED</span>
+            <h3>Antes de la sesión: Microorganismos</h3>
+            <p class="ws-text">Investiga en fuentes confiables sobre los siguientes microorganismos: levadura, bacterias del yogur, <i>Salmonella</i> y moho del pan, y completa la ficha antes de la clase.</p>
+            <div class="flipped-actions">
+              <a class="flipped-btn view" href="ficha-flipped-microorganismos.pdf" target="_blank" rel="noopener">👁️ Ver ficha</a>
+              <a class="flipped-btn download" href="ficha-flipped-microorganismos.pdf" download="Ficha Flipped - Microorganismos.pdf">⬇️ Descargar ficha</a>
+            </div>
+          </div>
+
+          <div class="activity-card">
+            <div class="activity-head">
+              <span class="activity-tag">Actividad 1</span>
+              <h3>Analizo y clasifico enfermedades</h3>
+              <span class="ficha-badge">Ficha · Actividad 01</span>
+            </div>
+
+            <p class="ws-instruction">Lee cada situación:</p>
+            <ul class="case-list">
+              <li><b>Caso 1. Influenza:</b> Lucía presenta fiebre, tos y dolor de garganta. El médico explica que tiene influenza, una enfermedad causada por un virus.</li>
+              <li><b>Caso 2. Dengue:</b> Mariana tiene fiebre alta y dolor muscular. El médico explica que presenta dengue, una enfermedad causada por un virus que puede llegar a las personas mediante la picadura de un mosquito infectado.</li>
+              <li><b>Caso 3. Diabetes:</b> Carlos debe controlar regularmente la cantidad de glucosa en su sangre porque tiene diabetes. Esta enfermedad no es causada por virus, bacterias, hongos ni parásitos.</li>
+              <li><b>Caso 4. Anemia por falta de hierro:</b> Pedro presenta cansancio frecuente. Los análisis muestran que tiene anemia relacionada con una cantidad insuficiente de hierro en su organismo.</li>
+            </ul>
+
+            <p class="ws-instruction">1. Completa:</p>
+            <div class="table-scroll">
+              <table class="ws-table">
+                <thead>
+                  <tr>
+                    <th>Caso</th>
+                    <th>¿Qué enfermedad presenta?</th>
+                    <th>¿Qué la causa?</th>
+                    <th>¿Interviene un agente infeccioso?</th>
+                    <th>Tipo de enfermedad</th>
+                    <th>¿Qué dato del caso te permitió decidir?</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Lucía</td><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td>Mariana</td><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td>Carlos</td><td></td><td></td><td></td><td></td><td></td></tr>
+                  <tr><td>Pedro</td><td></td><td></td><td></td><td></td><td></td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p class="ws-instruction">2. A partir de los casos, completa:</p>
+            <div class="table-scroll">
+              <table class="ws-table">
+                <thead>
+                  <tr>
+                    <th>Una enfermedad es</th>
+                    <th>Una enfermedad infecciosa se caracteriza por</th>
+                    <th>Una enfermedad no infecciosa se caracteriza por</th>
+                  </tr>
+                </thead>
+                <tbody><tr><td></td><td></td><td></td></tr></tbody>
+              </table>
+            </div>
+
+            <p class="ws-instruction">3. Explica: ¿Qué diferencia principal encuentras entre una enfermedad infecciosa y una no infecciosa?</p>
+            <div class="write-lines three"></div>
+          </div>
+
+          <div class="activity-card">
+            <div class="activity-head">
+              <span class="activity-tag">Actividad 2</span>
+              <h3>Comité médico: clasificamos, comparamos y explicamos</h3>
+              <span class="ficha-badge">Ficha · Actividad 02</span>
+            </div>
+
+            <p class="ws-team">Equipo: <span class="fill-blank"></span></p>
+            <p class="ws-instruction">Reto:</p>
+            <p class="ws-text">Un centro de salud necesita organizar diferentes casos para explicar a las familias que no todas las enfermedades tienen la misma causa. Su equipo deberá clasificarlas y elaborar una explicación clara.</p>
+
+            <p class="ws-instruction">1. Clasificamos — Lean las 6 tarjetas:</p>
+            <div class="cards-grid">
+              <div class="mini-card"><b>Influenza:</b> Enfermedad causada por un virus. Puede propagarse entre personas mediante gotitas respiratorias.</div>
+              <div class="mini-card"><b>Tuberculosis:</b> Enfermedad causada por una bacteria. Puede transmitirse a través del aire cuando una persona enferma tose o estornuda.</div>
+              <div class="mini-card"><b>Dengue:</b> Enfermedad causada por un virus que puede transmitirse mediante la picadura de un mosquito infectado.</div>
+              <div class="mini-card"><b>Diabetes:</b> Enfermedad relacionada con dificultades del organismo para regular la glucosa en la sangre. No es causada por un agente infeccioso.</div>
+              <div class="mini-card"><b>Asma:</b> Enfermedad que afecta las vías respiratorias y puede dificultar la respiración. No es causada por un agente infeccioso.</div>
+              <div class="mini-card"><b>Anemia por deficiencia de hierro:</b> Enfermedad relacionada con una cantidad insuficiente de hierro en el organismo. No es causada por un agente infeccioso.</div>
+            </div>
+
+            <p class="ws-instruction">Colóquenlas en la categoría correspondiente:</p>
+            <div class="table-scroll">
+              <table class="ws-table">
+                <thead><tr><th>Enfermedades infecciosas</th><th>Enfermedades no infecciosas</th></tr></thead>
+                <tbody><tr><td></td><td></td></tr></tbody>
+              </table>
+            </div>
+            <p class="ws-hint">Para cada caso completen oralmente: <i>"La clasificamos como ____ porque ____."</i></p>
+
+            <p class="ws-instruction">2. Comparamos — Elijan una enfermedad infecciosa y una no infecciosa:</p>
+            <div class="table-scroll">
+              <table class="ws-table">
+                <thead><tr><th>Aspecto</th><th>Enfermedad infecciosa</th><th>Enfermedad no infecciosa</th></tr></thead>
+                <tbody>
+                  <tr><td>Nombre</td><td></td><td></td></tr>
+                  <tr><td>Causa</td><td></td><td></td></tr>
+                  <tr><td>¿Interviene un agente infeccioso?</td><td></td><td></td></tr>
+                  <tr><td>¿Puede propagarse?</td><td></td><td></td></tr>
+                  <tr><td>Evidencia que permite clasificarla</td><td></td><td></td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p class="ws-instruction">3. Elaboramos nuestra explicación — ¿Cuál es la diferencia principal entre una enfermedad infecciosa y una no infecciosa?</p>
+            <div class="support-box">
+              <p>Ambas son enfermedades porque ____________________.</p>
+              <p>Sin embargo, se diferencian en que ____________________.</p>
+              <p>Por ejemplo, ____________ es infecciosa porque ____________, mientras que ____________ es no infecciosa porque ____________.</p>
+            </div>
+            <p class="ws-instruction">Explicación del equipo:</p>
+            <div class="write-lines three"></div>
+
+            <p class="ws-instruction">4. Revisamos otra explicación (Retroalimentación) — Lean la producción de otro equipo:</p>
+            <div class="write-lines"><span class="wl-label">Una fortaleza</span></div>
+            <div class="write-lines" style="margin-top:22px;"><span class="wl-label">Una pregunta para mejorar</span></div>
+          </div>
+        </div>
+      `,
+      2: `
+        <div class="worksheet">
+          <div class="meta-box">
+            <span class="meta-label">🎯 Meta</span>
+            <p class="meta-text">Explica el fenómeno de la actividad de la levadura para delimitar una relación investigable.</p>
+            <div class="criteria-chips">
+              <span class="chip">Observa</span>
+              <span class="chip">Registra</span>
+              <span class="chip">Describe</span>
+            </div>
+          </div>
+
+          <div class="activity-card">
+            <div class="activity-head">
+              <span class="activity-tag">Actividad 1</span>
+              <h3>Observamos y registramos la actividad de la levadura</h3>
+              <span class="ficha-badge">Ficha · Actividad 01</span>
+            </div>
+
+            <p class="ws-instruction">1. Antes de comenzar:</p>
+            <div class="table-scroll">
+              <table class="ws-table">
+                <thead>
+                  <tr>
+                    <th>¿Qué cambio crees que observarás en la mezcla?</th>
+                    <th>¿Qué cambio podrías medir con una regla?</th>
+                  </tr>
+                </thead>
+                <tbody><tr><td></td><td></td></tr></tbody>
+              </table>
+            </div>
+
+            <p class="ws-instruction">2. Registramos los cambios: observa la mezcla en cada momento y completa la tabla.</p>
+            <div class="table-scroll">
+              <table class="ws-table">
+                <thead>
+                  <tr><th>Tiempo</th><th>Altura de la espuma</th><th>Burbujas observadas</th><th>Descripción del cambio</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>0 min</td><td></td><td></td><td></td></tr>
+                  <tr><td>5 min</td><td></td><td></td><td></td></tr>
+                  <tr><td>10 min</td><td></td><td></td><td></td></tr>
+                  <tr><td>15 min</td><td></td><td></td><td></td></tr>
+                  <tr><td>20 min</td><td></td><td></td><td></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="tip-box">
+              <b style="color:#7a5c14;">Recuerda</b>
+              <ul>
+                <li>Medir implica utilizar un instrumento y registrar una cantidad con su unidad.</li>
+                <li>Describir implica señalar lo que observas sin explicar todavía por qué ocurre.</li>
+              </ul>
+            </div>
+
+            <p class="ws-instruction">3. Analizamos lo observado</p>
+            <p class="ws-text"><b>a.</b> ¿Qué cambio principal observaste?</p>
+            <div class="write-lines"></div>
+            <p class="ws-text"><b>b.</b> Escribe dos datos de la tabla que demuestren ese cambio.</p>
+            <div class="write-lines"></div>
+            <div class="write-lines" style="margin-top:22px;"></div>
+            <p class="ws-text"><b>c.</b> ¿Cuánto cambió la altura de la espuma entre el inicio y los 20 minutos?</p>
+            <ul class="fill-list">
+              <li>Altura a los 20 min: <span class="fill-blank small"></span><span class="unit">cm</span></li>
+              <li>Altura inicial: <span class="fill-blank small"></span><span class="unit">cm</span></li>
+              <li>Cálculo: <span class="fill-blank"></span></li>
+              <li>Diferencia: <span class="fill-blank small"></span><span class="unit">cm</span></li>
+            </ul>
+
+            <p class="ws-instruction">4. Leemos información científica:</p>
+            <div class="reading-box">
+              <p>La levadura es un microorganismo formado por una sola célula. Cuando tiene agua, azúcar y una temperatura adecuada, puede realizar <b>fermentación</b>.</p>
+              <p>Durante este proceso se produce un <b>gas</b> llamado <b>dióxido de carbono</b>. Las burbujas de este gas ayudan a formar la espuma que observamos.</p>
+              <p>La levadura utilizada para preparar pan (<i>Saccharomyces cerevisiae</i>) suele tener mayor actividad cerca de los 30 °C. Con temperaturas más bajas puede actuar más lentamente, mientras que temperaturas muy altas pueden reducir su actividad o dañarla.</p>
+              <p>También podemos observar cómo cambia la mezcla con el paso del tiempo, por ejemplo, si aumenta la espuma o aparecen más burbujas.</p>
+              <span class="reading-source">Fuente: Adaptado de Khan Academy, Fermentación y respiración anaeróbica, y de Salvadó et al. (2011), estudio sobre la respuesta de Saccharomyces cerevisiae a la temperatura.</span>
+            </div>
+            <p class="ws-text">Después de leer, responde:</p>
+            <p class="ws-text"><b>a.</b> ¿Qué gas libera la levadura durante la fermentación?</p>
+            <div class="write-lines"></div>
+            <p class="ws-text"><b>b.</b> ¿Cómo se relaciona este gas con las burbujas y la espuma observada?</p>
+            <div class="write-lines"></div>
+
+            <p class="ws-instruction">5. Explicamos el fenómeno: completa la explicación utilizando tus datos y la información científica.</p>
+            <div class="support-box">
+              <p>La altura de la espuma cambió de _____ cm a _____ cm.</p>
+              <p>Este cambio ocurrió porque la levadura utilizó el azúcar y liberó ________________________________.</p>
+              <p>Las burbujas de este gas contribuyeron a ________________________________________________.</p>
+            </div>
+          </div>
+
+          <div class="activity-card">
+            <div class="activity-head">
+              <span class="activity-tag">Actividad 2</span>
+              <h3>De los datos a una relación investigable</h3>
+              <span class="ficha-badge">Ficha · Actividad 02</span>
+            </div>
+
+            <p class="ws-instruction">6. Identificamos una relación que podemos investigar</p>
+            <p class="ws-text"><b>a.</b> Piensa en la experiencia:</p>
+            <ul class="case-list">
+              <li>¿Qué aspecto podríamos cambiar intencionalmente en una nueva experiencia?</li>
+              <li>¿Qué efecto podríamos observar o medir para saber qué ocurrió?</li>
+              <li>¿Con qué instrumento podríamos medirlo?</li>
+            </ul>
+
+            <p class="ws-text"><b>b.</b> Completa:</p>
+            <div class="table-scroll">
+              <table class="ws-table">
+                <thead>
+                  <tr><th>Factor que podría modificarse</th><th>Efecto que podría medirse</th><th>Instrumento para medirlo</th></tr>
+                </thead>
+                <tbody><tr><td></td><td></td><td></td></tr></tbody>
+              </table>
+            </div>
+
+            <p class="ws-text"><b>c.</b> Escribe otros dos factores que podrían modificar la actividad de la levadura.</p>
+            <div class="write-lines"></div>
+            <div class="write-lines" style="margin-top:22px;"></div>
+
+            <p class="ws-text"><b>d.</b> Relación que retomaremos en la siguiente sesión. Completa:</p>
+            <div class="support-box">
+              <p>Posible relación entre la ______________________________ del agua y la ______________________________ de la espuma.</p>
+            </div>
+          </div>
+        </div>
+      `
+    }
+  };
+
   function openSession(unitKey, num){
     document.getElementById('sessionUnitLabel').textContent =
       unitKey === 'unit7' ? 'UNIDAD 7 · MICROORGANISMOS EN ACCIÓN' : 'UNIDAD 8 · SISTEMA REPRODUCTOR HUMANO';
     document.getElementById('sessionTitle').textContent = 'Sesión ' + num;
+
+    const body = document.getElementById('sessionBody');
+    const extra = sessionExtra[unitKey] && sessionExtra[unitKey][num];
+    body.innerHTML = extra || `
+      <div class="session-placeholder">
+        <p>El contenido de esta sesión se agregará próximamente. Vuelve pronto 🚀</p>
+      </div>
+    `;
+    document.getElementById('screen-session').classList.toggle('top-align', !!extra);
     goTo('session');
   }
 

@@ -81,42 +81,80 @@
     transform:rotate(-45deg);
   }
 
-  /* ---------- Robot (shared component) ---------- */
+  /* ---------- Robot (shared component, real illustration) ---------- */
   .robot-slot{
     display:block;
-    line-height:0;
     flex-shrink:0;
-  }
-  .robot-slot svg{
-    display:block;
-    width:100%;
-    height:auto;
   }
   .robot-slot--home{ width:min(42vw, 180px); }
   .robot-slot--menu{ width:min(34vw, 150px); }
-  .robot-slot--session{ width:76px; }
+  .robot-slot--session{ width:82px; }
 
-  .robot-float{ animation:floaty 3.2s ease-in-out infinite; }
+  .robot-wrap{ position:relative; display:block; }
+  .robot-img{
+    display:block;
+    width:100%;
+    height:auto;
+    mix-blend-mode:multiply;
+    user-select:none;
+    -webkit-user-drag:none;
+  }
+  /* box-shadow (not filter) so it doesn't isolate the image's mix-blend-mode */
+  .robot-shadow{
+    position:absolute;
+    bottom:2%;
+    left:50%;
+    transform:translateX(-50%);
+    width:52%;
+    height:7%;
+    border-radius:50%;
+    background:radial-gradient(ellipse at center, rgba(18,34,74,.32) 0%, rgba(18,34,74,0) 75%);
+    pointer-events:none;
+  }
+
+  /* uses top/position instead of transform so it doesn't create a stacking
+     context that would isolate the robot image's mix-blend-mode from the
+     page background */
+  .robot-float{ position:relative; animation:floaty 3.2s ease-in-out infinite; }
   @keyframes floaty{
-    0%,100%{ transform:translateY(0);}
-    50%{ transform:translateY(-10px);}
+    0%,100%{ top:0;}
+    50%{ top:-10px;}
   }
 
-  .robot-eye{
-    transform-box: fill-box;
-    transform-origin: 50% 50%;
-    animation: blink 5s ease-in-out infinite;
+  /* eyelids: closed (scaleY 0) most of the time, briefly cover the eyes to blink */
+  .robot-eyelid{
+    position:absolute;
+    top:14.6%;
+    width:9.8%;
+    height:18.4%;
+    border-radius:50%;
+    background:#1c3a76;
+    transform-origin:top center;
+    transform:scaleY(0);
+    animation: robotBlink 5s ease-in-out infinite;
+    pointer-events:none;
   }
-  @keyframes blink{
-    0%, 92%, 100% { transform: scaleY(1); }
-    95% { transform: scaleY(0.12); }
+  .robot-eyelid-l{ left:30.8%; }
+  .robot-eyelid-r{ left:57.7%; }
+  @keyframes robotBlink{
+    0%, 92%, 100% { transform:scaleY(0); }
+    95% { transform:scaleY(1); }
   }
-  .robot-pupils{ transition: transform .12s ease-out; }
-  .robot-antenna-tip{ animation: glow 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin:50% 50%; }
-  @keyframes glow{
-    0%,100%{ opacity:.65; transform:scale(1); }
-    50%{ opacity:1; transform:scale(1.18); }
+
+  /* glints: small highlight that shifts toward the pointer for a "looking" effect */
+  .robot-glint{
+    position:absolute;
+    top:17.8%;
+    width:2.3%;
+    aspect-ratio:1;
+    border-radius:50%;
+    background:#ffffff;
+    opacity:.85;
+    pointer-events:none;
+    transition:transform .12s ease-out;
   }
+  .robot-glint-l{ left:33.4%; }
+  .robot-glint-r{ left:60.3%; }
 
   /* ---------- HOME ---------- */
   .home-content{
@@ -331,69 +369,6 @@
 </head>
 <body>
 
-<!-- Shared gradient defs referenced by every robot instance -->
-<svg width="0" height="0" style="position:absolute">
-  <defs>
-    <linearGradient id="gradHelmet" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#ffffff"/>
-      <stop offset="100%" stop-color="#dbe4f5"/>
-    </linearGradient>
-    <linearGradient id="gradEar" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#c3d0ea"/>
-      <stop offset="100%" stop-color="#9aabd4"/>
-    </linearGradient>
-    <linearGradient id="gradVisor" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#243a6e"/>
-      <stop offset="100%" stop-color="#0d1830"/>
-    </linearGradient>
-    <radialGradient id="gradEye" cx="35%" cy="30%" r="75%">
-      <stop offset="0%" stop-color="#a6f2ff"/>
-      <stop offset="55%" stop-color="#38d1f5"/>
-      <stop offset="100%" stop-color="#1aa9d6"/>
-    </radialGradient>
-    <linearGradient id="gradBody" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#e4eaf9"/>
-      <stop offset="100%" stop-color="#c3d0ea"/>
-    </linearGradient>
-  </defs>
-</svg>
-
-<!-- Robot template (cloned into each screen) -->
-<template id="robotTemplate">
-  <svg viewBox="0 0 240 260" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="120" cy="246" rx="62" ry="9" fill="#12224a" opacity=".10"/>
-    <!-- antenna -->
-    <line x1="120" y1="18" x2="120" y2="4" stroke="#9aabd4" stroke-width="4" stroke-linecap="round"/>
-    <circle class="robot-antenna-tip" cx="120" cy="6" r="6" fill="#38d1f5"/>
-    <!-- shoulders / body hint -->
-    <path d="M50 210c0-30 31-46 70-46s70 16 70 46v14H50z" fill="url(#gradBody)"/>
-    <!-- ears -->
-    <circle cx="34" cy="120" r="22" fill="url(#gradEar)"/>
-    <circle cx="30" cy="113" r="7" fill="#ffffff" opacity=".35"/>
-    <circle cx="206" cy="120" r="22" fill="url(#gradEar)"/>
-    <circle cx="202" cy="113" r="7" fill="#ffffff" opacity=".35"/>
-    <!-- head -->
-    <rect x="46" y="30" width="148" height="150" rx="58" fill="url(#gradHelmet)"/>
-    <path d="M64 44c30-14 82-14 112 0" stroke="#ffffff" stroke-width="8" stroke-linecap="round" fill="none" opacity=".55"/>
-    <!-- visor -->
-    <rect x="70" y="78" width="100" height="64" rx="30" fill="url(#gradVisor)"/>
-    <!-- eyes -->
-    <g class="robot-pupils">
-      <ellipse class="robot-eye eye-l" cx="98" cy="110" rx="12" ry="18" fill="url(#gradEye)"/>
-      <ellipse class="robot-eye eye-r" cx="142" cy="110" rx="12" ry="18" fill="url(#gradEye)"/>
-      <circle cx="94" cy="103" r="3.4" fill="#ffffff" opacity=".9"/>
-      <circle cx="138" cy="103" r="3.4" fill="#ffffff" opacity=".9"/>
-    </g>
-    <!-- cheeks -->
-    <circle cx="66" cy="150" r="8" fill="#ff9fc0" opacity=".35"/>
-    <circle cx="174" cy="150" r="8" fill="#ff9fc0" opacity=".35"/>
-    <!-- mouth -->
-    <rect x="90" y="156" width="60" height="16" rx="8" fill="#eef2fb"/>
-    <rect x="102" y="160" width="10" height="8" rx="3" fill="#c3d0ea"/>
-    <rect x="128" y="160" width="10" height="8" rx="3" fill="#c3d0ea"/>
-  </svg>
-</template>
-
 <div id="app">
 
   <!-- HOME -->
@@ -468,38 +443,48 @@
   // ---------- Instantiate the robot into every slot ----------
   const robotInstances = [];
   document.querySelectorAll('[data-robot]').forEach((slot, i) => {
-    const tpl = document.getElementById('robotTemplate').content.cloneNode(true);
-    const svg = tpl.querySelector('svg');
-    const eyeL = svg.querySelector('.eye-l');
-    const eyeR = svg.querySelector('.eye-r');
-    eyeL.style.animationDelay = (i * 0.35) + 's';
-    eyeR.style.animationDelay = (i * 0.35) + 's';
-    slot.appendChild(svg);
+    const wrap = document.createElement('div');
+    wrap.className = 'robot-wrap';
+    wrap.innerHTML = `
+      <span class="robot-shadow"></span>
+      <img class="robot-img" src="robot.png" alt="Robot">
+      <span class="robot-eyelid robot-eyelid-l"></span>
+      <span class="robot-eyelid robot-eyelid-r"></span>
+      <span class="robot-glint robot-glint-l"></span>
+      <span class="robot-glint robot-glint-r"></span>
+    `;
+    const eyelidL = wrap.querySelector('.robot-eyelid-l');
+    const eyelidR = wrap.querySelector('.robot-eyelid-r');
+    const delay = (i * 0.4) + 's';
+    eyelidL.style.animationDelay = delay;
+    eyelidR.style.animationDelay = delay;
+    slot.appendChild(wrap);
     robotInstances.push({
-      svg,
-      pupils: svg.querySelector('.robot-pupils')
+      wrap,
+      glintL: wrap.querySelector('.robot-glint-l'),
+      glintR: wrap.querySelector('.robot-glint-r')
     });
   });
 
-  // ---------- Eyes follow the pointer / touch ----------
-  const EYE_MAX_OFFSET = 7.5;
-  const VIEWBOX_W = 240;
+  // ---------- Eyes (glints) follow the pointer / touch ----------
   let ticking = false;
 
   function updateEyes(px, py){
     robotInstances.forEach(inst => {
-      const rect = inst.svg.getBoundingClientRect();
+      const rect = inst.wrap.getBoundingClientRect();
       if(rect.width === 0) return;
-      const scale = VIEWBOX_W / rect.width;
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height * 0.42;
+      const cx = rect.left + rect.width * 0.485;
+      const cy = rect.top + rect.height * 0.24;
       const dx = px - cx;
       const dy = py - cy;
-      const dist = Math.min(1, Math.sqrt(dx*dx + dy*dy) / 180);
+      const dist = Math.min(1, Math.sqrt(dx*dx + dy*dy) / 220);
       const angle = Math.atan2(dy, dx);
-      const ox = Math.cos(angle) * EYE_MAX_OFFSET * dist * scale;
-      const oy = Math.sin(angle) * EYE_MAX_OFFSET * 0.7 * dist * scale;
-      inst.pupils.style.transform = `translate(${ox}px, ${oy}px)`;
+      const maxOffset = rect.width * 0.022;
+      const ox = Math.cos(angle) * maxOffset * dist;
+      const oy = Math.sin(angle) * maxOffset * 0.6 * dist;
+      const t = `translate(${ox}px, ${oy}px)`;
+      inst.glintL.style.transform = t;
+      inst.glintR.style.transform = t;
     });
     ticking = false;
   }
@@ -523,7 +508,10 @@
   }, { passive:true });
 
   window.addEventListener('touchend', () => {
-    robotInstances.forEach(inst => { inst.pupils.style.transform = 'translate(0,0)'; });
+    robotInstances.forEach(inst => {
+      inst.glintL.style.transform = 'translate(0,0)';
+      inst.glintR.style.transform = 'translate(0,0)';
+    });
   });
 
   // ---------- Build the 8 session buttons for each unit ----------

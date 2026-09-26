@@ -2449,7 +2449,8 @@
           <div class="fld"><label for="lgEmail">Correo</label><input id="lgEmail" type="email" autocomplete="username" required value="${esc(panel.email || '')}"></div>
           <div class="fld"><label for="lgPass">Contraseña</label><input id="lgPass" type="password" autocomplete="current-password" required></div>
           ${panel.err ? `<p class="send warn">${esc(panel.err)}</p>` : ''}
-          <div class="tk-actions"><button type="submit" class="btn solid">Ingresar</button></div>
+          ${panel.info ? `<p class="send ok">${esc(panel.info)}</p>` : ''}
+          <div class="tk-actions"><button type="submit" class="btn solid">Ingresar</button><button type="button" class="btn ghost" data-tk="forgot">¿Olvidaste tu contraseña?</button></div>
         </form>
       </div>`;
       setTimeout(() => { const f = panel.email ? $('#lgPass') : $('#lgEmail'); f && f.focus(); }, 60);
@@ -2516,6 +2517,7 @@
     const btn = e.target.querySelector('button[type="submit"]');
     btn.disabled = true; btn.textContent = 'Ingresando…';
     panel.email = $('#lgEmail').value.trim();
+    panel.info = '';
     try{
       await signIn(await fbConfig(), $('#lgEmail').value.trim(), $('#lgPass').value);
       await loadPanel();
@@ -2565,6 +2567,23 @@
     else if(act === 'resend') send();
     else if(act === 'csv') resultsCsv();
     else if(act === 'reload') loadPanel();
+    else if(act === 'forgot'){
+      const email = ($('#lgEmail') && $('#lgEmail').value.trim()) || panel.email || '';
+      panel.email = email;
+      panel.info = '';
+      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ panel.err = 'Escribe primero tu correo y luego toca "¿Olvidaste tu contraseña?".'; renderPanel(); return; }
+      a.disabled = true; a.textContent = 'Enviando…';
+      try{
+        const c = await fbConfig();
+        const r = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${c.apiKey}`,
+          { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ requestType:'PASSWORD_RESET', email }) });
+        const j = await r.json().catch(() => ({}));
+        if(!r.ok && !/EMAIL_NOT_FOUND/.test((j.error && j.error.message) || '')) throw new Error('x');
+        panel.err = '';
+        panel.info = `📧 Si ${email} es tu cuenta de docente, te llegará un correo para crear una nueva contraseña. Revisa también la carpeta de Spam.`;
+      }catch(err){ panel.err = 'No se pudo enviar el correo. Revisa tu conexión e inténtalo otra vez.'; }
+      renderPanel();
+    }
     else if(act === 'logout'){ try{ localStorage.removeItem(AUTH_KEY); }catch(_){} loadPanel(); }
   });
   tkDlg.addEventListener('close', () => { tkBody.innerHTML = ''; panel = panel && { section: panel.section, email: panel.email }; });

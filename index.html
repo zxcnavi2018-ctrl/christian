@@ -1833,6 +1833,100 @@
   .ai-acts{ display:flex; flex-wrap:wrap; gap:8px; } .ai-acts .btn{ flex:1; }
   .ai-note{ margin:0; font-size:12px; font-weight:700; color:var(--ink-3); }
   @media (max-width:560px){ .ai-row{ flex-direction:column; } .ai-gen{ width:100%; } }
+  /* ---------- Tienda: estrellas grandes ---------- */
+  .v-side .bal-card{ position:relative; overflow:hidden; flex:1; display:flex; flex-direction:column; justify-content:center; gap:6px; padding:18px 18px 16px;
+    background:radial-gradient(90% 70% at 100% 0%, rgba(255,209,90,.38), transparent 60%), linear-gradient(150deg, #1d2a5c 0%, #2f4aa0 60%, #4a5fd6 100%); }
+  .v-side .bal-card::after{ content:"⭐"; position:absolute; right:-14px; bottom:-26px; font-size:110px; opacity:.13; transform:rotate(-14deg); pointer-events:none; }
+  .v-side .bal-card .bal-v{ font-size:clamp(46px, 13vw, 68px); line-height:1; letter-spacing:-.02em; text-shadow:0 4px 0 rgba(0,0,0,.18); }
+  .v-side .bal-card small{ font-size:13px; }
+  .it-price.tour{ background:linear-gradient(135deg, #7c3aed, #db2777); color:#fff; }
+  .it-btn.tour{ background:linear-gradient(135deg, #7c3aed, #db2777); color:#fff; box-shadow:0 6px 12px rgba(124,58,237,.28); }
+  /* ---------- botones Torneo y Correo ---------- */
+  .side-btn.tour .sb-ico{ background:linear-gradient(135deg, #fff1c2, #ffcf5c); }
+  .side-btn.mail .sb-ico{ background:linear-gradient(135deg, #e0ecff, #b9d2ff); }
+  .side-btn.tour.ready::after, .side-btn.mail.ready::after{ content:""; position:absolute; top:-4px; right:-4px; width:14px; height:14px; border-radius:50%; background:#ef4444; border:2px solid #fff; }
+  .side-btn.mail .sb-n{ position:absolute; top:-7px; right:-7px; z-index:1; min-width:20px; height:20px; padding:0 5px; border-radius:999px; display:none; align-items:center; justify-content:center; background:#ef4444; color:#fff; font-size:11px; font-weight:900; border:2px solid #fff; }
+  .side-btn.mail.ready .sb-n{ display:flex; } .side-btn.mail.ready::after{ display:none; }
+  .hcard.c-tour .hc-ico{ font-size:22px; background:linear-gradient(135deg, #fff1c2, #ffcf5c); }
+  /* ---------- 🏅 Torneo ---------- */
+  .tk-step.tour{ display:flex; flex-direction:column; gap:14px; }
+  .tr-hero{ display:flex; align-items:center; gap:14px; padding:14px 18px; border-radius:22px; color:#fff;
+    background:radial-gradient(80% 90% at 0% 0%, rgba(255,209,90,.35), transparent 60%), linear-gradient(135deg, #3b1d7a, #7c3aed 55%, #db2777); box-shadow:0 14px 28px rgba(124,58,237,.3); }
+  .tr-hero > div:last-child{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .tr-hero small{ font-size:12px; font-weight:900; letter-spacing:.06em; text-transform:uppercase; color:#fde68a; }
+  .tr-hero b{ font-size:clamp(19px, 5vw, 24px); font-weight:900; line-height:1.15; }
+  .tr-hero em{ font-style:normal; font-size:13px; font-weight:700; opacity:.9; }
+  .tr-hero.done > span{ font-size:46px; }
+  .tr-set{ position:relative; flex-shrink:0; width:112px; margin-right:4px; display:flex; justify-content:center; }
+  .tr-set .robot{ --rw:92px; }
+  .tr-crown{ position:absolute; top:-14px; left:50%; transform:translateX(-50%); font-size:26px; filter:drop-shadow(0 2px 4px rgba(0,0,0,.3)); }
+  .tr-prizes{ display:grid; grid-template-columns:repeat(auto-fit, minmax(92px, 1fr)); gap:8px; }
+  .tr-pz{ display:flex; flex-direction:column; align-items:center; gap:2px; padding:8px 6px; border-radius:14px; background:#fff; border:1.5px solid var(--line); text-align:center; }
+  .tr-pz b{ font-size:15px; font-weight:900; color:var(--navy); } .tr-pz span{ font-size:12.5px; font-weight:800; color:var(--ink-2); }
+  .tr-pz.first{ grid-column:1 / -1; flex-direction:row; justify-content:center; gap:8px; background:linear-gradient(135deg, #fff7d6, #ffe8a3); border-color:#f5c542; }
+  .tr-pz.all{ background:var(--soft); }
+  .tr-go{ width:100%; min-height:58px; border:none; border-radius:18px; cursor:pointer; font:inherit; font-size:18px; font-weight:900; color:#3b1d00;
+    background:linear-gradient(135deg, #fde047, #f59e0b); box-shadow:0 6px 0 #b45309, 0 14px 26px rgba(245,158,11,.35); transition:transform .12s, box-shadow .12s; }
+  .tr-go:active{ transform:translateY(4px); box-shadow:0 2px 0 #b45309; }
+  .tr-go:focus-visible{ outline:3px solid var(--navy); outline-offset:3px; }
+  .tr-note{ padding:12px 14px; border-radius:16px; background:var(--soft); font-size:14px; font-weight:800; color:var(--ink-2); line-height:1.45; }
+  .tr-note.ok{ background:#e8f8ee; color:#13824a; }
+  .tr-rules{ display:flex; flex-direction:column; gap:6px; padding:14px 16px; border-radius:18px; background:#fffaf0; border:1.5px solid #f5c542; }
+  .tr-rules b{ color:var(--navy); } .tr-rules p{ margin:0; font-size:14px; font-weight:700; line-height:1.5; color:var(--ink-2); }
+  .tr-sub{ margin:0; font-size:13px; font-weight:900; letter-spacing:.04em; color:var(--ink-3); text-transform:uppercase; }
+  .tr-empty{ margin:0; text-align:center; font-weight:800; color:var(--ink-3); }
+  .tr-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(84px, 1fr)); gap:8px; }
+  .tr-mate{ display:flex; flex-direction:column; align-items:center; gap:2px; padding:8px 4px 6px; border-radius:16px; background:#fff; border:1px solid var(--line); min-width:0; }
+  .tr-mate .robot{ --rw:62px; } .tr-mate .robot-shadow{ display:none; }
+  .tr-mate b{ font-size:12px; font-weight:900; color:var(--navy); max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .tr-mate small{ font-size:10.5px; font-weight:800; color:var(--ink-3); }
+  .tr-mate.empty{ justify-content:center; background:transparent; border-style:dashed; min-height:112px; } .tr-mate.empty span{ font-size:28px; font-weight:900; color:var(--ink-3); }
+  .tr-pod, .tr-res{ margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:8px; }
+  .tr-pod li, .tr-res li{ display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:16px; background:#fff; border:1px solid var(--line); }
+  .tr-pod li.p1{ background:linear-gradient(135deg, #fff7d6, #ffe8a3); border-color:#f5c542; } .tr-pod li.me{ box-shadow:0 0 0 3px var(--blue); }
+  .tr-pod .robot, .tr-res .robot{ --rw:48px; flex-shrink:0; } .tr-pod .robot-shadow, .tr-res .robot-shadow{ display:none; }
+  .tr-pod li > div:not(.robot), .tr-res li > div:not(.robot){ flex:1; min-width:0; display:flex; flex-direction:column; }
+  .tr-pod li > .robot, .tr-res li > .robot{ flex:0 0 auto; }
+  .tr-pod b, .tr-res b{ font-size:14.5px; font-weight:900; color:var(--navy); } .tr-pod small, .tr-res small{ font-size:12px; font-weight:800; color:var(--ink-3); }
+  .tr-pos{ min-width:34px; text-align:center; font-size:18px; font-weight:900; color:var(--navy); }
+  .tr-res li.wait{ opacity:.65; } .tr-res .tr-give{ flex:0 0 auto !important; width:auto !important; padding:8px 12px !important; font-size:12.5px !important; }
+  .tr-acts{ flex-wrap:wrap; }
+  .tr-setpick{ display:grid; grid-template-columns:repeat(auto-fill, minmax(104px, 1fr)); gap:8px; }
+  .tr-sp input{ position:absolute; opacity:0; pointer-events:none; }
+  .tr-sp span{ display:flex; flex-direction:column; align-items:center; gap:2px; padding:8px 4px; border-radius:16px; border:2px solid var(--line); background:#fff; cursor:pointer; text-align:center; }
+  .tr-sp .robot{ --rw:66px; } .tr-sp .robot-shadow{ display:none; }
+  .tr-sp b{ font-size:11.5px; font-weight:900; color:var(--navy); line-height:1.2; }
+  .tr-sp input:checked + span{ border-color:#7c3aed; box-shadow:0 0 0 4px rgba(124,58,237,.18); background:#faf5ff; }
+  .tr-sp input:focus-visible + span{ outline:3px solid var(--navy); outline-offset:2px; }
+  .tour-q{ display:flex; flex-direction:column; gap:16px; }
+  .tr-dots{ justify-content:center; } .tr-dots i{ background:var(--line); } .tr-dots i.on{ background:#22a860; box-shadow:none; } .tr-dots i.cur{ background:var(--blue); }
+  .tr-q{ margin:0; text-align:center; font-size:clamp(19px, 3vw, 23px); font-weight:900; line-height:1.35; color:var(--navy); text-wrap:balance; }
+  .tr-opts{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .tr-opt{ display:flex; align-items:center; gap:10px; min-height:62px; padding:12px; border-radius:18px; border:none; font:inherit; font-size:15.5px; font-weight:800; text-align:left; color:#fff; cursor:pointer; box-shadow:0 5px 0 rgba(0,0,0,.22); }
+  .tr-opt span{ width:30px; height:30px; flex-shrink:0; border-radius:10px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,.25); font-weight:900; }
+  .tr-opt:active{ transform:translateY(3px); box-shadow:0 2px 0 rgba(0,0,0,.22); }
+  .tr-opt.c0{ background:linear-gradient(160deg, #f0616a, #d9364a); } .tr-opt.c1{ background:linear-gradient(160deg, #4f86f7, #2b5fd9); }
+  .tr-opt.c2{ background:linear-gradient(160deg, #f2b53a, #d98e0f); } .tr-opt.c3{ background:linear-gradient(160deg, #2fbf6e, #178a4a); }
+  /* ---------- ✉️ Correo ---------- */
+  .tk-step.mail{ display:flex; flex-direction:column; gap:12px; }
+  .ml-list{ display:flex; flex-direction:column; gap:10px; }
+  .ml-card{ position:relative; display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:18px; background:#fff; border:1.5px solid var(--line);
+    background-image:repeating-linear-gradient(135deg, rgba(47,111,237,.08) 0 10px, transparent 10px 20px, rgba(239,68,68,.08) 20px 30px, transparent 30px 40px); background-size:100% 6px; background-repeat:no-repeat; }
+  .ml-card.set{ border-color:#c4b5fd; }
+  .ml-card.got{ opacity:.8; }
+  .ml-art{ flex-shrink:0; width:70px; display:flex; justify-content:center; }
+  .ml-art .robot{ --rw:64px; } .ml-art .robot-shadow{ display:none; }
+  .ml-star{ display:flex; flex-direction:column; align-items:center; font-size:34px; line-height:1; } .ml-star b{ font-size:18px; font-weight:900; color:#b45309; }
+  .ml-txt{ flex:1 1 180px; min-width:0; display:flex; flex-direction:column; gap:2px; }
+  .ml-txt small{ font-size:11.5px; font-weight:900; color:var(--ink-3); } .ml-txt b{ font-size:15px; font-weight:900; color:var(--navy); line-height:1.25; } .ml-txt span{ font-size:12.5px; font-weight:700; color:var(--ink-2); }
+  .ml-claim{ flex-shrink:0; white-space:nowrap; background:linear-gradient(135deg, #fde047, #f59e0b) !important; color:#3b1d00 !important; }
+  .ml-done{ flex-shrink:0; font-size:12.5px; font-weight:900; color:#13824a; }
+  .ml-wear{ flex-shrink:0; }
+  @media (max-width:560px){
+    .tr-opts{ grid-template-columns:1fr; } .tr-opt{ min-height:54px; }
+    .ml-card{ flex-wrap:wrap; } .ml-claim, .ml-wear{ flex:1 1 100%; width:100%; } .ml-txt{ flex-basis:calc(100% - 90px); } .ml-done{ flex:1 1 100%; text-align:center; }
+    .tr-set{ width:78px; } .tr-set .robot{ --rw:76px; }
+  }
   .dl-wait{ flex:1; text-align:center; padding:13px; border-radius:16px; background:var(--soft); font-weight:900; color:var(--ink-2); }
   .dl-how{ margin:0 0 6px; font-size:13px; font-weight:700; color:var(--ink-2); }
   .dl-how summary{ cursor:pointer; font-weight:900; color:var(--blue); }
@@ -2349,11 +2443,11 @@
       <div class="home-stage"><div data-robot-slot></div></div>
       <button type="button" class="hint" id="startBtn">Iniciar</button>
     </div>
-    <div class="edge-left"><button type="button" class="side-btn more" data-more aria-label="Misiones"><span class="sb-ico">📜</span>Misiones</button><button type="button" class="side-btn vs" data-vs-open aria-label="Duelos VS"><span class="sb-ico">VS</span>Duelos</button></div><div class="edge-right"><button type="button" class="shop-btn" data-shop aria-label="Tienda de Moli"><span class="sb-ico">🛍️</span>Tienda</button><button type="button" class="side-btn gift" data-gift aria-label="Estrellas gratis"><span class="sb-ico">⭐</span>Gratis</button></div>
+    <div class="edge-left"><button type="button" class="side-btn more" data-more aria-label="Misiones"><span class="sb-ico">📜</span>Misiones</button><button type="button" class="side-btn vs" data-vs-open aria-label="Duelos VS"><span class="sb-ico">VS</span>Duelos</button><button type="button" class="side-btn tour" data-tour aria-label="Torneo"><span class="sb-ico">🏅</span>Torneo</button></div><div class="edge-right"><button type="button" class="shop-btn" data-shop aria-label="Tienda de Moli"><span class="sb-ico">🛍️</span>Tienda</button><button type="button" class="side-btn gift" data-gift aria-label="Estrellas gratis"><span class="sb-ico">⭐</span>Gratis</button><button type="button" class="side-btn mail" data-mail aria-label="Correo"><span class="sb-ico">✉️</span>Correo<span class="sb-n"></span></button></div>
   </section>
 
   <section class="screen" id="screen-menu" aria-label="Elegir unidad">
-    <div class="edge-left"><button type="button" class="side-btn more" data-more aria-label="Misiones"><span class="sb-ico">📜</span>Misiones</button><button type="button" class="side-btn vs" data-vs-open aria-label="Duelos VS"><span class="sb-ico">VS</span>Duelos</button></div><div class="edge-right"><button type="button" class="shop-btn" data-shop aria-label="Tienda de Moli"><span class="sb-ico">🛍️</span>Tienda</button><button type="button" class="side-btn gift" data-gift aria-label="Estrellas gratis"><span class="sb-ico">⭐</span>Gratis</button></div>
+    <div class="edge-left"><button type="button" class="side-btn more" data-more aria-label="Misiones"><span class="sb-ico">📜</span>Misiones</button><button type="button" class="side-btn vs" data-vs-open aria-label="Duelos VS"><span class="sb-ico">VS</span>Duelos</button><button type="button" class="side-btn tour" data-tour aria-label="Torneo"><span class="sb-ico">🏅</span>Torneo</button></div><div class="edge-right"><button type="button" class="shop-btn" data-shop aria-label="Tienda de Moli"><span class="sb-ico">🛍️</span>Tienda</button><button type="button" class="side-btn gift" data-gift aria-label="Estrellas gratis"><span class="sb-ico">⭐</span>Gratis</button><button type="button" class="side-btn mail" data-mail aria-label="Correo"><span class="sb-ico">✉️</span>Correo<span class="sb-n"></span></button></div>
     <div class="menu-wrap">
       <div class="bubble" id="menuBubble" aria-live="polite">
         <p class="bubble-text" id="menuText"></p>
@@ -2583,6 +2677,8 @@
     else if(e.target.closest('[data-gift]')){ e.stopPropagation(); openDaily(); }
     else if(e.target.closest('[data-more]')){ e.stopPropagation(); openMore(); }
     else if(e.target.closest('[data-vs-open]')){ e.stopPropagation(); openDuel(); }
+    else if(e.target.closest('[data-tour]')){ e.stopPropagation(); openTour(); }
+    else if(e.target.closest('[data-mail]')){ e.stopPropagation(); openMail(); }
   }, true);
   $('#backBtn').addEventListener('click', goBack);
   document.addEventListener('click', e => {
@@ -3489,6 +3585,7 @@
     const giftReady = !!(me() && !isTeacher() && !dailyState().claimed);
     $$('[data-gift]').forEach(b => b.classList.toggle('ready', giftReady));
     if(acct && tkDlg.open && acct.view === 'shop') renderShop();
+    mailBadge(); tourBadge();
     syncRanking();
     if(route.name === 'session' && !editing){ const box = $('#tkCtaBox'); if(box) box.outerHTML = ticketHtml(curSession()); }
     if(route.name === 'unit' && !editing) renderUnit();
@@ -3513,6 +3610,10 @@
     if(v === 'shop') return renderShop();
     if(v === 'daily') return renderDaily();
     if(v === 'duel') return renderDuel();
+    if(v === 'tour') return renderTour();
+    if(v === 'tour-q') return renderTourQ();
+    if(v === 'mail') return renderMail();
+    if(v === 'tour-edit') return renderTourEditor();
     if(v === 'vs-edit') return renderVsEditor();
     if(v === 'more') return renderMore();
     if(v === 'pr-edit') return renderPracticeEditor();
@@ -3802,9 +3903,10 @@
     if(u && u.teacher) return { earned: Infinity, fromTickets: 0, fromCodes: 0, spent: 0, left: Infinity };
     const fromTickets = u ? missionStats().stars : 0, fromCodes = u ? closetOf(u.key).codes.length : 0;
     const fromDaily = u ? dailyOf(u.key).total : 0, fromPractice = u ? bonusOf(u.key).done.length * BONUS_STARS : 0;
-    const earned = fromTickets + fromCodes + fromDaily + fromPractice;
+    const fromMail = u ? mailStars(u.key) : 0;
+    const earned = fromTickets + fromCodes + fromDaily + fromPractice + fromMail;
     const spent = u ? closetOf(u.key).owned.reduce((t, id) => t + ((ITEM[id] && ITEM[id].p) || 0), 0) : 0;
-    return { earned, fromTickets, fromCodes, fromDaily, fromPractice, spent, left: Math.max(0, earned - spent) };
+    return { earned, fromTickets, fromCodes, fromDaily, fromPractice, fromMail, spent, left: Math.max(0, earned - spent) };
   }
   async function verifyCodes(c, key, codes){
     const ok = await Promise.all(codes.map(async code => {
@@ -3927,17 +4029,19 @@
         ${u.teacher ? '' : `<div class="cat-f" role="group" aria-label="Filtrar">${[['all', 'Todo'], ['afford', 'Puedo comprar'], ['mine', 'Míos']].map(([k, t]) => `<button type="button" class="${filter === k ? 'on' : ''}" data-shop-filter="${k}">${t}</button>`).join('')}</div>`}
       </div>`;
     const gridHTML = () => {
-      const items = cat.items.filter(it => filter === 'mine' ? own(it.id) : filter === 'afford' ? !own(it.id) && bal.left >= it.p : true);
+      const items = cat.items.filter(it => filter === 'mine' ? own(it.id) : filter === 'afford' ? !own(it.id) && bal.left >= it.p && ITEM[it.id].slot !== 'skin' : true);
       return `<div class="shop-grid">${items.map(it => {
         const slot = ITEM[it.id].slot, owned = own(it.id), on = cl.equipped[slot] === it.id, tr = acct.preview === it.id, [rk, rn] = RARITY(ITEM[it.id]);
-        const locked = !owned && bal.left < it.p;
+        const tourOnly = slot === 'skin' && !owned;
+        const locked = !owned && (tourOnly || bal.left < it.p);
         const act = on ? `<button type="button" class="it-btn off" data-shop-unequip="${slot}">Quitar</button>`
           : owned ? `<button type="button" class="it-btn puton" data-shop-equip="${it.id}">Ponérselo</button>`
+          : tourOnly ? `<button type="button" class="it-btn tour" data-tour>🏅 Gánalo en el Torneo</button>`
           : !locked ? `<button type="button" class="it-btn buy" data-shop-buy="${it.id}">Comprar ⭐${it.p}</button>`
           : `<span class="it-btn need">🔒 Te faltan ⭐${it.p - bal.left}</span>`;
         return `<div class="it r-${rk}${on ? ' on' : ''}${tr ? ' trying' : ''}${locked ? ' locked' : ''}" data-shop-try="${it.id}">
           <span class="it-rar">${rn}</span>
-          ${on ? '<span class="it-flag">Puesto ✓</span>' : owned ? '<span class="it-flag own">Tuyo</span>' : `<span class="it-price">⭐ ${it.p}</span>`}
+          ${on ? '<span class="it-flag">Puesto ✓</span>' : owned ? '<span class="it-flag own">Tuyo</span>' : tourOnly ? '<span class="it-price tour" title="Solo en torneos">🏅</span>' : `<span class="it-price">⭐ ${it.p}</span>`}
           <div class="it-art">${still(itemArt(ITEM[it.id]))}</div>
           <b>${it.n}</b>${it.th ? `<small class="it-th">${it.th}</small>` : ''}${act}</div>`;
       }).join('') || `<div class="pr-empty">${filter === 'mine' ? 'Todavía no tienes objetos de esta sección.' : 'No te alcanza para ninguno todavía. ¡Gana más estrellas! 📜'}</div>`}</div>`;
@@ -3961,7 +4065,7 @@
     }
     tkTop.innerHTML = `<small>🛍️ Tienda de Moli</small><strong>Viste a Moli</strong><span>${u.teacher ? 'Modo docente · todo gratis' : 'Compra con las estrellas que ganas'}</span>
       <button class="tk-x" type="button" data-tk="close" aria-label="Cerrar">✕</button>`;
-    const chips = u.teacher ? '' : [['🎟️', bal.fromTickets, 'Exit tickets'], ['🔑', bal.fromCodes, 'Códigos'], ['⭐', bal.fromDaily, 'Gratis'], ['📜', bal.fromPractice, 'Misiones']]
+    const chips = u.teacher ? '' : [['🎟️', bal.fromTickets, 'Exit tickets'], ['🔑', bal.fromCodes, 'Códigos'], ['⭐', bal.fromDaily, 'Gratis'], ['📜', bal.fromPractice, 'Misiones'], ['✉️', bal.fromMail, 'Premios']]
       .filter(([, n]) => n).map(([i, n, t]) => `<span class="bal-chip" title="${t}">${i} ${n}</span>`).join('');
     const st = dailyState();
     tkBody.innerHTML = `<div class="tk-step shop">
@@ -3974,7 +4078,6 @@
             ${u.teacher ? '<small>Modo docente · todo gratis</small>' : `<small>Ganaste ${bal.earned} · Gastaste ${bal.spent}</small><div class="bal-chips">${chips}</div>`}
           </div>
           <p class="v-msg">${msgHTML()}</p>
-          ${u.teacher ? '' : `<div class="v-quick"><button type="button" class="v-q${st.claimed ? '' : ' ready'}" data-gift>⭐ Gratis</button><button type="button" class="v-q" data-more>📜 Misiones</button></div>`}
         </div>
       </div>
       ${u.teacher ? '' : `<details class="code-box"${acct.codeMsg ? ' open' : ''}>
@@ -4000,7 +4103,7 @@
     acct.info = '';
     if(kind === 'buy'){
       const it = ITEM[id];
-      if(!it || ownsItem(u.key, id) || starsBalance().left < it.p) return;
+      if(!it || ownsItem(u.key, id) || starsBalance().left < it.p || it.slot === 'skin') return;   // los sets solo se ganan en torneos
       cl.owned.push(id);
       cl.equipped[it.slot] = id;
       (CLASH[it.slot] || []).forEach(x => delete cl.equipped[x]);
@@ -4694,6 +4797,7 @@
         <button type="button" class="hcard c-res" data-tk="h-res"><span class="hc-ico">${HOME_ICONS.res}</span><strong>Resultados</strong><span>Notas por sección, niveles de logro y preguntas que conviene reforzar.</span></button>
         <button type="button" class="hcard c-acc" data-tk="h-acc"><span class="hc-ico">👥</span><strong>Cuentas de estudiantes</strong><span>Mira quién se registró y borra cuentas.</span></button>
         <button type="button" class="hcard c-more" data-tk="h-more"><span class="hc-ico">📜</span><strong>Misiones</strong><span>Crea hasta 10 misiones (Exit tickets de práctica) que dan ⭐2.</span></button>
+        <button type="button" class="hcard c-tour" data-tk="h-tour"><span class="hc-ico">🏅</span><strong>Torneo</strong><span>Crea un torneo de 20 cupos, elige el set del ganador y envía los premios.</span></button>
         <button type="button" class="hcard c-vs" data-tk="h-vs"><span class="hc-ico">⚔️</span><strong>Preguntas VS</strong><span>Agrega o edita las preguntas de los duelos (salen 5 al azar).</span></button>
         <button type="button" class="hcard c-edit" data-tk="h-edit"><span class="hc-ico">${HOME_ICONS.edit}</span><strong>Editar la página</strong><span>Toca cualquier texto, sube fichas y cambia las preguntas del Exit ticket.</span></button>
         <button type="button" class="hcard c-save" data-tk="h-save"><span class="hc-ico">☁️</span><strong>Publicar cambios</strong><span>${dirty ? '<b>Tienes cambios sin publicar.</b> ' : ''}Se publican solos al editar; aquí puedes hacerlo ya.</span></button>
@@ -4743,6 +4847,7 @@
     if(e.target.id === 'codeForm'){ e.preventDefault(); redeemCode($('#codeIn').value); return; }
     if(e.target.id === 'prForm'){ e.preventDefault(); submitPracticeForm(); return; }
     if(e.target.id === 'vsForm'){ e.preventDefault(); submitVsForm(); return; }
+    if(e.target.id === 'trForm'){ e.preventDefault(); submitTourForm(); return; }
     if(e.target.id !== 'loginForm') return;
     e.preventDefault();
     const btn = e.target.querySelector('button[type="submit"]');
@@ -4784,6 +4889,12 @@
     const tab = t.closest('[data-tab]');
     if(tab){ panel.section = tab.dataset.tab; renderPanel(); return; }
     if(t.closest('[data-daily-claim]')){ claimDaily(); return; }
+    const trb = t.closest('[data-tr]');
+    if(trb && acct){ tourAction(trb.dataset.tr, trb.dataset.k); return; }
+    const mc = t.closest('[data-mail-claim]');
+    if(mc && acct){ mc.disabled = true; mailClaim(mc.dataset.mailClaim); return; }
+    const mw = t.closest('[data-mail-wear]');
+    if(mw && acct){ shopAction('equip', mw.dataset.mailWear).then(() => { if(acct && acct.view === 'mail'){ acct.info = '😎 ¡Moli ya lo lleva puesto!'; renderMail(); } }); return; }
     const vs = t.closest('[data-vs]');
     if(vs){ duelAction(vs.dataset.vs, vs.dataset.k); return; }
     const vq = t.closest('[data-vsq]');
@@ -4818,6 +4929,7 @@
     else if(act === 'h-res') openResults();
     else if(act === 'h-more') openPracticeEditor();
     else if(act === 'h-vs') openVsEditor();
+    else if(act === 'h-tour') openTourEditor();
     else if(act === 'shop') openShop();
     else if(act === 'h-acc'){
       openResults();
@@ -4877,7 +4989,7 @@
   });
   tkBody.addEventListener('keydown', e => { if((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-daily-claim][role="button"]')){ e.preventDefault(); claimDaily(); } });
   tkDlg.addEventListener('close', () => {
-    duelStop(); clearInterval(dailyTick);
+    duelStop(); clearInterval(dailyTick); if(tq){ clearInterval(tq.tick); tq = null; }
     tkBody.innerHTML = ''; tipEl.hidden = true;
     panel = panel && { section: panel.section, sort: panel.sort, email: panel.email };
     if(acct){ acct = null; if(route.name === 'menu' && mode !== 'units' && mode !== 'tutorial') setMode('main', { again:true }); }
@@ -4928,7 +5040,7 @@
   const peruDay = (t = Date.now()) => Math.floor((t - 5 * 3600e3) / 864e5);
   const dailyOf = key => { const d = lsGet(DAILY_KEY, {})[key]; return { day: (d && d.day) || 0, streak: (d && d.streak) || 0, total: (d && d.total) || 0, gifts: (d && d.gifts) || [] }; };
   function setDaily(key, d){ const all = lsGet(DAILY_KEY, {}); all[key] = d; lsSet(DAILY_KEY, all); }
-  const ownsItem = (key, id) => closetOf(key).owned.includes(id) || dailyOf(key).gifts.includes(id);
+  const ownsItem = (key, id) => closetOf(key).owned.includes(id) || dailyOf(key).gifts.includes(id) || mailSets(key).includes(id);
   function dailyState(){
     const u = me(), d = u ? dailyOf(u.key) : dailyOf(''), today = peruDay();
     const claimed = d.day === today;
@@ -5262,7 +5374,8 @@
   const AI_CTX = {
     pr: { n: 5, what: 'Exit ticket de práctica', short: false },
     tk: { n: 5, what: 'Exit ticket de la sesión', short: false },
-    vs: { n: 5, what: 'duelo rápido (5 segundos por pregunta)', short: true }
+    vs: { n: 5, what: 'duelo rápido (5 segundos por pregunta)', short: true },
+    tr: { n: 5, what: 'torneo (Exit ticket que se responde rápido)', short: false }
   };
   const aiSchema = { type:'OBJECT', required:['questions'], properties:{ questions:{ type:'ARRAY', items:{ type:'OBJECT', required:['q', 'options', 'answer'],
     properties:{ q:{ type:'STRING' }, options:{ type:'ARRAY', items:{ type:'STRING' } }, answer:{ type:'INTEGER' }, why:{ type:'STRING' } } } } } };
@@ -5366,8 +5479,8 @@ Reglas:
   }
   function aiUse(ctx, qs){
     const st = aiState[ctx];
-    if(ctx === 'pr' && acct && acct.view === 'pr-edit' && acct.draft){
-      const title = $('#prTitle'); if(title && !title.value.trim()) title.value = clip(st.topic.charAt(0).toUpperCase() + st.topic.slice(1), 60);
+    if((ctx === 'pr' && acct && acct.view === 'pr-edit' && acct.draft) || (ctx === 'tr' && acct && acct.view === 'tour-edit')){
+      const title = $(ctx === 'pr' ? '#prTitle' : '#trTitle'); if(title && !title.value.trim()) title.value = clip(st.topic.charAt(0).toUpperCase() + st.topic.slice(1), 60);
       qs.slice(0, 5).forEach((q, i) => {
         const set = (sel, v) => { const el = $(sel); if(el) el.value = v; };
         set(`[data-q="${i}"]`, q.q); set(`[data-why="${i}"]`, q.why);
@@ -5375,8 +5488,8 @@ Reglas:
         const r = $(`input[name="ans${i}"][value="${q.answer}"]`); if(r) r.checked = true;
       });
       st.result = null; aiRedraw(ctx);
-      toast('✅ Preguntas listas. Revísalas y toca «Guardar ejercicio».');
-      const f = $('#prForm fieldset'); if(f) f.scrollIntoView({ block: 'start', behavior: reduceMotion ? 'auto' : 'smooth' });
+      toast(ctx === 'pr' ? '✅ Preguntas listas. Revísalas y toca «Guardar ejercicio».' : '✅ Preguntas listas. Revísalas y crea el torneo.');
+      const f = $((ctx === 'pr' ? '#prForm' : '#trForm') + ' fieldset'); if(f) f.scrollIntoView({ block: 'start', behavior: reduceMotion ? 'auto' : 'smooth' });
     }
     else if(ctx === 'tk' && editing && route.name === 'session'){
       const s = curUnit().sessions[route.n - 1];
@@ -5407,6 +5520,425 @@ Reglas:
     e.preventDefault();
     aiAction('gen', e.target.closest('.ai-box'));
   }, true);
+
+
+  /* ================= 🏅 Torneo y ✉️ Correo ================= */
+  // Los sets (trajes legendarios) solo se ganan en torneos. La docente crea el torneo (máx. 20 inscritos),
+  // cada estudiante responde el Exit ticket una vez (se mide el tiempo) y nadie ve resultados hasta que ella publica.
+  const TOUR_START_KEY = 'ciencia4b:tourstart:' + APP.docId, TOUR_KEY = 'ciencia4b:tour:' + APP.docId, TOUR_DONE_KEY = 'ciencia4b:tourdone:' + APP.docId, MAIL_KEY = 'ciencia4b:mail:' + APP.docId;
+  const TOUR_MAX = 20, TOUR_PRIZE = [0, 10, 8, 6, 4], TOUR_PART = 1;   // 1.° = set; 2.° a 5.° estrellas; los demás que participaron = 1
+  const SETS = () => (SHOP.find(c => c.slot === 'skin') || { items: [] }).items;
+  let TOUR = lsGet(TOUR_KEY, null);
+  const tourData = () => { try{ return JSON.parse((TOUR && TOUR.data) || '{}'); }catch(e){ return {}; } };
+  const tourPodium = () => { try{ return JSON.parse((TOUR && TOUR.podium) || '[]'); }catch(e){ return []; } };
+  async function loadTour(){
+    const c = await fbConfig();
+    if(!c) return TOUR;
+    try{
+      const r = await fetch(`${docsBase(c)}/tourneys/current?key=${c.apiKey}`);
+      if(r.status === 404){ TOUR = null; lsSet(TOUR_KEY, null); }
+      else if(r.ok){ const d = fromDoc(await r.json()); TOUR = { tid: d.tid, status: d.status, data: d.data, podium: d.podium || '' }; lsSet(TOUR_KEY, TOUR); }
+    }catch(e){}
+    tourBadge();
+    return TOUR;
+  }
+  // un solo lugar para el orden: primero los que acertaron todo (el más rápido gana), luego por puntaje y tiempo
+  const tourOrder = (a, b) => (b.score === b.total) - (a.score === a.total) || b.score - a.score || a.ms - b.ms;
+  const fmtMs = ms => { const s = Math.round(ms / 1000); return s >= 60 ? `${Math.floor(s / 60)} min ${s % 60} s` : `${s} s`; };
+  async function tourSlots(c){
+    const q = { structuredQuery: { from: [{ collectionId: 'tslots' }], where: { fieldFilter: { field: { fieldPath: 'tid' }, op: 'EQUAL', value: { stringValue: TOUR.tid } } }, limit: 40 } };
+    const r = await fetch(`${docsBase(c)}:runQuery?key=${c.apiKey}`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(q) });
+    if(!r.ok) return [];
+    return (await r.json()).filter(x => x.document).map(x => { const d = fromDoc(x.document); d.n = +d.id.split('_')[1]; return d; }).sort((a, b) => a.n - b.n);
+  }
+  const docExists = async (c, col, id) => { try{ const r = await fetch(`${docsBase(c)}/${col}/${id}?key=${c.apiKey}&mask.fieldPaths=at`); return r.ok; }catch(e){ return null; } };
+  function tourBadge(){
+    const u = me(), open = TOUR && TOUR.status === 'open' && u && !u.teacher && !((lsGet(TOUR_DONE_KEY, {})[TOUR.tid] || {})[u.key]);
+    $$('[data-tour]').forEach(b => b.classList.toggle('ready', !!open));
+  }
+
+  // ----- correo -----
+  const mailOf = key => { const m = lsGet(MAIL_KEY, {})[key]; return { items: (m && m.items) || [], claimed: (m && m.claimed) || [] }; };
+  function setMail(key, m){ const all = lsGet(MAIL_KEY, {}); all[key] = m; lsSet(MAIL_KEY, all); }
+  const mailClaimed = key => { const m = mailOf(key); return m.items.filter(it => m.claimed.includes(it.id)); };
+  const mailStars = key => mailClaimed(key).reduce((t, it) => t + (it.kind === 'stars' ? it.stars : 0), 0);
+  const mailSets = key => mailClaimed(key).filter(it => it.kind === 'set').map(it => it.set);
+  const mailPending = key => { const m = mailOf(key); return m.items.filter(it => !m.claimed.includes(it.id)).length; };
+  async function loadMail(){
+    const u = me(), c = await fbConfig();
+    if(!u || u.teacher || !c) return;
+    try{
+      const r = await fetch(`${docsBase(c)}/mail/${u.key}?key=${c.apiKey}`);
+      if(r.status === 404) setMail(u.key, { items: [], claimed: [] });
+      else if(r.ok){ const d = fromDoc(await r.json()); let items = []; try{ items = JSON.parse(d.items || '[]'); }catch(e){} setMail(u.key, { items, claimed: d.claimed || [] }); }
+    }catch(e){ return; }
+    mailBadge(); onAccountChange();
+  }
+  function mailBadge(){
+    const u = me(), n = u && !u.teacher ? mailPending(u.key) : 0;
+    $$('[data-mail]').forEach(b => { b.classList.toggle('ready', n > 0); const e = $('.sb-n', b); if(e) e.textContent = n || ''; });
+  }
+  function openMail(){
+    if(isTeacher()){ toast('🧑‍🏫 El correo es para tus estudiantes: ahí reclaman los premios que les envías.'); return; }
+    if(!me()){ openAccount('login', { then: () => openMail(), msg: '¡Hola! Ingresa con tu DNI para ver tu correo ✉️' }); return; }
+    openAccount('mail');
+    loadMail().then(() => { if(acct && acct.view === 'mail') renderMail(); });
+  }
+  function renderMail(){
+    const u = me(), m = mailOf(u.key), items = [...m.items].sort((a, b) => (b.at || 0) - (a.at || 0)), n = mailPending(u.key);
+    tkTop.innerHTML = `<small>✉️ Correo</small><strong>Mensajes de tu profe</strong><span>${n ? `${n} ${n === 1 ? 'premio por reclamar' : 'premios por reclamar'}` : 'Aquí llegan tus premios'}</span>
+      <button class="tk-x" type="button" data-tk="close" aria-label="Cerrar">✕</button>`;
+    tkBody.innerHTML = `<div class="tk-step mail">
+      ${acct.info ? `<p class="send ok">${acct.info}</p>` : ''}${acct.err ? `<p class="send warn">${acct.err}</p>` : ''}
+      ${items.length ? `<div class="ml-list">${items.map(it => { const got = m.claimed.includes(it.id), set = it.kind === 'set' && ITEM[it.set];
+        return `<div class="ml-card${got ? ' got' : ''}${set ? ' set' : ''}">
+          <div class="ml-art">${set ? still(robotHTML({ outfit: { skin: it.set }, tag:false })) : `<span class="ml-star">⭐<b>${it.stars}</b></span>`}</div>
+          <div class="ml-txt"><small>✉️ ${esc(it.from || 'Tu profe')}</small><b>${esc(it.title || '')}</b><span>${esc(it.msg || '')}</span></div>
+          ${got ? `<span class="ml-done">✅ Reclamado</span>${set && currentOutfit().skin !== it.set ? `<button type="button" class="btn ghost ml-wear" data-mail-wear="${esc(it.set)}">Ponérmelo</button>` : ''}`
+            : `<button type="button" class="btn solid ml-claim" data-mail-claim="${esc(it.id)}">${set ? '🎁 Reclamar set' : `⭐ Reclamar ${it.stars}`}</button>`}
+        </div>`; }).join('')}</div>`
+        : `${sayRow('Tu buzón está vacío por ahora ✉️ Cuando ganes un premio en un torneo, te llegará aquí.')}`}
+      <div class="tk-actions"><button type="button" class="btn ghost" data-tour>🏅 Ver torneo</button><button type="button" class="btn up" data-tk="close">Listo</button></div>
+    </div>`;
+  }
+  async function mailClaim(id){
+    const u = me(), c = await fbConfig();
+    if(!u || !c || !acct) return;
+    const m = mailOf(u.key), it = m.items.find(x => x.id === id);
+    if(!it || m.claimed.includes(id)) return;
+    const claimed = [...m.claimed, id];
+    acct.err = ''; acct.info = '';
+    try{
+      const body = { writes: [{ update: { name: docName(c, 'mail', u.key), fields: toFields({ claimed, updatedAt: new Date() }) }, updateMask: { fieldPaths: ['claimed', 'updatedAt'] } }] };
+      const r = await fetch(`${docsBase(c)}:commit?key=${c.apiKey}`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body) });
+      if(!r.ok){ acct.err = r.status === 403 ? '🔧 No se pudo reclamar. Avísale a tu profe (puede faltar actualizar las reglas).' : '📶 No se pudo conectar. Inténtalo otra vez.'; return renderMail(); }
+    }catch(e){ acct.err = '📶 No se pudo conectar. Inténtalo otra vez.'; return renderMail(); }
+    setMail(u.key, { ...m, claimed });
+    if(it.kind === 'set' && ITEM[it.set]){ acct.info = `🎉 ¡El set ${ITEM[it.set].n} ya es tuyo! Moli ya lo lleva puesto.`; await shopAction('equip', it.set); acct.info = `🎉 ¡El set ${ITEM[it.set].n} ya es tuyo! Moli ya lo lleva puesto.`; }
+    else acct.info = `⭐ ¡Recibiste ${it.stars} ${it.stars === 1 ? 'estrella' : 'estrellas'}!`;
+    mailBadge(); onAccountChange(); renderMail(); confettiIn(tkBody);
+  }
+
+  // ----- torneo: vista del estudiante -----
+  function openTour(){
+    if(isTeacher()){ openTourEditor(); return; }
+    if(!me()){ openAccount('login', { then: () => openTour(), msg: '¡Hola! Ingresa con tu DNI para participar en el torneo 🏅' }); return; }
+    openAccount('tour');
+    acct.loading = true;
+    tourRefresh();
+  }
+  async function tourRefresh(){
+    const u = me(), c = await fbConfig();
+    await loadTour();
+    if(!acct || acct.view !== 'tour') return;
+    acct.slots = []; acct.joined = false; acct.sent = false;
+    if(c && TOUR){
+      let uu = u;
+      if(!uu.rid){ try{ uu = { ...uu, rid: await rankId(uu.dni) }; lsSet(ME_KEY, uu); }catch(e){} }
+      const [slots, joined, sent] = await Promise.all([tourSlots(c), docExists(c, 'tjoin', `${TOUR.tid}_${u.key}`), docExists(c, 'tres', `${TOUR.tid}_${u.key}`)]);
+      acct.slots = slots; acct.joined = !!joined; acct.sent = !!sent || !!((lsGet(TOUR_DONE_KEY, {})[TOUR.tid] || {})[u.key]);
+    }
+    acct.loading = false;
+    if(acct.view === 'tour') renderTour();
+  }
+  const prizeRows = setId => `<div class="tr-prizes">
+      <div class="tr-pz first"><b>1.°</b><span>${ITEM[setId] ? `Set <b>${esc(ITEM[setId].n)}</b>` : 'Un set legendario'}</span></div>
+      ${TOUR_PRIZE.slice(1).map((s, i) => `<div class="tr-pz"><b>${i + 2}.°</b><span>⭐ ${s}</span></div>`).join('')}
+      <div class="tr-pz all"><b>Todos</b><span>⭐ ${TOUR_PART} por participar</span></div>
+    </div>`;
+  const slotGrid = slots => `<div class="tr-grid">${slots.map(s => `<div class="tr-mate">${still(robotHTML({ outfit: outfitOf(s.outfit), tag:false }))}<b>${esc(s.name)}</b><small>${esc(GRADE.replace('to', '') + s.section)}</small></div>`).join('')}
+      ${Array.from({ length: Math.max(0, Math.min(4, TOUR_MAX - slots.length)) }, () => '<div class="tr-mate empty"><span>?</span><small>Cupo libre</small></div>').join('')}</div>`;
+  function renderTour(){
+    const d = tourData(), st = TOUR && TOUR.status, u = me();
+    tkTop.innerHTML = `<small>🏅 Torneo</small><strong>${TOUR && d.title ? esc(d.title) : 'Torneo de Ciencia'}</strong><span>${TOUR && st !== 'published' ? `${acct.slots ? acct.slots.length : 0} de ${TOUR_MAX} inscritos · resultados: ${esc(d.date || 'pronto')}` : 'Gana sets legendarios'}</span>
+      <button class="tk-x" type="button" data-tk="close" aria-label="Cerrar">✕</button>`;
+    const msgs = `${acct.err ? `<p class="send warn">${acct.err}</p>` : ''}${acct.info ? `<p class="send ok">${acct.info}</p>` : ''}`;
+    if(acct.loading){ tkBody.innerHTML = `<div class="tk-step"><div class="dash-loading">${robotHTML()}<p><span class="spin"></span> Buscando el torneo…</p></div></div>`; return; }
+    if(!TOUR){ tkBody.innerHTML = `<div class="tk-step tour">${sayRow('Todavía no hay un torneo 🏅 Tu profe avisará cuando empiece. ¡Los sets legendarios solo se ganan aquí!')}<div class="tk-actions"><button type="button" class="btn up" data-tk="close">Listo</button></div></div>`; return; }
+    if(st === 'published'){
+      const pod = tourPodium(), mine = pod.find(p => p.rid && p.rid === u.rid);
+      tkBody.innerHTML = `<div class="tk-step tour">
+        <div class="tr-hero done"><span>🏆</span><div><small>Resultados publicados</small><b>${esc(d.title || 'Torneo')}</b>${mine ? `<em>Quedaste en el puesto ${mine.pos} 🎉 Revisa tu ✉️ Correo</em>` : ''}</div></div>
+        <ol class="tr-pod">${pod.slice(0, 10).map(p => `<li class="p${p.pos}${mine && p === mine ? ' me' : ''}"><span class="tr-pos">${p.pos <= 3 ? ['🥇', '🥈', '🥉'][p.pos - 1] : p.pos + '.°'}</span>${still(robotHTML({ outfit: outfitOf(p.o), tag:false }))}<div><b>${esc(p.n)}</b><small>${p.score}/${p.total} · ${fmtMs(p.ms)}</small></div></li>`).join('')}</ol>
+        <div class="tk-actions"><button type="button" class="btn solid" data-mail>✉️ Ver mi correo</button><button type="button" class="btn up" data-tk="close">Listo</button></div>
+      </div>`;
+      return;
+    }
+    const setId = d.set, slots = acct.slots || [];
+    const hero = `<div class="tr-hero"><div class="tr-set">${ITEM[setId] ? still(robotHTML({ outfit: { skin: setId }, tag:false })) : ''}<span class="tr-crown">👑</span></div>
+        <div><small>Premio del 1.° lugar</small><b>${ITEM[setId] ? esc(ITEM[setId].n) : 'Set legendario'}</b><em>Solo se gana en el torneo</em></div></div>`;
+    let action = '';
+    if(acct.sent) action = `<div class="tr-note ok">✅ ¡Listo! Tus respuestas se enviaron. Los resultados se publicarán el <b>${esc(d.date || 'día que diga tu profe')}</b>.</div>`;
+    else if(acct.joined) action = st === 'open' ? `<div class="tr-note">Estás inscrito ✅ Tienes <b>un solo intento</b>: responde bien y lo más rápido que puedas.</div><button type="button" class="tr-go" data-tr="start">▶ Empezar el Exit ticket del torneo</button>`
+      : `<div class="tr-note">⏸️ El torneo está cerrado. Espera los resultados el <b>${esc(d.date || 'día que diga tu profe')}</b>.</div>`;
+    else if(st !== 'open') action = `<div class="tr-note">🔒 Las inscripciones están cerradas.</div>`;
+    else if(slots.length >= TOUR_MAX) action = `<div class="tr-note">😮 Ya se llenaron los ${TOUR_MAX} cupos.</div>`;
+    else if(acct.confirm) action = `<div class="tr-rules"><b>📜 Antes de inscribirte</b><p>En este torneo <b>solo ganará el estudiante que complete el Exit ticket más rápido y totalmente bien</b>. Los resultados se publicarán el <b>${esc(d.date || 'día que diga tu profe')}</b>.</p><p>No verás los resultados de nadie hasta ese día, solo los Molis de tus compañeros inscritos.</p>
+        <div class="tk-actions"><button type="button" class="btn solid" data-tr="join">✅ Acepto, inscribirme</button><button type="button" class="btn ghost" data-tr="nojoin">Ahora no</button></div></div>`;
+    else action = `<button type="button" class="tr-go" data-tr="ask">🏅 Inscribirme (${TOUR_MAX - slots.length} cupos libres)</button>`;
+    tkBody.innerHTML = `<div class="tk-step tour">
+      ${hero}${msgs}${action}
+      ${prizeRows(setId)}
+      <p class="tr-sub">👥 Inscritos (${slots.length}/${TOUR_MAX})</p>
+      ${slots.length ? slotGrid(slots) : '<p class="tr-empty">¡Sé el primero en inscribirte!</p>'}
+    </div>`;
+  }
+  async function tourJoin(){
+    const u = me(), c = await fbConfig();
+    if(!u || !c || !TOUR) return;
+    acct.err = ''; acct.info = ''; acct.busy = true;
+    let uu = u;
+    if(!uu.rid){ try{ uu = { ...uu, rid: await rankId(uu.dni) }; lsSet(ME_KEY, uu); }catch(e){ acct.err = 'Abre la página desde su link (https) para inscribirte.'; return renderTour(); } }
+    const slots = await tourSlots(c), taken = new Set(slots.map(s => s.n));
+    const info = { name: rankName(uu.name), section: uu.section, outfit: packOutfit(currentOutfit()), rid: uu.rid, tid: TOUR.tid, at: new Date() };
+    for(let n = 1; n <= TOUR_MAX; n++){
+      if(taken.has(n)) continue;
+      try{
+        const body = { writes: [
+          { update: { name: docName(c, 'tslots', `${TOUR.tid}_${n}`), fields: toFields(info) }, currentDocument: { exists: false } },
+          { update: { name: docName(c, 'tjoin', `${TOUR.tid}_${u.key}`), fields: toFields({ n, rid: uu.rid, at: new Date() }) }, currentDocument: { exists: false } }] };
+        const r = await fetch(`${docsBase(c)}:commit?key=${c.apiKey}`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body) });
+        if(r.ok){ acct.info = '🎉 ¡Te inscribiste! Cuando estés listo, empieza el Exit ticket del torneo.'; acct.confirm = false; break; }
+        if(await docExists(c, 'tjoin', `${TOUR.tid}_${u.key}`)) break;           // ya estaba inscrito
+        if(r.status === 403 && !(await docExists(c, 'tslots', `${TOUR.tid}_${n}`))){ acct.err = '🔧 No se pudo inscribir. Puede que el torneo esté cerrado o falte actualizar las reglas.'; break; }
+      }catch(e){ acct.err = '📶 No se pudo conectar. Inténtalo otra vez.'; break; }
+    }
+    acct.busy = false;
+    await tourRefresh();
+  }
+  // ----- Exit ticket del torneo: sin mostrar si acertó (el resultado se ve el día de la publicación) -----
+  let tq = null;
+  function tourStart(){
+    const d = tourData();
+    if(!d.qs || !d.qs.length) return;
+    // el tiempo cuenta desde el primer inicio: cerrar y volver a empezar no da ventaja
+    const u = me(), starts = lsGet(TOUR_START_KEY, {}), sk = TOUR.tid + '|' + u.key;
+    if(!starts[sk]){ starts[sk] = Date.now(); lsSet(TOUR_START_KEY, starts); }
+    tq = { qs: d.qs, i: 0, answers: [], t0: starts[sk], tid: TOUR.tid };
+    acct.view = 'tour-q';
+    renderTourQ();
+    tq.tick = setInterval(() => { const el = $('#trClock', tkBody); if(!tq || !el) return clearInterval(tq && tq.tick); el.textContent = fmtMs(Date.now() - tq.t0); }, 1000);
+  }
+  function renderTourQ(){
+    const q = tq.qs[tq.i];
+    tkTop.innerHTML = `<small>🏅 Torneo</small><strong>Pregunta ${tq.i + 1} de ${tq.qs.length}</strong><span>⏱️ <b id="trClock">${fmtMs(Date.now() - tq.t0)}</b> · un solo intento</span>`;
+    tkBody.innerHTML = `<div class="tk-step tour-q">
+      <div class="vs-dots tr-dots">${tq.qs.map((_, i) => `<i${i < tq.i ? ' class="on"' : i === tq.i ? ' class="cur"' : ''}></i>`).join('')}</div>
+      <h3 class="tr-q">${esc(q.q)}</h3>
+      <div class="tr-opts">${q.options.map((o, k) => o ? `<button type="button" class="tr-opt c${k}" data-tr="ans" data-k="${k}"><span>${LETTERS[k]}</span>${esc(o)}</button>` : '').join('')}</div>
+    </div>`;
+  }
+  async function tourAnswer(k){
+    if(!tq || acct.view !== 'tour-q') return;
+    tq.answers.push(+k);
+    if(tq.i < tq.qs.length - 1){ tq.i++; return renderTourQ(); }
+    clearInterval(tq.tick);
+    const ms = Math.max(1, Math.round(Date.now() - tq.t0)), score = tq.qs.reduce((t, q, i) => t + (tq.answers[i] === q.answer ? 1 : 0), 0);
+    const u = me(), c = await fbConfig(), done = { score, total: tq.qs.length, ms, answers: tq.answers, at: new Date() };
+    tkTop.innerHTML = `<small>🏅 Torneo</small><strong>Enviando…</strong><span>No cierres esta ventana</span>`;
+    tkBody.innerHTML = `<div class="tk-step"><div class="dash-loading">${robotHTML()}<p><span class="spin"></span> Enviando tus respuestas…</p></div></div>`;
+    let ok = false;
+    for(let a = 0; a < 3 && !ok; a++){
+      try{
+        const body = { writes: [{ update: { name: docName(c, 'tres', `${tq.tid}_${u.key}`), fields: toFields(done) }, currentDocument: { exists: false } }] };
+        const r = await fetch(`${docsBase(c)}:commit?key=${c.apiKey}`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body) });
+        ok = r.ok || !!(await docExists(c, 'tres', `${tq.tid}_${u.key}`));
+      }catch(e){ await new Promise(r => setTimeout(r, 1500)); }
+    }
+    const all = lsGet(TOUR_DONE_KEY, {}); all[tq.tid] = { ...(all[tq.tid] || {}), [u.key]: 1 }; lsSet(TOUR_DONE_KEY, all);
+    tq = null; acct.view = 'tour';
+    acct.info = ok ? '' : ''; acct.err = ok ? '' : '📶 No se pudieron enviar tus respuestas. Revisa tu internet y avísale a tu profe.';
+    tourBadge();
+    await tourRefresh();
+  }
+  function tourAction(kind, k){
+    if(!acct) return;
+    if(kind === 'ask'){ acct.confirm = true; acct.err = ''; renderTour(); }
+    else if(kind === 'nojoin'){ acct.confirm = false; renderTour(); }
+    else if(kind === 'join' && !acct.busy){ const b = $('[data-tr="join"]', tkBody); if(b){ b.disabled = true; b.textContent = 'Inscribiendo…'; } tourJoin(); }
+    else if(kind === 'start') tourStart();
+    else if(kind === 'ans') tourAnswer(k);
+    else tourTeacherAction(kind, k);
+  }
+
+  // ----- torneo: panel de la docente -----
+  const blankTourQ = () => ({ q: '', options: ['', '', '', ''], answer: -1, why: '' });
+  function openTourEditor(){
+    tk = null;
+    acct = { view: 'tour-edit', mode: 'loading', err: '', info: '' };
+    tkDlg.classList.add('wide');
+    renderTourEditor();
+    if(!tkDlg.open){ tkDlg.showModal(); tkBody.focus({ preventScroll:true }); }
+    tourTeacherLoad();
+  }
+  async function tourTeacherLoad(){
+    await loadTour();
+    if(!acct || acct.view !== 'tour-edit') return;
+    const c = await fbConfig();
+    acct.rows = [];
+    if(TOUR && TOUR.status !== 'published' && c){
+      try{
+        const [slots, joins, res] = await Promise.all([tourSlots(c), cloudList(c, 'tjoin'), cloudList(c, 'tres')]);
+        const pre = TOUR.tid + '_';
+        const byN = new Map(joins.filter(j => j.id.startsWith(pre)).map(j => [j.n, j.id.slice(pre.length)]));
+        const resBy = new Map(res.filter(r => r.id.startsWith(pre)).map(r => [r.id.slice(pre.length), r]));
+        acct.rows = slots.map(s => { const key = byN.get(s.n) || null, r = key && resBy.get(key); return { ...s, key, res: r || null }; });
+      }catch(e){ acct.err = e.message === 'AUTH' || e.message === 'DENIED' ? '🔐 Conecta tu cuenta de docente para ver los resultados.' : '📶 No se pudo cargar el torneo.'; }
+    }
+    acct.mode = !TOUR || TOUR.status === 'published' ? 'home' : 'manage';
+    renderTourEditor();
+  }
+  function tourFormHTML(d){
+    const qs = (d.qs && d.qs.length ? d.qs : []).concat(Array.from({ length: 5 }, blankTourQ)).slice(0, 5);
+    return `<form id="trForm" class="pr-form" autocomplete="off">
+      <div class="fld"><label for="trTitle">Nombre del torneo</label><input id="trTitle" maxlength="60" placeholder="Ej.: Torneo de los microorganismos" value="${esc(d.title || '')}"></div>
+      <div class="fld"><label for="trDate">¿Qué día publicarás los resultados?</label><input id="trDate" maxlength="40" placeholder="Ej.: el viernes 10 de octubre" value="${esc(d.date || '')}"></div>
+      <div class="fld"><label>Set que gana el 1.° lugar</label><div class="tr-setpick">${SETS().map(it => `<label class="tr-sp"><input type="radio" name="trSet" value="${it.id}"${(d.set || SETS()[0].id) === it.id ? ' checked' : ''}><span>${still(robotHTML({ outfit: { skin: it.id }, tag:false }))}<b>${esc(it.n)}</b></span></label>`).join('')}</div></div>
+      ${aiBoxHTML('tr', d.title || '')}
+      ${qs.map((q, i) => `<fieldset class="pr-q"><legend>Pregunta ${i + 1}</legend>
+        <textarea data-q="${i}" rows="2" maxlength="220" placeholder="Escribe la pregunta">${esc(q.q)}</textarea>
+        <div class="pr-opts">${[0, 1, 2, 3].map(k => `<label class="pr-opt"><input type="radio" name="ans${i}" value="${k}"${q.answer === k ? ' checked' : ''} aria-label="Respuesta correcta ${LETTERS[k]}"><span class="opt-l">${LETTERS[k]}</span><input data-o="${i}-${k}" maxlength="120" placeholder="Opción ${LETTERS[k]}" value="${esc(q.options[k] || '')}"></label>`).join('')}</div>
+        <input class="pr-why" data-why="${i}" maxlength="180" placeholder="💡 Explicación (opcional)" value="${esc(q.why || '')}">
+      </fieldset>`).join('')}
+      ${acct.err ? `<p class="send warn">${acct.err}</p>` : ''}
+      <div class="tk-actions"><button type="submit" class="btn solid">${TOUR && TOUR.status !== 'published' && acct.editing ? '💾 Guardar cambios' : '🏅 Crear y abrir inscripciones'}</button><button type="button" class="btn ghost" data-tr="t-cancel">Cancelar</button></div>
+    </form>`;
+  }
+  function renderTourEditor(){
+    if(!acct || acct.view !== 'tour-edit') return;
+    const d = tourData();
+    tkTop.innerHTML = `<small>🧑‍🏫 Modo docente</small><strong>🏅 Torneo</strong><span>${TOUR && TOUR.status !== 'published' ? `${esc(d.title || '')} · ${TOUR.status === 'open' ? 'inscripciones abiertas' : 'cerrado'}` : 'Los sets legendarios solo se ganan aquí'}</span>
+      <button class="tk-x" type="button" data-tk="close" aria-label="Cerrar">✕</button>`;
+    const msgs = `${acct.err && acct.mode !== 'form' ? `<p class="send warn">${acct.err}</p>` : ''}${acct.info ? `<p class="send ok">${acct.info}</p>` : ''}`;
+    if(acct.mode === 'loading'){ tkBody.innerHTML = `<div class="tk-step"><div class="dash-loading">${robotHTML()}<p><span class="spin"></span> Cargando el torneo…</p></div></div>`; return; }
+    if(acct.mode === 'form'){ tkBody.innerHTML = `<div class="tk-step">${tourFormHTML(acct.draft || {})}</div>`; return; }
+    if(acct.mode === 'home'){
+      const pod = TOUR && TOUR.status === 'published' ? tourPodium() : [];
+      tkBody.innerHTML = `<div class="tk-step tour">
+        ${sayRow('Crea un torneo: 20 cupos, un Exit ticket de 5 preguntas y gana quien lo complete totalmente bien y más rápido 🏅 Tú eliges el set del 1.° lugar.')}
+        ${msgs}
+        ${pod.length ? `<p class="tr-sub">Último torneo: ${esc(d.title || '')} (publicado)</p><ol class="tr-pod">${pod.slice(0, 5).map(p => `<li><span class="tr-pos">${p.pos}.°</span><div><b>${esc(p.n)}</b><small>${p.score}/${p.total} · ${fmtMs(p.ms)}</small></div></li>`).join('')}</ol>` : ''}
+        <div class="tk-actions"><button type="button" class="btn solid" data-tr="t-new">➕ Crear torneo nuevo</button><button type="button" class="btn up" data-tk="close">Listo</button></div>
+      </div>`;
+      return;
+    }
+    const rows = [...(acct.rows || [])], sent = rows.filter(r => r.res).sort((a, b) => tourOrder(a.res, b.res)), wait = rows.filter(r => !r.res);
+    const perfect = sent.length && sent[0].res.score === sent[0].res.total;
+    tkBody.innerHTML = `<div class="tk-step tour">
+      ${msgs}
+      <div class="tr-hero"><div class="tr-set">${ITEM[d.set] ? still(robotHTML({ outfit: { skin: d.set }, tag:false })) : ''}<span class="tr-crown">👑</span></div>
+        <div><small>${TOUR.status === 'open' ? '🟢 Inscripciones abiertas' : '⏸️ Cerrado'} · ${rows.length}/${TOUR_MAX} inscritos · ${sent.length} terminaron</small><b>${esc(d.title || 'Torneo')}</b><em>Premio 1.°: ${ITEM[d.set] ? esc(ITEM[d.set].n) : '—'} · Resultados: ${esc(d.date || '—')}</em></div></div>
+      <p class="tr-sub">📊 Resultados (solo tú los ves)</p>
+      ${rows.length ? `<ol class="tr-res">${sent.map((r, i) => `<li><span class="tr-pos">${i + 1}.°</span>${still(robotHTML({ outfit: outfitOf(r.outfit), tag:false }))}<div><b>${esc(r.name)} <small>${esc(GRADE.replace('to', '') + r.section)}</small></b><small>${r.res.score}/${r.res.total}${r.res.score === r.res.total ? ' ✅' : ''} · ${fmtMs(r.res.ms)} · ${i === 0 && perfect ? `gana el set` : i < 5 ? `⭐ ${TOUR_PRIZE[i] || TOUR_PART}` : `⭐ ${TOUR_PART}`}</small></div>${r.key ? `<button type="button" class="btn ghost tr-give" data-tr="t-give" data-k="${esc(r.key)}">🎁 Dar set</button>` : ''}</li>`).join('')}
+        ${wait.map(r => `<li class="wait"><span class="tr-pos">—</span>${still(robotHTML({ outfit: outfitOf(r.outfit), tag:false }))}<div><b>${esc(r.name)} <small>${esc(GRADE.replace('to', '') + r.section)}</small></b><small>⏳ Aún no responde</small></div></li>`).join('')}</ol>`
+        : '<p class="tr-empty">Aún no hay inscritos. Avisa a tus estudiantes que toquen 🏅 Torneo.</p>'}
+      ${sent.length && !perfect ? '<p class="send warn">Nadie respondió todo bien todavía: si publicas así, el set no se entrega automáticamente (puedes darlo con «🎁 Dar set»).</p>' : ''}
+      <div class="tk-actions tr-acts">
+        <button type="button" class="btn solid" data-tr="t-publish"${sent.length ? '' : ' disabled'}>🏁 Publicar resultados y enviar premios</button>
+        <button type="button" class="btn ghost" data-tr="${TOUR.status === 'open' ? 't-close' : 't-open'}">${TOUR.status === 'open' ? '🔒 Cerrar inscripciones' : '🔓 Reabrir'}</button>
+        <button type="button" class="btn ghost" data-tr="t-edit">✏️ Editar</button>
+        <button type="button" class="btn ghost" data-tr="t-reload">🔄 Actualizar</button>
+        <button type="button" class="icon-btn del" data-tr="t-delete" aria-label="Borrar torneo">${ICON.trash}</button>
+      </div>
+    </div>`;
+  }
+  async function tourSave(fields){
+    const c = await fbConfig(), tok = c && await idToken(c).catch(() => null);
+    if(!c) return 'offline';
+    if(!tok) return 'auth';
+    try{
+      const body = { writes: [{ update: { name: docName(c, 'tourneys', 'current'), fields: toFields({ ...fields, updatedAt: new Date() }) } }] };
+      const r = await fetch(`${docsBase(c)}:commit?key=${c.apiKey}`, { method:'POST', headers:{ 'Content-Type':'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify(body) });
+      if(r.status === 403) return 'rules';
+      if(!r.ok) return 'net';
+    }catch(e){ return 'net'; }
+    TOUR = { tid: fields.tid, status: fields.status, data: fields.data, podium: fields.podium || '' }; lsSet(TOUR_KEY, TOUR);
+    return 'ok';
+  }
+  async function submitTourForm(){
+    const title = ($('#trTitle').value || '').trim(), date = ($('#trDate').value || '').trim(), set = ($('input[name="trSet"]:checked') || {}).value;
+    const qs = [0, 1, 2, 3, 4].map(i => { const r = $(`input[name="ans${i}"]:checked`); return { q: ($(`[data-q="${i}"]`).value || '').trim(), options: [0, 1, 2, 3].map(k => ($(`[data-o="${i}-${k}"]`).value || '').trim()), answer: r ? +r.value : -1, why: ($(`[data-why="${i}"]`).value || '').trim() }; });
+    acct.draft = { title, date, set, qs };
+    const bad = qs.findIndex(q => !q.q || q.options.filter(Boolean).length < 2 || q.answer < 0 || !q.options[q.answer]);
+    acct.err = !title ? 'Escribe el nombre del torneo.' : !date ? 'Escribe el día en que publicarás los resultados.' : !ITEM[set] ? 'Elige el set del 1.° lugar.' : bad >= 0 ? `Revisa la pregunta ${bad + 1}: necesita el texto, al menos 2 opciones y la respuesta correcta marcada.` : '';
+    if(acct.err) return renderTourEditor();
+    const editing = acct.editing && TOUR && TOUR.status !== 'published';
+    const clean = { title: title.slice(0, 60), date: date.slice(0, 40), set, qs: qs.map(q => ({ q: q.q, options: q.options, answer: q.answer, why: q.why })) };
+    const res = await tourSave({ tid: editing ? TOUR.tid : 't' + Date.now().toString(36), status: editing ? TOUR.status : 'open', data: JSON.stringify(clean), podium: '' });
+    if(res !== 'ok'){ acct.err = res === 'auth' ? '🔐 Conecta tu cuenta de docente (Panel → «Conecta tu cuenta») y vuelve a guardar.' : saveErr(res); return renderTourEditor(); }
+    acct.info = editing ? '✅ Torneo actualizado.' : '🏅 ¡Torneo creado! Tus estudiantes ya pueden inscribirse en 🏅 Torneo.';
+    acct.editing = false; acct.draft = null; acct.err = '';
+    tourTeacherLoad();
+  }
+  // Correo: se agrega un premio al buzón de cada estudiante (se conserva lo que ya reclamó).
+  async function mailWrites(c, tok, gifts){
+    const writes = [];
+    for(const [key, items] of gifts){
+      let cur = { items: [], ids: [], claimed: [] };
+      try{ const r = await fetch(`${docsBase(c)}/mail/${key}?key=${c.apiKey}`, { headers:{ Authorization: 'Bearer ' + tok } }); if(r.ok){ const d = fromDoc(await r.json()); cur = { items: JSON.parse(d.items || '[]'), ids: d.ids || [], claimed: d.claimed || [] }; } }catch(e){}
+      const all = [...cur.items, ...items].slice(-90);
+      writes.push({ update: { name: docName(c, 'mail', key), fields: toFields({ items: JSON.stringify(all), ids: all.map(x => x.id), claimed: cur.claimed.filter(id => all.some(x => x.id === id)), updatedAt: new Date() }) } });
+    }
+    return writes;
+  }
+  const mid = () => 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  async function tourTeacherAction(kind, k){
+    if(!acct || acct.view !== 'tour-edit') return;
+    acct.err = ''; acct.info = '';
+    const d = tourData();
+    if(kind === 't-new'){ acct.mode = 'form'; acct.editing = false; acct.draft = { set: SETS()[0].id }; return renderTourEditor(); }
+    if(kind === 't-edit'){ acct.mode = 'form'; acct.editing = true; acct.draft = d; return renderTourEditor(); }
+    if(kind === 't-cancel'){ acct.mode = 'loading'; renderTourEditor(); return tourTeacherLoad(); }
+    if(kind === 't-reload'){ acct.mode = 'loading'; renderTourEditor(); return tourTeacherLoad(); }
+    if(kind === 't-close' || kind === 't-open'){
+      const r = await tourSave({ tid: TOUR.tid, status: kind === 't-close' ? 'closed' : 'open', data: TOUR.data, podium: '' });
+      if(r !== 'ok') acct.err = saveErr(r); else acct.info = kind === 't-close' ? '🔒 Inscripciones cerradas: ya nadie puede entrar ni responder.' : '🔓 Inscripciones abiertas otra vez.';
+      return renderTourEditor();
+    }
+    if(kind === 't-delete'){
+      if(!confirm('¿Borrar este torneo? Se pierden las inscripciones y los resultados que no hayas publicado.')) return;
+      const c = await fbConfig(), tok = c && await idToken(c).catch(() => null);
+      if(!tok){ acct.err = saveErr('auth'); return renderTourEditor(); }
+      const r = await fetch(`${docsBase(c)}/tourneys/current?key=${c.apiKey}`, { method:'DELETE', headers:{ Authorization: 'Bearer ' + tok } }).catch(() => null);
+      if(!r || !r.ok){ acct.err = saveErr('net'); return renderTourEditor(); }
+      TOUR = null; lsSet(TOUR_KEY, null); acct.mode = 'home'; acct.info = '🗑 Torneo borrado.';
+      return renderTourEditor();
+    }
+    if(kind === 't-give'){
+      const row = (acct.rows || []).find(r => r.key === k);
+      if(!row || !ITEM[d.set] || !confirm(`¿Enviar el set ${ITEM[d.set].n} al correo de ${row.name}?`)) return;
+      const c = await fbConfig(), tok = c && await idToken(c).catch(() => null);
+      if(!tok){ acct.err = saveErr('auth'); return renderTourEditor(); }
+      const writes = await mailWrites(c, tok, [[k, [{ id: mid(), kind: 'set', set: d.set, title: `🎁 ¡Te regalo el set ${ITEM[d.set].n}!`, msg: `Premio del torneo «${d.title || ''}». Reclámalo y Moli lo llevará puesto.`, from: 'Tu profe', at: Date.now() }]]]);
+      const r = await fetch(`${docsBase(c)}:commit?key=${c.apiKey}`, { method:'POST', headers:{ 'Content-Type':'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify({ writes }) }).catch(() => null);
+      acct.info = r && r.ok ? `✉️ Set enviado al correo de ${row.name}.` : ''; if(!r || !r.ok) acct.err = saveErr(r && r.status === 403 ? 'rules' : 'net');
+      return renderTourEditor();
+    }
+    if(kind === 't-publish'){
+      const rows = (acct.rows || []).filter(r => r.res && r.key).sort((a, b) => tourOrder(a.res, b.res));
+      if(!rows.length) return;
+      const perfect = rows[0].res.score === rows[0].res.total;
+      if(!confirm(`¿Publicar los resultados y enviar los premios a ${rows.length} ${rows.length === 1 ? 'estudiante' : 'estudiantes'}?\n\n1.° ${rows[0].name}: ${perfect ? 'set ' + (ITEM[d.set] ? ITEM[d.set].n : '') : '⭐ (no respondió todo bien)'}\nLos puestos 2 a 5 reciben ⭐10, ⭐8, ⭐6 y ⭐4; los demás ⭐1.`)) return;
+      const c = await fbConfig(), tok = c && await idToken(c).catch(() => null);
+      if(!tok){ acct.err = saveErr('auth'); return renderTourEditor(); }
+      const b = $('[data-tr="t-publish"]', tkBody); if(b){ b.disabled = true; b.textContent = 'Enviando premios…'; }
+      const podium = rows.map((r, i) => ({ pos: i + 1, n: r.name, s: r.section, o: r.outfit, rid: r.rid, score: r.res.score, total: r.res.total, ms: r.res.ms }));
+      const gifts = rows.map((r, i) => {
+        const pos = i + 1, t = d.title || 'el torneo';
+        const item = pos === 1 && perfect && ITEM[d.set]
+          ? { id: mid(), kind: 'set', set: d.set, title: `🥇 ¡Ganaste el torneo «${t}»!`, msg: `Respondiste todo bien y fuiste el más rápido (${fmtMs(r.res.ms)}). Tu premio: el set ${ITEM[d.set].n}.`, from: 'Tu profe', at: Date.now() }
+          : { id: mid(), kind: 'stars', stars: pos <= 5 ? (TOUR_PRIZE[pos - 1] || TOUR_PRIZE[1]) : TOUR_PART, title: pos <= 5 ? `🏅 ¡Puesto ${pos} en «${t}»!` : `🎖️ Gracias por participar en «${t}»`, msg: `Hiciste ${r.res.score} de ${r.res.total} en ${fmtMs(r.res.ms)}.`, from: 'Tu profe', at: Date.now() };
+        return [r.key, [item]];
+      });
+      const writes = await mailWrites(c, tok, gifts);
+      writes.push({ update: { name: docName(c, 'tourneys', 'current'), fields: toFields({ tid: TOUR.tid, status: 'published', data: TOUR.data, podium: JSON.stringify(podium), updatedAt: new Date() }) } });
+      const r = await fetch(`${docsBase(c)}:commit?key=${c.apiKey}`, { method:'POST', headers:{ 'Content-Type':'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify({ writes }) }).catch(() => null);
+      if(!r || !r.ok){ acct.err = saveErr(r && r.status === 403 ? 'rules' : 'net'); return renderTourEditor(); }
+      TOUR = { ...TOUR, status: 'published', podium: JSON.stringify(podium) }; lsSet(TOUR_KEY, TOUR);
+      acct.mode = 'home'; acct.info = `🏁 ¡Resultados publicados! Se enviaron ${rows.length} premios al ✉️ Correo de tus estudiantes.`;
+      renderTourEditor(); confettiIn(tkBody);
+    }
+  }
 
   /* ================= ⚔️ Duelos VS: dos Molis, las mismas 5 preguntas, 5 segundos cada una ================= */
   const DUELS_KEY = 'ciencia4b:duels:' + APP.docId;
@@ -6154,6 +6686,7 @@ Reglas:
     if(cached && cached.savedAt > APP.savedAt){ applyContent(cached); rememberCloud(cached); rerender(); if(route.name === 'menu' && mode === 'units') renderChoices(); }
   }catch(e){}
   loadContent(false);
+  loadTour(); loadMail();
   setInterval(() => { if(document.visibilityState === 'visible') pollContent(); }, 90000);
   document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible' && Date.now() - lastPoll > 30000) pollContent(); });
   // La docente que ya ingresó con su DNI entra directo al modo docente.

@@ -242,6 +242,73 @@ service cloud.firestore {
       allow list, delete: if isTeacher();
     }
 
+    // 🏅 Torneo: la docente crea «tourneys/current». Los estudiantes se inscriben (máximo 20 cupos),
+    // envían su Exit ticket una sola vez y nadie ve resultados ajenos hasta que la docente los publica.
+    function tNow() {
+      return get(/databases/$(database)/documents/tourneys/current).data;
+    }
+    match /tourneys/{id} {
+      allow get: if true;
+      allow create, update, delete: if isTeacher() && id == 'current';
+    }
+    // Cupos públicos (nombre corto, sección y Moli) para que los compañeros vean quién participa.
+    match /tslots/{id} {
+      allow get, list: if true;
+      allow create: if id.matches('t[a-z0-9]{4,16}_([1-9]|1[0-9]|20)')
+        && tNow().status == 'open' && id.split('_')[0] == tNow().tid
+        && request.resource.data.keys().hasOnly(['name', 'section', 'outfit', 'rid', 'tid', 'at'])
+        && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 40
+        && request.resource.data.section is string && request.resource.data.section.size() <= 4
+        && request.resource.data.outfit is list && request.resource.data.outfit.size() <= 12
+        && request.resource.data.rid is string && request.resource.data.rid.size() <= 30
+        && request.resource.data.tid == tNow().tid
+        && request.resource.data.at is timestamp;
+      allow delete: if isTeacher();
+    }
+    // Inscripción privada (una por estudiante): va junto con su cupo en la misma escritura.
+    match /tjoin/{id} {
+      allow get: if true;
+      allow list, delete: if isTeacher();
+      allow create: if id.matches('t[a-z0-9]{4,16}_k[0-9a-f]{20}')
+        && tNow().status == 'open' && id.split('_')[0] == tNow().tid
+        && exists(/databases/$(database)/documents/students/$(id.split('_')[1]))
+        && request.resource.data.keys().hasOnly(['n', 'rid', 'at'])
+        && request.resource.data.n is int && request.resource.data.n >= 1 && request.resource.data.n <= 20
+        && !exists(/databases/$(database)/documents/tslots/$(tNow().tid + '_' + string(request.resource.data.n)))
+        && getAfter(/databases/$(database)/documents/tslots/$(tNow().tid + '_' + string(request.resource.data.n))).data.rid == request.resource.data.rid
+        && request.resource.data.at is timestamp;
+    }
+    // Respuestas del torneo: un solo intento; solo la docente puede listarlas.
+    match /tres/{id} {
+      allow get: if true;
+      allow list, delete: if isTeacher();
+      allow create: if id.matches('t[a-z0-9]{4,16}_k[0-9a-f]{20}')
+        && tNow().status == 'open' && id.split('_')[0] == tNow().tid
+        && exists(/databases/$(database)/documents/tjoin/$(id))
+        && request.resource.data.keys().hasOnly(['score', 'total', 'ms', 'answers', 'at'])
+        && request.resource.data.total is int && request.resource.data.total >= 1 && request.resource.data.total <= 20
+        && request.resource.data.score is int && request.resource.data.score >= 0 && request.resource.data.score <= request.resource.data.total
+        && request.resource.data.ms is int && request.resource.data.ms > 0 && request.resource.data.ms < 3600000
+        && request.resource.data.answers is list && request.resource.data.answers.size() == request.resource.data.total
+        && request.resource.data.at is timestamp;
+    }
+    // ✉️ Correo: la docente envía premios; el estudiante solo marca como reclamados los que le enviaron.
+    match /mail/{id} {
+      allow get: if true;
+      allow list, delete: if isTeacher();
+      allow create, update: if isTeacher() && id.matches('k[0-9a-f]{20}')
+        && request.resource.data.keys().hasOnly(['items', 'ids', 'claimed', 'updatedAt'])
+        && request.resource.data.items is string && request.resource.data.items.size() <= 30000
+        && request.resource.data.ids is list && request.resource.data.ids.size() <= 100
+        && request.resource.data.claimed is list
+        && request.resource.data.updatedAt is timestamp;
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['claimed', 'updatedAt'])
+        && request.resource.data.claimed is list && request.resource.data.claimed.size() <= resource.data.ids.size()
+        && request.resource.data.claimed.hasAll(resource.data.claimed)
+        && request.resource.data.claimed.hasOnly(resource.data.ids)
+        && request.resource.data.updatedAt is timestamp;
+    }
+
     // Regalo diario: una vez por día (hora de Perú). La racha sube de 1 en 1 hasta 15 (si faltas un día vuelve a 1).
     // Cada 3 días de racha (días 3, 6, 9, 12 y 15) se ganan 6 estrellas; el día 15 además puede traer un objeto básico.
     function peruDay() {

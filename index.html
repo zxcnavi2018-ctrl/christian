@@ -1715,6 +1715,139 @@
   .it:hover{ transform:translateY(-2px); box-shadow:var(--shadow-sm); }
   .it.trying{ border-color:var(--blue); box-shadow:0 0 0 4px rgba(47,111,237,.15); }
   .it.on{ border-color:#34c170; background:linear-gradient(160deg, #fff 50%, #effaf3); }
+
+  /* ---------- Regalo y Más estrellas (a la izquierda de Moli) ---------- */
+  .side-btns{ position:absolute; right:calc(100% + 6px); top:22%; display:flex; flex-direction:column; gap:10px; z-index:2; }
+  .side-btn{ position:relative; display:flex; flex-direction:column; align-items:center; gap:4px; padding:9px 9px 7px; border-radius:20px; border:1px solid var(--line); background:rgba(255,255,255,.95); box-shadow:0 12px 26px rgba(18,34,74,.16); color:var(--navy); font:inherit; font-size:11.5px; font-weight:900; cursor:pointer; animation:popIn .6s .5s var(--ease) both; transition:transform .25s var(--spring); white-space:nowrap; }
+  .side-btn:hover{ transform:translateY(-3px) rotate(3deg); }
+  .side-btn .sb-ico{ width:40px; height:40px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:22px; }
+  .side-btn.gift .sb-ico{ background:linear-gradient(135deg, #ffe4ec, #ffc9d9); }
+  .side-btn.more .sb-ico{ background:linear-gradient(135deg, #e0f2ff, #c7e5ff); }
+  .side-btn.gift.ready::after, .v-q.ready::after{ content:""; position:absolute; top:-4px; right:-4px; width:14px; height:14px; border-radius:50%; background:#ef4444; border:2px solid #fff; animation:dotPulse 1.2s ease-in-out infinite; }
+  .side-btn.gift.ready .sb-ico{ animation:giftWiggle 1.6s ease-in-out infinite; }
+  @keyframes dotPulse{ 50%{ transform:scale(1.25); } }
+  @keyframes giftWiggle{ 0%, 70%, 100%{ transform:none; } 80%{ transform:rotate(-12deg) scale(1.08); } 90%{ transform:rotate(10deg) scale(1.08); } }
+  @media (max-width:560px){ .side-btns{ right:calc(100% - 4px); } .side-btn{ padding:7px 7px 6px; font-size:10.5px; } .side-btn .sb-ico{ width:36px; height:36px; font-size:20px; } }
+
+  /* ---------- Regalo diario ---------- */
+  .dl-grid{ display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); gap:8px; margin:6px 0 14px; }
+  .dl-day{ position:relative; display:flex; flex-direction:column; align-items:center; gap:2px; padding:9px 4px 8px; border-radius:16px; border:1.5px solid var(--line); background:#fff; }
+  .dl-day small{ font-size:10.5px; font-weight:900; color:var(--ink-3); letter-spacing:.02em; }
+  .dl-day b{ font-size:15px; font-weight:900; color:var(--navy); }
+  .dl-day.gift{ background:linear-gradient(160deg, #fff, #fff1f5); border-color:#ffc9d9; }
+  .dl-day.final{ background:linear-gradient(160deg, #fffbeb, #fde68a); border-color:#f5c542; }
+  .dl-day.done{ background:linear-gradient(160deg, #effaf3, #d9f5e5); border-color:#86d9a8; }
+  .dl-day.done b{ opacity:.55; }
+  .dl-day i{ position:absolute; top:-6px; right:-4px; width:20px; height:20px; border-radius:50%; background:#22a860; color:#fff; font-style:normal; font-size:12px; font-weight:900; display:flex; align-items:center; justify-content:center; border:2px solid #fff; }
+  .dl-day.today{ border-color:var(--blue); box-shadow:0 0 0 4px rgba(47,111,237,.18); animation:todayPulse 1.6s ease-in-out infinite; }
+  @keyframes todayPulse{ 50%{ transform:translateY(-3px); } }
+  .dl-claim{ flex:1; font-size:17px !important; padding:15px 18px !important; background:linear-gradient(135deg, #ff5a8a, #ff9a3c) !important; box-shadow:0 12px 24px rgba(255,90,138,.35) !important; }
+  .dl-wait{ flex:1; text-align:center; padding:13px; border-radius:16px; background:var(--soft); font-weight:900; color:var(--ink-2); }
+  .dl-rules{ margin:12px 0 4px; font-size:12.5px; font-weight:700; line-height:1.5; color:var(--ink-2); }
+  .dl-won{ display:flex; align-items:center; gap:14px; margin:0 0 12px; padding:14px 16px; border-radius:20px; background:linear-gradient(135deg, #fff7d6, #ffe6f0); border:1.5px solid #ffd27a; animation:popIn .6s var(--spring) both; }
+  .dl-won div{ display:flex; flex-direction:column; }
+  .dl-won small{ font-size:12px; font-weight:900; color:#b45309; }
+  .dl-won b{ font-size:22px; font-weight:900; color:var(--navy); }
+  .dl-won span{ font-size:12.5px; font-weight:700; color:var(--ink-2); }
+  .dl-won-star{ font-size:44px; animation:spinIn .9s var(--spring) both; }
+  .dl-won-art{ width:88px; display:flex; justify-content:center; }
+  .dl-won-art .it-svg{ width:88px; height:64px; }
+  @keyframes spinIn{ from{ transform:scale(.2) rotate(-200deg); } to{ transform:none; } }
+
+  /* ---------- Más estrellas ---------- */
+  .pr-list{ display:flex; flex-direction:column; gap:10px; margin:6px 0 14px; }
+  .pr-card{ display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:18px; border:1.5px solid var(--line); background:#fff; }
+  .pr-card.done{ background:linear-gradient(135deg, #f1fbf5, #fff); border-color:#c9ecd7; }
+  .pr-n{ width:38px; height:38px; flex-shrink:0; border-radius:12px; display:flex; align-items:center; justify-content:center; background:var(--grad); color:#fff; font-weight:900; }
+  .pr-card.done .pr-n{ background:#22a860; }
+  .pr-txt{ flex:1; min-width:0; display:flex; flex-direction:column; }
+  .pr-txt b{ font-size:15px; font-weight:900; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .pr-txt small{ font-size:12.5px; font-weight:700; color:var(--ink-3); }
+  .pr-card .btn{ flex:none; padding:10px 14px; }
+  .pr-empty{ grid-column:1 / -1; padding:22px 16px; border-radius:18px; border:1.5px dashed var(--line); text-align:center; font-weight:800; color:var(--ink-2); background:#fbfcff; }
+  .pr-form .pr-q{ margin:0 0 12px; padding:12px 14px 14px; border-radius:18px; border:1.5px solid var(--line); background:#fbfcff; }
+  .pr-form legend{ padding:0 6px; font-weight:900; color:var(--navy); }
+  .pr-form textarea, .pr-form input:not([type=radio]){ width:100%; box-sizing:border-box; padding:10px 12px; border-radius:12px; border:1.5px solid var(--line); font:inherit; font-size:14.5px; background:#fff; color:var(--navy); }
+  .pr-form textarea{ resize:vertical; margin-bottom:8px; }
+  .pr-opts{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px; }
+  .pr-opt{ display:flex; align-items:center; gap:6px; }
+  .pr-opt input[type=radio]{ width:20px; height:20px; accent-color:#22a860; flex-shrink:0; }
+  .pr-opt .opt-l{ flex-shrink:0; }
+  @media (max-width:560px){ .pr-opts{ grid-template-columns:1fr; } }
+
+  /* ---------- Tienda: vitrina, rarezas y filtros ---------- */
+  .vitrina{ display:grid; grid-template-columns:minmax(0, 1.1fr) minmax(0, 1fr); gap:14px; margin-bottom:14px; }
+  .v-stage{ position:relative; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; min-height:250px; padding:40px 12px 12px; border-radius:26px; background:radial-gradient(ellipse at 50% 20%, #ffffff 0%, #e8f1ff 45%, #cfe0fb 100%); border:1px solid #d6e3fb; }
+  .v-light{ position:absolute; inset:-40% -20% auto; height:140%; background:conic-gradient(from 180deg at 50% 0%, transparent 0 40%, rgba(255,255,255,.75) 46%, transparent 52% 100%); animation:sway 6s ease-in-out infinite alternate; pointer-events:none; }
+  @keyframes sway{ from{ transform:rotate(-8deg); } to{ transform:rotate(8deg); } }
+  .v-floor{ position:absolute; left:18%; right:18%; bottom:34px; height:30px; border-radius:50%; background:radial-gradient(ellipse at center, rgba(47,111,237,.28), rgba(47,111,237,0) 70%); }
+  .v-stage .robot{ --rw:150px; position:relative; z-index:1; }
+  .v-stage .robot-shadow{ display:none; }
+  .v-trying{ position:relative; z-index:2; margin-top:4px; padding:6px 12px; border-radius:999px; border:none; background:var(--navy); color:#fff; font:inherit; font-size:12.5px; font-weight:800; cursor:pointer; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .v-float-wrap{ position:sticky; bottom:10px; height:0; z-index:5; }
+  .v-float{ position:absolute; right:-4px; bottom:0; width:122px; padding:22px 6px 8px; border-radius:22px; display:flex; flex-direction:column; align-items:center; gap:2px; background:radial-gradient(ellipse at 50% 30%, #fff, #dfeafd); border:2px solid var(--blue); box-shadow:0 14px 30px rgba(18,34,74,.3); animation:popIn .35s var(--spring) both; pointer-events:none; }
+  .v-float .robot{ --rw:86px; }
+  .v-float .robot-shadow{ display:none; }
+  .v-float span{ max-width:100%; font-size:11px; font-weight:900; color:var(--navy); text-align:center; line-height:1.2; }
+  .v-side{ display:flex; flex-direction:column; gap:10px; min-width:0; }
+  .bal-card{ padding:14px 16px; border-radius:22px; background:linear-gradient(135deg, #1d2a5c, #2f4aa0); color:#fff; box-shadow:0 12px 24px rgba(29,42,92,.25); }
+  .bal-card .bal-l{ color:#a9c1ff; }
+  .bal-card .bal-v{ display:block; color:#fff; font-size:34px; }
+  .bal-card small{ color:#d6e2ff; font-weight:800; font-size:12.5px; }
+  .bal-chips{ display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
+  .bal-chip{ padding:3px 8px; border-radius:999px; background:rgba(255,255,255,.14); font-size:11.5px; font-weight:900; }
+  .v-msg{ margin:0; font-size:13.5px; font-weight:700; line-height:1.45; color:var(--ink-2); }
+  .v-quick{ display:flex; gap:8px; flex-wrap:wrap; }
+  .v-q{ position:relative; flex:1; min-width:120px; padding:10px 10px; border-radius:14px; border:1.5px solid var(--line); background:#fff; font:inherit; font-size:13px; font-weight:900; color:var(--navy); cursor:pointer; }
+  .v-q:hover{ border-color:#b9cdf5; }
+  details.code-box{ padding:0; }
+  details.code-box summary{ list-style:none; display:flex; align-items:center; gap:8px; padding:12px 14px; cursor:pointer; }
+  details.code-box summary::-webkit-details-marker{ display:none; }
+  details.code-box summary b{ font-size:14.5px; font-weight:900; color:#7a4a12; }
+  details.code-box summary small{ margin-left:auto; font-size:12px; font-weight:800; color:#a86a10; }
+  details.code-box form{ padding:0 14px 14px; }
+  .shop-nav{ position:sticky; top:-1px; z-index:3; margin:0 -4px 10px; padding:6px 4px; background:linear-gradient(#fff 80%, rgba(255,255,255,0)); }
+  .shop-nav .shop-tabs{ margin:0; -webkit-mask:linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 22px), transparent); mask:linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 22px), transparent); padding:2px 14px 4px; }
+  .shop-tab em{ font-style:normal; margin-left:2px; padding:1px 7px; border-radius:999px; background:#e3f5ea; color:#13824a; font-size:11px; font-weight:900; }
+  .shop-tab.on em{ background:rgba(255,255,255,.2); color:#fff; }
+  .cat-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:10px; flex-wrap:wrap; margin:2px 2px 12px; }
+  .cat-t h4{ margin:0; font-size:18px; font-weight:900; color:var(--navy); }
+  .cat-t small{ font-size:12.5px; font-weight:700; color:var(--ink-3); }
+  .cat-f{ display:flex; gap:4px; padding:4px; border-radius:999px; background:var(--soft); }
+  .cat-f button{ padding:6px 11px; border-radius:999px; border:none; background:none; font:inherit; font-size:12.5px; font-weight:900; color:var(--ink-2); cursor:pointer; }
+  .cat-f button.on{ background:#fff; color:var(--navy); box-shadow:0 2px 6px rgba(18,34,74,.12); }
+  .shop-grid .it{ --rc:#94a3b8; --rbg:#f4f6fa; padding:30px 10px 12px; border-width:2px; border-color:color-mix(in srgb, var(--rc) 35%, #fff); }
+  .shop-grid .it.r-rare{ --rc:#3b82f6; --rbg:#eaf2ff; }
+  .shop-grid .it.r-epic{ --rc:#a855f7; --rbg:#f5ecff; }
+  .shop-grid .it.r-leg{ --rc:#f59e0b; --rbg:#fff5dc; }
+  .it-rar{ position:absolute; top:8px; left:8px; padding:2px 8px; border-radius:999px; background:var(--rc); color:#fff; font-size:10px; font-weight:900; letter-spacing:.06em; text-transform:uppercase; }
+  .it.r-leg .it-rar{ background:linear-gradient(135deg, #7c3aed, #ec4899, #f59e0b); }
+  .it-art{ width:100%; height:92px; display:flex; align-items:center; justify-content:center; border-radius:16px; background:radial-gradient(circle at 50% 45%, #fff 0%, var(--rbg) 70%); overflow:visible; }
+  .it-art .it-svg{ width:110px; height:78px; }
+  .it-art .it-skin{ padding-top:10px; }
+  .it.r-epic .it-art{ box-shadow:inset 0 0 0 1px rgba(168,85,247,.2); }
+  .it.r-leg .it-art{ background:radial-gradient(circle at 50% 45%, #fff 0%, #fff0c2 55%, #ffd7ef 100%); }
+  .shop-grid .it.on{ border-color:#34c170; }
+  .shop-grid .it.trying{ border-color:var(--blue); }
+  @media (max-width:560px){
+    .vitrina{ grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:10px; }
+    .v-stage{ min-height:0; padding:30px 6px 8px; border-radius:22px; }
+    .v-stage .robot{ --rw:112px; }
+    .v-floor{ bottom:26px; }
+    .v-side{ gap:8px; }
+    .bal-card{ padding:10px 12px; border-radius:18px; }
+    .bal-card .bal-v{ font-size:26px; }
+    .bal-card small{ font-size:11px; }
+    .bal-chip{ font-size:10.5px; padding:2px 6px; }
+    .v-msg{ font-size:12px; line-height:1.35; }
+    .v-quick{ flex-direction:column; gap:6px; }
+    .v-q{ min-width:0; padding:8px; font-size:12px; }
+    .strip-all, .v-trying{ font-size:11px; padding:5px 9px; }
+    details.code-box summary small{ display:none; }
+    details.code-box summary b{ font-size:13.5px; }
+    .cat-t h4{ font-size:16px; }
+    .it-art{ height:80px; }
+  }
   /* ---------- special eyes ---------- */
   .robot.ey-anime .eye{ background:radial-gradient(circle at 36% 26%, #fff 0 15%, transparent 16%), radial-gradient(circle at 62% 64%, #fff 0 8%, transparent 9%), linear-gradient(#1e3a8a, #2563eb 45%, #38bdf8 80%, #a5f3fc); box-shadow:0 0 1.8cqw rgba(56,189,248,.8); }
   .robot.ey-heart .eye, .robot.ey-star .eye{ top:18.5%; width:12.5%; height:15.5%; border-radius:0; box-shadow:none; filter:drop-shadow(0 0 1.2cqw var(--glow)); }
@@ -1961,7 +2094,7 @@
       <h1 class="home-title" id="siteTitle" spellcheck="false">CIENCIA</h1>
       <p class="home-teacher">Prof. Christian Quispe Llerena</p>
       <button type="button" class="home-pill" id="bimPill"><i></i><span class="bim-txt">4to Bimestre</span><span class="bim-edit" aria-hidden="true">✏️</span></button>
-      <div class="home-stage"><div data-robot-slot></div><button type="button" class="shop-btn" data-shop aria-label="Tienda de Moli"><span class="sb-ico">🛍️</span>Tienda</button></div>
+      <div class="home-stage"><div class="side-btns"><button type="button" class="side-btn gift" data-gift aria-label="Regalo diario"><span class="sb-ico">🎁</span>Regalo</button><button type="button" class="side-btn more" data-more aria-label="Más estrellas"><span class="sb-ico">🎯</span>Más ⭐</button></div><div data-robot-slot></div><button type="button" class="shop-btn" data-shop aria-label="Tienda de Moli"><span class="sb-ico">🛍️</span>Tienda</button></div>
       <button type="button" class="hint" id="startBtn">Iniciar</button>
     </div>
   </section>
@@ -1973,7 +2106,7 @@
         <p class="bubble-next" id="menuNext" hidden>Toca para continuar ›</p>
         <div class="choices" id="menuChoices" hidden></div>
       </div>
-      <div class="menu-stage"><div data-robot-slot id="menuRobot"></div><button type="button" class="shop-btn" data-shop aria-label="Tienda de Moli"><span class="sb-ico">🛍️</span>Tienda</button></div>
+      <div class="menu-stage"><div class="side-btns"><button type="button" class="side-btn gift" data-gift aria-label="Regalo diario"><span class="sb-ico">🎁</span>Regalo</button><button type="button" class="side-btn more" data-more aria-label="Más estrellas"><span class="sb-ico">🎯</span>Más ⭐</button></div><div data-robot-slot id="menuRobot"></div><button type="button" class="shop-btn" data-shop aria-label="Tienda de Moli"><span class="sb-ico">🛍️</span>Tienda</button></div>
     </div>
   </section>
 
@@ -2184,7 +2317,11 @@
   }
 
   $('#startBtn').addEventListener('click', () => go({ name:'menu' }));
-  document.addEventListener('click', e => { if(e.target.closest('[data-shop]')){ e.stopPropagation(); openShop(); } }, true);
+  document.addEventListener('click', e => {
+    if(e.target.closest('[data-shop]')){ e.stopPropagation(); openShop(); }
+    else if(e.target.closest('[data-gift]')){ e.stopPropagation(); openDaily(); }
+    else if(e.target.closest('[data-more]')){ e.stopPropagation(); openMore(); }
+  }, true);
   $('#backBtn').addEventListener('click', goBack);
   document.addEventListener('click', e => {
     const g = e.target.closest('[data-go]');
@@ -2212,7 +2349,7 @@
   const TUTORIAL = [
     () => { const n = shownUnits().map(u => u.num); return `¡Te cuento lo principal! 📚 Aquí está${n.length > 1 ? 'n las Unidades' : ' la Unidad'} ${listNums(n)}. Cada sesión es igual a tu cuaderno 📒, con sus fichas para ver o descargar.`; },
     'Al final de cada sesión haz tu Exit ticket 🎟️ (¡solo una vez!). Para abrirlo, crea tu cuenta con tu DNI 🪪. Si ves 🔄 Flipped, es tarea para antes de la clase.',
-    'Ganas estrellas ⭐ con tus Exit tickets (¡hasta 5 cada uno!) y con los códigos que te da tu profe en clase (1 por código).',
+    'Ganas estrellas ⭐ con tus Exit tickets (¡hasta 5!), con los códigos de tu profe, con el 🎁 Regalo diario (¡no pierdas tu racha!) y practicando en 🎯 Más estrellas.',
     'Con tus estrellas vísteme en mi Tienda 🛍️: cascos, armas, alas, marcos, compañeros… ¡y hasta transformarme en un ✨ Ser legendario!',
     'En el Ranking 🏆 aparecen los 15 con más estrellas y sus Molis. ¡Tú puedes llegar ahí! 💪'
   ];
@@ -3027,7 +3164,7 @@
         setProgress(u.key, `${x.u.key}|${x.n}`, r ? { score: r.score, total: r.total, at: r.at } : null);
       });
     }
-    await loadCloset();
+    await Promise.all([loadCloset(), loadDaily(), loadBonus()]);
     onAccountChange();
   }
 
@@ -3059,6 +3196,8 @@
       b.querySelectorAll('.sb-lock,.sb-stars').forEach(x => x.remove());
       b.insertAdjacentHTML('beforeend', u ? (left ? `<span class="sb-stars">⭐${starTxt(left)}</span>` : '') : '<span class="sb-lock">🔒</span>');
     });
+    const giftReady = !!(me() && !isTeacher() && !dailyState().claimed);
+    $$('[data-gift]').forEach(b => b.classList.toggle('ready', giftReady));
     if(acct && tkDlg.open && acct.view === 'shop') renderShop();
     syncRanking();
     if(route.name === 'session' && !editing){ const box = $('#tkCtaBox'); if(box) box.outerHTML = ticketHtml(curSession()); }
@@ -3082,6 +3221,9 @@
   function renderAccount(){
     const v = acct.view;
     if(v === 'shop') return renderShop();
+    if(v === 'daily') return renderDaily();
+    if(v === 'more') return renderMore();
+    if(v === 'pr-edit') return renderPracticeEditor();
     if(v === 'ranking') return renderRanking();
     const head = { login: ['🪪 Mi cuenta', 'Ingresar', `${GRADE} grado`], register: ['🪪 Mi cuenta', 'Crear mi cuenta', `${GRADE} grado`], me: isTeacher() ? ['🧑‍🏫 Mi cuenta', 'Modo docente', 'Estrellas infinitas ⭐∞'] : ['🎯 Mi avance', 'Mis misiones', `${GRADE} grado`] }[v];
     tkTop.innerHTML = `<small>${head[0]}</small><strong>${head[1]}</strong><span>${head[2]}</span><button class="tk-x" type="button" data-tk="close" aria-label="Cerrar">✕</button>`;
@@ -3361,9 +3503,10 @@
     const u = me();
     if(u && u.teacher) return { earned: Infinity, fromTickets: 0, fromCodes: 0, spent: 0, left: Infinity };
     const fromTickets = u ? missionStats().stars : 0, fromCodes = u ? closetOf(u.key).codes.length : 0;
-    const earned = fromTickets + fromCodes;
+    const fromDaily = u ? dailyOf(u.key).total : 0, fromPractice = u ? bonusOf(u.key).done.length * BONUS_STARS : 0;
+    const earned = fromTickets + fromCodes + fromDaily + fromPractice;
     const spent = u ? closetOf(u.key).owned.reduce((t, id) => t + ((ITEM[id] && ITEM[id].p) || 0), 0) : 0;
-    return { earned, fromTickets, fromCodes, spent, left: Math.max(0, earned - spent) };
+    return { earned, fromTickets, fromCodes, fromDaily, fromPractice, spent, left: Math.max(0, earned - spent) };
   }
   async function verifyCodes(c, key, codes){
     const ok = await Promise.all(codes.map(async code => {
@@ -3449,47 +3592,81 @@
   }
   // Solo el Moli grande se anima; las miniaturas quedan quietas (más fluido en celulares).
   const freeze = root => $$('svg.parts, .it-svg', root).forEach(g => { if(g.pauseAnimations) g.pauseAnimations(); });
+  const RARITY = it => it.legend || it.p >= 16 ? ['leg', 'Legendario'] : it.p >= 10 ? ['epic', 'Épico'] : it.p >= 5 ? ['rare', 'Raro'] : ['common', 'Común'];
+  const CAT_DESC = { skin: 'Transforma a Moli en otro robot, con partículas propias.', squid: 'Jugadores y guardias del famoso juego.', anime: 'Inspirado en tus animes y juegos favoritos.',
+    hat: 'Sombreros y gorras para la cabeza.', helm: 'Cascos con forma: antenas, cuernos, torreta láser…', eyes: 'Cambia el color y la forma de sus ojos.',
+    head: 'Cabeza de metales brillantes.', body: 'Ropa y armaduras que también cambian los brazos.', shoulder: 'Armas y aparatos sobre el hombro.',
+    weapon: 'Espadas, blasters y armas de brazo.', back: 'Capas, alas y mochilas cohete.', fx: 'Auras y efectos que se mueven alrededor de Moli.',
+    acc: 'Gafetes, pines, bufandas y más.', frame: 'Un marco épico detrás de Moli (se luce en el ranking).', pet: 'Un compañero que acompaña a Moli.', face: 'Lentes y gafas.' };
+  function itemArt(it){
+    return it.slot === 'skin' ? `<span class="it-skin">${robotHTML({ outfit: { skin: it.id }, tag: false })}</span>`
+      : it.slot === 'eyes' ? `<span class="it-skin it-eyes">${robotHTML({ outfit: { eyes: it.id }, tag: false })}</span>`
+      : it.sv ? `<svg class="it-svg" viewBox="${PARTS_VB[it.id]}" aria-hidden="true">${[it.bk, it.id, it.fr].filter(Boolean).map(x => PARTS[x] || '').join('')}</svg>`
+      : it.html ? `<span class="it-emoji it-html">${it.html}</span>` : it.e ? `<span class="it-emoji">${it.e}</span>` : `<span class="it-swatch" style="background:${it.c || it.m}"></span>`;
+  }
   function renderShop(){
     const u = me(), cl = closetOf(u.key), bal = starsBalance();
     const cat = SHOP.find(c => c.slot === acct.cat) || SHOP[0];
     acct.cat = cat.slot;
+    const filter = acct.filter || 'all';
     const preview = { ...cl.equipped };
-    if(acct.preview && ITEM[acct.preview]) preview[ITEM[acct.preview].slot] = acct.preview;
-    tkTop.innerHTML = `<small>🛍️ Tienda de Moli</small><strong>Viste a Moli</strong><span>Compra con las estrellas de tus Exit tickets</span>
+    const trying = acct.preview && ITEM[acct.preview];
+    if(trying){ preview[trying.slot] = acct.preview; (CLASH[trying.slot] || []).forEach(x => delete preview[x]); }
+    const own = id => ownsItem(u.key, id);
+    tkTop.innerHTML = `<small>🛍️ Tienda de Moli</small><strong>Viste a Moli</strong><span>${u.teacher ? 'Modo docente · todo gratis' : 'Compra con las estrellas que ganas'}</span>
       <button class="tk-x" type="button" data-tk="close" aria-label="Cerrar">✕</button>`;
-    const swatch = it => it.slot === 'skin' ? `<span class="it-skin">${robotHTML({ outfit: { skin: it.id }, tag: false })}</span>`
-      : ITEM[it.id].slot === 'eyes' ? `<span class="it-skin it-eyes">${robotHTML({ outfit: { eyes: it.id }, tag: false })}</span>`
-      : it.sv ? `<svg class="it-svg" viewBox="${PARTS_VB[it.id]}" aria-hidden="true">${[it.bk, it.id, it.fr].filter(Boolean).map(x => PARTS[x] || '').join('')}</svg>` : it.html ? `<span class="it-emoji it-html">${it.html}</span>` : it.e ? `<span class="it-emoji">${it.e}</span>` : `<span class="it-swatch" style="background:${it.c || it.m}"></span>`;
+    const chips = u.teacher ? '' : [['🎟️', bal.fromTickets, 'Exit tickets'], ['🔑', bal.fromCodes, 'Códigos'], ['🎁', bal.fromDaily, 'Regalos'], ['🎯', bal.fromPractice, 'Práctica']]
+      .filter(([, n]) => n).map(([i, n, t]) => `<span class="bal-chip" title="${t}">${i} ${n}</span>`).join('');
+    const items = cat.items.filter(it => filter === 'mine' ? own(it.id) : filter === 'afford' ? !own(it.id) && bal.left >= it.p : true);
+    const ownedIn = c => c.items.filter(it => own(it.id)).length;
+    const st = dailyState();
     tkBody.innerHTML = `<div class="tk-step shop">
-      <div class="shop-top">
-        <div class="shop-stage">${robotHTML({ outfit: preview })}${Object.keys(cl.equipped).length ? '<button type="button" class="strip-all" data-shop-strip>🧹 Quitar todo</button>' : ''}</div>
-        <div class="shop-bal">
-          <span class="bal-l">Tus estrellas</span>
-          <b class="bal-v">⭐ ${starTxt(bal.left)}</b>
-          <small>${u.teacher ? 'Modo docente · todo gratis' : `Ganaste ${bal.earned}${bal.fromCodes ? ` (${bal.fromCodes} con códigos)` : ''} · Gastaste ${bal.spent}`}</small>
-          <p>${acct.info || (bal.earned ? 'Toca una prenda para probársela a Moli 👀' : 'Responde tus Exit tickets para ganar estrellas: ¡hasta 5 por cada uno! ⭐')}</p>
+      <div class="vitrina">
+        <div class="v-stage">
+          <div class="v-light" aria-hidden="true"></div><div class="v-floor" aria-hidden="true"></div>
+          ${robotHTML({ outfit: preview })}
+          ${trying ? `<button type="button" class="v-trying" data-shop-try="${trying.id}">👀 Probando: <b>${esc(trying.n)}</b> ✕</button>` : Object.keys(cl.equipped).length ? '<button type="button" class="strip-all" data-shop-strip>🧹 Quitar todo</button>' : ''}
+        </div>
+        <div class="v-side">
+          <div class="bal-card">
+            <span class="bal-l">Tus estrellas</span>
+            <b class="bal-v">⭐ ${starTxt(bal.left)}</b>
+            ${u.teacher ? '<small>Modo docente · todo gratis</small>' : `<small>Ganaste ${bal.earned} · Gastaste ${bal.spent}</small><div class="bal-chips">${chips}</div>`}
+          </div>
+          <p class="v-msg">${acct.info || (trying ? `${own(trying.id) ? 'Ya es tuyo.' : `Cuesta ⭐${trying.p}.`} ¿Te gusta cómo se ve? 😎` : 'Toca cualquier objeto para probárselo a Moli 👀')}</p>
+          ${u.teacher ? '' : `<div class="v-quick"><button type="button" class="v-q${st.claimed ? '' : ' ready'}" data-gift>🎁 Regalo diario</button><button type="button" class="v-q" data-more>🎯 Más estrellas</button></div>`}
         </div>
       </div>
-      ${u.teacher ? '' : `<form class="code-box" id="codeForm" autocomplete="off">
-        <div class="cb-txt"><b>🎟️ Canjear código</b><small>¿Tu profe te dio un código en clase? ¡Vale 1 estrella!</small></div>
-        <div class="cb-row"><input id="codeIn" maxlength="4" placeholder="4U2M" autocapitalize="characters" autocorrect="off" spellcheck="false" aria-label="Código"><button type="submit" class="btn solid">Canjear</button></div>
-        ${acct.codeMsg ? `<p class="send ${acct.codeOk ? 'ok' : 'warn'}">${acct.codeMsg}</p>` : ''}
-      </form>`}
-      <div class="shop-tabs" role="tablist">${SHOP.map(c => `<button type="button" role="tab" class="shop-tab${c.slot === cat.slot ? ' on' : ''}" aria-selected="${c.slot === cat.slot}" data-shop-cat="${c.slot}"${c.legend ? ' data-legend' : ''}><span>${c.icon}</span>${c.name}</button>`).join('')}</div>
-      <div class="shop-grid">${cat.items.map(it => {
-        const slot = ITEM[it.id].slot, owned = cl.owned.includes(it.id), on = cl.equipped[slot] === it.id, trying = acct.preview === it.id;
+      ${u.teacher ? '' : `<details class="code-box"${acct.codeMsg ? ' open' : ''}>
+        <summary><span>🎟️</span><b>¿Tienes un código de tu profe?</b><small>Cada código vale ⭐1</small></summary>
+        <form id="codeForm" autocomplete="off">
+          <div class="cb-row"><input id="codeIn" maxlength="4" placeholder="4U2M" autocapitalize="characters" autocorrect="off" spellcheck="false" aria-label="Código"><button type="submit" class="btn solid">Canjear</button></div>
+          ${acct.codeMsg ? `<p class="send ${acct.codeOk ? 'ok' : 'warn'}">${acct.codeMsg}</p>` : ''}
+        </form>
+      </details>`}
+      <div class="shop-nav"><div class="shop-tabs" role="tablist">${SHOP.map(c => `<button type="button" role="tab" class="shop-tab${c.slot === cat.slot ? ' on' : ''}" aria-selected="${c.slot === cat.slot}" data-shop-cat="${c.slot}"${c.legend ? ' data-legend' : ''}><span>${c.icon}</span>${c.name}${!u.teacher && ownedIn(c) ? `<em>${ownedIn(c)}</em>` : ''}</button>`).join('')}</div></div>
+      <div class="cat-head">
+        <div class="cat-t"><h4>${cat.icon} ${esc(cat.name)}</h4><small>${CAT_DESC[cat.slot] || ''}</small></div>
+        ${u.teacher ? '' : `<div class="cat-f" role="group" aria-label="Filtrar">${[['all', 'Todo'], ['afford', 'Puedo comprar'], ['mine', 'Míos']].map(([k, t]) => `<button type="button" class="${filter === k ? 'on' : ''}" data-shop-filter="${k}">${t}</button>`).join('')}</div>`}
+      </div>
+      <div class="shop-grid">${items.map(it => {
+        const slot = ITEM[it.id].slot, owned = own(it.id), on = cl.equipped[slot] === it.id, tr = acct.preview === it.id, [rk, rn] = RARITY(ITEM[it.id]);
+        const locked = !owned && bal.left < it.p;
         const act = on ? `<button type="button" class="it-btn off" data-shop-unequip="${slot}">Quitar</button>`
           : owned ? `<button type="button" class="it-btn puton" data-shop-equip="${it.id}">Ponérselo</button>`
-          : bal.left >= it.p ? `<button type="button" class="it-btn buy" data-shop-buy="${it.id}">Comprar ⭐${it.p}</button>`
-          : `<span class="it-btn need">Te faltan ⭐${it.p - bal.left}</span>`;
-        return `<div class="it${on ? ' on' : ''}${trying ? ' trying' : ''}${!owned && bal.left < it.p ? ' locked' : ''}${ITEM[it.id].legend ? ' legend' : ITEM[it.id].premium ? ' premium' : ''}" data-shop-try="${it.id}">
-          ${ITEM[it.id].legend ? `<span class="it-legend">${owned ? '✨' : 'LEGENDARIO'}</span>` : ITEM[it.id].premium ? `<span class="it-prem">${owned ? '💎' : '💎 Premium'}</span>` : ''}
+          : !locked ? `<button type="button" class="it-btn buy" data-shop-buy="${it.id}">Comprar ⭐${it.p}</button>`
+          : `<span class="it-btn need">🔒 Te faltan ⭐${it.p - bal.left}</span>`;
+        return `<div class="it r-${rk}${on ? ' on' : ''}${tr ? ' trying' : ''}${locked ? ' locked' : ''}" data-shop-try="${it.id}">
+          <span class="it-rar">${rn}</span>
           ${on ? '<span class="it-flag">Puesto ✓</span>' : owned ? '<span class="it-flag own">Tuyo</span>' : `<span class="it-price">⭐ ${it.p}</span>`}
-          ${swatch(it)}<b>${it.n}</b>${it.th ? `<small class="it-th">${it.th}</small>` : ''}${act}</div>`;
-      }).join('')}</div>
+          <div class="it-art">${itemArt(ITEM[it.id])}</div>
+          <b>${it.n}</b>${it.th ? `<small class="it-th">${it.th}</small>` : ''}${act}</div>`;
+      }).join('') || `<div class="pr-empty">${filter === 'mine' ? 'Todavía no tienes objetos de esta sección.' : 'No te alcanza para ninguno todavía. ¡Gana más estrellas! 🎯'}</div>`}</div>
+      ${trying ? `<div class="v-float-wrap"><div class="v-float">${robotHTML({ outfit: preview, tag: false })}<span>${esc(trying.n)}</span></div></div>` : ''}
       <div class="tk-actions"><button type="button" class="btn ghost" data-tk="acc-me">🎯 Mi avance</button><button type="button" class="btn up" data-tk="close">Listo</button></div>
     </div>`;
     freeze($('.shop-grid', tkBody));
+    const tab = $('.shop-tab.on', tkBody); if(tab) tab.scrollIntoView({ block: 'nearest', inline: 'center' });
   }
   async function shopAction(kind, id){
     const u = me();
@@ -3498,13 +3675,13 @@
     acct.info = '';
     if(kind === 'buy'){
       const it = ITEM[id];
-      if(!it || cl.owned.includes(id) || starsBalance().left < it.p) return;
+      if(!it || ownsItem(u.key, id) || starsBalance().left < it.p) return;
       cl.owned.push(id);
       cl.equipped[it.slot] = id;
       (CLASH[it.slot] || []).forEach(x => delete cl.equipped[x]);
       acct.info = `🎉 ¡Compraste ${it.n}! Moli se ve genial.`;
     } else if(kind === 'equip'){
-      if(!cl.owned.includes(id)) return;
+      if(!ownsItem(u.key, id)) return;
       cl.equipped[ITEM[id].slot] = id;
       (CLASH[ITEM[id].slot] || []).forEach(x => delete cl.equipped[x]);
     } else if(kind === 'unequip'){
@@ -3611,6 +3788,12 @@
 
   /* ---------- student flow ---------- */
   function tkHead(sub, prog){
+    if(tk.bonus){
+      tkTop.innerHTML = `<small>🎯 Más estrellas · práctica</small><strong>${esc(tk.title)}</strong><span>${sub}</span>
+        ${prog != null ? `<div class="tk-prog"><i style="width:${prog}%"></i></div>` : ''}
+        <button class="tk-x" type="button" data-tk="close" aria-label="Cerrar">✕</button>`;
+      return;
+    }
     const u = unitByKey(tk.unit);
     tkTop.innerHTML = `<small>🎟️ Exit ticket${tk.practice ? ' · modo prueba' : ''}</small><strong>Sesión ${tk.n} · Unidad ${esc(u.num)}</strong><span>${sub}</span>
       ${prog != null ? `<div class="tk-prog"><i style="width:${prog}%"></i></div>` : ''}
@@ -3618,7 +3801,7 @@
   }
   const sayRow = (text, cls = '') => `<div class="say-row">${robotHTML()}<div class="say ${cls}" id="tkSay" aria-live="polite">${text}</div></div>`;
   const firstName = () => esc(firstOf(tk.name));
-  const who = () => tk.practice ? 'Modo prueba · no se guarda' : `${esc(tk.name)} · ${GRADE} ${esc(tk.section)}`;
+  const who = () => tk.bonus ? `${tk.qs.length} preguntas · gana ⭐${BONUS_STARS} con ${BONUS_PASS} o más correctas` : tk.practice ? 'Modo prueba · no se guarda' : `${esc(tk.name)} · ${GRADE} ${esc(tk.section)}`;
   const starsOf = p => Math.round(p.score / p.total * 5);
 
   function openTicket(unit, n, practice){
@@ -3757,8 +3940,8 @@
     const total = tk.qs.length, score = tk.answers.filter(a => a && a.ok).length, pct = Math.round(score / total * 100);
     const stars = Math.round(score / total * 5);
     tk.score = score;
-    const u = unitByKey(tk.unit);
-    if(!tk.practice && !tk.res){
+    const u = tk.bonus ? null : unitByKey(tk.unit);
+    if(!tk.practice && !tk.bonus && !tk.res){
       tk.res = { id: tk.id, key: tk.key, dni: tk.dni, unit: tk.unit, unitNum: u.num, n: tk.n, section: tk.section, name: tk.name, score, total, answers: tk.answers.map(a => !!a.ok), at: Date.now() };
     }
     const nm = firstName();
@@ -3777,12 +3960,13 @@
       ${tk.practice ? '<div class="send warn">🧪 Modo prueba: este resultado no se guarda ni se envía.</div>' : '<div class="send wait" id="tkSend"></div>'}
       <ul class="review">${tk.qs.map((q, i) => { const a = tk.answers[i]; return `<li class="${a.ok ? '' : 'no'}"><span>${a.ok ? '✓' : '✕'}</span><div>${esc(q.q)}${a.ok ? '' : `<small>Respuesta correcta: ${esc(a.right)}</small>`}</div></li>`; }).join('')}</ul>
       <div class="tk-actions">
-        <button type="button" class="btn solid" data-tk="png">📸 Guardar imagen</button>
-        ${tk.practice ? '<button type="button" class="btn ghost" data-tk="retry">🔁 Probar de nuevo</button>' : '<button type="button" class="btn ghost" data-tk="acc-me">🎯 Ver mi avance</button>'}
+        ${tk.bonus ? `<button type="button" class="btn ghost" data-tk="retry">🔁 Intentar de nuevo</button><button type="button" class="btn solid" data-more>🎯 Más ejercicios</button>` : `<button type="button" class="btn solid" data-tk="png">📸 Guardar imagen</button>
+        ${tk.practice ? '<button type="button" class="btn ghost" data-tk="retry">🔁 Probar de nuevo</button>' : '<button type="button" class="btn ghost" data-tk="acc-me">🎯 Ver mi avance</button>'}`}
         <button type="button" class="btn up" data-tk="close">✔ Terminar</button>
       </div>
     </div>`;
-    if(!tk.practice) send();
+    if(tk.bonus) awardBonus();
+    else if(!tk.practice) send();
     const robot = $('.say-row .robot', tkBody);
     if(pct >= 60) setTimeout(() => react(robot), 250);
     if(pct >= 80 && !reduceMotion){
@@ -4117,7 +4301,7 @@
         const tok = await idToken(c);
         if(!tok) throw new Error('AUTH');
         const rid = st.dni ? await rankId(st.dni) : '';
-        const paths = [['students', id], ['closets', id], ...(rid ? [['ranking', rid]] : []), ...tickets.map(t => ['exitTickets', t])];
+        const paths = [['students', id], ['closets', id], ['daily', id], ['practice', id], ...(rid ? [['ranking', rid]] : []), ...tickets.map(t => ['exitTickets', t])];
         const r = await fetch(`${docsBase(c)}:commit?key=${c.apiKey}`, { method:'POST', headers:{ 'Content-Type':'application/json', Authorization: 'Bearer ' + tok },
           body: JSON.stringify({ writes: paths.map(([col, d]) => ({ delete: docName(c, col, d) })) }) });
         if(!r.ok) throw new Error('HTTP ' + r.status);
@@ -4183,6 +4367,7 @@
       <div class="home-grid">
         <button type="button" class="hcard c-res" data-tk="h-res"><span class="hc-ico">${HOME_ICONS.res}</span><strong>Resultados</strong><span>Notas por sección, niveles de logro y preguntas que conviene reforzar.</span></button>
         <button type="button" class="hcard c-acc" data-tk="h-acc"><span class="hc-ico">👥</span><strong>Cuentas de estudiantes</strong><span>Mira quién se registró y borra cuentas.</span></button>
+        <button type="button" class="hcard c-more" data-tk="h-more"><span class="hc-ico">🎯</span><strong>Más estrellas</strong><span>Crea hasta 10 Exit tickets de práctica que dan ⭐2.</span></button>
         <button type="button" class="hcard c-edit" data-tk="h-edit"><span class="hc-ico">${HOME_ICONS.edit}</span><strong>Editar la página</strong><span>Toca cualquier texto, sube fichas y cambia las preguntas del Exit ticket.</span></button>
         <button type="button" class="hcard c-save" data-tk="h-save"><span class="hc-ico">${HOME_ICONS.save}</span><strong>Guardar cambios</strong><span>${dirty ? '<b>Tienes cambios sin guardar.</b> ' : ''}Descarga la página con todo lo que editaste.</span></button>
         <button type="button" class="hcard c-exit" data-tk="h-exit"><span class="hc-ico">${HOME_ICONS.exit}</span><strong>Salir del modo docente</strong><span>Vuelve a la vista que ven tus estudiantes.</span></button>
@@ -4228,6 +4413,7 @@
   tkBody.addEventListener('submit', async e => {
     if(e.target.id === 'accForm'){ e.preventDefault(); submitAccount(); return; }
     if(e.target.id === 'codeForm'){ e.preventDefault(); redeemCode($('#codeIn').value); return; }
+    if(e.target.id === 'prForm'){ e.preventDefault(); submitPracticeForm(); return; }
     if(e.target.id !== 'loginForm') return;
     e.preventDefault();
     const btn = e.target.querySelector('button[type="submit"]');
@@ -4253,7 +4439,7 @@
     const sb = t.closest('[data-shop-buy],[data-shop-equip],[data-shop-unequip]');
     if(sb && acct){ shopAction(sb.dataset.shopBuy ? 'buy' : sb.dataset.shopEquip ? 'equip' : 'unequip', sb.dataset.shopBuy || sb.dataset.shopEquip || sb.dataset.shopUnequip); return; }
     const sc = t.closest('[data-shop-cat]');
-    if(sc && acct){ acct.cat = sc.dataset.shopCat; acct.preview = null; acct.info = ''; acct.codeMsg = ''; renderShop(); return; }
+    if(sc && acct){ acct.cat = sc.dataset.shopCat; acct.preview = null; acct.info = ''; acct.codeMsg = ''; acct.filter = 'all'; renderShop(); return; }
     const st = t.closest('[data-shop-try]');
     if(st && acct){ acct.preview = acct.preview === st.dataset.shopTry ? null : st.dataset.shopTry; acct.info = ''; renderShop(); return; }
     const asec = t.closest('[data-asec]');
@@ -4267,6 +4453,11 @@
     if(t.closest('#tkNext')){ tk.i++; tk.i < tk.qs.length ? stepQuestion() : stepResult(); return; }
     const tab = t.closest('[data-tab]');
     if(tab){ panel.section = tab.dataset.tab; renderPanel(); return; }
+    if(t.closest('[data-daily-claim]')){ claimDaily(); return; }
+    const pr = t.closest('[data-pr]');
+    if(pr){ practiceAction(pr.dataset.pr, pr.dataset.id); return; }
+    const fl = t.closest('[data-shop-filter]');
+    if(fl && acct){ acct.filter = fl.dataset.shopFilter; renderShop(); return; }
     const bim = t.closest('[data-bim]');
     if(bim){ setBimestre(+bim.dataset.bim); return; }
     const delAcc = t.closest('[data-del-acc]');
@@ -4291,6 +4482,8 @@
     const act = a.dataset.tk;
     if(act === 'close') tkDlg.close();
     else if(act === 'h-res') openResults();
+    else if(act === 'h-more') openPracticeEditor();
+    else if(act === 'shop') openShop();
     else if(act === 'h-acc'){
       openResults();
       panel.accOpen = panel.accJump = true;
@@ -4385,6 +4578,299 @@
     });
   }
 
+  /* ================= Regalo diario (racha de 15 días) ================= */
+  const DAILY_KEY = 'ciencia4b:daily:' + APP.docId;
+  const DAILY_R = [1, 2, 4, 2, 3, 0, 2, 3, 4, 3, 4, 0, 4, 5, 6];   // 0 = regalo sorpresa (día 6 y 12)
+  // Objetos básicos (3 a 7 estrellas) que pueden salir de regalo. La misma lista está en las reglas de Firebase.
+  const BASIC = ['a-badge', 'b-track', 'f-guard-c', 'f-guard-t', 'b-guard', 'b-jersey', 'b-gi', 'fx-notes', 'w-violin', 'tophat', 'grad', 'hl-antenna', 'hl-cat', 'hl-horns', 'e-pink', 'e-violet', 'e-gold', 'e-anime', 'e-heart', 'e-star', 'h-bronze', 'h-silver', 'b-belt', 'b-plate', 'sh-radar', 'sh-cannon', 'wand', 'sword', 'shield', 'arco', 'w-blaster', 'at-claw', 'at-drill', 'bk-cape', 'bk-vampire', 'bk-jet', 'fx-sparks', 'a-innova', 'a-emblem', 'a-scarf', 'a-sphere', 'pt-drone', 'pt-crew', 'pt-dog', 'goggles', 'shades'];
+  const peruDay = (t = Date.now()) => Math.floor((t - 5 * 3600e3) / 864e5);
+  const dailyOf = key => { const d = lsGet(DAILY_KEY, {})[key]; return { day: (d && d.day) || 0, streak: (d && d.streak) || 0, total: (d && d.total) || 0, gifts: (d && d.gifts) || [] }; };
+  function setDaily(key, d){ const all = lsGet(DAILY_KEY, {}); all[key] = d; lsSet(DAILY_KEY, all); }
+  const ownsItem = (key, id) => closetOf(key).owned.includes(id) || dailyOf(key).gifts.includes(id);
+  function dailyState(){
+    const u = me(), d = u ? dailyOf(u.key) : dailyOf(''), today = peruDay();
+    const claimed = d.day === today;
+    const next = claimed ? d.streak : (d.day === today - 1 && d.streak > 0 && d.streak < 15 ? d.streak + 1 : 1);
+    return { d, today, claimed, next };
+  }
+  const rewardLabel = s => DAILY_R[s - 1] ? `⭐${DAILY_R[s - 1]}` : '🎁';
+  async function loadDaily(){
+    const u = me(), c = await fbConfig();
+    if(!u || u.teacher || !c) return;
+    try{
+      const r = await fetch(`${docsBase(c)}/daily/${u.key}?key=${c.apiKey}`);
+      if(r.status === 404){ setDaily(u.key, { day: 0, streak: 0, total: 0, gifts: [] }); return; }
+      if(!r.ok) return;
+      const d = fromDoc(await r.json());
+      setDaily(u.key, { day: d.day || 0, streak: d.streak || 0, total: d.total || 0, gifts: (d.gifts || []).filter(id => ITEM[id]) });
+    }catch(e){ /* sin conexión: se usa lo guardado */ }
+  }
+  function openDaily(){
+    if(isTeacher()){ toast('🧑‍🏫 En modo docente ya tienes estrellas infinitas ⭐∞'); return; }
+    if(!me()){ openAccount('login', { then: () => openDaily(), msg: '¡Hola! Soy Moli 🤖 Ingresa con tu DNI para reclamar tu regalo del día 🎁' }); return; }
+    openAccount('daily');
+    loadDaily().then(() => { if(acct && acct.view === 'daily' && !acct.claiming) renderDaily(); });
+  }
+  function renderDaily(){
+    const st = dailyState(), shown = st.claimed ? st.d.streak : st.next - 1;
+    tkTop.innerHTML = `<small>🎁 Regalo diario</small><strong>${shown ? `🔥 Racha de ${shown} ${shown === 1 ? 'día' : 'días'}` : '¡Empieza tu racha!'}</strong><span>Entra cada día y gana más</span>
+      <button class="tk-x" type="button" data-tk="close" aria-label="Cerrar">✕</button>`;
+    const won = acct.dailyWon;
+    const wonHtml = !won ? '' : won.item ? `<div class="dl-won item"><span class="dl-won-art">${itemArt(ITEM[won.item])}</span><div><small>🎁 ¡Regalo sorpresa!</small><b>${esc(ITEM[won.item].n)}</b><span>Ya es tuyo: póntelo en la Tienda</span></div></div>`
+      : `<div class="dl-won"><span class="dl-won-star">⭐</span><div><small>${won.gift ? '🎁 ¡Regalo sorpresa!' : '¡Reclamaste tu regalo!'}</small><b>+${won.stars} ${won.stars === 1 ? 'estrella' : 'estrellas'}</b><span>Ya están en tu cuenta</span></div></div>`;
+    const left = (st.today + 1) * 864e5 + 5 * 3600e3 - Date.now(), hh = Math.floor(left / 3600e3), mm = Math.floor(left % 3600e3 / 6e4);
+    tkBody.innerHTML = `<div class="tk-step daily">
+      ${sayRow(won ? '¡Toma tu regalo! 🎉 Vuelve mañana para seguir tu racha 🔥' : st.claimed ? '¡Ya reclamaste tu regalo de hoy! Vuelve mañana para no perder tu racha 🔥' : shown ? `¡Volviste! 🙌 Hoy es tu día ${st.next}. ¡Reclama tu regalo!` : '¡Hola! 🎁 Entra cada día para ganar estrellas. ¡Hoy empieza tu racha!', won || !st.claimed ? 'good' : '')}
+      ${wonHtml}
+      <div class="dl-grid">${DAILY_R.map((r, i) => { const k = i + 1, done = k <= shown, today = !st.claimed && k === st.next;
+        return `<div class="dl-day${done ? ' done' : ''}${today ? ' today' : ''}${r ? '' : ' gift'}${k === 15 ? ' final' : ''}"><small>Día ${k}</small><b>${r ? `⭐${r}` : '🎁'}</b>${done ? '<i>✓</i>' : ''}</div>`; }).join('')}</div>
+      ${acct.err ? `<p class="send warn">${acct.err}</p>` : ''}
+      <div class="tk-actions">${st.claimed
+        ? `<span class="dl-wait">⏰ Vuelve en ${hh} h ${mm} min</span>`
+        : `<button type="button" class="btn solid dl-claim" data-daily-claim${acct.claiming ? ' disabled' : ''}>${acct.claiming ? 'Abriendo…' : DAILY_R[st.next - 1] ? `¡Reclamar ⭐${DAILY_R[st.next - 1]}!` : '🎁 ¡Abrir regalo sorpresa!'}</button>`}</div>
+      <p class="dl-rules">🔥 Si faltas un día, la racha vuelve al Día 1. Los días 6 y 12 hay un <b>regalo sorpresa</b>: un objeto de la tienda o de 3 a 7 estrellas. Al completar los 15 días empiezas de nuevo.</p>
+      <div class="tk-actions"><button type="button" class="btn ghost" data-shop>🛍️ Ir a la tienda</button><button type="button" class="btn up" data-tk="close">Listo</button></div>
+    </div>`;
+  }
+  async function claimDaily(){
+    const u = me();
+    if(!u || u.teacher || !acct || acct.claiming) return;
+    const st = dailyState();
+    if(st.claimed) return renderDaily();
+    acct.claiming = true; acct.err = ''; renderDaily();
+    const s = st.next, r = DAILY_R[s - 1];
+    const d = { day: st.today, streak: s, total: st.d.total, gifts: [...st.d.gifts] };
+    let won;
+    if(r){ d.total += r; won = { stars: r }; }
+    else {
+      const pool = BASIC.filter(id => ITEM[id] && !ownsItem(u.key, id));
+      if(pool.length && Math.random() < .5){ const id = pool[Math.floor(Math.random() * pool.length)]; d.gifts.push(id); won = { item: id }; }
+      else { const n = 3 + Math.floor(Math.random() * 5); d.total += n; won = { stars: n, gift: true }; }
+    }
+    const c = await fbConfig();
+    if(c){
+      try{
+        const body = { writes: [{ update: { name: docName(c, 'daily', u.key), fields: toFields({ ...d, updatedAt: new Date() }) } }] };
+        const res = await fetch(`${docsBase(c)}:commit?key=${c.apiKey}`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body) });
+        if(!res.ok){
+          await loadDaily();
+          acct.claiming = false;
+          acct.err = dailyState().claimed ? '📌 Ya reclamaste tu regalo de hoy en otro dispositivo.'
+            : res.status === 403 ? '🔧 No se pudo reclamar. Revisa que la fecha y la hora de tu celular estén bien. Si sigue igual, avísale a tu profe (puede faltar actualizar las reglas).'
+            : '📶 No se pudo conectar. Inténtalo otra vez.';
+          onAccountChange(); renderDaily();
+          return;
+        }
+      }catch(e){ acct.claiming = false; acct.err = '📶 No se pudo conectar. Inténtalo otra vez.'; renderDaily(); return; }
+    }
+    setDaily(u.key, d);
+    acct.claiming = false; acct.dailyWon = won;
+    onAccountChange();
+    renderDaily();
+    const robot = $('.say-row .robot', tkBody); if(robot) react(robot);
+    confettiIn(tkBody);
+  }
+  function confettiIn(root){
+    if(reduceMotion) return;
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    const colors = ['#2f6fed', '#38d1f5', '#f5a623', '#34c170', '#5b4fe0', '#f57c23'];
+    c.innerHTML = Array.from({ length: 40 }, (_, i) => `<i style="left:${Math.random() * 100}%;background:${colors[i % colors.length]};animation-delay:${Math.random() * .5}s;animation-duration:${1.8 + Math.random() * 1.2}s"></i>`).join('');
+    root.appendChild(c);
+    setTimeout(() => c.remove(), 3400);
+  }
+
+  /* ================= Más estrellas: Exit tickets de práctica ================= */
+  const PRACTICE_KEY = 'ciencia4b:practice:' + APP.docId, BONUS_KEY = 'ciencia4b:bonus:' + APP.docId;
+  const BONUS_STARS = 2, BONUS_PASS = 3, PRACTICE_MAX = 10;
+  let PRACTICE = lsGet(PRACTICE_KEY, null) || { tickets: [], ids: [] };
+  const bonusOf = key => { const b = lsGet(BONUS_KEY, {})[key]; return { done: (b && b.done) || [] }; };
+  function setBonus(key, b){ const all = lsGet(BONUS_KEY, {}); all[key] = b; lsSet(BONUS_KEY, all); }
+  async function loadPractice(){
+    const c = await fbConfig();
+    if(!c) return;
+    try{
+      const r = await fetch(`${docsBase(c)}/config/practice?key=${c.apiKey}`);
+      if(r.status === 404){ PRACTICE = { tickets: [], ids: [] }; lsSet(PRACTICE_KEY, PRACTICE); return; }
+      if(!r.ok) return;
+      const d = fromDoc(await r.json());
+      let tickets = [];
+      try{ tickets = JSON.parse(d.data || '[]'); }catch(e){}
+      PRACTICE = { tickets: Array.isArray(tickets) ? tickets : [], ids: d.ids || [] };
+      lsSet(PRACTICE_KEY, PRACTICE);
+    }catch(e){ /* sin conexión */ }
+  }
+  async function loadBonus(){
+    const u = me(), c = await fbConfig();
+    if(!u || u.teacher || !c) return;
+    try{
+      const r = await fetch(`${docsBase(c)}/practice/${u.key}?key=${c.apiKey}`);
+      if(r.status === 404){ setBonus(u.key, { done: [] }); return; }
+      if(r.ok) setBonus(u.key, { done: fromDoc(await r.json()).done || [] });
+    }catch(e){}
+  }
+  function openMore(){
+    openAccount('more');
+    Promise.all([loadPractice(), loadBonus()]).then(() => { if(acct && acct.view === 'more') renderMore(); });
+  }
+  function renderMore(){
+    const u = me(), done = u ? bonusOf(u.key).done : [], list = PRACTICE.tickets;
+    const got = list.filter(t => done.includes(t.id)).length;
+    tkTop.innerHTML = `<small>🎯 Más estrellas</small><strong>Practica con Moli</strong><span>${list.length ? `${got} de ${list.length} completados` : 'Exit tickets de práctica'}</span>
+      <button class="tk-x" type="button" data-tk="close" aria-label="Cerrar">✕</button>`;
+    tkBody.innerHTML = `<div class="tk-step more">
+      ${sayRow(`¡Este es mi rincón de práctica! 🎯 Aquí hay Exit tickets extra que puedes hacer cuando quieras. Si respondes bien <b>${BONUS_PASS} o más</b> de las 5 preguntas, ganas <b>⭐${BONUS_STARS}</b> (una vez por cada ejercicio).`)}
+      ${!u ? '<p class="send warn">🪪 Ingresa con tu DNI para que tus estrellas de práctica se guarden.</p>' : ''}
+      ${list.length ? `<div class="pr-list">${list.map((t, i) => { const ok = done.includes(t.id);
+        return `<div class="pr-card${ok ? ' done' : ''}"><span class="pr-n">${ok ? '✓' : i + 1}</span>
+          <div class="pr-txt"><b>${esc(t.title)}</b><small>${t.qs.length} preguntas · ${ok ? `⭐${BONUS_STARS} ganadas` : `gana ⭐${BONUS_STARS}`}</small></div>
+          <button type="button" class="btn ${ok ? 'ghost' : 'solid'}" data-pr="start" data-id="${esc(t.id)}">${ok ? 'Repasar' : 'Practicar ›'}</button></div>`; }).join('')}</div>`
+        : '<div class="pr-empty">📭 Tu profe todavía no ha creado ejercicios de práctica. ¡Vuelve pronto! 🚀</div>'}
+      <div class="tk-actions">${isTeacher() || editing ? '<button type="button" class="btn ghost" data-tk="h-more">✏️ Crear o editar ejercicios</button>' : '<button type="button" class="btn ghost" data-gift>🎁 Regalo diario</button>'}<button type="button" class="btn up" data-tk="close">Listo</button></div>
+    </div>`;
+  }
+  function startBonus(id){
+    const t = PRACTICE.tickets.find(x => x.id === id);
+    if(!t) return;
+    const qs = playable({ ticket: { questions: t.qs } });
+    if(!qs.length) return;
+    const u = me();
+    acct = null;
+    tk = { bonus: id, title: t.title, qs, name: u && !u.teacher ? u.name : 'Profe', section: '', i: 0, answers: [], order: null };
+    tkDlg.classList.remove('wide');
+    stepQuestion();
+    if(!tkDlg.open){ tkDlg.showModal(); tkBody.focus({ preventScroll:true }); }
+  }
+  async function awardBonus(){
+    const box = $('#tkSend');
+    const set = (cls, html) => { if(box){ box.className = 'send ' + cls; box.innerHTML = html; } };
+    const u = me(), cur = tk;
+    if(!u){ set('warn', '🪪 Ingresa con tu DNI para ganar estrellas con la práctica.'); return; }
+    if(u.teacher){ set('warn', '🧑‍🏫 Modo docente: la práctica no suma estrellas.'); return; }
+    const b = bonusOf(u.key);
+    if(b.done.includes(cur.bonus)){ set('ok', `✅ Ya ganaste las ⭐${BONUS_STARS} de este ejercicio. ¡Buen repaso!`); return; }
+    if(cur.score < BONUS_PASS){ set('warn', `Necesitas ${BONUS_PASS} o más respuestas correctas para ganar ⭐${BONUS_STARS}. ¡Inténtalo otra vez! 💪`); return; }
+    const done = [...b.done, cur.bonus];
+    const c = await fbConfig();
+    if(c){
+      set('wait', '<span class="spin"></span> Guardando tus estrellas…');
+      try{
+        const body = { writes: [{ update: { name: docName(c, 'practice', u.key), fields: toFields({ done, updatedAt: new Date() }) } }] };
+        const r = await fetch(`${docsBase(c)}:commit?key=${c.apiKey}`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body) });
+        if(!r.ok){ set('warn', r.status === 403 ? '🔧 No se pudieron guardar tus estrellas. Avísale a tu profe: falta actualizar las reglas.' : '📶 No se pudo conectar. Vuelve a intentarlo.'); return; }
+      }catch(e){ set('warn', '📶 No se pudo conectar. Vuelve a intentarlo.'); return; }
+    }
+    setBonus(u.key, { done });
+    onAccountChange();
+    set('ok', `🎉 ¡Ganaste ⭐${BONUS_STARS}! Ya están en tu cuenta.`);
+    confettiIn(tkBody);
+  }
+
+  // ----- editor de la docente -----
+  const blankPractice = () => ({ id: '', title: '', qs: Array.from({ length: 5 }, () => ({ q: '', options: ['', '', '', ''], answer: -1, why: '' })) });
+  function openPracticeEditor(){
+    tk = null;
+    acct = { view: 'pr-edit', mode: 'list', draft: null, err: '', info: '' };
+    tkDlg.classList.add('wide');
+    renderPracticeEditor();
+    if(!tkDlg.open){ tkDlg.showModal(); tkBody.focus({ preventScroll:true }); }
+    loadPractice().then(() => { if(acct && acct.view === 'pr-edit' && acct.mode === 'list') renderPracticeEditor(); });
+  }
+  function renderPracticeEditor(){
+    const list = PRACTICE.tickets;
+    tkTop.innerHTML = `<small>🧑‍🏫 Modo docente</small><strong>Más estrellas · práctica</strong><span>${list.length} de ${PRACTICE_MAX} ejercicios · cada uno da ⭐${BONUS_STARS}</span>
+      <button class="tk-x" type="button" data-tk="close" aria-label="Cerrar">✕</button>`;
+    const msgs = `${acct.err ? `<p class="send warn">${acct.err}</p>` : ''}${acct.info ? `<p class="send ok">${acct.info}</p>` : ''}`;
+    if(acct.mode === 'list'){
+      tkBody.innerHTML = `<div class="tk-step">
+        ${sayRow(`Aquí creas los Exit tickets de práctica 🎯 Tus estudiantes los hacen cuando quieran y ganan ⭐${BONUS_STARS} si aciertan ${BONUS_PASS} de 5.`)}
+        ${msgs}
+        ${list.length ? `<div class="pr-list">${list.map((t, i) => `<div class="pr-card"><span class="pr-n">${i + 1}</span>
+          <div class="pr-txt"><b>${esc(t.title)}</b><small>${t.qs.length} preguntas</small></div>
+          <button type="button" class="btn ghost" data-pr="edit" data-id="${esc(t.id)}">✏️ Editar</button>
+          <button type="button" class="icon-btn del" data-pr="del" data-id="${esc(t.id)}" aria-label="Eliminar ${esc(t.title)}">${ICON.trash}</button></div>`).join('')}</div>`
+          : '<div class="pr-empty">Aún no hay ejercicios. ¡Crea el primero! ✨</div>'}
+        <div class="tk-actions">${list.length < PRACTICE_MAX ? '<button type="button" class="btn solid" data-pr="new">➕ Nuevo ejercicio</button>' : '<span class="dl-wait">Llegaste al máximo de 10 ejercicios.</span>'}<button type="button" class="btn up" data-tk="close">Listo</button></div>
+      </div>`;
+      return;
+    }
+    const t = acct.draft;
+    tkBody.innerHTML = `<div class="tk-step">
+      <form id="prForm" class="pr-form" autocomplete="off">
+        <div class="fld"><label for="prTitle">Título del ejercicio</label><input id="prTitle" maxlength="60" placeholder="Ej.: Repaso de microorganismos" value="${esc(t.title)}"></div>
+        ${t.qs.map((q, i) => `<fieldset class="pr-q"><legend>Pregunta ${i + 1}</legend>
+          <textarea data-q="${i}" rows="2" maxlength="220" placeholder="Escribe la pregunta">${esc(q.q)}</textarea>
+          <div class="pr-opts">${q.options.map((o, k) => `<label class="pr-opt"><input type="radio" name="ans${i}" value="${k}"${q.answer === k ? ' checked' : ''} aria-label="Respuesta correcta ${LETTERS[k]}"><span class="opt-l">${LETTERS[k]}</span><input data-o="${i}-${k}" maxlength="120" placeholder="Opción ${LETTERS[k]}" value="${esc(o)}"></label>`).join('')}</div>
+          <input class="pr-why" data-why="${i}" maxlength="180" placeholder="💡 Explicación (opcional)" value="${esc(q.why || '')}">
+        </fieldset>`).join('')}
+        <p class="drop-hint" style="text-align:left">Marca el círculo de la respuesta correcta en cada pregunta.</p>
+        ${msgs}
+        <div class="tk-actions"><button type="submit" class="btn solid">💾 Guardar ejercicio</button><button type="button" class="btn ghost" data-pr="list">Cancelar</button></div>
+      </form>
+    </div>`;
+  }
+  function readPracticeForm(){
+    const t = acct.draft;
+    t.title = ($('#prTitle').value || '').trim();
+    t.qs.forEach((q, i) => {
+      q.q = ($(`[data-q="${i}"]`).value || '').trim();
+      q.options = q.options.map((_, k) => ($(`[data-o="${i}-${k}"]`).value || '').trim());
+      const r = $(`input[name="ans${i}"]:checked`);
+      q.answer = r ? +r.value : -1;
+      q.why = ($(`[data-why="${i}"]`).value || '').trim();
+    });
+    return t;
+  }
+  async function savePractice(tickets){
+    const c = await fbConfig();
+    if(!c) return 'offline';
+    const tok = await idToken(c).catch(() => null);
+    if(!tok) return 'auth';
+    const ids = [...new Set([...(PRACTICE.ids || []), ...tickets.map(t => t.id)])];
+    try{
+      const body = { writes: [{ update: { name: docName(c, 'config', 'practice'), fields: toFields({ data: JSON.stringify(tickets), ids, updatedAt: new Date() }) } }] };
+      const r = await fetch(`${docsBase(c)}:commit?key=${c.apiKey}`, { method:'POST', headers:{ 'Content-Type':'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify(body) });
+      if(r.status === 403) return 'rules';
+      if(!r.ok) return 'net';
+    }catch(e){ return 'net'; }
+    PRACTICE = { tickets, ids };
+    lsSet(PRACTICE_KEY, PRACTICE);
+    return 'ok';
+  }
+  const saveErr = r => r === 'auth' ? '🔐 Para guardar, primero entra a «Resultados» con tu cuenta de docente (solo una vez) y vuelve aquí.'
+    : r === 'rules' ? '🔧 Falta actualizar las reglas de Firebase para guardar los ejercicios.'
+    : '📶 No se pudo guardar. Revisa tu conexión.';
+  async function submitPracticeForm(){
+    const t = readPracticeForm();
+    acct.err = ''; acct.info = '';
+    const bad = t.qs.findIndex(q => !q.q || q.options.filter(Boolean).length < 2 || q.answer < 0 || !q.options[q.answer]);
+    if(!t.title) acct.err = 'Escribe un título para el ejercicio.';
+    else if(bad >= 0) acct.err = `Revisa la pregunta ${bad + 1}: necesita el texto, al menos 2 opciones y la respuesta correcta marcada.`;
+    if(acct.err) return renderPracticeEditor();
+    const btn = $('#prForm button[type="submit"]'); if(btn){ btn.disabled = true; btn.textContent = 'Guardando…'; }
+    const clean = { id: t.id || 'p' + Date.now().toString(36), title: t.title.slice(0, 60), qs: t.qs.map(q => ({ q: q.q, options: q.options, answer: q.answer, why: q.why })) };
+    const tickets = PRACTICE.tickets.some(x => x.id === clean.id) ? PRACTICE.tickets.map(x => x.id === clean.id ? clean : x) : [...PRACTICE.tickets, clean];
+    const r = await savePractice(tickets.slice(0, PRACTICE_MAX));
+    if(r !== 'ok'){ acct.err = saveErr(r); return renderPracticeEditor(); }
+    acct.mode = 'list'; acct.draft = null; acct.info = `✅ «${clean.title}» guardado. Tus estudiantes ya lo ven en «Más estrellas».`;
+    renderPracticeEditor();
+  }
+  async function practiceAction(kind, id){
+    if(kind === 'start'){ if(!me()){ openAccount('login', { then: () => startBonus(id), msg: '¡Hola! Ingresa con tu DNI para ganar estrellas practicando 🎯' }); return; } startBonus(id); return; }
+    if(!acct || acct.view !== 'pr-edit') return;
+    acct.err = ''; acct.info = '';
+    if(kind === 'new'){ acct.mode = 'form'; acct.draft = blankPractice(); }
+    else if(kind === 'edit'){ const t = PRACTICE.tickets.find(x => x.id === id); if(!t) return; acct.mode = 'form'; acct.draft = JSON.parse(JSON.stringify(t)); while(acct.draft.qs.length < 5) acct.draft.qs.push(blankPractice().qs[0]); }
+    else if(kind === 'list'){ acct.mode = 'list'; acct.draft = null; }
+    else if(kind === 'del'){
+      const t = PRACTICE.tickets.find(x => x.id === id);
+      if(!t || !confirm(`¿Eliminar el ejercicio «${t.title}»? Las estrellas que ya ganaron tus estudiantes se mantienen.`)) return;
+      const r = await savePractice(PRACTICE.tickets.filter(x => x.id !== id));
+      if(r !== 'ok') acct.err = saveErr(r); else acct.info = '🗑 Ejercicio eliminado.';
+    }
+    renderPracticeEditor();
+  }
+
   /* ================= Título y bimestre (se guardan en la nube para todos) ================= */
   const SITE_KEY = 'ciencia4b:site:' + APP.docId;
   const BIM = ['', '1er Bimestre', '2do Bimestre', '3er Bimestre', '4to Bimestre'];
@@ -4467,6 +4953,7 @@
   /* ================= Start ================= */
   onAccountChange();
   loadSite();
+  loadPractice();
   setTimeout(refreshProgress, 600);
   const start = parse(location.hash);
   trail.push(toHash(start));

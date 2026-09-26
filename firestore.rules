@@ -207,6 +207,11 @@ service cloud.firestore {
     // Portada: título, bimestre y unidades visibles. Todos la leen; solo la docente la cambia.
     match /config/{id} {
       allow get: if true;
+      allow create, update: if isTeacher() && id == 'practice'
+        && request.resource.data.keys().hasOnly(['data', 'ids', 'updatedAt'])
+        && request.resource.data.data is string && request.resource.data.data.size() <= 80000
+        && request.resource.data.ids is list && request.resource.data.ids.size() <= 300
+        && request.resource.data.updatedAt is timestamp;
       allow create, update: if isTeacher() && id == 'site'
         && request.resource.data.keys().hasOnly(['title', 'bimestre', 'hidden', 'updatedAt'])
         && request.resource.data.title is string && request.resource.data.title.size() > 0 && request.resource.data.title.size() <= 40
@@ -214,6 +219,61 @@ service cloud.firestore {
         && request.resource.data.hidden is list && request.resource.data.hidden.size() <= 20
         && request.resource.data.updatedAt is timestamp;
       allow delete: if isTeacher();
+    }
+
+    // Regalo diario: una vez por día (hora de Perú). La racha sube de 1 en 1 hasta 15 y el premio
+    // de cada día está fijo aquí; los días 6 y 12 son regalo sorpresa (3 a 7 estrellas u objeto básico).
+    function peruDay() {
+      return math.floor((request.time.toMillis() - 18000000) / 86400000);
+    }
+    function dailyReward(s) {
+      return [1, 2, 4, 2, 3, 0, 2, 3, 4, 3, 4, 0, 4, 5, 6][s - 1];
+    }
+    function basicGift(id) {
+      return id in ['a-badge', 'b-track', 'f-guard-c', 'f-guard-t', 'b-guard', 'b-jersey', 'b-gi', 'fx-notes', 'w-violin', 'tophat', 'grad', 'hl-antenna', 'hl-cat', 'hl-horns', 'e-pink', 'e-violet', 'e-gold', 'e-anime', 'e-heart', 'e-star', 'h-bronze', 'h-silver', 'b-belt', 'b-plate', 'sh-radar', 'sh-cannon', 'wand', 'sword', 'shield', 'arco', 'w-blaster', 'at-claw', 'at-drill', 'bk-cape', 'bk-vampire', 'bk-jet', 'fx-sparks', 'a-innova', 'a-emblem', 'a-scarf', 'a-sphere', 'pt-drone', 'pt-crew', 'pt-dog', 'goggles', 'shades'];
+    }
+    function validDaily(d) {
+      return d.keys().hasOnly(['day', 'streak', 'total', 'gifts', 'updatedAt'])
+        && d.day is int && d.day == peruDay()
+        && d.streak is int && d.streak >= 1 && d.streak <= 15
+        && d.total is int && d.total >= 0 && d.total <= 5000
+        && d.gifts is list && d.gifts.size() <= 60
+        && d.updatedAt is timestamp;
+    }
+    function dailyPrize(d, old, oldGifts) {
+      return dailyReward(d.streak) > 0
+        ? (d.total == old + dailyReward(d.streak) && d.gifts == oldGifts)
+        : ((d.total >= old + 3 && d.total <= old + 7 && d.gifts == oldGifts)
+          || (d.total == old && d.gifts.size() == oldGifts.size() + 1 && d.gifts.hasAll(oldGifts) && basicGift(d.gifts[d.gifts.size() - 1])));
+    }
+    match /daily/{id} {
+      allow get: if true;
+      allow create: if id.matches('k[0-9a-f]{20}')
+        && exists(/databases/$(database)/documents/students/$(id))
+        && validDaily(request.resource.data)
+        && request.resource.data.streak == 1 && dailyPrize(request.resource.data, 0, []);
+      allow update: if validDaily(request.resource.data)
+        && request.resource.data.day > resource.data.day
+        && request.resource.data.streak == ((request.resource.data.day == resource.data.day + 1 && resource.data.streak < 15) ? resource.data.streak + 1 : 1)
+        && dailyPrize(request.resource.data, resource.data.total, resource.data.gifts);
+      allow list, delete: if isTeacher();
+    }
+
+    // Más estrellas: ejercicios de práctica completados (cada uno da 2 estrellas una sola vez).
+    match /practice/{id} {
+      allow get: if true;
+      allow create: if id.matches('k[0-9a-f]{20}')
+        && exists(/databases/$(database)/documents/students/$(id))
+        && request.resource.data.keys().hasOnly(['done', 'updatedAt'])
+        && request.resource.data.done is list && request.resource.data.done.size() <= 300
+        && request.resource.data.done.hasOnly(get(/databases/$(database)/documents/config/practice).data.ids)
+        && request.resource.data.updatedAt is timestamp;
+      allow update: if request.resource.data.keys().hasOnly(['done', 'updatedAt'])
+        && request.resource.data.done is list && request.resource.data.done.size() <= 300
+        && request.resource.data.done.hasAll(resource.data.done)
+        && request.resource.data.done.hasOnly(get(/databases/$(database)/documents/config/practice).data.ids)
+        && request.resource.data.updatedAt is timestamp;
+      allow list, delete: if isTeacher();
     }
 
     // Marcas de la versión anterior (solo para que la docente pueda limpiarlas).

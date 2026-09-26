@@ -226,13 +226,10 @@ service cloud.firestore {
       allow delete: if isTeacher();
     }
 
-    // Regalo diario: una vez por día (hora de Perú). La racha sube de 1 en 1 hasta 15 y el premio
-    // de cada día está fijo aquí; los días 6 y 12 son regalo sorpresa (3 a 7 estrellas u objeto básico).
+    // Regalo diario: una vez por día (hora de Perú). La racha sube de 1 en 1 hasta 15 (si faltas un día vuelve a 1).
+    // Cada 3 días de racha (días 3, 6, 9, 12 y 15) se ganan 6 estrellas; el día 15 además puede traer un objeto básico.
     function peruDay() {
       return math.floor((request.time.toMillis() - 18000000) / 86400000);
-    }
-    function dailyReward(s) {
-      return [1, 2, 4, 2, 3, 0, 2, 3, 4, 3, 4, 0, 4, 5, 6][s - 1];
     }
     function basicGift(id) {
       return id in ['a-badge', 'b-track', 'f-guard-c', 'f-guard-t', 'b-guard', 'b-jersey', 'b-gi', 'fx-notes', 'w-violin', 'tophat', 'grad', 'hl-antenna', 'hl-cat', 'hl-horns', 'e-pink', 'e-violet', 'e-gold', 'e-anime', 'e-heart', 'e-star', 'h-bronze', 'h-silver', 'b-belt', 'b-plate', 'sh-radar', 'sh-cannon', 'wand', 'sword', 'shield', 'arco', 'w-blaster', 'at-claw', 'at-drill', 'bk-cape', 'bk-vampire', 'bk-jet', 'fx-sparks', 'a-innova', 'a-emblem', 'a-scarf', 'a-sphere', 'pt-drone', 'pt-crew', 'pt-dog', 'goggles', 'shades'];
@@ -246,10 +243,9 @@ service cloud.firestore {
         && d.updatedAt is timestamp;
     }
     function dailyPrize(d, old, oldGifts) {
-      return dailyReward(d.streak) > 0
-        ? (d.total == old + dailyReward(d.streak) && d.gifts == oldGifts)
-        : ((d.total >= old + 3 && d.total <= old + 7 && d.gifts == oldGifts)
-          || (d.total == old && d.gifts.size() == oldGifts.size() + 1 && d.gifts.hasAll(oldGifts) && basicGift(d.gifts[d.gifts.size() - 1])));
+      return d.total == old + (d.streak % 3 == 0 ? 6 : 0)
+        && (d.gifts == oldGifts
+          || (d.streak == 15 && d.gifts.size() == oldGifts.size() + 1 && d.gifts.hasAll(oldGifts) && basicGift(d.gifts[d.gifts.size() - 1])));
     }
     match /daily/{id} {
       allow get: if true;

@@ -1963,6 +1963,88 @@
   .tk:has(.tk-step.duel) .tk-body{ padding:0 20px 24px; }
   .tk-step.duel{ max-width:560px; margin:0 auto; padding-top:16px; }
 
+  /* ---------- 💣 Oleadas ---------- */
+  .tk:has(.tk-step.wv){ color:#e8fff6; background:radial-gradient(80% 50% at 20% 0%, rgba(45,212,191,.28), transparent 70%), radial-gradient(70% 50% at 100% 100%, rgba(132,204,22,.18), transparent 70%), linear-gradient(180deg, #0c2230, #081620); }
+  .tk:has(.tk-step.wv) .tk-top{ background:transparent; }
+  .tk:has(.tk-step.wv) .tk-top small{ color:#5eead4; }
+  .tk:has(.tk-step.wv) .tk-x{ background:rgba(255,255,255,.12); }
+  .wv-card{ display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1.3fr); gap:14px; align-items:center; }
+  .wv-stage{ position:relative; display:flex; flex-direction:column; align-items:center; gap:8px; padding:14px 6px 12px; border-radius:22px;
+    background:radial-gradient(60% 55% at 50% 60%, rgba(45,212,191,.35), transparent 72%), rgba(255,255,255,.04); border:1px solid rgba(94,234,212,.2); }
+  .wv-stage .robot{ --rw:min(40vw, 190px); }
+  .wv-rec{ padding:4px 12px; border-radius:999px; background:rgba(250,204,21,.16); border:1px solid rgba(250,204,21,.45); color:#fde68a; font-size:13px; font-weight:900; }
+  .wv-stats{ display:flex; flex-direction:column; gap:8px; }
+  .wv-st{ display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:14px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); }
+  .wv-st.off{ opacity:.55; }
+  .wv-ico{ font-size:22px; width:30px; text-align:center; flex-shrink:0; }
+  .wv-txt{ flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
+  .wv-txt b{ display:flex; justify-content:space-between; font-size:14px; font-weight:900; }
+  .wv-txt b em{ font-style:normal; color:#5eead4; font-variant-numeric:tabular-nums; }
+  .wv-txt small{ font-size:11.5px; font-weight:700; color:rgba(232,255,246,.62); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .wv-bar{ display:block; height:6px; border-radius:999px; background:rgba(255,255,255,.1); overflow:hidden; }
+  .wv-bar i{ display:block; height:100%; border-radius:inherit; background:linear-gradient(90deg, #2dd4bf, #a3e635); transform-origin:left center; transition:transform .6s var(--spring); }
+  .wv-tip{ margin:14px 0 0; font-size:13px; font-weight:700; line-height:1.5; color:rgba(232,255,246,.75); }
+  .wv-tip b{ color:#fff; }
+  .wv-go-row{ position:sticky; bottom:0; z-index:3; display:flex; flex-wrap:wrap; gap:10px; margin:14px -4px 0; padding:10px 4px 4px; background:linear-gradient(180deg, rgba(8,22,32,0), #081620 30%); }
+  .wv-go-row .btn{ flex:1; }
+  .wv-go{ flex:2; min-width:200px; min-height:56px; white-space:nowrap; border:none; border-radius:18px; cursor:pointer; font:inherit; font-size:20px; font-weight:900; color:#fff;
+    background:linear-gradient(135deg, #f97316, #ef4444); box-shadow:0 6px 0 #9a3412, 0 14px 26px rgba(239,68,68,.35); transition:transform .12s, box-shadow .12s; }
+  .wv-go:active{ transform:translateY(4px); box-shadow:0 2px 0 #9a3412, 0 8px 16px rgba(239,68,68,.3); }
+  .wv-go:focus-visible{ outline:3px solid #fff; outline-offset:3px; }
+  .tk:has(.tk-step.wv) .btn.ghost{ background:rgba(255,255,255,.08); color:#e8fff6; border-color:rgba(255,255,255,.2); }
+  .wv-hud{ display:flex; align-items:center; gap:10px; margin-bottom:10px; font-weight:900; }
+  .wv-w{ padding:6px 12px; border-radius:12px; background:rgba(45,212,191,.16); color:#99f6e4; white-space:nowrap; }
+  .wv-w b, .wv-k b{ font-variant-numeric:tabular-nums; color:#fff; }
+  .wv-k{ white-space:nowrap; }
+  .wv-hp{ position:relative; flex:1; height:24px; border-radius:999px; background:rgba(0,0,0,.35); box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.15); overflow:hidden; }
+  .wv-hp i{ position:absolute; inset:0; background:linear-gradient(90deg, #22c55e, #a3e635); transform-origin:left center; transition:transform .25s; }
+  .wv-hp.low i{ background:linear-gradient(90deg, #ef4444, #f97316); }
+  .wv-hp b{ position:relative; display:block; text-align:center; line-height:24px; font-size:13px; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.6); font-variant-numeric:tabular-nums; }
+  .wv-arena{ position:relative; width:100%; overflow:hidden; border-radius:20px; contain:strict;
+    background:radial-gradient(40% 50% at 13% 50%, rgba(45,212,191,.22), transparent 70%), repeating-linear-gradient(0deg, rgba(255,255,255,.03) 0 1px, transparent 1px 40px), repeating-linear-gradient(90deg, rgba(255,255,255,.03) 0 1px, transparent 1px 40px), #0a1a24;
+    box-shadow:inset 0 0 0 1.5px rgba(94,234,212,.25); }
+  .wv-arena.tall{ background:radial-gradient(60% 30% at 50% 86%, rgba(45,212,191,.22), transparent 70%), repeating-linear-gradient(0deg, rgba(255,255,255,.03) 0 1px, transparent 1px 40px), repeating-linear-gradient(90deg, rgba(255,255,255,.03) 0 1px, transparent 1px 40px), #0a1a24; }
+  .wv-arena > *{ position:absolute; left:0; top:0; }
+  .wv-moli{ width:0; height:0; z-index:2; }
+  .wv-moli .robot{ --rw:clamp(70px, 22vw, 120px); position:absolute; left:0; top:0; transform:translate(-50%, -58%); }
+  .wv-flash{ position:absolute; left:-55px; top:-60px; width:110px; height:110px; border-radius:50%; background:radial-gradient(closest-side, rgba(239,68,68,.65), transparent); opacity:0; pointer-events:none; }
+  .wv-moli.hurt .wv-flash{ animation:wvHurt .35s ease-out; }
+  @keyframes wvHurt{ 0%{ opacity:1; transform:scale(.8); } 100%{ opacity:0; transform:scale(1.25); } }
+  .wv-en{ width:0; height:0; z-index:1; will-change:transform; }
+  .wv-en > span{ position:absolute; left:0; top:0; font-size:var(--r); line-height:1; transform:translate(-50%, -55%); filter:drop-shadow(0 3px 4px rgba(0,0,0,.45)); }
+  .wv-en.k-boss > span{ filter:drop-shadow(0 0 12px rgba(239,68,68,.9)) hue-rotate(-60deg) saturate(1.6); }
+  .wv-en.k-mutant > span{ filter:drop-shadow(0 0 8px rgba(168,85,247,.8)); }
+  .wv-en > i{ position:absolute; left:0; top:0; width:calc(var(--r) * .9); height:5px; transform:translate(-50%, calc(var(--r) * -.62)); border-radius:3px; background:rgba(0,0,0,.5); overflow:hidden; }
+  .wv-en > i > i{ display:block; height:100%; background:#f43f5e; transform-origin:left center; }
+  .wv-shot{ width:12px; height:12px; margin:-6px 0 0 -6px; border-radius:50%; z-index:3; will-change:transform; background:radial-gradient(circle, #fff 0 30%, #5eead4 55%, rgba(94,234,212,0) 72%); box-shadow:0 0 10px #2dd4bf; }
+  .wv-shot.crit{ width:16px; height:16px; margin:-8px 0 0 -8px; background:radial-gradient(circle, #fff 0 30%, #fde047 55%, rgba(253,224,71,0) 72%); box-shadow:0 0 14px #facc15; }
+  .wv-shot.pet{ background:radial-gradient(circle, #fff 0 30%, #f0abfc 55%, rgba(240,171,252,0) 72%); box-shadow:0 0 10px #e879f9; }
+  .wv-pop{ z-index:4; font-size:15px; font-weight:900; color:#fff; text-shadow:0 2px 3px rgba(0,0,0,.7); pointer-events:none; white-space:nowrap; animation:wvPop .7s ease-out forwards; }
+  .wv-pop.crit{ color:#fde047; font-size:18px; } .wv-pop.pet{ color:#f0abfc; }
+  .wv-pop.big{ font-size:clamp(18px, 5vw, 26px); color:#fde047; margin-left:-110px; }
+  @keyframes wvPop{ 0%{ opacity:0; translate:0 6px; scale:.7; } 20%{ opacity:1; translate:0 0; scale:1.1; } 100%{ opacity:0; translate:0 -34px; scale:1; } }
+  .wv-banner{ left:50% !important; top:40% !important; z-index:5; display:flex; flex-direction:column; align-items:center; pointer-events:none; opacity:0; transform:translate(-50%, -50%); }
+  .wv-banner b{ font-size:clamp(34px, 10vw, 56px); font-weight:900; font-style:italic; color:#fff; text-shadow:0 0 22px rgba(45,212,191,.9), 0 4px 0 #134e4a; white-space:nowrap; }
+  .wv-banner small{ font-size:15px; font-weight:900; color:#fde68a; white-space:nowrap; }
+  .wv-banner.show{ animation:wvBanner 1.5s ease-out both; }
+  @keyframes wvBanner{ 0%{ opacity:0; transform:translate(-50%, -50%) scale(1.8); } 18%{ opacity:1; transform:translate(-50%, -50%) scale(1); } 78%{ opacity:1; } 100%{ opacity:0; transform:translate(-50%, -50%) scale(.9); } }
+  .wv-ctrl{ display:flex; gap:10px; margin-top:12px; } .wv-ctrl .btn{ flex:1; }
+  .wv-over{ inset:0 !important; z-index:8; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; padding:16px; text-align:center; background:rgba(4,14,20,.8); animation:popIn .4s var(--spring) both; }
+  .wv-over-t{ font-size:clamp(28px, 8vw, 40px); font-weight:900; color:#fff; }
+  .wv-over p{ margin:0; font-size:16px; font-weight:800; color:#d1fae5; } .wv-over p b{ color:#fff; }
+  .wv-over .wv-over-s{ font-size:13px; color:rgba(209,250,229,.75); }
+  .wv-new{ padding:6px 14px; border-radius:999px; font-weight:900; color:#422006; background:linear-gradient(135deg, #fde047, #f59e0b); animation:popIn .5s .2s var(--spring) both; }
+  .wv-best{ font-weight:900; color:#fde68a; }
+  .wv-over .vs-acts{ margin-top:10px; }
+  .waves-btn .sb-ico{ background:linear-gradient(135deg, #ffe4dc, #ffb8a3) !important; }
+  html.lite .wv-en > span, html.lite .wv-en.k-boss > span, html.lite .wv-en.k-mutant > span{ filter:none; }
+  @media (max-width:560px){
+    .wv-card{ grid-template-columns:1fr; gap:10px; } .wv-stage{ padding:10px 6px 8px; } .wv-stage .robot{ --rw:min(34vw, 140px); }
+    .wv-stats{ display:grid; grid-template-columns:1fr 1fr; gap:8px; } .wv-st{ padding:7px 8px; gap:6px; } .wv-ico{ font-size:18px; width:22px; }
+    .wv-txt b{ font-size:13px; } .wv-txt small{ font-size:10.5px; white-space:normal; line-height:1.25; }
+    .wv-tip{ font-size:12px; margin-top:10px; } .wv-hud{ font-size:13px; gap:8px; } .wv-go{ min-width:0; flex-basis:100%; min-height:54px; } .wv-go-row .btn{ flex-basis:100%; }
+  }
+  .wv.play.over .wv-ctrl{ visibility:hidden; }
   /* ---------- ⚔️ Pantalla partida: tu Moli en una mitad, el rival en la otra ---------- */
   .tk:has(.tk-step.duel.split) .tk-top{ position:absolute; top:0; left:0; right:0; z-index:30; }
   .tk:has(.tk-step.duel.split) .tk-body{ padding:0; display:flex; flex-direction:column; }
@@ -2356,11 +2438,11 @@
       <div class="home-stage"><div data-robot-slot></div></div>
       <button type="button" class="hint" id="startBtn">Iniciar</button>
     </div>
-    <div class="edge-left"><button type="button" class="side-btn gift" data-gift aria-label="Estrellas gratis"><span class="sb-ico">⭐</span>Gratis</button><button type="button" class="side-btn more" data-more aria-label="Misiones"><span class="sb-ico">📜</span>Misiones</button><button type="button" class="side-btn vs" data-vs-open aria-label="Duelos VS"><span class="sb-ico">VS</span>Duelos</button></div><div class="edge-right"><button type="button" class="shop-btn" data-shop aria-label="Tienda de Moli"><span class="sb-ico">🛍️</span>Tienda</button></div>
+    <div class="edge-left"><button type="button" class="side-btn gift" data-gift aria-label="Estrellas gratis"><span class="sb-ico">⭐</span>Gratis</button><button type="button" class="side-btn more" data-more aria-label="Misiones"><span class="sb-ico">📜</span>Misiones</button><button type="button" class="side-btn vs" data-vs-open aria-label="Duelos VS"><span class="sb-ico">VS</span>Duelos</button></div><div class="edge-right"><button type="button" class="shop-btn" data-shop aria-label="Tienda de Moli"><span class="sb-ico">🛍️</span>Tienda</button><button type="button" class="shop-btn waves-btn" data-waves aria-label="Oleadas"><span class="sb-ico">💣</span>Oleadas</button></div>
   </section>
 
   <section class="screen" id="screen-menu" aria-label="Elegir unidad">
-    <div class="edge-left"><button type="button" class="side-btn gift" data-gift aria-label="Estrellas gratis"><span class="sb-ico">⭐</span>Gratis</button><button type="button" class="side-btn more" data-more aria-label="Misiones"><span class="sb-ico">📜</span>Misiones</button><button type="button" class="side-btn vs" data-vs-open aria-label="Duelos VS"><span class="sb-ico">VS</span>Duelos</button></div><div class="edge-right"><button type="button" class="shop-btn" data-shop aria-label="Tienda de Moli"><span class="sb-ico">🛍️</span>Tienda</button></div>
+    <div class="edge-left"><button type="button" class="side-btn gift" data-gift aria-label="Estrellas gratis"><span class="sb-ico">⭐</span>Gratis</button><button type="button" class="side-btn more" data-more aria-label="Misiones"><span class="sb-ico">📜</span>Misiones</button><button type="button" class="side-btn vs" data-vs-open aria-label="Duelos VS"><span class="sb-ico">VS</span>Duelos</button></div><div class="edge-right"><button type="button" class="shop-btn" data-shop aria-label="Tienda de Moli"><span class="sb-ico">🛍️</span>Tienda</button><button type="button" class="shop-btn waves-btn" data-waves aria-label="Oleadas"><span class="sb-ico">💣</span>Oleadas</button></div>
     <div class="menu-wrap">
       <div class="bubble" id="menuBubble" aria-live="polite">
         <p class="bubble-text" id="menuText"></p>
@@ -2590,6 +2672,7 @@
     else if(e.target.closest('[data-gift]')){ e.stopPropagation(); openDaily(); }
     else if(e.target.closest('[data-more]')){ e.stopPropagation(); openMore(); }
     else if(e.target.closest('[data-vs-open]')){ e.stopPropagation(); openDuel(); }
+    else if(e.target.closest('[data-waves]')){ e.stopPropagation(); openWaves(); }
   }, true);
   $('#backBtn').addEventListener('click', goBack);
   document.addEventListener('click', e => {
@@ -3481,7 +3564,7 @@
   function onAccountChange(){
     updateUserChip();
     refreshRobots();
-    $$('.shop-btn').forEach(b => {
+    $$('.shop-btn:not(.waves-btn)').forEach(b => {
       const u = me(), left = u ? starsBalance().left : 0;
       b.querySelectorAll('.sb-lock,.sb-stars').forEach(x => x.remove());
       b.insertAdjacentHTML('beforeend', u ? (left ? `<span class="sb-stars">⭐${starTxt(left)}</span>` : '') : '<span class="sb-lock">🔒</span>');
@@ -3513,6 +3596,7 @@
     if(v === 'shop') return renderShop();
     if(v === 'daily') return renderDaily();
     if(v === 'duel') return renderDuel();
+    if(v === 'waves') return renderWaves();
     if(v === 'vs-edit') return renderVsEditor();
     if(v === 'more') return renderMore();
     if(v === 'pr-edit') return renderPracticeEditor();
@@ -4784,6 +4868,8 @@
     const tab = t.closest('[data-tab]');
     if(tab){ panel.section = tab.dataset.tab; renderPanel(); return; }
     if(t.closest('[data-daily-claim]')){ claimDaily(); return; }
+    const wvb = t.closest('[data-wv]');
+    if(wvb && acct){ wavesAction(wvb.dataset.wv); return; }
     const vs = t.closest('[data-vs]');
     if(vs){ duelAction(vs.dataset.vs, vs.dataset.k); return; }
     const vq = t.closest('[data-vsq]');
@@ -4877,7 +4963,7 @@
   });
   tkBody.addEventListener('keydown', e => { if((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-daily-claim][role="button"]')){ e.preventDefault(); claimDaily(); } });
   tkDlg.addEventListener('close', () => {
-    duelStop(); clearInterval(dailyTick);
+    duelStop(); wavesStop(); clearInterval(dailyTick);
     tkBody.innerHTML = ''; tipEl.hidden = true;
     panel = panel && { section: panel.section, sort: panel.sort, email: panel.email };
     if(acct){ acct = null; if(route.name === 'menu' && mode !== 'units' && mode !== 'tutorial') setMode('main', { again:true }); }
@@ -5249,6 +5335,263 @@
     }
     renderPracticeEditor();
   }
+
+
+  /* ================= 💣 Oleadas: Moli resiste solo contra microbios; su ropa le da estadísticas ================= */
+  /*WV_ENGINE_START*/
+  // Motor de Oleadas. Arena horizontal (1000×600, Moli a la izquierda) o vertical en celular (600×900, Moli abajo).
+  const WV_EN = {
+    virus:  { e:'🦠', n:'Virus',          hp:1,   dmg:1,    spd:95,  r:26 },
+    bact:   { e:'🧫', n:'Bacteria',       hp:1.7, dmg:.8,   spd:68,  r:28 },
+    worm:   { e:'🪱', n:'Parásito',       hp:.6,  dmg:.9,   spd:165, r:24 },
+    fungus: { e:'🍄', n:'Hongo',          hp:2.4, dmg:1.25, spd:52,  r:30, from:4 },
+    mutant: { e:'👾', n:'Mutante',        hp:1.4, dmg:1.6,  spd:120, r:28, from:7 },
+    boss:   { e:'🦠', n:'Súper bacteria', hp:12,  dmg:3,    spd:42,  r:56, boss:true }
+  };
+  const WV_GEO = {
+    wide: { w:1000, h:600, mx:130, my:300, spawn: () => ({ x:1060, y:80 + Math.random() * 440 }), shot: [40, -20], pet: [-10, -90] },
+    tall: { w:600, h:900, mx:300, my:770, spawn: () => ({ x:60 + Math.random() * 480, y:-60 }), shot: [0, -45], pet: [-80, -40] }
+  };
+  const wvHp = n => 15 * Math.pow(1.11, n - 1), wvDmg = n => 2.5 * Math.pow(1.075, n - 1);
+  function wvWaveList(n){
+    const kinds = Object.keys(WV_EN).filter(k => !WV_EN[k].boss && (WV_EN[k].from || 1) <= n);
+    const list = Array.from({ length: Math.min(3 + n, 30) }, () => kinds[Math.floor(Math.random() * kinds.length)]);
+    if(n % 5 === 0) list.splice(Math.floor(list.length / 2), 0, 'boss');
+    return list;
+  }
+  function wvNew(stats, geo){
+    return { geo: geo || WV_GEO.wide, t:0, wave:1, phase:'banner', bannerT:1.6, stats, hp:stats.hp, max:stats.hp, cd:.4, petCd:1, spawnQ:wvWaveList(1), spawnT:0,
+      en:[], shots:[], ev:[], kills:0, dealt:0, seq:0 };
+  }
+  function wvStep(s, dt){
+    if(s.phase === 'over') return;
+    s.t += dt;
+    if(s.phase === 'banner'){ s.bannerT -= dt; if(s.bannerT <= 0) s.phase = 'fight'; return; }
+    const st = s.stats, G = s.geo;
+    // aparecen enemigos por la derecha
+    if(s.spawnQ.length && (s.spawnT -= dt) <= 0){
+      const k = s.spawnQ.shift(), d = WV_EN[k], hp = Math.round(wvHp(s.wave) * d.hp), p = G.spawn();
+      s.en.push({ id: ++s.seq, k, x: p.x, y: p.y, hp, max: hp, dmg: wvDmg(s.wave) * d.dmg, spd: d.spd * (1 + Math.min(.5, s.wave * .015)), r: d.r, cd: .3 });
+      s.spawnT = Math.max(.28, .95 - s.wave * .035);
+    }
+    // se acercan y muerden
+    for(const e of s.en){
+      const dx = G.mx - e.x, dy = G.my - e.y, dist = Math.hypot(dx, dy), reach = 60 + e.r - 8;
+      if(dist > reach){ const m = Math.min(dist - reach, e.spd * dt); e.x += dx / dist * m; e.y += dy / dist * m; }
+      else if((e.cd -= dt) <= 0){
+        const hit = e.dmg * 60 / (60 + st.def);
+        s.hp -= hit; e.cd = 1;
+        s.ev.push({ t:'hurt', v: Math.max(1, Math.round(hit)) });
+      }
+    }
+    if(s.hp <= 0){ s.hp = 0; s.phase = 'over'; s.ev.push({ t:'over' }); return; }
+    const alive = s.en.filter(e => e.x < G.w && e.y > 0);
+    // Moli dispara al más cercano
+    if((s.cd -= dt) <= 0 && alive.length){
+      const tg = alive.reduce((a, b) => (a.x - G.mx) ** 2 + (a.y - G.my) ** 2 <= (b.x - G.mx) ** 2 + (b.y - G.my) ** 2 ? a : b);
+      const crit = Math.random() * 100 < st.crit;
+      s.shots.push({ id: ++s.seq, x: G.mx + G.shot[0], y: G.my + G.shot[1], tg: tg.id, dmg: st.atk * (crit ? 2 : 1), crit, pet:false });
+      s.cd = 1 / (1 + st.spd / 100);
+    }
+    // la mascota ataca al más débil
+    if(st.pet > 0 && (s.petCd -= dt) <= 0 && alive.length){
+      const tg = alive.reduce((a, b) => a.hp <= b.hp ? a : b);
+      s.shots.push({ id: ++s.seq, x: G.mx + G.pet[0], y: G.my + G.pet[1], tg: tg.id, dmg: st.pet, crit:false, pet:true });
+      s.petCd = 1.5;
+    }
+    // proyectiles
+    for(const sh of s.shots){
+      let tg = s.en.find(e => e.id === sh.tg);
+      if(!tg){ tg = alive[0]; if(!tg){ sh.dead = true; continue; } sh.tg = tg.id; }
+      const dx = tg.x - sh.x, dy = tg.y - sh.y, dist = Math.hypot(dx, dy), m = 950 * dt;
+      if(dist <= m + tg.r * .5){
+        tg.hp -= sh.dmg; s.dealt += sh.dmg; sh.dead = true;
+        s.ev.push({ t:'hit', id: tg.id, v: Math.round(sh.dmg), crit: sh.crit, pet: sh.pet });
+        if(tg.hp <= 0 && !tg.dead){ tg.dead = true; s.kills++; s.ev.push({ t:'kill', id: tg.id, boss: WV_EN[tg.k].boss }); }
+      } else { sh.x += dx / dist * m; sh.y += dy / dist * m; }
+    }
+    s.shots = s.shots.filter(x => !x.dead);
+    s.en = s.en.filter(e => !e.dead);
+    // oleada superada
+    if(!s.en.length && !s.spawnQ.length){
+      s.wave++; s.phase = 'banner'; s.bannerT = 1.5;
+      s.hp = Math.min(s.max, s.hp + s.max * .15);
+      s.spawnQ = wvWaveList(s.wave); s.spawnT = 0;
+      s.ev.push({ t:'wave', n: s.wave });
+    }
+  }
+  /*WV_ENGINE_END*/
+  const WAVES_KEY = 'ciencia4b:waves:' + APP.docId;
+  // Cuánto da cada estrella de precio, según dónde se pone la pieza.
+  const WV_W = {
+    skin:{ hp:6, atk:1, def:.5, spd:1.2, crit:.25 }, weapon:{ atk:2, crit:.3 }, shoulder:{ atk:1.3, spd:1.5 },
+    hat:{ hp:5, def:.7 }, helm:{ hp:5, def:.8 }, head:{ hp:5, def:.8 }, body:{ hp:6, def:1 },
+    back:{ spd:2.5, hp:2 }, fx:{ atk:.8, spd:1.5, crit:.4 }, eyes:{ crit:.8, atk:.4 }, face:{ crit:1 },
+    acc:{ hp:3, def:.4, crit:.3 }, frame:{ hp:3, def:.5, atk:.4 }, pet:{ pet:1.3, hp:1 }
+  };
+  const WV_BASE = { hp:140, atk:12, def:0, spd:0, crit:5, pet:0 };
+  const WV_INFO = [
+    ['hp', '❤️', 'Vida', 'Cuánto aguanta Moli', 600],
+    ['atk', '⚔️', 'Ataque', 'Daño de cada disparo', 120],
+    ['def', '🛡️', 'Defensa', 'Resta daño de los golpes', 60],
+    ['spd', '⚡', 'Velocidad', 'Dispara más seguido', 150, '%'],
+    ['crit', '🎯', 'Crítico', 'Probabilidad de daño doble', 50, '%'],
+    ['pet', '🐾', 'Compañero', 'Tu mascota también ataca', 40]
+  ];
+  function wvStats(){
+    const u = me(), outfit = u ? currentOutfit() : {}, st = { ...WV_BASE }, from = {};
+    Object.values(outfit).forEach(id => {
+      const it = ITEM[id]; if(!it) return;
+      const w = WV_W[it.slot] || { hp:2, atk:.6 };
+      Object.entries(w).forEach(([k, v]) => { st[k] += v * it.p; from[k] = (from[k] || 0) + v * it.p; });
+    });
+    const owned = u ? new Set([...closetOf(u.key).owned, ...dailyOf(u.key).gifts]).size : 0;
+    const col = Math.min(60, owned);
+    st.hp += col; from.hp = (from.hp || 0) + col;
+    st.spd = Math.min(150, st.spd); st.crit = Math.min(50, st.crit);
+    Object.keys(st).forEach(k => { st[k] = Math.round(st[k]); from[k] = Math.round(from[k] || 0); });
+    return { st, from, col };
+  }
+  const wvBest = () => { const u = me(); return (lsGet(WAVES_KEY, {})[u ? u.key : 'guest'] || { best: 0 }); };
+  function wvSaveBest(wave, kills){
+    const u = me(), all = lsGet(WAVES_KEY, {}), k = u ? u.key : 'guest', cur = all[k] || { best: 0, kills: 0 };
+    const rec = wave > cur.best;
+    all[k] = { best: Math.max(cur.best, wave), kills: Math.max(cur.kills || 0, kills) };
+    lsSet(WAVES_KEY, all);
+    return rec;
+  }
+  let wv = null;   // partida en curso
+  function openWaves(){
+    if(!me()){ openAccount('login', { then: () => openWaves(), msg: '¡Hola! Ingresa con tu DNI para que Moli pelee con su ropa 💣' }); return; }
+    openAccount('waves');
+  }
+  function wavesStop(){ if(wv){ wv.stop = true; wv = null; } }
+  function renderWaves(){
+    if(!acct || acct.view !== 'waves') return;
+    wavesStop();
+    const { st, from, col } = wvStats(), best = wvBest();
+    tkTop.innerHTML = `<small>💣 Oleadas</small><strong>Moli contra los microbios</strong><span>${best.best ? `🏆 Tu récord: Oleada ${best.best}` : '¿Hasta qué oleada llegarás?'}</span>
+      <button class="tk-x" type="button" data-tk="close" aria-label="Cerrar">✕</button>`;
+    tkBody.innerHTML = `<div class="tk-step wv">
+      <div class="wv-card">
+        <div class="wv-stage">${robotHTML({ outfit: currentOutfit(), tag:false })}<span class="wv-rec">${best.best ? `🏆 Oleada ${best.best}` : '🏆 Sin récord'}</span></div>
+        <div class="wv-stats">${WV_INFO.map(([k, ico, name, tip, max, unit]) => `
+          <div class="wv-st${k === 'pet' && !st.pet ? ' off' : ''}"><span class="wv-ico">${ico}</span>
+            <div class="wv-txt"><b>${name}<em>${st[k]}${unit || ''}</em></b><small>${k === 'pet' && !st.pet ? 'Ponle una mascota en la Tienda' : from[k] ? `+${from[k]}${unit || ''} por tu ropa${k === 'hp' && col ? ` (y +${col} por tu colección)` : ''}` : tip}</small>
+            <i class="wv-bar"><i style="transform:scaleX(${Math.min(1, st[k] / max).toFixed(3)})"></i></i></div></div>`).join('')}
+        </div>
+      </div>
+      <p class="wv-tip">👕 Cada cosa que Moli se pone le da mejoras: <b>armas</b> ⚔️, <b>cascos y cuerpo</b> ❤️🛡️, <b>espalda</b> ⚡, <b>ojos</b> 🎯 y <b>mascotas</b> 🐾. ¡Los trajes legendarios dan de todo!</p>
+      <div class="wv-go-row"><button type="button" class="wv-go" data-wv="start">▶ Comenzar</button><button type="button" class="btn ghost" data-shop>🛍️ Mejorar en la Tienda</button></div>
+    </div>`;
+  }
+  function wavesStart(){
+    wavesStop();
+    const { st } = wvStats(), tall = matchMedia('(max-aspect-ratio: 4/5)').matches;
+    const g = wv = { s: wvNew(st, tall ? WV_GEO.tall : WV_GEO.wide), tall, mul: 1, els: new Map(), shots: new Map(), pops: 0, last: 0, acc: 0, stop: false, hud: {} };
+    tkTop.innerHTML = `<small>💣 Oleadas</small><strong>¡A resistir!</strong><span>Moli pelea solo</span><button class="tk-x" type="button" data-tk="close" aria-label="Cerrar">✕</button>`;
+    tkBody.innerHTML = `<div class="tk-step wv play">
+      <div class="wv-hud">
+        <span class="wv-w">Oleada <b id="wvWave">1</b></span>
+        <span class="wv-hp"><i id="wvHp"></i><b id="wvHpTxt">${st.hp}</b></span>
+        <span class="wv-k">💥 <b id="wvKills">0</b></span>
+      </div>
+      <div class="wv-arena${tall ? ' tall' : ''}" id="wvArena">
+        <div class="wv-moli" id="wvMoli">${still(robotHTML({ outfit: currentOutfit(), tag:false }))}<i class="wv-flash"></i></div>
+        <div class="wv-banner" id="wvBanner"><b>Oleada 1</b><small>¡Ahí vienen!</small></div>
+      </div>
+      <div class="wv-ctrl"><button type="button" class="btn ghost" data-wv="speed" id="wvSpeed">⏩ Rápido x2</button><button type="button" class="btn ghost" data-wv="quit">🏳️ Rendirse</button></div>
+    </div>`;
+    const arena = $('#wvArena', tkBody);
+    g.arena = arena; g.moli = $('#wvMoli', tkBody); g.banner = $('#wvBanner', tkBody);
+    g.hud = { wave: $('#wvWave', tkBody), hp: $('#wvHp', tkBody), hpTxt: $('#wvHpTxt', tkBody), kills: $('#wvKills', tkBody) };
+    const place = () => { const G = g.s.geo; g.sc = arena.clientWidth / G.w; arena.style.height = Math.round(G.h * g.sc) + 'px';
+      g.moli.style.transform = `translate3d(${(G.mx * g.sc).toFixed(1)}px, ${(G.my * g.sc).toFixed(1)}px, 0)`; };
+    place(); g.place = place;
+    g.banner.classList.add('show');
+    const frame = now => {
+      if(g.stop || wv !== g) return;
+      if(!g.last) g.last = now;
+      let dt = Math.min(.05, (now - g.last) / 1000) * g.mul; g.last = now;
+      while(dt > 0){ const d = Math.min(dt, 1 / 60); wvStep(g.s, d); dt -= d; }
+      wvDraw(g);
+      if(g.s.phase === 'over'){ wavesEnd(g); return; }
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  }
+  const wvPx = (g, x, y) => `translate3d(${(x * g.sc).toFixed(1)}px, ${(y * g.sc).toFixed(1)}px, 0)`;
+  function wvPop(g, x, y, txt, cls){
+    if(g.pops > (LITE ? 5 : 12)) return;
+    const p = document.createElement('span');
+    p.className = 'wv-pop ' + cls; p.textContent = txt;
+    p.style.transform = wvPx(g, x, y);
+    g.pops++;
+    p.addEventListener('animationend', () => { p.remove(); g.pops--; }, { once: true });
+    g.arena.appendChild(p);
+  }
+  function wvDraw(g){
+    const s = g.s, seen = new Set();
+    for(const e of s.en){
+      let el = g.els.get(e.id);
+      if(!el){
+        const d = WV_EN[e.k];
+        el = document.createElement('div');
+        el.className = 'wv-en k-' + e.k;
+        el.style.setProperty('--r', (e.r * 2 * g.sc).toFixed(1) + 'px');
+        el.innerHTML = `<span>${d.e}</span><i><i></i></i>`;
+        el._bar = el.lastChild.firstChild; el._hp = -1;
+        g.arena.appendChild(el); g.els.set(e.id, el);
+      }
+      seen.add(e.id);
+      el.style.transform = wvPx(g, e.x, e.y);
+      if(el._hp !== e.hp){ el._hp = e.hp; el._bar.style.transform = `scaleX(${Math.max(0, e.hp / e.max).toFixed(3)})`; }
+    }
+    for(const [id, el] of g.els) if(!seen.has(id)){ el.remove(); g.els.delete(id); }
+    const shotSeen = new Set();
+    for(const sh of s.shots){
+      let el = g.shots.get(sh.id);
+      if(!el){ el = document.createElement('i'); el.className = 'wv-shot' + (sh.pet ? ' pet' : sh.crit ? ' crit' : ''); g.arena.appendChild(el); g.shots.set(sh.id, el); }
+      shotSeen.add(sh.id);
+      el.style.transform = wvPx(g, sh.x, sh.y);
+    }
+    for(const [id, el] of g.shots) if(!shotSeen.has(id)){ el.remove(); g.shots.delete(id); }
+    // eventos: números de daño, golpes, oleadas
+    let hurt = false;
+    for(const ev of s.ev){
+      if(ev.t === 'hit'){ const e = s.en.find(x => x.id === ev.id) || { x: s.geo.w * .6, y: s.geo.h * .4 }; wvPop(g, e.x, e.y - 30, (ev.crit ? '💥' : '') + ev.v, ev.crit ? 'crit' : ev.pet ? 'pet' : ''); }
+      else if(ev.t === 'kill' && ev.boss) wvPop(g, s.geo.w / 2, s.geo.h / 2, '¡Súper bacteria vencida!', 'big');
+      else if(ev.t === 'hurt') hurt = true;
+      else if(ev.t === 'wave'){ g.banner.innerHTML = `<b>Oleada ${ev.n}</b><small>${ev.n % 5 === 0 ? '⚠️ ¡Viene una Súper bacteria!' : '❤️ Moli recupera vida'}</small>`; g.banner.classList.remove('show'); void g.banner.offsetWidth; g.banner.classList.add('show'); }
+    }
+    s.ev.length = 0;
+    if(hurt){ g.moli.classList.remove('hurt'); void g.moli.offsetWidth; g.moli.classList.add('hurt'); }
+    // marcador: solo se toca lo que cambió
+    const h = g.hud, hp = Math.ceil(s.hp);
+    if(h._w !== s.wave){ h._w = s.wave; h.wave.textContent = s.wave; }
+    if(h._k !== s.kills){ h._k = s.kills; h.kills.textContent = s.kills; }
+    if(h._hp !== hp){ h._hp = hp; h.hpTxt.textContent = hp; h.hp.style.transform = `scaleX(${(s.hp / s.max).toFixed(3)})`; h.hp.parentNode.classList.toggle('low', s.hp / s.max < .3); }
+  }
+  function wavesEnd(g){
+    const s = g.s, rec = wvSaveBest(s.wave, s.kills), best = wvBest().best;
+    const box = document.createElement('div');
+    box.className = 'wv-over';
+    box.innerHTML = `<b class="wv-over-t">💥 ¡Moli cayó!</b>
+      <p>Resistió hasta la <b>Oleada ${s.wave}</b></p>
+      ${rec ? '<span class="wv-new">🏆 ¡Nuevo récord!</span>' : `<span class="wv-best">🏆 Récord: Oleada ${best}</span>`}
+      <p class="wv-over-s">💥 ${s.kills} microbios vencidos · ⚔️ ${Math.round(s.dealt)} de daño</p>
+      <div class="vs-acts">${vsIc('data-wv="again"', 'again', 'Otra vez', true)}${vsIc('data-wv="card"', 'rank', 'Estadísticas')}${vsIc('data-tk="close"', 'exit', 'Salir')}</div>`;
+    g.arena.appendChild(box);
+    const step = $('.tk-step.wv', tkBody); if(step) step.classList.add('over');
+    if(rec) confettiIn(tkBody);
+  }
+  function wavesAction(kind){
+    if(!acct || acct.view !== 'waves') return;
+    if(kind === 'start' || kind === 'again') wavesStart();
+    else if(kind === 'card' || kind === 'quit') renderWaves();
+    else if(kind === 'speed' && wv){ wv.mul = wv.mul === 1 ? 2 : 1; const b = $('#wvSpeed', tkBody); if(b) b.textContent = wv.mul === 1 ? '⏩ Rápido x2' : '▶ Normal x1'; }
+  }
+  addEventListener('resize', () => { if(wv && wv.place) wv.place(); });
 
   /* ================= ⚔️ Duelos VS: dos Molis, las mismas 5 preguntas, 5 segundos cada una ================= */
   const DUELS_KEY = 'ciencia4b:duels:' + APP.docId;

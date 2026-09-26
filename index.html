@@ -1810,6 +1810,29 @@
   html.lite .vs-ic.go i::after, html.lite .vs-side.champ .vs-bot::before, html.lite .dl-c.today, html.lite .vs-radar,
   html.lite .side-btn.gift.ready .sb-ico, html.lite .vs-bot.ghost span{ animation:none !important; }
   html.lite .tk:has(.tk-step.duel)::before{ display:none; }
+  /* ---------- ✨ Generador de preguntas con IA ---------- */
+  .ai-box{ display:flex; flex-direction:column; gap:10px; margin:0 0 16px; padding:14px; border-radius:18px;
+    background:linear-gradient(135deg, #f5f3ff, #eef6ff); border:1.5px solid #d8cffc; box-shadow:0 6px 18px rgba(91,79,224,.1); }
+  .ai-head{ display:flex; align-items:center; gap:10px; }
+  .ai-head div{ display:flex; flex-direction:column; }
+  .ai-head b{ font-size:15.5px; font-weight:900; color:var(--navy); }
+  .ai-head small{ font-size:12.5px; font-weight:700; color:var(--ink-2); }
+  .ai-spark{ width:38px; height:38px; flex-shrink:0; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; background:linear-gradient(135deg, #7c3aed, #2f6fed); box-shadow:0 6px 14px rgba(124,58,237,.3); }
+  .ai-row{ display:flex; gap:8px; }
+  .ai-topic{ flex:1; min-width:0; padding:12px 14px; border-radius:14px; border:1.5px solid var(--line); font:inherit; font-weight:700; color:var(--navy); background:#fff; }
+  .ai-topic:focus{ outline:none; border-color:#7c3aed; box-shadow:0 0 0 4px rgba(124,58,237,.15); }
+  .ai-row .ai-gen{ flex:0 0 auto; padding-left:22px; padding-right:22px; }
+  .ai-gen{ flex-shrink:0; white-space:nowrap; background:linear-gradient(135deg, #7c3aed, #2f6fed) !important; }
+  .ai-gen .spin{ border-color:rgba(255,255,255,.35); border-top-color:#fff; }
+  .ai-err{ margin:0; } .ai-err a{ color:inherit; font-weight:900; }
+  .ai-prev{ margin:0; padding:0 0 0 22px; display:flex; flex-direction:column; gap:8px; }
+  .ai-prev li{ padding:8px 10px; border-radius:12px; background:#fff; border:1px solid var(--line); font-size:13.5px; line-height:1.4; }
+  .ai-prev b{ display:block; color:var(--navy); font-weight:900; }
+  .ai-ok{ display:block; margin-top:2px; font-weight:800; color:#13824a; }
+  .ai-prev small{ display:block; font-weight:700; color:var(--ink-3); }
+  .ai-acts{ display:flex; flex-wrap:wrap; gap:8px; } .ai-acts .btn{ flex:1; }
+  .ai-note{ margin:0; font-size:12px; font-weight:700; color:var(--ink-3); }
+  @media (max-width:560px){ .ai-row{ flex-direction:column; } .ai-gen{ width:100%; } }
   .dl-wait{ flex:1; text-align:center; padding:13px; border-radius:16px; background:var(--soft); font-weight:900; color:var(--ink-2); }
   .dl-how{ margin:0 0 6px; font-size:13px; font-weight:700; color:var(--ink-2); }
   .dl-how summary{ cursor:pointer; font-weight:900; color:var(--blue); }
@@ -2875,8 +2898,12 @@
       return `<div id="tkCtaBox">${inner}</div>`;
     }
     const ed = editable();
+    const tkKey = route.unit + '|' + route.n;
+    if(!aiState.tk || aiState.tk.key !== tkKey) aiState.tk = { key: tkKey, topic: '', loading: false, err: '', result: null };
+    const u = curUnit();
     return `<div class="sec-title">Exit ticket</div>
       <div class="tk-edit">
+        ${aiBoxHTML('tk', filled(s.title) ? s.title : filled(u.title) ? u.title : '')}
         ${qs.map((q, i) => `<div class="tq">
           <div class="tq-top"><span class="q-num">Pregunta ${i + 1}</span><button type="button" class="tq-mini rm" data-tq-rm="${i}">✕ Quitar</button></div>
           <h4 ${ed} data-bind="s.ticket.questions.${i}.q" data-single data-ph="Escribe la pregunta…">${esc(q.q)}</h4>
@@ -5150,6 +5177,7 @@
     tkBody.innerHTML = `<div class="tk-step">
       <form id="prForm" class="pr-form" autocomplete="off">
         <div class="fld"><label for="prTitle">Título del ejercicio</label><input id="prTitle" maxlength="60" placeholder="Ej.: Repaso de microorganismos" value="${esc(t.title)}"></div>
+        ${aiBoxHTML('pr', t.title)}
         ${t.qs.map((q, i) => `<fieldset class="pr-q"><legend>Pregunta ${i + 1}</legend>
           <textarea data-q="${i}" rows="2" maxlength="220" placeholder="Escribe la pregunta">${esc(q.q)}</textarea>
           <div class="pr-opts">${q.options.map((o, k) => `<label class="pr-opt"><input type="radio" name="ans${i}" value="${k}"${q.answer === k ? ' checked' : ''} aria-label="Respuesta correcta ${LETTERS[k]}"><span class="opt-l">${LETTERS[k]}</span><input data-o="${i}-${k}" maxlength="120" placeholder="Opción ${LETTERS[k]}" value="${esc(o)}"></label>`).join('')}</div>
@@ -5223,6 +5251,148 @@
     renderPracticeEditor();
   }
 
+
+
+  /* ================= ✨ Generador de preguntas con IA (Firebase AI Logic · Gemini) ================= */
+  // Se llama directo desde la página con la misma apiKey pública de Firebase (sin claves secretas).
+  // La docente lo activa una vez en Firebase → AI Logic → Gemini Developer API (gratis).
+  const AI_MODELS = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.0-flash'];
+  const aiState = {};   // por lugar: pr (Misiones), tk (Exit ticket de la sesión), vs (Preguntas VS)
+  const AI_CTX = {
+    pr: { n: 5, what: 'Exit ticket de práctica', short: false },
+    tk: { n: 5, what: 'Exit ticket de la sesión', short: false },
+    vs: { n: 5, what: 'duelo rápido (5 segundos por pregunta)', short: true }
+  };
+  const aiSchema = { type:'OBJECT', required:['questions'], properties:{ questions:{ type:'ARRAY', items:{ type:'OBJECT', required:['q', 'options', 'answer'],
+    properties:{ q:{ type:'STRING' }, options:{ type:'ARRAY', items:{ type:'STRING' } }, answer:{ type:'INTEGER' }, why:{ type:'STRING' } } } } } };
+  function aiPrompt(topic, ctx){
+    const c = AI_CTX[ctx];
+    return `Eres docente de Ciencia y Tecnología de 6.° grado de primaria en Perú. Crea ${c.n} preguntas de opción múltiple para un ${c.what} sobre este tema:
+«${topic}»
+Reglas:
+- Español sencillo para niñas y niños de 11 a 12 años. Datos científicamente correctos.
+- ${c.short ? 'Preguntas MUY cortas (máximo 80 caracteres) y opciones de 1 a 4 palabras, para responder en 5 segundos.' : 'Cada pregunta clara y corta (máximo 140 caracteres); opciones cortas (máximo 60 caracteres).'}
+- Exactamente 4 opciones por pregunta y solo UNA correcta; las incorrectas deben ser creíbles.
+- "answer" es el número (0 a 3) de la opción correcta.
+- "why": explicación de una sola oración (máximo 140 caracteres) que ayude a aprender.
+- No repitas preguntas y evita "todas las anteriores" o "ninguna".`;
+  }
+  const clip = (t, n) => String(t || '').replace(/\s+/g, ' ').trim().slice(0, n);
+  function aiClean(list, want){
+    const out = [];
+    (Array.isArray(list) ? list : []).forEach(x => {
+      const q = clip(x && x.q, 220), opts = (x && Array.isArray(x.options) ? x.options : []).map(o => clip(o, 120)).filter(Boolean).slice(0, 4);
+      const a = x && Number.isInteger(x.answer) ? x.answer : -1;
+      if(!q || opts.length < 2 || a < 0 || a >= opts.length || out.some(y => y.q.toLowerCase() === q.toLowerCase())) return;
+      // se mezclan las opciones para que la correcta no quede siempre en el mismo lugar
+      const order = shuffle(opts.map((_, i) => i));
+      out.push({ q, options: order.map(i => opts[i]), answer: order.indexOf(a), why: clip(x.why, 180) });
+    });
+    return out.slice(0, want);
+  }
+  async function aiGenerate(topic, ctx){
+    const c = await fbConfig();
+    if(!c) throw new Error('OFFLINE');
+    const body = JSON.stringify({
+      contents: [{ role: 'user', parts: [{ text: aiPrompt(topic, ctx) }] }],
+      generationConfig: { responseMimeType: 'application/json', responseSchema: aiSchema, temperature: .8, maxOutputTokens: 4096 }
+    });
+    let last = 'NET';
+    for(const model of AI_MODELS){
+      let r;
+      try{ r = await fetch(`https://firebasevertexai.googleapis.com/v1beta/projects/${c.projectId}/models/${model}:generateContent`, { method:'POST', headers:{ 'Content-Type':'application/json', 'x-goog-api-key': c.apiKey }, body }); }
+      catch(e){ throw new Error('NET'); }
+      if(r.status === 404){ last = 'MODEL'; continue; }                 // ese modelo ya no existe: se prueba el siguiente
+      const j = await r.json().catch(() => ({}));
+      if(!r.ok){
+        const msg = JSON.stringify(j);
+        throw new Error(/SERVICE_DISABLED|has not been used|not enabled/i.test(msg) ? 'DISABLED' : r.status === 429 ? 'QUOTA' : r.status === 403 ? 'DENIED' : 'HTTP');
+      }
+      const text = ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || '').join('');
+      let data = null; try{ data = JSON.parse(text); }catch(e){}
+      const qs = aiClean(data && data.questions, AI_CTX[ctx].n);
+      if(qs.length) return qs;
+      last = 'EMPTY';
+    }
+    throw new Error(last);
+  }
+  const aiErrText = code => code === 'DISABLED' ? `🔧 Falta activar la IA en tu Firebase (una sola vez): Firebase → <b>AI Logic</b> → <b>Comenzar</b> → elige <b>Gemini Developer API</b> (gratis). <a href="https://console.firebase.google.com/project/ciencia6abcd/ailogic" target="_blank" rel="noopener">Abrir Firebase ›</a>`
+    : code === 'QUOTA' ? '⏳ Se usaron muchas preguntas seguidas. Espera un minuto y vuelve a intentar.'
+    : code === 'OFFLINE' || code === 'NET' ? '📶 No hay conexión. Revisa tu internet.'
+    : code === 'EMPTY' ? '🤔 No salieron preguntas válidas. Escribe el tema con un poco más de detalle y vuelve a intentar.'
+    : '⚠️ No se pudieron crear las preguntas. Inténtalo otra vez en un momento.';
+  function aiBoxHTML(ctx, suggestion){
+    const st = aiState[ctx] || (aiState[ctx] = { topic: '', loading: false, err: '', result: null });
+    if(!st.topic && suggestion) st.topic = suggestion;
+    const n = AI_CTX[ctx].n;
+    return `<div class="ai-box" data-ai-ctx="${ctx}">
+      <div class="ai-head"><span class="ai-spark">✨</span><div><b>Crear preguntas con IA</b><small>Escribe el tema o lo que quieres evaluar y Moli prepara ${n} preguntas</small></div></div>
+      <div class="ai-row"><input class="ai-topic" maxlength="220" placeholder="Ej.: Microorganismos buenos y malos en los alimentos" value="${esc(st.topic)}" aria-label="Tema de las preguntas"${st.loading ? ' disabled' : ''}>
+        <button type="button" class="btn solid ai-gen" data-ai="gen"${st.loading ? ' disabled' : ''}>${st.loading ? '<span class="spin"></span> Creando…' : '✨ Generar'}</button></div>
+      ${st.err ? `<p class="send warn ai-err">${st.err}</p>` : ''}
+      ${st.result ? `<ol class="ai-prev">${st.result.map(q => `<li><b>${esc(q.q)}</b><span class="ai-ok">✅ ${esc(q.options[q.answer])}</span><small>Otras: ${q.options.filter((_, i) => i !== q.answer).map(esc).join(' · ')}</small></li>`).join('')}</ol>
+        <div class="ai-acts"><button type="button" class="btn solid" data-ai="use">✅ Usar estas preguntas</button><button type="button" class="btn ghost" data-ai="gen">🔁 Crear otras</button><button type="button" class="btn ghost" data-ai="cancel">Descartar</button></div>
+        <p class="ai-note">${ctx === 'tk' ? 'Reemplazarán las preguntas del Exit ticket de esta sesión.' : ctx === 'vs' ? 'Se agregarán al banco de preguntas del VS.' : 'Llenarán las 5 preguntas del formulario. Puedes corregirlas antes de guardar.'} Revísalas: la IA puede equivocarse.</p>` : ''}
+    </div>`;
+  }
+  const aiRedraw = ctx => { const b = document.querySelector(`.ai-box[data-ai-ctx="${ctx}"]`); if(b) b.outerHTML = aiBoxHTML(ctx); };
+  async function aiAction(kind, box){
+    const ctx = box.dataset.aiCtx, st = aiState[ctx];
+    const inp = $('.ai-topic', box); if(inp) st.topic = inp.value.trim();
+    if(kind === 'cancel'){ st.result = null; st.err = ''; return aiRedraw(ctx); }
+    if(kind === 'gen'){
+      if(st.topic.length < 3){ st.err = 'Escribe el tema (por ejemplo: «La fotosíntesis» o «Los hongos»).'; return aiRedraw(ctx); }
+      st.loading = true; st.err = ''; st.result = null; aiRedraw(ctx);
+      try{ st.result = await aiGenerate(st.topic, ctx); }
+      catch(e){ st.err = aiErrText(e.message); }
+      st.loading = false; aiRedraw(ctx);
+      return;
+    }
+    if(kind === 'use' && st.result) aiUse(ctx, st.result);
+  }
+  function aiUse(ctx, qs){
+    const st = aiState[ctx];
+    if(ctx === 'pr' && acct && acct.view === 'pr-edit' && acct.draft){
+      const title = $('#prTitle'); if(title && !title.value.trim()) title.value = clip(st.topic.charAt(0).toUpperCase() + st.topic.slice(1), 60);
+      qs.slice(0, 5).forEach((q, i) => {
+        const set = (sel, v) => { const el = $(sel); if(el) el.value = v; };
+        set(`[data-q="${i}"]`, q.q); set(`[data-why="${i}"]`, q.why);
+        for(let k = 0; k < 4; k++) set(`[data-o="${i}-${k}"]`, q.options[k] || '');
+        const r = $(`input[name="ans${i}"][value="${q.answer}"]`); if(r) r.checked = true;
+      });
+      st.result = null; aiRedraw(ctx);
+      toast('✅ Preguntas listas. Revísalas y toca «Guardar ejercicio».');
+      const f = $('#prForm fieldset'); if(f) f.scrollIntoView({ block: 'start', behavior: reduceMotion ? 'auto' : 'smooth' });
+    }
+    else if(ctx === 'tk' && editing && route.name === 'session'){
+      const s = curUnit().sessions[route.n - 1];
+      s.ticket.questions = qs.map(q => ({ q: q.q, options: q.options.slice(), answer: q.answer, why: q.why }));
+      st.result = null; st.topic = '';
+      changed(); renderSession();
+      toast('✅ Exit ticket listo con preguntas nuevas. Se publica solo ☁️');
+    }
+    else if(ctx === 'vs' && acct && acct.view === 'vs-edit'){
+      (async () => {
+        const res = await saveVsBank([...VSBANK, ...qs.map(q => ({ q: q.q, options: q.options.slice(), answer: q.answer, why: q.why }))].slice(0, VS_MAX));
+        if(res !== 'ok'){ acct.err = saveErr(res); }
+        else { acct.info = `✨ Se agregaron ${qs.length} preguntas al VS.`; st.result = null; }
+        renderVsEditor();
+      })();
+    }
+  }
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-ai]');
+    if(!b) return;
+    const box = b.closest('.ai-box');
+    if(!box) return;
+    e.preventDefault(); e.stopPropagation();
+    aiAction(b.dataset.ai, box);
+  }, true);
+  document.addEventListener('keydown', e => {
+    if(e.key !== 'Enter' || !e.target.classList || !e.target.classList.contains('ai-topic')) return;
+    e.preventDefault();
+    aiAction('gen', e.target.closest('.ai-box'));
+  }, true);
 
   /* ================= ⚔️ Duelos VS: dos Molis, las mismas 5 preguntas, 5 segundos cada una ================= */
   const DUELS_KEY = 'ciencia4b:duels:' + APP.docId;
@@ -5583,6 +5753,7 @@
         ${sayRow(list.length >= DUEL_Q ? `¡Tienes ${list.length} preguntas! En cada duelo elijo 5 al azar y los dos rivales reciben las mismas ⚔️` : 'Aquí armas el banco de preguntas del VS ⚔️ Mientras tenga menos de 5, uso las preguntas de los Exit tickets.')}
         ${msgs}
         <div class="tk-actions" style="margin-bottom:12px">${list.length < VS_MAX ? '<button type="button" class="btn solid" data-vsq="new">➕ Nueva pregunta</button>' : ''}<button type="button" class="btn ghost" data-vsq="import">📥 Traer las de los Exit tickets</button></div>
+        ${list.length < VS_MAX ? aiBoxHTML('vs') : ''}
         ${list.length ? `<div class="pr-list">${list.map((q, i) => `<div class="pr-card"><span class="pr-n">${i + 1}</span>
           <div class="pr-txt"><b>${esc(q.q)}</b><small>✅ ${esc(q.options[q.answer] || '')}</small></div>
           <button type="button" class="btn ghost" data-vsq="edit" data-i="${i}">✏️</button>

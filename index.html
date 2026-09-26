@@ -767,6 +767,11 @@
     cursor:pointer;
   }
   .act-x:hover{ background:var(--red); color:#fff; }
+  .act-ins{ position:relative; display:flex; align-items:center; justify-content:center; width:100%; height:34px; margin:-6px 0; padding:0; border:0; background:none; cursor:pointer; font:inherit; }
+  .act-ins::before{ content:""; position:absolute; left:8%; right:8%; top:50%; border-top:2px dashed #b9cdf5; }
+  .act-ins span{ position:relative; padding:5px 14px; border-radius:999px; background:#eef3ff; border:1.5px solid #b9cdf5; color:var(--blue); font-size:12.5px; font-weight:900; transition:background .15s, color .15s, transform .2s var(--spring); }
+  .act-ins:hover span, .act-ins:focus-visible span{ background:var(--blue); color:#fff; transform:scale(1.05); }
+  .act-ins:focus-visible{ outline:none; }
   .yt{ position:relative; max-width:680px; margin-top:12px; aspect-ratio:16 / 9; border-radius:16px; overflow:hidden; background:#0b0b0b; box-shadow:0 10px 24px rgba(18,34,74,.18); contain:layout paint; }
   .yt-play{ position:absolute; inset:0; display:block; width:100%; padding:0; border:0; background:#0b0b0b; cursor:pointer; }
   .yt-play img{ display:block; width:100%; height:100%; object-fit:cover; opacity:.9; transition:opacity .2s, transform .35s var(--ease); }
@@ -1104,6 +1109,25 @@
   .seg-b small{ min-width:20px; padding:1px 6px; border-radius:999px; background:rgba(18,34,74,.08); font-size:11px; font-weight:900; text-align:center; }
   .seg-b.on{ background:#fff; color:var(--navy); box-shadow:0 2px 8px rgba(18,34,74,.12); }
   .seg-b.on small{ background:var(--blue); color:#fff; }
+  .sec-wrap h4, .dash-sub{ margin:4px 2px 10px; font-size:15px; font-weight:900; color:var(--navy); }
+  .dash-sub{ margin-top:6px; }
+  .sec-cards{ display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:10px; }
+  .sec-card{ display:flex; flex-direction:column; align-items:stretch; gap:6px; padding:12px 12px 10px; border-radius:18px; border:1.5px solid var(--line); background:#fff; box-shadow:var(--shadow-sm); text-align:left; font:inherit; color:var(--navy); cursor:pointer; transition:transform .2s var(--spring), border-color .2s; }
+  .sec-card:hover{ transform:translateY(-2px); border-color:#b9cdf5; }
+  .sec-card:focus-visible{ outline:3px solid var(--blue); outline-offset:2px; }
+  .sc-h{ display:flex; align-items:center; justify-content:space-between; gap:6px; }
+  .sc-h b{ font-size:15px; font-weight:900; }
+  .sc-h em{ font-style:normal; font-size:12px; font-weight:900; color:var(--blue); }
+  .sc-v{ font-size:26px; font-weight:900; line-height:1; font-variant-numeric:tabular-nums; }
+  .sc-v small{ font-size:14px; color:var(--ink-3); }
+  .sc-s{ font-size:12px; font-weight:800; color:var(--ink-2); }
+  .sc-bar{ display:flex; gap:2px; height:8px; border-radius:999px; overflow:hidden; background:#eef2fa; }
+  .sc-bar i{ display:block; height:100%; } .sc-bar i:first-child{ border-radius:999px 0 0 999px; } .sc-bar i:last-child{ border-radius:0 999px 999px 0; } .sc-bar i.none{ flex:1; background:none; }
+  .sc-p{ font-size:11.5px; font-weight:900; color:var(--green); } .sc-p.on{ color:#b4552c; }
+  .sec-now{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; padding:10px 14px; border-radius:14px; background:#eef3ff; border:1px solid #d3e0fb; font-size:14px; font-weight:800; color:var(--navy); }
+  .pend-sec{ display:flex; align-items:center; gap:8px; margin:10px 4px 2px; font-size:12px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; color:#b4552c; }
+  .pend-sec small{ padding:1px 7px; border-radius:999px; background:#fdf0e6; letter-spacing:0; }
+  @media (max-width:700px){ .sec-cards{ grid-template-columns:repeat(2, minmax(0, 1fr)); } .sc-v{ font-size:22px; } }
   .icon-btn{ width:44px; height:44px; flex-shrink:0; display:flex; align-items:center; justify-content:center; border-radius:14px; border:1px solid var(--line); background:#fff; color:var(--navy-2); cursor:pointer; box-shadow:var(--shadow-sm); transition:transform .25s var(--spring), background .2s, color .2s; }
   .icon-btn:hover{ transform:translateY(-2px); background:var(--soft); }
   .icon-btn svg{ width:19px; height:19px; }
@@ -2226,6 +2250,17 @@
   .hub-btn.on .hub-ico{ transform:rotate(45deg) scale(.92); }
   .hub-dot{ position:absolute; top:-5px; right:-5px; min-width:18px; height:18px; padding:0 4px; border-radius:999px; display:flex; align-items:center; justify-content:center; background:#ef4444; color:#fff; font-size:10.5px; border:2px solid #fff; animation:dotPulse 1.4s ease-in-out infinite; }
   .hub-dot[hidden]{ display:none; }
+  .mail-btn{ position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; width:52px; height:52px; padding:0; border-radius:18px; border:0;
+    background:linear-gradient(145deg, #ffffff, #e6efff); box-shadow:0 10px 24px rgba(18,34,74,.2), inset 0 0 0 1.5px #d3e0fb; color:var(--navy); font:inherit; font-size:9.5px; font-weight:900;
+    cursor:pointer; animation:popIn .5s .55s var(--ease) both; transition:transform .25s var(--spring); -webkit-tap-highlight-color:transparent; }
+  .mail-btn:hover{ transform:translateY(-3px); } .mail-btn:active{ transform:scale(.94); }
+  .mail-btn:focus-visible{ outline:3px solid var(--blue); outline-offset:3px; }
+  .mb-ico{ font-size:21px; line-height:1; }
+  .mail-btn.ready .mb-ico{ animation:mailBob 1.8s ease-in-out infinite; }
+  @keyframes mailBob{ 0%, 70%, 100%{ transform:none; } 80%{ transform:rotate(-10deg) scale(1.1); } 90%{ transform:rotate(8deg) scale(1.1); } }
+  .mb-n{ position:absolute; top:-6px; right:-6px; min-width:20px; height:20px; padding:0 5px; border-radius:999px; display:flex; align-items:center; justify-content:center; background:#ef4444; color:#fff; font-size:11px; font-weight:900; border:2px solid #fff; }
+  .mb-n[hidden]{ display:none; }
+  html.lite .mail-btn.ready .mb-ico{ animation:none; }
   .hub-btn.locked::after{ content:"🔒"; position:absolute; top:-7px; right:-7px; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--navy); font-size:10px; border:2px solid #fff; }
   .hub{ position:fixed; inset:0; z-index:69; background:rgba(12,22,50,.28); animation:hubFade .2s ease-out both; }
   .hub[hidden]{ display:none; }
@@ -2237,7 +2272,8 @@
   .hub-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin:4px 2px 12px; }
   .hub-head b{ font-size:16px; font-weight:900; color:var(--navy); }
   .hub-x{ width:32px; height:32px; border-radius:50%; border:0; background:#eef2fa; color:var(--ink-2); font:inherit; font-size:14px; font-weight:900; cursor:pointer; }
-  .hub-grid{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:10px; }
+  .hub-grid{ display:grid; grid-template-columns:repeat(6, minmax(0, 1fr)); gap:10px; }
+  .hub-grid > .hub-t{ grid-column:span 2; } .hub-grid > .hub-t:nth-child(4){ grid-column:2 / span 2; }
   .hub-t{ position:relative; display:flex; flex-direction:column; align-items:center; gap:6px; padding:12px 4px 10px; border-radius:20px; border:0; background:var(--tb, #f3f6fd);
     box-shadow:inset 0 -3px 0 rgba(20,40,90,.08); color:var(--navy); font:inherit; font-size:12.5px; font-weight:900; cursor:pointer;
     animation:hubTile .38s calc(.03s * var(--i, 0)) var(--spring) both; transition:transform .2s var(--spring); -webkit-tap-highlight-color:transparent; }
@@ -2250,7 +2286,6 @@
   .hub-t.t-vs .ht-ico{ background:linear-gradient(135deg, #2f6fed 0 50%, #ef4444 50% 100%); color:#fff; font-size:19px; font-style:italic; letter-spacing:-.02em; text-shadow:0 2px 0 rgba(0,0,0,.25); }
   .hub-t.t-tour{ --tb:#fff7e0; --ti:linear-gradient(135deg, #fff1c2, #ffcf5c); }
   .hub-t.t-shop{ --tb:#fff1ea; --ti:linear-gradient(135deg, #fff4dc, #ffd6b3); }
-  .hub-t.t-mail{ --tb:#eaf2ff; --ti:linear-gradient(135deg, #e0ecff, #b9d2ff); }
   .hub-t.t-rank{ --tb:#fff8e6; --ti:linear-gradient(160deg, #fffaf0, #ffe0a0); }
   .ht-n{ position:absolute; top:4px; right:4px; min-width:20px; height:20px; padding:0 6px; border-radius:999px; display:none; align-items:center; justify-content:center; background:#ef4444; color:#fff; font-size:11px; font-weight:900; border:2px solid #fff; }
   .hub-t.ready .ht-n, .hub-t.val .ht-n{ display:flex; }
@@ -2258,7 +2293,7 @@
   @keyframes hubFade{ from{ opacity:0; } }
   @keyframes hubPop{ from{ opacity:0; transform:scale(.4); } }
   @keyframes hubTile{ from{ opacity:0; transform:translateY(10px) scale(.8); } }
-  @media (max-width:560px){ .hub-btn{ width:48px; height:48px; border-radius:16px; } .hub-card{ bottom:calc(76px + var(--safe-b)); } .ht-ico{ width:44px; height:44px; font-size:24px; } }
+  @media (max-width:560px){ .hub-btn, .mail-btn{ width:48px; height:48px; border-radius:16px; } .hub-card{ bottom:calc(76px + var(--safe-b)); } .ht-ico{ width:44px; height:44px; font-size:24px; } }
   @media (prefers-reduced-motion:reduce){ .hub, .hub-card, .hub-t{ animation:none; } }
   html.lite .hub-t, html.lite .hub-dot{ animation:none !important; }
 
@@ -2369,11 +2404,12 @@
 </button>
 
 <div class="corner" id="corner">
-  <button class="hub-btn" id="hubBtn" type="button" aria-label="Menú: Misiones, Duelos, Torneo, Tienda, Correo y Ranking" aria-expanded="false" aria-controls="hub"><span class="hub-ico" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Menú<span class="hub-dot" hidden></span></button>
+  <button class="hub-btn" id="hubBtn" type="button" aria-label="Menú: Misiones, Duelos, Torneo, Tienda y Ranking" aria-expanded="false" aria-controls="hub"><span class="hub-ico" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Menú<span class="hub-dot" hidden></span></button>
+  <button class="mail-btn" id="mailBtn" type="button" data-mail aria-label="Correo: mis premios"><span class="mb-ico" aria-hidden="true">✉️</span>Correo<span class="mb-n" hidden></span></button>
   <button class="user-chip" id="userChip" type="button"></button>
 </div>
 
-<div class="hub" id="hub" hidden><div class="hub-card" role="dialog" aria-label="Menú de juegos"><div class="hub-head"><b>¿Qué hacemos hoy? 🚀</b><button type="button" class="hub-x" data-hub-x aria-label="Cerrar menú">✕</button></div><div class="hub-grid"><button type="button" class="hub-t t-more" data-more style="--i:0"><span class="ht-ico">📜</span>Misiones</button><button type="button" class="hub-t t-vs" data-vs-open style="--i:1"><span class="ht-ico">VS</span>Duelos</button><button type="button" class="hub-t t-tour" data-tour style="--i:2"><span class="ht-ico">🏅</span>Torneo<span class="ht-n"></span></button><button type="button" class="hub-t t-shop" data-shop style="--i:3"><span class="ht-ico">🛍️</span>Tienda<span class="ht-n"></span></button><button type="button" class="hub-t t-mail" data-mail style="--i:4"><span class="ht-ico">✉️</span>Correo<span class="ht-n"></span></button><button type="button" class="hub-t t-rank" data-rank style="--i:5"><span class="ht-ico">🏆</span>Ranking</button></div></div></div>
+<div class="hub" id="hub" hidden><div class="hub-card" role="dialog" aria-label="Menú de juegos"><div class="hub-head"><b>¿Qué hacemos hoy? 🚀</b><button type="button" class="hub-x" data-hub-x aria-label="Cerrar menú">✕</button></div><div class="hub-grid"><button type="button" class="hub-t t-more" data-more style="--i:0"><span class="ht-ico">📜</span>Misiones</button><button type="button" class="hub-t t-vs" data-vs-open style="--i:1"><span class="ht-ico">VS</span>Duelos</button><button type="button" class="hub-t t-tour" data-tour style="--i:2"><span class="ht-ico">🏅</span>Torneo<span class="ht-n"></span></button><button type="button" class="hub-t t-shop" data-shop style="--i:3"><span class="ht-ico">🛍️</span>Tienda<span class="ht-n"></span></button><button type="button" class="hub-t t-rank" data-rank style="--i:4"><span class="ht-ico">🏆</span>Ranking</button></div></div></div>
 
 <div id="app">
   <section class="screen" id="screen-home" aria-label="Inicio">
@@ -2620,7 +2656,7 @@
   // El menú solo se abre después de ingresar con el DNI.
   hubBtn.addEventListener('click', () => {
     if(!hub.hidden){ setHub(false); return; }
-    if(!me()){ openAccount('login', { then: () => { tkDlg.close(); setHub(true); }, msg: '¡Hola! Soy Moli 🤖 Para abrir el menú de Misiones, Duelos, Torneo, Tienda, Correo y Ranking primero ingresa con tu DNI o regístrate 🪪' }); return; }
+    if(!me()){ openAccount('login', { then: () => { tkDlg.close(); setHub(true); }, msg: '¡Hola! Soy Moli 🤖 Para abrir el menú de Misiones, Duelos, Torneo, Tienda y Ranking primero ingresa con tu DNI o regístrate 🪪' }); return; }
     setHub(true);
   });
   hub.addEventListener('click', e => { if(e.target === hub || e.target.closest('[data-hub-x]')) setHub(false); });
@@ -2879,7 +2915,7 @@
     if(!editing) return player;
     const link = has ? `https://youtu.be/${obj.yt}${obj.yts ? '?t=' + obj.yts : ''}` : '';
     return `<div class="yt-edit">${player}
-      <div class="yt-row"><span class="yt-ico">${YT_LOGO}</span><input class="yt-in" data-yt-in="${slot}" type="url" inputmode="url" autocomplete="off" placeholder="${has ? 'Pega otro link para cambiar el video' : 'Pega aquí un link de YouTube'}" value="${esc(link)}" aria-label="Link del video de YouTube">${has ? `<button type="button" class="yt-x" data-yt-rm="${slot}" aria-label="Quitar video">✕</button>` : ''}</div>
+      <div class="yt-row"><span class="yt-ico">${YT_LOGO}</span><input class="yt-in" data-yt-in="${slot}" type="url" inputmode="url" autocomplete="off" placeholder="${has ? 'Pega otro link de YouTube' : 'Pega un link de YouTube'}" value="${esc(link)}" aria-label="Link del video de YouTube">${has ? `<button type="button" class="yt-x" data-yt-rm="${slot}" aria-label="Quitar video">✕</button>` : ''}</div>
       <small class="yt-hint" data-yt-hint="${slot}"></small></div>`;
   }
 
@@ -2926,7 +2962,7 @@
           ${ytBox(a, 'a' + i)}
         </div>
         ${fileBox(a, 'a' + i, `s.activities.${i}.ficha`)}
-      </article>`;
+      </article>${editing && i < s.activities.length - 1 ? `<button type="button" class="act-ins" data-act-ins="${i + 1}"><span>＋ Añadir actividad aquí</span></button>` : ''}`;
     }).join('');
 
     const f = s.flipped;
@@ -3087,13 +3123,17 @@
     if(ar){
       const i = +ar.dataset.actRm, a = s.activities[i];
       if((filled(a.title) || filled(a.desc) || a.file) && !confirm(`¿Quitar la Actividad ${i + 1}?`)) return;
-      commitFocused(); s.activities.splice(i, 1); changed(); renderSession(); return;
+      commitFocused(); s.activities.splice(i, 1); renumberFichas(s); changed(); renderSession(); return;
     }
-    if(t.closest('#actAdd')){
+    const ins = t.closest('[data-act-ins]');
+    if(ins || t.closest('#actAdd')){
       commitFocused();
-      const k = s.activities.length + 1;
-      s.activities.push({ mode:'individual', title:'', desc:'', ficha:'Ficha · Actividad ' + String(k).padStart(2, '0'), file:'' });
-      changed(); renderSession(); focusLast('.act h3[data-bind]'); return;
+      const at = ins ? +ins.dataset.actIns : s.activities.length;
+      s.activities.splice(at, 0, { mode:'individual', title:'', desc:'', ficha:'', file:'' });
+      renumberFichas(s);
+      changed(); renderSession();
+      const h = $$('.act h3[data-bind]', screens.session)[at]; if(h){ h.focus(); h.scrollIntoView({ block:'center', behavior: reduceMotion ? 'auto' : 'smooth' }); }
+      return;
     }
     if(t.closest('#sessionRm')){
       const u = curUnit();
@@ -3127,6 +3167,10 @@
     if(!/^[\w-]{11}$/.test(id)) return;
     b.parentNode.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&playsinline=1${st ? '&start=' + st : ''}" title="Video de YouTube" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
   });
+  // Las fichas con el nombre de siempre («Ficha · Actividad 02») se renumeran al añadir o quitar; los nombres propios se respetan.
+  function renumberFichas(s){
+    s.activities.forEach((a, i) => { if(!filled(a.ficha) || /^Ficha · Actividad \d+$/.test(a.ficha.trim())) a.ficha = 'Ficha · Actividad ' + String(i + 1).padStart(2, '0'); });
+  }
   function focusLast(sel){ const els = $$(sel, screens.session); const el = els[els.length - 1]; if(el) el.focus(); }
 
   /* ---------- upload (button or drag & drop) ---------- */
@@ -4583,11 +4627,25 @@
       </div>
     </div>`;
 
+    // Tarjetas por sección (A, B, C, D): cuántos respondieron, promedio y niveles; tocar una abre solo esa sección.
+    const secCards = panel.section !== 'ALL' ? `<div class="sec-now"><span>📍 Solo <b>${GRADE} ${panel.section}</b></span><button type="button" class="linkish" data-tab="ALL">Ver todas las secciones</button></div>` : `<section class="sec-wrap"><h4>Resultados por sección</h4><div class="sec-cards">${SECTIONS.map(s => {
+      const rs = all.filter(r => r.section === s), reg = (panel.students || []).filter(st => st.section === s);
+      const pend = reg.filter(st => !doneKeys.has(st.id)).length, a = rs.length ? rs.reduce((t, r) => t + ratio(r), 0) / rs.length : 0;
+      const lv = LEVELS.map(l => rs.filter(r => levelOf(r) === l).length);
+      return `<button type="button" class="sec-card" data-tab="${s}" aria-label="Ver resultados de ${GRADE} ${s}">
+        <span class="sc-h"><b>${GRADE} ${s}</b><em>Ver ›</em></span>
+        <span class="sc-v">${rs.length ? `${(a * total).toFixed(1)}<small>/${total}</small>` : '—'}</span>
+        <span class="sc-s">${rs.length} respondi${rs.length === 1 ? 'ó' : 'eron'}${reg.length ? ` de ${reg.length}` : ''}</span>
+        <span class="sc-bar">${rs.length ? LEVELS.map((l, i) => lv[i] ? `<i style="flex:${lv[i]};background:${l.color}" title="${l.k}: ${lv[i]}"></i>` : '').join('') : '<i class="none"></i>'}</span>
+        <span class="sc-p${pend ? ' on' : ''}">${pend ? `⏳ ${pend} pendiente${pend === 1 ? '' : 's'}` : rs.length ? '✅ Al día' : 'Sin registrados'}</span>
+      </button>`; }).join('')}</div></section>`;
+
     if(!N){
       tkBody.innerHTML = `<div class="tk-step dash">${filters}
         ${panel.err ? `<p class="send warn">${esc(panel.err)}</p>` : ''}
+        ${secCards}
         <div class="dash-empty">${robotHTML()}<strong>Aún no hay respuestas</strong><span>Cuando tus estudiantes de ${secLabel} terminen el Exit ticket de esta sesión, sus notas aparecerán aquí.</span></div>
-        ${pending.length ? `<section class="card-d students"><div class="st-head"><h4>Registrados que aún no lo hacen <small>${pending.length}</small></h4></div>${pendingList(pending)}</section>` : ''}
+        ${pending.length ? `<section class="card-d students"><div class="st-head"><h4>Registrados que aún no lo hacen <small>${pending.length}</small></h4></div>${pendingGroups(pending)}</section>` : ''}
         ${dashFooter(all.length)}
       </div>`;
       return;
@@ -4624,19 +4682,13 @@
       ${hardest && hardest.p < .6 ? `<p class="card-note">💡 La pregunta más difícil fue la <b>P${hardest.i + 1}</b>: solo ${pctTxt(hardest.p)} acertó. Conviene repasarla en la próxima clase.</p>` : '<p class="card-note">✅ Ninguna pregunta quedó por debajo del 60% de aciertos.</p>'}
     </section>`;
 
-    const bySec = panel.section === 'ALL' ? `<section class="card-d">
-      <h4>Comparación por sección</h4>
-      ${SECTIONS.map(s => { const rs = all.filter(r => r.section === s), a = rs.length ? rs.reduce((t, r) => t + ratio(r), 0) / rs.length : 0;
-        return barRow({ label: `${GRADE} ${s}`, sub: rs.length ? `${rs.length} estudiante${rs.length === 1 ? '' : 's'}` : 'sin respuestas', value: a, max: 1,
-          text: rs.length ? `${(a * total).toFixed(1)}/${total}` : '—', tip: rs.length ? `${GRADE} ${s}: promedio ${(a * total).toFixed(1)} de ${total} (${pctTxt(a)}) · ${rs.length} estudiantes` : `${GRADE} ${s}: aún sin respuestas` }); }).join('')}
-      <p class="card-note">Promedio de respuestas correctas de cada salón.</p>
-    </section>` : '';
-
     tkBody.innerHTML = `<div class="tk-step dash">
       ${filters}
       ${panel.err ? `<p class="send warn">${esc(panel.err)}</p>` : ''}
+      ${secCards}
+      ${panel.section === 'ALL' ? '<h4 class="dash-sub">Todas las secciones juntas</h4>' : ''}
       ${kpis}
-      <div class="dash-grid">${levels}${bySec}${questions}</div>
+      <div class="dash-grid">${levels}${questions}</div>
       <section class="card-d students">
         <div class="st-head">
           <h4>Estudiantes <small>${N}</small></h4>
@@ -4657,7 +4709,7 @@
       low: (a, b) => ratio(a) - ratio(b) || a.name.localeCompare(b.name, 'es'), recent: (a, b) => b.at - a.at }[panel.sort];
     const shown = rows.filter(r => !q || r.name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(q)).sort(cmp);
     const pend = (panel.pending || []).filter(st => !q || st.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(q));
-    const tail = pend.length ? `<div class="st-group pending"><div class="st-gh">⏳ Registrados que aún no lo hacen <small>${pend.length}</small></div>${pendingList(pend)}</div>` : '';
+    const tail = pend.length ? `<div class="st-group pending"><div class="st-gh">⏳ Registrados que aún no lo hacen <small>${pend.length}</small></div>${pendingGroups(pend)}</div>` : '';
     if(!shown.length) return (q ? '<p class="res-empty">No hay estudiantes con ese nombre.</p>' : '') + tail;
     const row = (r, i) => {
       const l = levelOf(r);
@@ -4675,6 +4727,10 @@
       const g = shown.filter(r => r.section === s);
       return g.length ? `<div class="st-group"><div class="st-gh">${GRADE} ${s} <small>${g.length}</small></div>${g.map(row).join('')}</div>` : '';
     }).join('') + tail;
+  }
+  function pendingGroups(list){
+    if(panel.section !== 'ALL') return pendingList(list);
+    return SECTIONS.map(s => { const g = list.filter(st => st.section === s); return g.length ? `<div class="pend-sec">${GRADE} ${s} <small>${g.length}</small></div>${pendingList(g)}` : ''; }).join('');
   }
   function pendingList(list){
     return list.slice().sort((a, b) => a.section.localeCompare(b.section) || a.name.localeCompare(b.name, 'es')).map((st, i) => `<div class="st-row pend">
@@ -5459,8 +5515,7 @@ Reglas:
   }
   function mailBadge(){
     const u = me(), n = u && !u.teacher ? mailPending(u.key) : 0;
-    const b = $('#hub .t-mail'); b.classList.toggle('ready', n > 0); $('.ht-n', b).textContent = n || '';
-    hubDot();
+    const b = $('#mailBtn'), d = $('.mb-n', b); b.classList.toggle('ready', n > 0); d.hidden = !n; d.textContent = n || '';
   }
   function openMail(){
     if(isTeacher()){ toast('🧑‍🏫 El correo es para tus estudiantes: ahí reclaman los premios que les envías.'); return; }

@@ -2800,7 +2800,9 @@
       logIn(key, { dni: acct.dni, name: acct.name, section: acct.section });
       afterLogin(`¡Listo, ${esc(firstOf(acct.name))}! Tu cuenta fue creada 🎉`);
     }catch(e){
-      acct.err = e.message === 'CRYPTO' ? 'Abre la página desde su link (https) para poder ingresar.' : 'No se pudo conectar. Revisa tu internet e inténtalo otra vez.';
+      acct.err = e.message === 'CRYPTO' ? 'Abre la página desde su link (https) para poder ingresar.'
+        : /PERMISSION|403/.test(e.message) ? '🔧 La página todavía no tiene permiso para guardar cuentas. Avísale a tu profesor(a): falta actualizar las reglas de Firebase.'
+        : 'No se pudo conectar. Revisa tu internet e inténtalo otra vez.';
       renderAccount();
     }
   }

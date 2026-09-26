@@ -8,34 +8,57 @@ service cloud.firestore {
         && request.auth.token.email in ['zxc.navi2018@gmail.com'];
     }
 
+    function validStudent(d) {
+      return d.keys().hasOnly(['dni', 'name', 'section', 'grade', 'createdAt'])
+        && d.keys().hasAll(['dni', 'name', 'section', 'grade', 'createdAt'])
+        && d.dni is string && d.dni.matches('[0-9]{8}')
+        && d.name is string && d.name.size() >= 3 && d.name.size() <= 60
+        && d.section in ['A', 'B', 'C', 'D']
+        && d.grade == '6to'
+        && d.createdAt is timestamp;
+    }
+
     function validResult(d) {
-      return d.keys().hasOnly(['unit', 'unitNum', 'session', 'grade', 'section', 'name', 'score', 'total', 'answers', 'createdAt'])
-        && d.keys().hasAll(['unit', 'unitNum', 'session', 'grade', 'section', 'name', 'score', 'total', 'answers', 'createdAt'])
+      return d.keys().hasOnly(['unit', 'unitNum', 'session', 'grade', 'section', 'name', 'student', 'dni', 'score', 'total', 'answers', 'createdAt'])
+        && d.keys().hasAll(['unit', 'unitNum', 'session', 'grade', 'section', 'name', 'student', 'dni', 'score', 'total', 'answers', 'createdAt'])
         && d.unit is string && d.unit.size() <= 20
         && d.unitNum is string && d.unitNum.size() <= 10
         && d.session is int && d.session >= 1 && d.session <= 50
         && d.grade == '6to'
         && d.section in ['A', 'B', 'C', 'D']
         && d.name is string && d.name.size() > 0 && d.name.size() <= 60
+        && d.student is string && d.student.matches('k[0-9a-f]{20}')
+        && d.dni is string && d.dni.matches('[0-9]{8}')
         && d.total is int && d.total >= 1 && d.total <= 20
         && d.score is int && d.score >= 0 && d.score <= d.total
         && d.answers is list && d.answers.size() == d.total
         && d.createdAt is timestamp;
     }
 
-    // Resultados: el estudiante solo puede enviarlo una vez; solo la docente los ve o borra.
+    // Cuentas de estudiantes: el id sale del DNI (cifrado), así que solo quien
+    // conoce el DNI puede abrir su cuenta. Solo la docente ve la lista completa.
+    match /students/{id} {
+      allow get: if true;
+      allow create: if id.matches('k[0-9a-f]{20}') && validStudent(request.resource.data);
+      allow list, update, delete: if isTeacher();
+    }
+
+    // Resultados: uno por estudiante y sesión, no se pueden cambiar.
+    // El estudiante puede ver el suyo (necesita su id); solo la docente ve todos o borra.
     match /exitTickets/{id} {
-      allow create: if validResult(request.resource.data);
-      allow read, delete: if isTeacher();
+      allow create: if validResult(request.resource.data)
+        && id == request.resource.data.unit + '-s' + string(request.resource.data.session) + '-' + request.resource.data.student
+        && get(/databases/$(database)/documents/students/$(request.resource.data.student)).data.dni == request.resource.data.dni;
+      allow get: if id.matches('.*-k[0-9a-f]{20}') || isTeacher();
+      allow list, delete: if isTeacher();
       allow update: if false;
     }
 
-    // Marca de "ya respondió" (sin nota ni datos): se puede consultar para bloquear un segundo intento.
+    // Marcas de la versión anterior (solo para que la docente pueda limpiarlas).
     match /exitTicketsDone/{id} {
       allow get: if true;
-      allow create: if request.resource.data.keys().hasOnly(['at']) && request.resource.data.at is timestamp;
       allow list, delete: if isTeacher();
-      allow update: if false;
+      allow create, update: if false;
     }
   }
 }

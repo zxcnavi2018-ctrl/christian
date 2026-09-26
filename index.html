@@ -1476,6 +1476,115 @@
     .sec{ font-size:21px; padding:12px 0; }
   }
 
+  /* ---------- Moli: name tag, menu options ---------- */
+  .robot-tag{
+    position:absolute;
+    left:50%;
+    top:66%;
+    transform:translateX(-50%) rotate(-3deg);
+    padding:.5cqw 3.4cqw .7cqw;
+    border-radius:999px;
+    background:linear-gradient(135deg, var(--blue), var(--cyan));
+    color:#fff;
+    border:max(1.5px, .8cqw) solid #fff;
+    box-shadow:0 1.2cqw 2.6cqw rgba(18,34,74,.28);
+    font-size:max(9px, 6.4cqw);
+    font-weight:900;
+    letter-spacing:.06em;
+    line-height:1.25;
+    white-space:nowrap;
+    pointer-events:none;
+  }
+  .choice.moli .choice-icon{ font-size:24px; }
+  .choice-sub{ font-size:12.5px; font-weight:700; opacity:.72; }
+  .moli-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .moli-step{ font-size:12px; font-weight:900; letter-spacing:.08em; color:var(--ink-3); }
+  .moli-link{ border:none; background:none; padding:6px 4px; font:inherit; font-size:13px; font-weight:800; color:var(--blue); cursor:pointer; text-decoration:underline; text-underline-offset:3px; }
+  .moli-link:hover{ color:var(--navy); }
+  .moli-link.back{ align-self:center; margin-top:2px; text-decoration:none; }
+
+  /* ---------- Student chip (bottom-right) ---------- */
+  .user-chip{
+    position:fixed;
+    right:16px;
+    bottom:calc(16px + var(--safe-b));
+    z-index:70;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:7px 14px 7px 7px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:rgba(255,255,255,.94);
+    color:var(--navy);
+    box-shadow:0 12px 28px rgba(18,34,74,.18);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    cursor:pointer;
+    animation:popIn .5s .4s var(--ease) both;
+    transition:transform .25s var(--spring), box-shadow .2s;
+  }
+  .user-chip:hover{ transform:translateY(-3px); box-shadow:0 16px 32px rgba(18,34,74,.24); }
+  .uc-av{ width:36px; height:36px; flex-shrink:0; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--grad); color:#fff; font-weight:900; font-size:16px; }
+  .uc-txt{ display:flex; flex-direction:column; line-height:1.15; text-align:left; }
+  .uc-txt b{ font-size:14px; font-weight:900; }
+  .uc-txt small{ font-size:11.5px; font-weight:800; color:var(--ink-2); }
+  .uc-ring{ --p:0; width:26px; height:26px; border-radius:50%; background:conic-gradient(#0ca30c calc(var(--p) * 1%), #e3eaf7 0); -webkit-mask:radial-gradient(circle, transparent 55%, #000 57%); mask:radial-gradient(circle, transparent 55%, #000 57%); }
+  body.editing .user-chip{ display:none; }
+  body:not(.editing) #app{ padding-bottom:96px; }
+
+  /* ---------- Exit ticket CTA states ---------- */
+  .tk-cta.locked{ background:linear-gradient(120deg, #3b4a72 0%, #52628e 100%); box-shadow:0 16px 30px rgba(18,34,74,.25); }
+  .tk-cta.locked::after{ display:none; }
+  .tk-cta.locked .tk-cta-go{ color:var(--navy); }
+  .tk-cta.done{ background:linear-gradient(120deg, #13824a 0%, #22a860 60%, #3cc47e 100%); box-shadow:0 16px 30px rgba(19,130,74,.28); }
+  .tk-cta.done::after{ display:none; }
+  .tk-cta.done .tk-cta-go{ color:#13824a; }
+
+  /* ---------- Account dialog ---------- */
+  .acc-form .fld{ margin-bottom:14px; }
+  .dni-in{ font-size:24px !important; letter-spacing:.28em; font-variant-numeric:tabular-nums; text-align:center; }
+  .acc-alt{ display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:8px 12px; margin-top:18px; padding-top:16px; border-top:1px dashed var(--line); font-size:14px; font-weight:700; color:var(--ink-2); }
+  .acc-alt .btn{ flex:none; }
+  .id-card{ display:flex; align-items:center; gap:12px; margin-bottom:14px; padding:14px; border-radius:18px; background:linear-gradient(135deg, var(--soft), #eaf6ff); border:1px solid var(--line); }
+  .id-av{ width:46px; height:46px; flex-shrink:0; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--grad); color:#fff; font-size:20px; font-weight:900; box-shadow:0 8px 16px rgba(47,111,237,.3); }
+  .id-txt{ display:flex; flex-direction:column; flex:1; min-width:0; }
+  .id-txt b{ font-size:16.5px; font-weight:900; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .id-txt small{ font-size:12.5px; font-weight:800; color:var(--ink-2); }
+  .id-stars{ flex-shrink:0; padding:6px 12px; border-radius:999px; background:#fff; border:1px solid var(--line); font-weight:900; font-size:15px; }
+  .m-progress{ margin-bottom:14px; }
+  .m-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; font-size:14px; }
+  .m-head b{ font-weight:900; }
+  .m-head span{ font-weight:900; color:var(--blue); }
+  .m-bar{ display:block; height:12px; border-radius:99px; background:#e6ecf8; overflow:hidden; }
+  .m-bar i{ display:block; height:100%; border-radius:99px; background:linear-gradient(90deg, #22a860, #3cc47e); transition:width .8s var(--ease); }
+  .missions{ list-style:none; margin:0 0 16px; padding:0; display:flex; flex-direction:column; gap:8px; }
+  .mission{ display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:16px; background:#fff; border:1px solid var(--line); }
+  .mission.done{ background:linear-gradient(135deg, #f1fbf5, #fff); border-color:#c9ecd7; }
+  .m-ico{ width:38px; height:38px; flex-shrink:0; border-radius:12px; display:flex; align-items:center; justify-content:center; background:var(--soft); font-size:19px; }
+  .mission.done .m-ico{ background:#e3f5ea; }
+  .m-txt{ display:flex; flex-direction:column; flex:1; min-width:0; }
+  .m-txt b{ font-size:14.5px; font-weight:900; }
+  .m-txt small{ font-size:12px; font-weight:700; color:var(--ink-3); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .m-res{ display:flex; flex-direction:column; align-items:flex-end; }
+  .m-res b{ font-size:15px; font-weight:900; color:#13824a; }
+  .m-res span{ font-size:13px; color:#f5a623; letter-spacing:1px; }
+  .m-res span i{ font-style:normal; color:#dfe8fb; }
+  .m-go{ flex:none !important; padding:9px 14px !important; }
+  .mini.ok{ background:#e3f5ea; border-color:#c9ecd7; color:#13824a; }
+  .mini.tkt{ background:var(--violet-bg); border-color:#dcd8ff; color:var(--violet); }
+  .tile:hover .mini.ok, .tile:hover .mini.tkt{ background:rgba(255,255,255,.14); border-color:rgba(255,255,255,.25); color:#fff; }
+  @container (max-width: 130px){ .robot-tag{ display:none; } }
+  .st-row.pend .st-name b{ color:var(--ink-2); }
+  .pend-badge{ padding:3px 10px; border-radius:999px; background:#fff4dc; color:#8a5a0a; font-size:12px; font-weight:900; }
+  .st-group.pending .st-gh{ color:#b4552c; }
+  @media (max-width:720px){
+    .user-chip{ right:12px; bottom:calc(12px + var(--safe-b)); padding:6px 12px 6px 6px; gap:8px; }
+    .uc-av{ width:32px; height:32px; font-size:14px; }
+    .uc-txt b{ font-size:13px; }
+    .uc-txt small{ font-size:10.5px; }
+  }
+
   /* ---------- Responsive ---------- */
   @media (max-width:720px){
     #app{ padding:16px 14px 44px; }
@@ -1544,6 +1653,8 @@
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
 </button>
 
+<button class="user-chip" id="userChip" type="button"></button>
+
 <div id="app">
   <section class="screen" id="screen-home" aria-label="Inicio">
     <div class="home" id="homeTap" role="button" tabindex="0" aria-label="Toca para comenzar">
@@ -1551,7 +1662,7 @@
       <p class="home-teacher">Prof. Christian Quispe Llerena</p>
       <div class="home-pill"><i></i>4to Bimestre</div>
       <div class="home-stage" data-robot-slot></div>
-      <div class="hint"><span class="tap">👆</span> Comenzar</div>
+      <div class="hint"><span class="tap">👆</span> Iniciar</div>
     </div>
   </section>
 
@@ -1637,10 +1748,10 @@
 
   /* ================= Robot ================= */
   let robotSeq = 0;
-  function robotHTML(){
+  function robotHTML(opts = {}){
     const d = (robotSeq++ * 1.3 % 5).toFixed(1);
-    return `<div class="robot" role="img" aria-label="Robot" style="--blink-delay:${d}s">
-      <div class="robot-hop"><div class="robot-bob"><div class="robot-body"><div class="robot-eyes"><i class="eye l" style="--blink:${d}s"></i><i class="eye r" style="--blink:${d}s"></i></div></div></div></div>
+    return `<div class="robot" role="img" aria-label="Moli, el robot" style="--blink-delay:${d}s">
+      <div class="robot-hop"><div class="robot-bob"><div class="robot-body"><div class="robot-eyes"><i class="eye l" style="--blink:${d}s"></i><i class="eye r" style="--blink:${d}s"></i></div></div>${opts.tag === false ? '' : '<span class="robot-tag">Moli</span>'}</div></div>
       <span class="robot-shadow"></span></div>`;
   }
   $$('[data-robot-slot]').forEach(s => { s.innerHTML = robotHTML(); });
@@ -1776,11 +1887,20 @@
     }
   });
 
-  /* ================= Menu: staged speech bubble ================= */
+  /* ================= Menu: Moli's conversation ================= */
   const menuText = $('#menuText'), menuNext = $('#menuNext'), menuChoices = $('#menuChoices');
-  const GREETING = '¡Hola, estimado(a) estudiante! ¿Cómo estás? El día de hoy, ¿qué unidad deseas aprender?';
-  let stage = 0, typing = null, stageTimer = null;
+  let mode = null, typing = null, stageTimer = null, tutStep = 0;
   const menuRobot = () => $('#menuRobot .robot');
+  const firstOf = name => String(name || '').split(/\s+/)[0];
+  const TUTORIAL = [
+    '¡Te cuento cómo funciona esta página! 📚',
+    () => `Aquí están las Unidades ${APP.units.map(u => u.num).join(' y ')} de Ciencia. Cada unidad tiene sus sesiones de clase.`,
+    'Cada sesión es igual a lo que trabajas en tu cuaderno 📒: ahí están la meta, las actividades y las fichas, que puedes ver o descargar.',
+    'Si una sesión tiene la etiqueta 🔄 Flipped, es una tarea para hacer ANTES de la clase.',
+    'Al final de cada sesión harás un Exit ticket 🎟️: unas preguntitas sobre lo que aprendiste. ¡Solo se responde una vez!',
+    'Para desbloquear el Exit ticket primero te registras con tu DNI 🪪. Las siguientes veces solo escribes tu DNI y listo.',
+    'En «Mi avance» 🎯 verás tus misiones cumplidas y tus estrellas ⭐. ¡Complétalas todas!'
+  ];
 
   function typeText(text, done){
     stopTyping();
@@ -1794,7 +1914,7 @@
       i += text[i] === ' ' ? 2 : 1;
       span.textContent = text.slice(0, i);
       if(i >= text.length) finishTyping();
-    }, 24) };
+    }, 22) };
   }
   function stopTyping(){ if(typing){ clearInterval(typing.id); typing = null; } const r = menuRobot(); r && r.classList.remove('talking'); }
   function finishTyping(){
@@ -1805,33 +1925,81 @@
     done && done();
     return true;
   }
-  function setStage(s){
-    stage = s;
+  const moliBtn = (k, ico, title, sub, i) => `<button class="choice moli" type="button" style="--i:${i}" data-moli="${k}">
+      <span class="choice-icon">${ico}</span>
+      <span class="choice-text"><strong>${title}</strong><span class="choice-sub">${sub}</span></span>
+      <span class="choice-arrow">›</span></button>`;
+  function renderMainChoices(){
+    const u = me(), p = u ? missionStats() : null;
+    menuChoices.innerHTML = [
+      u ? moliBtn('mine', '🎯', 'Mi avance', `${p.done} de ${p.total} misiones cumplidas`, 0) : moliBtn('register', '🪪', 'Registrarse', 'Crea tu cuenta con tu DNI', 0),
+      moliBtn('tutorial', '📖', 'Tutorial', 'Moli te explica cómo funciona', 1),
+      moliBtn('units', '🔬', 'Unidades', 'Elige qué aprender hoy', 2)
+    ].join('');
+  }
+  function setMode(m, opts = {}){
+    mode = m;
     clearTimeout(stageTimer);
     menuNext.hidden = true;
-    if(s === 0){
+    menuChoices.hidden = true;
+    const u = me();
+    if(m === 'dots'){
       stopTyping();
-      menuChoices.hidden = true;
       menuText.innerHTML = '<span class="typing-dots" aria-label="Escribiendo"><span></span><span></span><span></span></span>';
-      stageTimer = setTimeout(() => setStage(1), 900);
-    } else if(s === 1){
-      menuChoices.hidden = true;
-      typeText(GREETING, () => { menuNext.hidden = false; stageTimer = setTimeout(() => setStage(2), 2600); });
-    } else {
+      stageTimer = setTimeout(() => setMode('intro'), 900);
+    } else if(m === 'intro'){
+      typeText(u ? `¡Hola, ${firstOf(u.name)}! Soy Moli 🤖` : '¡Hola! Soy Moli 🤖', () => {
+        menuNext.textContent = 'Toca para continuar ›'; menuNext.hidden = false;
+        stageTimer = setTimeout(() => setMode('main'), 1800);
+      });
+    } else if(m === 'main'){
+      renderMainChoices();
+      const q = opts.again ? '¿Qué deseas hacer ahora?' : '¿Qué deseas hacer hoy?';
+      if(opts.instant){ stopTyping(); menuText.textContent = q; menuChoices.hidden = false; }
+      else typeText(q, () => { menuChoices.hidden = false; });
+    } else if(m === 'units'){
       renderChoices();
-      typeText('¡Elige una unidad! 🤖', () => { menuChoices.hidden = false; });
+      if(opts.instant){ stopTyping(); menuText.textContent = '¡Elige una unidad! 🤖'; menuChoices.hidden = false; }
+      else typeText('¡Elige una unidad! 🤖', () => { menuChoices.hidden = false; });
+    } else if(m === 'tutorial'){
+      tutStep = opts.step || 0;
+      const line = TUTORIAL[tutStep];
+      menuChoices.innerHTML = '<div class="moli-row"><span class="moli-step">' + (tutStep + 1) + ' / ' + TUTORIAL.length + '</span><button type="button" class="moli-link" data-moli="skip">Saltar tutorial</button></div>';
+      menuChoices.hidden = false;
+      typeText(typeof line === 'function' ? line() : line, () => {
+        menuNext.textContent = tutStep < TUTORIAL.length - 1 ? 'Toca para continuar ›' : 'Toca para terminar ›';
+        menuNext.hidden = false;
+      });
     }
   }
   function startMenu(fresh){
-    if(fresh || stage < 2) setStage(0);
-    else { stopTyping(); clearTimeout(stageTimer); renderChoices(); menuText.textContent = '¡Elige una unidad! 🤖'; menuNext.hidden = true; menuChoices.hidden = false; }
+    if(fresh || !mode || mode === 'dots' || mode === 'intro') setMode('dots');
+    else if(mode === 'units') setMode('units', { instant:true });
+    else setMode('main', { again:true, instant:true });
   }
   function stopMenu(){ stopTyping(); clearTimeout(stageTimer); }
   function advance(){
     if(finishTyping()) return;
-    if(stage < 2) setStage(stage + 1);
+    if(mode === 'dots') setMode('intro');
+    else if(mode === 'intro') setMode('main');
+    else if(mode === 'tutorial'){
+      if(tutStep < TUTORIAL.length - 1) setMode('tutorial', { step: tutStep + 1 });
+      else setMode('main', { again:true });
+    }
   }
-  $('#menuBubble').addEventListener('click', e => { if(!e.target.closest('.choices')) advance(); });
+  $('#menuBubble').addEventListener('click', e => {
+    const b = e.target.closest('[data-moli]');
+    if(b){
+      const k = b.dataset.moli;
+      if(k === 'register') openAccount('register');
+      else if(k === 'mine') openAccount('me');
+      else if(k === 'tutorial') setMode('tutorial', { step:0 });
+      else if(k === 'units') setMode('units');
+      else if(k === 'main' || k === 'skip') setMode('main', { again:true });
+      return;
+    }
+    if(!e.target.closest('.choices')) advance();
+  });
   $('#menuRobot').addEventListener('click', advance);
 
   function renderChoices(){
@@ -1842,7 +2010,7 @@
         <span class="choice-text"><small>Unidad ${esc(u.num)}</small><strong>${esc(u.title)}</strong>
           <span class="choice-meta"><span class="bar"><i style="width:${t ? Math.round(n / t * 100) : 0}%"></i></span>${n} de ${t} sesiones listas</span></span>
         <span class="choice-arrow">›</span></button>`;
-    }).join('');
+    }).join('') + '<button type="button" class="moli-link back" data-moli="main">‹ Volver</button>';
   }
 
   /* ================= Unit screen ================= */
@@ -1853,12 +2021,14 @@
       const empty = isEmptySession(s);
       const desc = empty ? 'Próximamente' : [s.title, s.meta, ...s.activities.map(x => x.title), s.flipped.title].find(filled) || 'Ver sesión';
       const acts = s.activities.filter(a => filled(a.title) || a.file).length;
+      const hasTk = !editing && playable(s).length, st = me(), pr = st && progressOf(st.key)[`${u.key}|${i + 1}`];
+      const tkChip = hasTk ? (pr ? `<span class="mini ok">✅ Exit ticket ${pr.score}/${pr.total}</span>` : '<span class="mini tkt">🎟️ Exit ticket</span>') : '';
       return `<button type="button" class="tile${empty ? ' soon' : ''}" style="--i:${i}" data-go="#/u/${u.key}/s/${i + 1}" aria-label="Sesión ${i + 1}${empty ? ', próximamente' : ''}">
         ${s.flipped.enabled ? '<span class="flag">🔄 Flipped</span>' : ''}
         <span class="tile-num">${i + 1}</span>
         <span class="tile-name">Sesión ${i + 1}</span>
         <span class="tile-desc">${esc(desc)}</span>
-        ${!empty && acts ? `<span class="tile-foot"><span class="mini">📝 ${acts} ${acts === 1 ? 'actividad' : 'actividades'}</span></span>` : ''}
+        ${!empty && (acts || tkChip) ? `<span class="tile-foot">${acts ? `<span class="mini">📝 ${acts} ${acts === 1 ? 'actividad' : 'actividades'}</span>` : ''}${tkChip}</span>` : ''}
       </button>`;
     }).join('') + (editing ? `<button type="button" class="tile add" id="addSession" style="--i:${t}"><span class="tile-num">+</span><span class="tile-name">Añadir sesión</span></button>` : '');
     screens.unit.innerHTML = `
@@ -1913,7 +2083,7 @@
     const empty = isEmptySession(s) && !editing;
     const head = `
       <header class="s-head">
-        ${empty ? '' : robotHTML()}
+        ${empty ? '' : robotHTML({ tag:false })}
         <div class="s-head-text">
           <button type="button" class="kicker" data-go="#/u/${u.key}">${esc(u.icon)} Unidad ${esc(u.num)}<span class="k-long"> · ${esc(u.title)}</span></button>
           <h1 class="page-title">Sesión ${n}</h1>
@@ -1982,9 +2152,19 @@
   function ticketHtml(s){
     const qs = s.ticket.questions, ready = playable(s).length;
     if(!editing){
-      return ready ? `<button type="button" class="tk-cta" id="tkOpen"><span class="tk-cta-ico">🎟️</span>
-        <span class="tk-cta-text"><strong>Exit ticket</strong><span>Responde ${ready} preguntas sobre lo que aprendiste hoy</span></span>
-        <span class="tk-cta-go">¡Empezar!</span></button>` : '';
+      if(!ready) return '';
+      const u = me(), p = u && progressOf(u.key)[`${route.unit}|${route.n}`];
+      const inner = !u
+        ? `<button type="button" class="tk-cta locked" id="tkOpen"><span class="tk-cta-ico">🔒</span>
+            <span class="tk-cta-text"><strong>Exit ticket</strong><span>Ingresa con tu DNI para desbloquearlo</span></span>
+            <span class="tk-cta-go">Ingresar</span></button>`
+        : p ? `<button type="button" class="tk-cta done" id="tkOpen"><span class="tk-cta-ico">✅</span>
+            <span class="tk-cta-text"><strong>Exit ticket completado</strong><span>Obtuviste ${p.score} de ${p.total} · ${'⭐'.repeat(starsOf(p)) || 'sigue practicando'}</span></span>
+            <span class="tk-cta-go">Ver</span></button>`
+        : `<button type="button" class="tk-cta" id="tkOpen"><span class="tk-cta-ico">🎟️</span>
+            <span class="tk-cta-text"><strong>Exit ticket</strong><span>Responde ${ready} preguntas sobre lo que aprendiste hoy</span></span>
+            <span class="tk-cta-go">¡Empezar!</span></button>`;
+      return `<div id="tkCtaBox">${inner}</div>`;
     }
     const ed = editable();
     return `<div class="sec-title">Exit ticket</div>
@@ -2178,7 +2358,7 @@
     if(!(el.dataset && el.dataset.bind) || !editing) return;
     commitField(el);
     if(!readField(el)) el.textContent = '';
-    if(el.dataset.bind.startsWith('u.')) renderChoices();
+    if(el.dataset.bind.startsWith('u.') && mode === 'units') renderChoices();
   });
   document.addEventListener('keydown', e => {
     const el = e.target;
@@ -2225,7 +2405,7 @@
     if(!d) return;
     Object.assign(APP, d.app); normalize();
     dirty = true; dock.classList.add('dirty'); dockText.textContent = 'Cambios sin guardar';
-    rerender(); renderChoices();
+    rerender(); if(mode === 'units') renderChoices();
   }
   $('#resBtn').addEventListener('click', () => openResults());
   $('#homeBtn').addEventListener('click', () => { commitFocused(); showHome(); });
@@ -2277,7 +2457,6 @@
   const lsSet = (k, v) => { try{ localStorage.setItem(k, JSON.stringify(v)); return true; }catch(e){ return false; } };
   const slug = s => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
   const cleanName = s => String(s).replace(/\s+/g, ' ').trim().toLocaleLowerCase('es').replace(/(^|[\s'-])(\p{L})/gu, (m, p, c) => p + c.toLocaleUpperCase('es'));
-  const ticketId = (unit, n, section, name) => `${unit}-s${n}-${section}-${slug(name)}`;
 
   function playable(s){
     return s.ticket.questions
@@ -2313,18 +2492,11 @@
 
   function recordFor(res){
     return { unit: res.unit, unitNum: res.unitNum, session: res.n, grade: GRADE, section: res.section, name: res.name,
-      score: res.score, total: res.total, answers: res.answers, createdAt: new Date(res.at) };
-  }
-  async function cloudAlreadyDone(c, id){
-    const r = await fetch(`${docsBase(c)}/exitTicketsDone/${encodeURIComponent(id)}?key=${c.apiKey}`);
-    if(r.status === 200) return true;
-    if(r.status === 404) return false;
-    throw new Error('check ' + r.status);
+      student: res.key, dni: res.dni, score: res.score, total: res.total, answers: res.answers, createdAt: new Date(res.at) };
   }
   async function cloudSubmit(c, res){
     const body = { writes: [
-      { update: { name: docName(c, 'exitTickets', res.id), fields: toFields(recordFor(res)) }, currentDocument: { exists: false } },
-      { update: { name: docName(c, 'exitTicketsDone', res.id), fields: toFields({ at: new Date(res.at) }) }, currentDocument: { exists: false } }
+      { update: { name: docName(c, 'exitTickets', res.id), fields: toFields(recordFor(res)) }, currentDocument: { exists: false } }
     ] };
     const r = await fetch(`${docsBase(c)}:commit?key=${c.apiKey}`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body) });
     if(r.ok) return 'ok';
@@ -2396,20 +2568,20 @@
     lsSet(AUTH_KEY, { email: a.email, idToken: j.id_token, refreshToken: j.refresh_token, exp: Date.now() + (+j.expires_in || 3600) * 1000 });
     return j.id_token;
   }
-  async function cloudList(c){
+  async function cloudList(c, col = 'exitTickets'){
     const tok = await idToken(c);
     if(!tok) throw new Error('AUTH');
     const out = [];
     let page = '';
     do{
-      const r = await fetch(`${docsBase(c)}/exitTickets?pageSize=300${page ? '&pageToken=' + encodeURIComponent(page) : ''}&key=${c.apiKey}`, { headers:{ Authorization: 'Bearer ' + tok } });
+      const r = await fetch(`${docsBase(c)}/${col}?pageSize=300${page ? '&pageToken=' + encodeURIComponent(page) : ''}&key=${c.apiKey}`, { headers:{ Authorization: 'Bearer ' + tok } });
       if(r.status === 401 || r.status === 403) throw new Error('DENIED');
       if(!r.ok) throw new Error('HTTP ' + r.status);
       const j = await r.json();
       (j.documents || []).forEach(d => out.push(fromDoc(d)));
       page = j.nextPageToken || '';
     } while(page);
-    return out.map(r => ({ ...r, n: r.session, at: r.createdAt }));
+    return col === 'exitTickets' ? out.map(r => ({ ...r, n: r.session, at: r.createdAt })) : out;
   }
   async function cloudDelete(c, id){
     const tok = await idToken(c);
@@ -2417,6 +2589,226 @@
       const r = await fetch(`${docsBase(c)}/${col}/${encodeURIComponent(id)}?key=${c.apiKey}`, { method:'DELETE', headers:{ Authorization: 'Bearer ' + tok } });
       if(!r.ok && r.status !== 404) throw new Error('HTTP ' + r.status);
     }
+  }
+
+  /* ---------- student accounts (DNI) ---------- */
+  const ME_KEY = 'ciencia4b:me:' + APP.docId;
+  const LOCAL_STUDENTS = 'ciencia4b:students:' + APP.docId;
+  const PROG_KEY = 'ciencia4b:progress:' + APP.docId;
+  const me = () => lsGet(ME_KEY, null);
+  const cleanDni = s => String(s || '').replace(/\D/g, '').slice(0, 8);
+  const validDni = d => /^\d{8}$/.test(d);
+  const maskDni = d => '••••' + String(d || '').slice(-4);
+  const resultId = (unit, n, key) => `${unit}-s${n}-${key}`;
+  async function dniKey(dni){
+    if(!(window.crypto && crypto.subtle)) throw new Error('CRYPTO');
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('ciencia6|' + dni));
+    return 'k' + [...new Uint8Array(buf)].slice(0, 10).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+  async function getStudent(key){
+    const c = await fbConfig();
+    if(!c) return lsGet(LOCAL_STUDENTS, {})[key] || null;
+    const r = await fetch(`${docsBase(c)}/students/${key}?key=${c.apiKey}`);
+    if(r.status === 404) return null;
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    return fromDoc(await r.json());
+  }
+  async function createStudent(key, rec){
+    const data = { dni: rec.dni, name: rec.name, section: rec.section, grade: GRADE, createdAt: new Date() };
+    const c = await fbConfig();
+    if(!c){
+      const all = lsGet(LOCAL_STUDENTS, {});
+      if(all[key]) return 'dup';
+      all[key] = { ...data, createdAt: Date.now(), id: key };
+      lsSet(LOCAL_STUDENTS, all);
+      return 'ok';
+    }
+    const body = { writes: [{ update: { name: docName(c, 'students', key), fields: toFields(data) }, currentDocument: { exists: false } }] };
+    const r = await fetch(`${docsBase(c)}:commit?key=${c.apiKey}`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body) });
+    if(r.ok) return 'ok';
+    const err = await r.json().catch(() => ({}));
+    const st = err.error && err.error.status;
+    if(st === 'ALREADY_EXISTS' || st === 'FAILED_PRECONDITION') return 'dup';
+    throw new Error(st || ('HTTP ' + r.status));
+  }
+  function logIn(key, st){
+    lsSet(ME_KEY, { key, dni: st.dni, name: st.name, section: st.section });
+    onAccountChange();
+    refreshProgress();
+  }
+  function logOut(){
+    try{ localStorage.removeItem(ME_KEY); }catch(e){}
+    onAccountChange();
+  }
+
+  /* progress = exit tickets this student already sent */
+  const progressOf = key => (lsGet(PROG_KEY, {})[key] || {});
+  function setProgress(key, k, val){
+    const all = lsGet(PROG_KEY, {});
+    all[key] = all[key] || {};
+    if(val) all[key][k] = val; else delete all[key][k];
+    lsSet(PROG_KEY, all);
+  }
+  function missionStats(){
+    const u = me(), list = sessionsWithTicket(), prog = u ? progressOf(u.key) : {};
+    const done = list.filter(x => prog[`${x.u.key}|${x.n}`]);
+    const stars = done.reduce((t, x) => { const p = prog[`${x.u.key}|${x.n}`]; return t + Math.round(p.score / p.total * 5); }, 0);
+    return { list, prog, done: done.length, total: list.length, stars };
+  }
+  async function refreshProgress(){
+    const u = me();
+    if(!u) return;
+    const c = await fbConfig();
+    const queued = new Set(lsGet(QUEUE_KEY, []).map(q => q.id));
+    const list = sessionsWithTicket();
+    if(c){
+      await Promise.all(list.map(async x => {
+        const k = `${x.u.key}|${x.n}`, id = resultId(x.u.key, x.n, u.key);
+        try{
+          const r = await fetch(`${docsBase(c)}/exitTickets/${id}?key=${c.apiKey}`);
+          if(r.ok){ const d = fromDoc(await r.json()); setProgress(u.key, k, { score: d.score, total: d.total, at: d.createdAt }); }
+          else if(r.status === 404 && !queued.has(id)) setProgress(u.key, k, null);
+        }catch(e){ /* sin conexión: se usa lo guardado */ }
+      }));
+    } else {
+      const local = lsGet(RES_KEY, []);
+      list.forEach(x => {
+        const r = local.find(l => l.id === resultId(x.u.key, x.n, u.key));
+        setProgress(u.key, `${x.u.key}|${x.n}`, r ? { score: r.score, total: r.total, at: r.at } : null);
+      });
+    }
+    onAccountChange();
+  }
+
+  /* ---------- account UI: chip, dialog views ---------- */
+  const userChip = $('#userChip');
+  function updateUserChip(){
+    const u = me();
+    if(!u){
+      userChip.innerHTML = '<span class="uc-av">🪪</span><span class="uc-txt"><b>Ingresar</b><small>con tu DNI</small></span>';
+      userChip.setAttribute('aria-label', 'Ingresar con tu DNI');
+      return;
+    }
+    const s = missionStats();
+    userChip.innerHTML = `<span class="uc-av">${esc(firstOf(u.name).charAt(0).toUpperCase())}</span>
+      <span class="uc-txt"><b>${esc(firstOf(u.name))}</b><small>🎯 ${s.done}/${s.total} misiones</small></span>
+      <span class="uc-ring" style="--p:${s.total ? Math.round(s.done / s.total * 100) : 0}"></span>`;
+    userChip.setAttribute('aria-label', `Mi avance: ${s.done} de ${s.total} misiones`);
+  }
+  function onAccountChange(){
+    updateUserChip();
+    if(route.name === 'session' && !editing){ const box = $('#tkCtaBox'); if(box) box.outerHTML = ticketHtml(curSession()); }
+    if(route.name === 'unit' && !editing) renderUnit();
+    if(route.name === 'menu' && mode === 'main' && !menuChoices.hidden) renderMainChoices();
+    if(acct && tkDlg.open && acct.view === 'me') renderAccount();
+  }
+  userChip.addEventListener('click', () => openAccount(me() ? 'me' : 'login'));
+
+  let acct = null;
+  function openAccount(view, opts = {}){
+    tk = null;
+    acct = { view, then: opts.then || null, err: '', info: '', dni: opts.dni || '', name: '', section: '' };
+    tkDlg.classList.remove('wide');
+    renderAccount();
+    if(!tkDlg.open){ tkDlg.showModal(); tkBody.focus({ preventScroll:true }); }
+    setTimeout(() => { const f = $('#accDni') || $('#accName'); f && f.focus(); }, 90);
+  }
+  function renderAccount(){
+    const v = acct.view;
+    const head = { login: ['🪪 Mi cuenta', 'Ingresar', `${GRADE} grado`], register: ['🪪 Mi cuenta', 'Crear mi cuenta', `${GRADE} grado`], me: ['🎯 Mi avance', 'Mis misiones', `${GRADE} grado`] }[v];
+    tkTop.innerHTML = `<small>${head[0]}</small><strong>${head[1]}</strong><span>${head[2]}</span><button class="tk-x" type="button" data-tk="close" aria-label="Cerrar">✕</button>`;
+    const msgs = `${acct.err ? `<p class="send warn">${acct.err}</p>` : ''}${acct.info ? `<p class="send ok">${acct.info}</p>` : ''}`;
+    if(v === 'login'){
+      tkBody.innerHTML = `<div class="tk-step">
+        ${sayRow(acct.then ? '¡Hola! Soy Moli 🤖 Para desbloquear el Exit ticket, escribe tu DNI.' : '¡Hola! Soy Moli 🤖 Escribe tu DNI para ingresar.')}
+        <form id="accForm" class="acc-form" autocomplete="off">
+          <div class="fld"><label for="accDni">Tu DNI</label><input id="accDni" class="dni-in" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="8 números" value="${esc(acct.dni)}"></div>
+          ${msgs}
+          <div class="tk-actions"><button type="submit" class="btn solid">Ingresar ✓</button></div>
+        </form>
+        <div class="acc-alt"><span>¿Primera vez aquí?</span><button type="button" class="btn ghost" data-tk="acc-register">🪪 Crear mi cuenta</button></div>
+      </div>`;
+    } else if(v === 'register'){
+      tkBody.innerHTML = `<div class="tk-step">
+        ${sayRow('¡Vamos a crear tu cuenta! 🪪 Solo necesito tu DNI, tu nombre y tu sección.')}
+        <form id="accForm" class="acc-form" autocomplete="off">
+          <div class="fld"><label for="accDni">Tu DNI</label><input id="accDni" class="dni-in" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="8 números" value="${esc(acct.dni)}"></div>
+          <div class="fld"><label for="accName">Nombre y apellido</label><input id="accName" maxlength="60" placeholder="Ej.: Ana Torres" value="${esc(acct.name)}"></div>
+          <div class="fld"><label>Grado</label><div class="grade-chip">🎓 ${GRADE} grado</div></div>
+          <div class="fld"><label id="accSecLbl">¿A qué sección perteneces?</label>
+            <div class="sec-pick" role="radiogroup" aria-labelledby="accSecLbl">${SECTIONS.map(s => `<button type="button" class="sec${acct.section === s ? ' on' : ''}" role="radio" aria-checked="${acct.section === s}" data-asec="${s}">${s}</button>`).join('')}</div></div>
+          ${msgs}
+          <div class="tk-actions"><button type="submit" class="btn solid">Crear mi cuenta ✓</button></div>
+        </form>
+        <div class="acc-alt"><span>¿Ya tienes cuenta?</span><button type="button" class="btn ghost" data-tk="acc-login">Ingresar con mi DNI</button></div>
+      </div>`;
+    } else {
+      const u = me();
+      if(!u){ acct.view = 'login'; return renderAccount(); }
+      const s = missionStats();
+      const pct = s.total ? Math.round(s.done / s.total * 100) : 0;
+      const line = !s.total ? 'Aún no hay misiones disponibles. ¡Pronto habrá más! 🚀'
+        : s.done === s.total ? `¡Increíble, ${esc(firstOf(u.name))}! Completaste todas tus misiones 🏆`
+        : s.done ? `¡Vas muy bien, ${esc(firstOf(u.name))}! Te ${s.total - s.done === 1 ? 'falta 1 misión' : `faltan ${s.total - s.done} misiones`} 💪`
+        : `¡Hola, ${esc(firstOf(u.name))}! Tu primera misión te espera 🚀`;
+      tkBody.innerHTML = `<div class="tk-step">
+        ${sayRow(line, s.total && s.done === s.total ? 'good' : '')}
+        ${msgs}
+        <div class="id-card">
+          <span class="id-av">${esc(firstOf(u.name).charAt(0).toUpperCase())}</span>
+          <div class="id-txt"><b>${esc(u.name)}</b><small>${GRADE} ${esc(u.section)} · DNI ${maskDni(u.dni)}</small></div>
+          <div class="id-stars" title="Estrellas ganadas">⭐ ${s.stars}</div>
+        </div>
+        <div class="m-progress"><div class="m-head"><b>Misiones cumplidas</b><span>${s.done} de ${s.total}</span></div>
+          <span class="m-bar"><i style="width:${pct}%"></i></span></div>
+        <ul class="missions">${s.list.map(x => {
+          const p = s.prog[`${x.u.key}|${x.n}`];
+          const st = p ? Math.round(p.score / p.total * 5) : 0;
+          return `<li class="mission${p ? ' done' : ''}">
+            <span class="m-ico">${p ? '✅' : '🎟️'}</span>
+            <div class="m-txt"><b>Exit ticket · Sesión ${x.n}</b><small>Unidad ${esc(x.u.num)} · ${esc(x.u.title)}</small></div>
+            ${p ? `<div class="m-res"><b>${p.score}/${p.total}</b><span>${'★'.repeat(st)}<i>${'★'.repeat(5 - st)}</i></span></div>`
+              : `<button type="button" class="btn solid m-go" data-go="#/u/${x.u.key}/s/${x.n}">Ir ›</button>`}
+          </li>`; }).join('') || '<li class="res-empty">Aún no hay Exit tickets.</li>'}</ul>
+        <div class="tk-actions"><button type="button" class="btn ghost" data-tk="acc-logout">Cerrar sesión</button><button type="button" class="btn up" data-tk="close">Listo</button></div>
+      </div>`;
+    }
+  }
+  async function submitAccount(){
+    const btn = $('#accForm button[type="submit"]');
+    const dniIn = $('#accDni'), nameIn = $('#accName');
+    acct.dni = cleanDni(dniIn.value);
+    if(nameIn) acct.name = nameIn.value;
+    acct.err = ''; acct.info = '';
+    if(!validDni(acct.dni)){ acct.err = 'Tu DNI debe tener 8 números.'; return renderAccount(); }
+    if(acct.view === 'register'){
+      acct.name = cleanName(acct.name);
+      if(acct.name.length < 3 || !/\s/.test(acct.name)){ acct.err = 'Escribe tu nombre y tu apellido.'; return renderAccount(); }
+      if(!acct.section){ acct.err = 'Elige tu sección: A, B, C o D.'; return renderAccount(); }
+    }
+    btn.disabled = true; btn.textContent = 'Un momento…';
+    try{
+      const key = await dniKey(acct.dni);
+      if(acct.view === 'login'){
+        const st = await getStudent(key);
+        if(!st){ acct.err = 'No encontré una cuenta con ese DNI. Revisa los números o crea tu cuenta.'; return renderAccount(); }
+        logIn(key, st);
+        return afterLogin(`¡Bienvenido(a) de nuevo, ${esc(firstOf(st.name))}! 👋`);
+      }
+      const r = await createStudent(key, { dni: acct.dni, name: acct.name, section: acct.section });
+      if(r === 'dup'){ acct.view = 'login'; acct.err = 'Ese DNI ya tiene una cuenta. Solo ingresa con tu DNI.'; return renderAccount(); }
+      logIn(key, { dni: acct.dni, name: acct.name, section: acct.section });
+      afterLogin(`¡Listo, ${esc(firstOf(acct.name))}! Tu cuenta fue creada 🎉`);
+    }catch(e){
+      acct.err = e.message === 'CRYPTO' ? 'Abre la página desde su link (https) para poder ingresar.' : 'No se pudo conectar. Revisa tu internet e inténtalo otra vez.';
+      renderAccount();
+    }
+  }
+  function afterLogin(msg){
+    const then = acct.then;
+    if(then){ then(); return; }
+    acct.view = 'me'; acct.info = msg;
+    renderAccount();
   }
 
   /* ---------- student flow ---------- */
@@ -2427,52 +2819,71 @@
       <button class="tk-x" type="button" data-tk="close" aria-label="Cerrar">✕</button>`;
   }
   const sayRow = (text, cls = '') => `<div class="say-row">${robotHTML()}<div class="say ${cls}" id="tkSay" aria-live="polite">${text}</div></div>`;
-  const firstName = () => esc(tk.name.split(/\s+/)[0]);
-  const who = () => `${esc(tk.name)} · ${GRADE} ${esc(tk.section)}`;
+  const firstName = () => esc(firstOf(tk.name));
+  const who = () => tk.practice ? 'Modo prueba · no se guarda' : `${esc(tk.name)} · ${GRADE} ${esc(tk.section)}`;
+  const starsOf = p => Math.round(p.score / p.total * 5);
 
   function openTicket(unit, n, practice){
     const qs = playable(unitByKey(unit).sessions[n - 1]);
     if(!qs.length) return;
-    tk = { unit, n, qs, name:'', section:'', i:0, answers:[], practice: !!practice };
+    if(!practice && !me()){ openAccount('login', { then: () => openTicket(unit, n) }); return; }
+    const u = me();
+    acct = null;
+    tk = practice
+      ? { unit, n, qs, name: 'Profe', section: '—', i: 0, answers: [], practice: true }
+      : { unit, n, qs, name: u.name, section: u.section, dni: u.dni, key: u.key, id: resultId(unit, n, u.key), i: 0, answers: [] };
     tkDlg.classList.remove('wide');
-    stepIntro();
-    tkDlg.showModal();
-    setTimeout(() => { const f = $('#tkName'); f && f.focus(); }, 80);
+    if(practice){ tk.order = null; stepQuestion(); }
+    else stepReady();
+    if(!tkDlg.open){ tkDlg.showModal(); tkBody.focus({ preventScroll:true }); }
   }
-  function stepIntro(msg){
+  async function stepReady(){
+    const cur = tk, k = `${tk.unit}|${tk.n}`;
+    const prev = progressOf(tk.key)[k];
+    if(prev) return stepDone(prev);
     tkHead(esc(unitByKey(tk.unit).title), 0);
     tkBody.innerHTML = `<div class="tk-step">
-      ${sayRow(msg || '¡Hola! 👋 Escribe tu nombre y elige tu sección.<br><b>Recuerda:</b> este exit ticket se responde <b>solo una vez</b>, ¡hazlo con calma! 🧠', msg ? 'bad' : '')}
-      <div class="fld"><label for="tkName">Nombre y apellido</label><input id="tkName" autocomplete="off" maxlength="60" placeholder="Ej.: Ana Torres" value="${esc(tk.name)}"></div>
-      <div class="fld"><label>Grado</label><div class="grade-chip">🎓 ${GRADE} grado</div></div>
-      <div class="fld"><label id="secLbl">¿A qué sección perteneces?</label>
-        <div class="sec-pick" role="radiogroup" aria-labelledby="secLbl">${SECTIONS.map(s => `<button type="button" class="sec${tk.section === s ? ' on' : ''}" role="radio" aria-checked="${tk.section === s}" data-sec="${s}">${s}</button>`).join('')}</div></div>
-      <p class="once">⚠️ Solo tienes <b>una oportunidad</b>. Revisa que tu nombre y sección estén bien antes de aceptar.</p>
-      <div class="tk-actions"><button type="button" class="btn solid" id="tkStart"${tk.name && tk.section ? '' : ' disabled'}>Aceptar ✓</button></div>
-      <p class="drop-hint" style="text-align:left;margin-top:12px">Son ${tk.qs.length} preguntas sobre lo que trabajamos en esta sesión.</p>
+      ${sayRow(`¡Hola, ${firstName()}! 👋 Vas a responder el Exit ticket de la Sesión ${tk.n}.<br><b>Recuerda:</b> solo tienes <b>una oportunidad</b>, ¡hazlo con calma! 🧠`)}
+      <div class="id-card">
+        <span class="id-av">${esc(firstOf(tk.name).charAt(0).toUpperCase())}</span>
+        <div class="id-txt"><b>${esc(tk.name)}</b><small>${GRADE} ${esc(tk.section)} · DNI ${maskDni(tk.dni)}</small></div>
+        <button type="button" class="moli-link" data-tk="not-me">No soy yo</button>
+      </div>
+      <p class="drop-hint" style="text-align:left;margin:0 0 14px">Son ${tk.qs.length} preguntas sobre lo que trabajamos en esta sesión.</p>
+      <div class="tk-actions"><button type="button" class="btn solid" id="tkStart" disabled>Revisando…</button></div>
     </div>`;
+    const c = await fbConfig();
+    if(c){
+      try{
+        const r = await fetch(`${docsBase(c)}/exitTickets/${cur.id}?key=${c.apiKey}`);
+        if(r.ok){
+          const d = fromDoc(await r.json()), p = { score: d.score, total: d.total, at: d.createdAt };
+          setProgress(cur.key, k, p);
+          onAccountChange();
+          if(tk === cur) stepDone(p);
+          return;
+        }
+      }catch(e){ /* sin conexión: se verifica al enviar */ }
+    }
+    if(tk !== cur) return;
+    const b = $('#tkStart');
+    if(b){ b.disabled = false; b.textContent = 'Empezar ✓'; }
   }
-  function stepBlocked(){
+  function stepDone(p){
+    const pct = Math.round(p.score / p.total * 100), st = starsOf(p);
     tkHead(who(), null);
     tkBody.innerHTML = `<div class="tk-step">
-      ${sayRow(`${firstName()}, ya respondiste este exit ticket 😊<br>Solo se puede responder <b>una vez</b>. ¡Gracias por tu esfuerzo!`, 'good')}
-      <div class="tk-actions"><button type="button" class="btn ghost" data-tk="edit">✏️ No soy yo / corregir mis datos</button><button type="button" class="btn solid" data-tk="close">Entendido</button></div>
+      ${sayRow(`¡Ya completaste este Exit ticket, ${firstName()}! 🎉<br>Solo se responde una vez. ¡Sigue con tus otras misiones!`, 'good')}
+      <div class="score">
+        <div class="ring" style="--p:${pct}"><b>${p.score}/${p.total}</b></div>
+        <div class="score-text"><strong>Tu resultado</strong><span>${p.at ? fmtDate(p.at) : ''}</span>
+          <div class="stars" aria-label="${st} de 5 estrellas">${[0, 1, 2, 3, 4].map(i => `<i class="${i < st ? 'on' : ''}">⭐</i>`).join('')}</div></div>
+      </div>
+      <div class="tk-actions"><button type="button" class="btn solid" data-tk="acc-me">🎯 Ver mi avance</button><button type="button" class="btn ghost" data-tk="close">Cerrar</button></div>
     </div>`;
     react($('.say-row .robot', tkBody));
   }
-  async function beginTicket(){
-    tk.name = cleanName(tk.name);
-    if(!tk.name || !tk.section) return;
-    tk.id = ticketId(tk.unit, tk.n, tk.section, tk.name);
-    if(!tk.practice){
-      const btn = $('#tkStart');
-      btn.disabled = true; btn.textContent = 'Revisando…';
-      if(lsGet(DONE_KEY, {})[tk.id]) return stepBlocked();
-      const c = await fbConfig();
-      if(c){
-        try{ if(await cloudAlreadyDone(c, tk.id)) return stepBlocked(); }catch(e){ /* sin conexión: se verifica al enviar */ }
-      }
-    }
+  function beginTicket(){
     tk.i = 0; tk.answers = []; tk.order = null;
     stepQuestion();
   }
@@ -2522,21 +2933,22 @@
     const set = (cls, html) => { if(box){ box.className = 'send ' + cls; box.innerHTML = html; } };
     const res = tk.res;
     const c = await fbConfig();
+    const mark = () => { markDone(res.id); setProgress(res.key, `${res.unit}|${res.n}`, { score: res.score, total: res.total, at: res.at }); onAccountChange(); };
     if(!c){
       const list = lsGet(RES_KEY, []); list.push(res); lsSet(RES_KEY, list);
-      markDone(res.id);
+      mark();
       set('ok', '💾 Resultado guardado en este dispositivo.');
       return;
     }
     set('wait', '<span class="spin"></span> Enviando tu resultado a tu profesor(a)…');
     try{
       const r = await cloudSubmit(c, res);
-      markDone(res.id);
+      mark();
       set(r === 'dup' ? 'warn' : 'ok', r === 'dup' ? '📌 Ya habías enviado este exit ticket antes; se conserva tu primer resultado.' : '✅ ¡Resultado enviado a tu profesor(a)!');
     }catch(e){
       const q = lsGet(QUEUE_KEY, []);
       if(!q.some(x => x.id === res.id)){ q.push(res); lsSet(QUEUE_KEY, q); }
-      markDone(res.id);
+      mark();
       set('warn', '📶 No se pudo enviar en este momento. Tu resultado quedó guardado en este equipo y se enviará solo más tarde. <button type="button" class="btn ghost" data-tk="resend">Reintentar ahora</button>');
     }
   }
@@ -2548,7 +2960,7 @@
     tk.score = score;
     const u = unitByKey(tk.unit);
     if(!tk.practice && !tk.res){
-      tk.res = { id: tk.id, unit: tk.unit, unitNum: u.num, n: tk.n, section: tk.section, name: tk.name, score, total, answers: tk.answers.map(a => !!a.ok), at: Date.now() };
+      tk.res = { id: tk.id, key: tk.key, dni: tk.dni, unit: tk.unit, unitNum: u.num, n: tk.n, section: tk.section, name: tk.name, score, total, answers: tk.answers.map(a => !!a.ok), at: Date.now() };
     }
     const nm = firstName();
     const msg = score === total ? `¡Perfecto, ${nm}! Dominas el tema 🏆`
@@ -2567,7 +2979,7 @@
       <ul class="review">${tk.qs.map((q, i) => { const a = tk.answers[i]; return `<li class="${a.ok ? '' : 'no'}"><span>${a.ok ? '✓' : '✕'}</span><div>${esc(q.q)}${a.ok ? '' : `<small>Respuesta correcta: ${esc(a.right)}</small>`}</div></li>`; }).join('')}</ul>
       <div class="tk-actions">
         <button type="button" class="btn solid" data-tk="png">📸 Guardar imagen</button>
-        ${tk.practice ? '<button type="button" class="btn ghost" data-tk="retry">🔁 Probar de nuevo</button>' : ''}
+        ${tk.practice ? '<button type="button" class="btn ghost" data-tk="retry">🔁 Probar de nuevo</button>' : '<button type="button" class="btn ghost" data-tk="acc-me">🎯 Ver mi avance</button>'}
         <button type="button" class="btn up" data-tk="close">✔ Terminar</button>
       </div>
     </div>`;
@@ -2663,7 +3075,12 @@
     renderPanel();
     if(c && !auth()) return;
     try{
-      panel.rows = c ? await cloudList(c) : lsGet(RES_KEY, []).map(r => ({ ...r, section: r.section || '—' }));
+      const [rows, roster] = await Promise.all([
+        c ? cloudList(c) : lsGet(RES_KEY, []).map(r => ({ ...r, section: r.section || '—', student: r.student || r.key })),
+        c ? cloudList(c, 'students').catch(() => []) : Object.values(lsGet(LOCAL_STUDENTS, {}))
+      ]);
+      panel.rows = rows;
+      panel.students = roster;
       if(!panel.wantKey[0]) panel.key = defaultKey();
     }catch(e){
       if(e.message === 'AUTH' || e.message === 'DENIED'){
@@ -2741,6 +3158,10 @@
     const good = rows.filter(r => ratio(r) >= .7 - 1e-9).length;
     const help = rows.filter(r => ratio(r) < .5 - 1e-9).length;
     const secLabel = panel.section === 'ALL' ? 'las 4 secciones' : `${GRADE} ${panel.section}`;
+    const roster = (panel.students || []).filter(st => panel.section === 'ALL' || st.section === panel.section);
+    const doneKeys = new Set(all.map(r => r.student).filter(Boolean));
+    const pending = roster.filter(st => !doneKeys.has(st.id));
+    panel.pending = pending;
 
     const filters = `<div class="dash-filters">
       <div class="dash-row"><label class="dash-select"><span>Sesión</span>
@@ -2755,13 +3176,14 @@
       tkBody.innerHTML = `<div class="tk-step dash">${filters}
         ${panel.err ? `<p class="send warn">${esc(panel.err)}</p>` : ''}
         <div class="dash-empty">${robotHTML()}<strong>Aún no hay respuestas</strong><span>Cuando tus estudiantes de ${secLabel} terminen el Exit ticket de esta sesión, sus notas aparecerán aquí.</span></div>
+        ${pending.length ? `<section class="card-d students"><div class="st-head"><h4>Registrados que aún no lo hacen <small>${pending.length}</small></h4></div>${pendingList(pending)}</section>` : ''}
         ${dashFooter(all.length)}
       </div>`;
       return;
     }
 
     const kpis = `<div class="kpis">
-      <div class="kpi"><span class="kpi-l">Respondieron</span><b class="kpi-v">${N}</b><span class="kpi-s">estudiante${N === 1 ? '' : 's'} de ${secLabel}</span></div>
+      <div class="kpi"><span class="kpi-l">Respondieron</span><b class="kpi-v">${N}${roster.length ? `<small>/${roster.length}</small>` : ''}</b><span class="kpi-s">${roster.length ? `registrados de ${secLabel}` : `estudiante${N === 1 ? '' : 's'} de ${secLabel}`}</span></div>
       <div class="kpi"><span class="kpi-l">Promedio</span><b class="kpi-v">${(avg * total).toFixed(1)}<small>/${total}</small></b>
         <span class="meter" role="meter" aria-valuenow="${Math.round(avg * 100)}" aria-valuemin="0" aria-valuemax="100"><i style="width:${avg * 100}%"></i></span><span class="kpi-s">${pctTxt(avg)} de aciertos</span></div>
       <div class="kpi"><span class="kpi-l">Logro esperado o más</span><b class="kpi-v">${pctTxt(good / N)}</b><span class="kpi-s">${good} con nivel AD o A</span></div>
@@ -2823,7 +3245,9 @@
     const cmp = { name: (a, b) => a.name.localeCompare(b.name, 'es'), high: (a, b) => ratio(b) - ratio(a) || a.name.localeCompare(b.name, 'es'),
       low: (a, b) => ratio(a) - ratio(b) || a.name.localeCompare(b.name, 'es'), recent: (a, b) => b.at - a.at }[panel.sort];
     const shown = rows.filter(r => !q || r.name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(q)).sort(cmp);
-    if(!shown.length) return '<p class="res-empty">No hay estudiantes con ese nombre.</p>';
+    const pend = (panel.pending || []).filter(st => !q || st.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(q));
+    const tail = pend.length ? `<div class="st-group pending"><div class="st-gh">⏳ Registrados que aún no lo hacen <small>${pend.length}</small></div>${pendingList(pend)}</div>` : '';
+    if(!shown.length) return (q ? '<p class="res-empty">No hay estudiantes con ese nombre.</p>' : '') + tail;
     const row = (r, i) => {
       const l = levelOf(r);
       const dots = Array.from({ length: Q }, (_, k) => { const v = (r.answers || [])[k]; return v === undefined ? '<i class="dot na">·</i>' : `<i class="dot ${v ? 'ok' : 'no'}" title="P${k + 1}: ${v ? 'correcta' : 'incorrecta'}">${v ? '✓' : '✕'}</i>`; }).join('');
@@ -2835,16 +3259,25 @@
         <button type="button" class="icon-btn del" data-del="${esc(r.id)}" title="Borrar para que pueda volver a responder" aria-label="Borrar resultado de ${esc(r.name)}">${ICON.trash}</button>
       </div>`;
     };
-    if(panel.section !== 'ALL') return shown.map(row).join('');
+    if(panel.section !== 'ALL') return shown.map(row).join('') + tail;
     return SECTIONS.map(s => {
       const g = shown.filter(r => r.section === s);
       return g.length ? `<div class="st-group"><div class="st-gh">${GRADE} ${s} <small>${g.length}</small></div>${g.map(row).join('')}</div>` : '';
-    }).join('');
+    }).join('') + tail;
+  }
+  function pendingList(list){
+    return list.slice().sort((a, b) => a.section.localeCompare(b.section) || a.name.localeCompare(b.name, 'es')).map((st, i) => `<div class="st-row pend">
+        <span class="st-n">${i + 1}</span>
+        <div class="st-name"><b>${esc(st.name)}</b><small>${GRADE} ${esc(st.section)} · DNI ${maskDni(st.dni)}</small></div>
+        <div class="st-dots"></div>
+        <div class="st-score"><span class="pend-badge">Pendiente</span></div>
+        <span></span>
+      </div>`).join('');
   }
 
   function dashFooter(count){
     return `<div class="dash-foot">
-      ${count ? `<button type="button" class="btn solid" data-tk="csv">⬇️ Descargar para Excel</button>` : ''}
+      ${count || (panel.pending || []).length ? `<button type="button" class="btn solid" data-tk="csv">⬇️ Descargar para Excel</button>` : ''}
       ${panel.cloud ? '<button type="button" class="btn ghost" data-tk="logout">Cerrar sesión</button>' : ''}
       <button type="button" class="btn ghost" data-tk="close">Cerrar</button>
     </div>
@@ -2856,9 +3289,13 @@
     const rows = sectionRows().sort((a, b) => a.section.localeCompare(b.section) || a.name.localeCompare(b.name, 'es'));
     const Q = Math.max(0, ...rows.map(r => (r.answers || []).length));
     const q = v => '"' + String(v).replace(/"/g, '""') + '"';
-    const head = ['Grado', 'Sección', 'Estudiante', 'Correctas', 'Total', '% aciertos', 'Nivel', ...Array.from({ length: Q }, (_, i) => 'P' + (i + 1)), 'Fecha y hora'];
-    const lines = [head.map(q).join(';')].concat(rows.map(r => [GRADE, r.section, r.name, r.score, r.total, Math.round(ratio(r) * 100), levelOf(r).k,
-      ...Array.from({ length: Q }, (_, i) => (r.answers || [])[i] === undefined ? '' : r.answers[i] ? 1 : 0), new Date(r.at).toLocaleString('es-PE')].map(q).join(';')));
+    const roster = panel.students || [];
+    const dniOf = r => r.dni || ((roster.find(st => st.id === r.student) || {}).dni) || '';
+    const head = ['Grado', 'Sección', 'DNI', 'Estudiante', 'Estado', 'Correctas', 'Total', '% aciertos', 'Nivel', ...Array.from({ length: Q }, (_, i) => 'P' + (i + 1)), 'Fecha y hora'];
+    const lines = [head.map(q).join(';')].concat(rows.map(r => [GRADE, r.section, dniOf(r), r.name, 'Completado', r.score, r.total, Math.round(ratio(r) * 100), levelOf(r).k,
+      ...Array.from({ length: Q }, (_, i) => (r.answers || [])[i] === undefined ? '' : r.answers[i] ? 1 : 0), new Date(r.at).toLocaleString('es-PE')].map(q).join(';')))
+      .concat((panel.pending || []).slice().sort((a, b) => a.section.localeCompare(b.section) || a.name.localeCompare(b.name, 'es'))
+        .map(st => [GRADE, st.section, st.dni, st.name, 'Pendiente', '', '', '', '', ...Array.from({ length: Q }, () => ''), ''].map(q).join(';')));
     const url = URL.createObjectURL(new Blob(['﻿' + lines.join('\r\n')], { type:'text/csv;charset=utf-8' }));
     download(url, `exit-ticket-unidad${u.num}-sesion${n}-${GRADE}${panel.section === 'ALL' ? '' : panel.section}.csv`);
     setTimeout(() => URL.revokeObjectURL(url), 4000);
@@ -2922,18 +3359,14 @@
       $('#stList').innerHTML = studentList(rows, Math.max(sess ? playable(sess).length : 0, ...rows.map(r => (r.answers || []).length)));
       return;
     }
-    if(e.target.id !== 'tkName' || !tk) return;
-    tk.name = e.target.value;
-    $('#tkStart').disabled = !(cleanName(tk.name) && tk.section);
-  });
-  tkBody.addEventListener('keydown', e => {
-    if(e.key === 'Enter' && e.target.id === 'tkName'){ e.preventDefault(); if(!$('#tkStart').disabled) beginTicket(); }
+    if(e.target.id === 'accDni'){ const v = cleanDni(e.target.value); if(v !== e.target.value) e.target.value = v; }
   });
   tkBody.addEventListener('change', e => {
     if(e.target.id === 'pnSession'){ panel.key = e.target.value; panel.wantKey = panel.key.split('|'); renderPanel(); }
     if(e.target.id === 'pnSort'){ panel.sort = e.target.value; renderPanel(); }
   });
   tkBody.addEventListener('submit', async e => {
+    if(e.target.id === 'accForm'){ e.preventDefault(); submitAccount(); return; }
     if(e.target.id !== 'loginForm') return;
     e.preventDefault();
     const btn = e.target.querySelector('button[type="submit"]');
@@ -2955,13 +3388,13 @@
     if(t === tkDlg){ tkDlg.close(); return; }
     const o = t.closest('.opt');
     if(o && !o.disabled){ answer(+o.dataset.opt); return; }
-    const sec = t.closest('[data-sec]');
-    if(sec && tk){
-      tk.section = sec.dataset.sec;
-      $$('.sec', tkBody).forEach(b => { const on = b === sec; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); });
-      $('#tkStart').disabled = !(cleanName(tk.name) && tk.section);
+    const asec = t.closest('[data-asec]');
+    if(asec && acct){
+      acct.section = asec.dataset.asec;
+      $$('.sec', tkBody).forEach(b => { const on = b === asec; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); });
       return;
     }
+    if(t.closest('[data-go]')){ tkDlg.close(); return; }
     if(t.closest('#tkStart')){ beginTicket(); return; }
     if(t.closest('#tkNext')){ tk.i++; tk.i < tk.qs.length ? stepQuestion() : stepResult(); return; }
     const tab = t.closest('[data-tab]');
@@ -2991,7 +3424,13 @@
     else if(act === 'h-exit'){ tkDlg.close(); $('#exitBtn').click(); }
     else if(act === 'draft-yes'){ restoreDraft(); showHome(); toast('✅ Cambios recuperados'); }
     else if(act === 'draft-no'){ clearDraft(); showHome(); }
-    else if(act === 'edit') stepIntro();
+    else if(act === 'acc-register' || act === 'acc-login'){
+      const then = acct && acct.then, dni = $('#accDni') ? cleanDni($('#accDni').value) : '';
+      openAccount(act === 'acc-register' ? 'register' : 'login', { then, dni });
+    }
+    else if(act === 'acc-me') openAccount('me');
+    else if(act === 'acc-logout'){ logOut(); tkDlg.close(); toast('👋 Cerraste tu sesión'); }
+    else if(act === 'not-me'){ const { unit, n } = tk; logOut(); openAccount('login', { then: () => openTicket(unit, n) }); }
     else if(act === 'retry'){ tk.i = 0; tk.answers = []; tk.order = null; stepQuestion(); }
     else if(act === 'png') resultPng();
     else if(act === 'resend') send();
@@ -3027,7 +3466,11 @@
     }
     else if(act === 'logout'){ try{ localStorage.removeItem(AUTH_KEY); }catch(_){} loadPanel(); }
   });
-  tkDlg.addEventListener('close', () => { tkBody.innerHTML = ''; tipEl.hidden = true; panel = panel && { section: panel.section, sort: panel.sort, email: panel.email }; });
+  tkDlg.addEventListener('close', () => {
+    tkBody.innerHTML = ''; tipEl.hidden = true;
+    panel = panel && { section: panel.section, sort: panel.sort, email: panel.email };
+    if(acct){ acct = null; if(route.name === 'menu' && mode !== 'units' && mode !== 'tutorial') setMode('main', { again:true }); }
+  });
 
   /* ================= Toast ================= */
   let toastEl = null, toastTimer = null;
@@ -3066,6 +3509,8 @@
   }
 
   /* ================= Start ================= */
+  updateUserChip();
+  setTimeout(refreshProgress, 600);
   const start = parse(location.hash);
   trail.push(toHash(start));
   history.replaceState(null, '', toHash(start));

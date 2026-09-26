@@ -3783,7 +3783,7 @@
   const SMIL_RE = /<animate[A-Za-z]*\b[^>]*?(\/>|>[\s\S]*?<\/animate[A-Za-z]*>)/g;
   const still = html => html.indexOf('<animate') < 0 ? html : html.replace(SMIL_RE, '');   // miniaturas: mismo dibujo, sin animaciones internas
   if(LITE) for(const k in PARTS) PARTS[k] = still(PARTS[k]);
-  window.__moli = { SHOP, robotHTML: (o) => robotHTML(o), duel: () => duel, poll: () => pollContent(), app: () => APP, editing: () => editing };
+  window.__moli = { SHOP, robotHTML: (o) => robotHTML(o), duel: () => duel, poll: () => pollContent(), app: () => APP, editing: () => editing, ai: (t, c) => aiGenerate(t, c || 'pr') };
   const ITEM = {};
   SHOP.forEach(cat => cat.items.forEach(it => { ITEM[it.id] = { ...it, slot: it.s || cat.slot, premium: it.p >= 10, legend: !!cat.legend }; }));
   // Casco y sombrero van en el mismo lugar: ponerse uno quita el otro.
@@ -5256,7 +5256,8 @@
   /* ================= ✨ Generador de preguntas con IA (Firebase AI Logic · Gemini) ================= */
   // Se llama directo desde la página con la misma apiKey pública de Firebase (sin claves secretas).
   // La docente lo activa una vez en Firebase → AI Logic → Gemini Developer API (gratis).
-  const AI_MODELS = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.0-flash'];
+  // Primero el rápido; si Google retira un modelo, su respuesta dice cuál usar y se prueba ese.
+  const AI_MODELS = ['gemini-3.5-flash-lite', 'gemini-3.8-flash'];
   const aiState = {};   // por lugar: pr (Misiones), tk (Exit ticket de la sesión), vs (Preguntas VS)
   const AI_CTX = {
     pr: { n: 5, what: 'Exit ticket de práctica', short: false },
@@ -5298,15 +5299,26 @@ Reglas:
       generationConfig: { responseMimeType: 'application/json', responseSchema: aiSchema, temperature: .8, maxOutputTokens: 4096 }
     });
     let last = 'NET';
-    for(const model of AI_MODELS){
+    const queue = [...AI_MODELS], tried = new Set();
+    while(queue.length){
+      const model = queue.shift();
+      if(tried.has(model)) continue;
+      tried.add(model);
       let r;
-      try{ r = await fetch(`https://firebasevertexai.googleapis.com/v1beta/projects/${c.projectId}/models/${model}:generateContent`, { method:'POST', headers:{ 'Content-Type':'application/json', 'x-goog-api-key': c.apiKey }, body }); }
-      catch(e){ throw new Error('NET'); }
-      if(r.status === 404){ last = 'MODEL'; continue; }                 // ese modelo ya no existe: se prueba el siguiente
+      const ctl = new AbortController(), tmr = setTimeout(() => ctl.abort(), 30000);
+      try{ r = await fetch(`https://firebasevertexai.googleapis.com/v1beta/projects/${c.projectId}/models/${model}:generateContent`, { method:'POST', headers:{ 'Content-Type':'application/json', 'x-goog-api-key': c.apiKey }, body, signal: ctl.signal }); }
+      catch(e){ clearTimeout(tmr); last = e.name === 'AbortError' ? 'BUSY' : 'NET'; continue; }
+      clearTimeout(tmr);
       const j = await r.json().catch(() => ({}));
+      const msg = JSON.stringify(j);
+      if(r.status === 404){                                             // modelo retirado: Google sugiere el nuevo
+        (msg.match(/models\/(gemini-[\w.-]+)/g) || []).map(x => x.slice(7)).filter(m => !tried.has(m)).forEach(m => queue.push(m));
+        last = 'MODEL'; continue;
+      }
+      if(r.status >= 500){ last = 'BUSY'; continue; }                   // saturado: se prueba el otro modelo
       if(!r.ok){
-        const msg = JSON.stringify(j);
-        throw new Error(/SERVICE_DISABLED|has not been used|not enabled/i.test(msg) ? 'DISABLED' : r.status === 429 ? 'QUOTA' : r.status === 403 ? 'DENIED' : 'HTTP');
+        if(r.status === 429){ last = 'QUOTA'; continue; }
+        throw new Error(/SERVICE_DISABLED|has not been used|not enabled/i.test(msg) ? 'DISABLED' : r.status === 403 ? 'DENIED' : 'HTTP');
       }
       const text = ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || '').join('');
       let data = null; try{ data = JSON.parse(text); }catch(e){}
@@ -5318,6 +5330,7 @@ Reglas:
   }
   const aiErrText = code => code === 'DISABLED' ? `🔧 Falta activar la IA en tu Firebase (una sola vez): Firebase → <b>AI Logic</b> → <b>Comenzar</b> → elige <b>Gemini Developer API</b> (gratis). <a href="https://console.firebase.google.com/project/ciencia6abcd/ailogic" target="_blank" rel="noopener">Abrir Firebase ›</a>`
     : code === 'QUOTA' ? '⏳ Se usaron muchas preguntas seguidas. Espera un minuto y vuelve a intentar.'
+    : code === 'BUSY' ? '⏳ La IA de Google está muy ocupada en este momento. Vuelve a intentar en un minuto.'
     : code === 'OFFLINE' || code === 'NET' ? '📶 No hay conexión. Revisa tu internet.'
     : code === 'EMPTY' ? '🤔 No salieron preguntas válidas. Escribe el tema con un poco más de detalle y vuelve a intentar.'
     : '⚠️ No se pudieron crear las preguntas. Inténtalo otra vez en un momento.';

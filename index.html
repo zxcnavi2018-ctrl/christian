@@ -232,7 +232,6 @@
     text-align:center;
     gap:6px;
     padding:18px;
-    cursor:pointer;
     user-select:none;
     -webkit-user-select:none;
     border-radius:32px;
@@ -320,7 +319,19 @@
     animation:ring 2s ease-out infinite;
   }
   @keyframes ring{ from{ transform:scale(.96); opacity:1; } to{ transform:scale(1.12); opacity:0; } }
-  .home:hover .hint{ transform:translateY(-2px); background:var(--blue); }
+  .hint{ border:none; font-family:inherit; cursor:pointer; }
+  .hint:hover{ transform:translateY(-2px); background:var(--blue); }
+  .home-pill{ font-family:inherit; cursor:default; }
+  .home-pill .bim-edit{ display:none; font-size:.85em; }
+  body.editing .home-pill{ cursor:pointer; outline:2px dashed var(--blue); outline-offset:3px; }
+  body.editing .home-pill .bim-edit{ display:inline; }
+  body.editing .home-title{ cursor:text; outline:2px dashed var(--blue); outline-offset:6px; border-radius:12px; }
+  .bim-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:6px 0 14px; }
+  .bim-opt{ display:flex; flex-direction:column; align-items:center; gap:2px; padding:16px 10px; border-radius:18px; border:2px solid var(--line); background:#fff; font:inherit; color:var(--navy); cursor:pointer; transition:transform .2s var(--spring), border-color .2s; }
+  .bim-opt b{ font-size:26px; font-weight:900; }
+  .bim-opt span{ font-size:14px; font-weight:800; color:var(--ink-2); }
+  .bim-opt:hover{ transform:translateY(-2px); }
+  .bim-opt.on{ border-color:var(--blue); background:linear-gradient(160deg, #fff, #eef4ff); box-shadow:0 0 0 4px rgba(47,111,237,.14); }
   .hint .tap{ display:inline-block; animation:tap 1.4s ease-in-out infinite; }
   @keyframes tap{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-4px); } }
 
@@ -1946,12 +1957,12 @@
 
 <div id="app">
   <section class="screen" id="screen-home" aria-label="Inicio">
-    <div class="home" id="homeTap" role="button" tabindex="0" aria-label="Toca para comenzar">
-      <h1 class="home-title">CIENCIA</h1>
+    <div class="home" id="homeTap">
+      <h1 class="home-title" id="siteTitle" spellcheck="false">CIENCIA</h1>
       <p class="home-teacher">Prof. Christian Quispe Llerena</p>
-      <div class="home-pill"><i></i>4to Bimestre</div>
+      <button type="button" class="home-pill" id="bimPill"><i></i><span class="bim-txt">4to Bimestre</span><span class="bim-edit" aria-hidden="true">✏️</span></button>
       <div class="home-stage"><div data-robot-slot></div><button type="button" class="shop-btn" data-shop aria-label="Tienda de Moli"><span class="sb-ico">🛍️</span>Tienda</button></div>
-      <div class="hint">Iniciar</div>
+      <button type="button" class="hint" id="startBtn">Iniciar</button>
     </div>
   </section>
 
@@ -2019,7 +2030,7 @@
     ],
     ticket: { questions: [] }
   });
-  const normalize = () => APP.units.forEach(u => { u.hidden = !!u.hidden; u.sessions.forEach(s => { if(!s.ticket) s.ticket = { questions: [] }; }); });
+  const normalize = () => (APP.site = APP.site || { title: 'CIENCIA', bimestre: 4 }, APP.units).forEach(u => { u.hidden = !!u.hidden; u.sessions.forEach(s => { if(!s.ticket) s.ticket = { questions: [] }; }); });
   // Unidades que ven los estudiantes (la docente oculta o muestra cada una en el modo editor).
   const shownUnits = () => APP.units.filter(u => !u.hidden);
   const unitTitle = u => u.title || 'Próximamente';
@@ -2167,14 +2178,13 @@
     if(r.name === 'unit') renderUnit();
     if(r.name === 'session') renderSession();
     document.title = r.name === 'session' ? `Sesión ${r.n} · Unidad ${unitByKey(r.unit).num} · Ciencia`
-      : r.name === 'unit' ? `Unidad ${unitByKey(r.unit).num} · Ciencia` : 'Ciencia · 4to Bimestre';
+      : r.name === 'unit' ? `Unidad ${unitByKey(r.unit).num} · Ciencia` : `${siteTitleCase()} · ${BIM[APP.site.bimestre]}`;
     if(dir !== undefined) window.scrollTo(0, 0);
     applyLook();
   }
 
-  $('#homeTap').addEventListener('click', e => { if(!e.target.closest('[data-shop]')) go({ name:'menu' }); });
+  $('#startBtn').addEventListener('click', () => go({ name:'menu' }));
   document.addEventListener('click', e => { if(e.target.closest('[data-shop]')){ e.stopPropagation(); openShop(); } }, true);
-  $('#homeTap').addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); go({ name:'menu' }); } });
   $('#backBtn').addEventListener('click', goBack);
   document.addEventListener('click', e => {
     const g = e.target.closest('[data-go]');
@@ -2327,6 +2337,7 @@
     if(!u.hidden && shownUnits().length === 1){ toast('Deja al menos una unidad visible para tus estudiantes 🙂'); return; }
     u.hidden = !u.hidden;
     changed();
+    saveSiteSoon();
     if(mode === 'units') renderChoices();
     toast(u.hidden ? `🙈 La Unidad ${u.num} quedó oculta para los estudiantes.` : `👁 La Unidad ${u.num} ya se ve para los estudiantes.`);
   }
@@ -3870,6 +3881,7 @@
       panel.rows = rows;
       panel.students = roster;
       panel.codes = c ? await cloudList(c, 'redemptions').catch(() => []) : [];
+      if(c && (lsGet(SITE_KEY, {}) || {}).pending) saveSite();
       if(!panel.wantKey[0]) panel.key = defaultKey();
     }catch(e){
       if(e.message === 'AUTH' || e.message === 'DENIED'){
@@ -4255,6 +4267,8 @@
     if(t.closest('#tkNext')){ tk.i++; tk.i < tk.qs.length ? stepQuestion() : stepResult(); return; }
     const tab = t.closest('[data-tab]');
     if(tab){ panel.section = tab.dataset.tab; renderPanel(); return; }
+    const bim = t.closest('[data-bim]');
+    if(bim){ setBimestre(+bim.dataset.bim); return; }
     const delAcc = t.closest('[data-del-acc]');
     if(delAcc){ deleteAccount(delAcc.dataset.delAcc); return; }
     const del = t.closest('[data-del]');
@@ -4371,8 +4385,88 @@
     });
   }
 
+  /* ================= Título y bimestre (se guardan en la nube para todos) ================= */
+  const SITE_KEY = 'ciencia4b:site:' + APP.docId;
+  const BIM = ['', '1er Bimestre', '2do Bimestre', '3er Bimestre', '4to Bimestre'];
+  const BIM_NAME = ['', 'Primer', 'Segundo', 'Tercer', 'Cuarto'];
+  const siteTitle = $('#siteTitle'), bimPill = $('#bimPill');
+  function siteTitleCase(){ const t = APP.site.title.trim(); return t.charAt(0).toUpperCase() + t.slice(1).toLowerCase(); }
+  const siteNow = () => ({ title: APP.site.title, bimestre: APP.site.bimestre, hidden: APP.units.filter(u => u.hidden).map(u => u.key) });
+  function applySite(cfg){
+    if(cfg){
+      if(typeof cfg.title === 'string' && cfg.title.trim()) APP.site.title = cfg.title.trim().slice(0, 40);
+      if(+cfg.bimestre >= 1 && +cfg.bimestre <= 4) APP.site.bimestre = +cfg.bimestre;
+      if(Array.isArray(cfg.hidden) && APP.units.some(u => !cfg.hidden.includes(u.key))) APP.units.forEach(u => { u.hidden = cfg.hidden.includes(u.key); });
+    }
+    if(document.activeElement !== siteTitle) siteTitle.textContent = APP.site.title;
+    // Palabras largas: la letra se achica para que el título no se salga de la pantalla.
+    const longest = Math.max(7, ...APP.site.title.split(/\s+/).map(w => w.length));
+    siteTitle.style.fontSize = longest > 7 ? `clamp(30px, ${(92 / longest).toFixed(1)}vw, ${Math.round(104 * 7 / longest)}px)` : '';
+    $('.bim-txt', bimPill).textContent = BIM[APP.site.bimestre];
+    if(route.name === 'home') document.title = `${siteTitleCase()} · ${BIM[APP.site.bimestre]}`;
+    if(route.name === 'menu' && mode === 'units') renderChoices();
+  }
+  let siteTimer = null;
+  function saveSiteSoon(){ clearTimeout(siteTimer); siteTimer = setTimeout(saveSite, 900); }
+  async function saveSite(){
+    const cfg = siteNow();
+    lsSet(SITE_KEY, { ...cfg, pending: true });
+    const c = await fbConfig();
+    if(!c) return;
+    const tok = await idToken(c).catch(() => null);
+    if(!tok){ toast('💾 Guardado en este equipo. Para que tus estudiantes lo vean, entra una vez a «Resultados» con tu cuenta de docente.'); return; }
+    try{
+      const body = { writes: [{ update: { name: docName(c, 'config', 'site'), fields: toFields({ ...cfg, updatedAt: new Date() }) } }] };
+      const r = await fetch(`${docsBase(c)}:commit?key=${c.apiKey}`, { method:'POST', headers:{ 'Content-Type':'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify(body) });
+      if(r.ok){ lsSet(SITE_KEY, cfg); toast('☁️ ¡Listo! Tus estudiantes ya lo verán.'); }
+      else if(r.status === 403) toast('🔧 Falta actualizar las reglas de Firebase para guardar el título, el bimestre y las unidades.');
+    }catch(e){ /* sin conexión: queda pendiente */ }
+  }
+  async function loadSite(){
+    applySite(lsGet(SITE_KEY, null));
+    const c = await fbConfig();
+    if(!c) return;
+    try{
+      const r = await fetch(`${docsBase(c)}/config/site?key=${c.apiKey}`);
+      if(!r.ok) return;
+      const d = fromDoc(await r.json());
+      if(!(lsGet(SITE_KEY, {}) || {}).pending){ lsSet(SITE_KEY, { title: d.title, bimestre: d.bimestre, hidden: d.hidden || [] }); applySite(d); }
+    }catch(e){ /* sin conexión: se usa lo guardado */ }
+  }
+  function setBimestre(n){
+    if(!editing || !(n >= 1 && n <= 4)) return;
+    APP.site.bimestre = n;
+    changed();
+    applySite();
+    if(tkDlg.open) tkDlg.close();
+    saveSite();
+  }
+  bimPill.addEventListener('click', () => {
+    if(!editing) return;
+    tk = null; acct = null;
+    tkDlg.classList.remove('wide');
+    tkTop.innerHTML = `<small>✏️ Modo editor</small><strong>¿Qué bimestre es?</strong><span>Se verá en la portada</span><button class="tk-x" type="button" data-tk="close" aria-label="Cerrar">✕</button>`;
+    tkBody.innerHTML = `<div class="tk-step">${sayRow('Elige el bimestre y lo pongo en la portada 📅')}
+      <div class="bim-grid">${[1, 2, 3, 4].map(n => `<button type="button" class="bim-opt${n === APP.site.bimestre ? ' on' : ''}" data-bim="${n}"><b>${n}°</b><span>${BIM_NAME[n]} bimestre</span></button>`).join('')}</div></div>`;
+    if(!tkDlg.open) tkDlg.showModal();
+  });
+  // El título se edita tocándolo en el modo editor.
+  const setTitleEditable = on => { siteTitle.contentEditable = on ? (supportsPlain ? 'plaintext-only' : 'true') : 'false'; };
+  new MutationObserver(() => setTitleEditable(document.body.classList.contains('editing'))).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  siteTitle.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); siteTitle.blur(); } });
+  siteTitle.addEventListener('blur', () => {
+    if(!editing) return;
+    const t = siteTitle.textContent.replace(/\s+/g, ' ').trim().slice(0, 40);
+    if(!t || t === APP.site.title){ siteTitle.textContent = APP.site.title; return; }
+    APP.site.title = t;
+    changed();
+    applySite();
+    saveSite();
+  });
+
   /* ================= Start ================= */
   onAccountChange();
+  loadSite();
   setTimeout(refreshProgress, 600);
   const start = parse(location.hash);
   trail.push(toHash(start));

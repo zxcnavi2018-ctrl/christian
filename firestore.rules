@@ -204,6 +204,18 @@ service cloud.firestore {
       allow delete: if isTeacher();
     }
 
+    // Portada: título, bimestre y unidades visibles. Todos la leen; solo la docente la cambia.
+    match /config/{id} {
+      allow get: if true;
+      allow create, update: if isTeacher() && id == 'site'
+        && request.resource.data.keys().hasOnly(['title', 'bimestre', 'hidden', 'updatedAt'])
+        && request.resource.data.title is string && request.resource.data.title.size() > 0 && request.resource.data.title.size() <= 40
+        && request.resource.data.bimestre is int && request.resource.data.bimestre >= 1 && request.resource.data.bimestre <= 4
+        && request.resource.data.hidden is list && request.resource.data.hidden.size() <= 20
+        && request.resource.data.updatedAt is timestamp;
+      allow delete: if isTeacher();
+    }
+
     // Marcas de la versión anterior (solo para que la docente pueda limpiarlas).
     match /exitTicketsDone/{id} {
       allow get: if true;

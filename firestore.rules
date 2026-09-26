@@ -59,11 +59,145 @@ service cloud.firestore {
       allow get: if true;
       allow create, update: if id.matches('k[0-9a-f]{20}')
         && exists(/databases/$(database)/documents/students/$(id))
-        && request.resource.data.keys().hasOnly(['owned', 'equipped', 'updatedAt'])
+        && request.resource.data.keys().hasOnly(['owned', 'equipped', 'codes', 'updatedAt'])
+        && (!('codes' in request.resource.data) || (request.resource.data.codes is list && request.resource.data.codes.size() <= 100))
         && request.resource.data.owned is list && request.resource.data.owned.size() <= 60
         && request.resource.data.equipped is list && request.resource.data.equipped.size() <= 10
         && request.resource.data.updatedAt is timestamp;
       allow list, delete: if isTeacher();
+    }
+
+    // Códigos de estrellas que entrega la docente en clase. Aquí solo está la
+    // versión cifrada de cada código; cada código se puede canjear una sola vez.
+    function validCode(code) {
+      return hashing.sha256('moli|' + code).toHexString().lower() in [
+          '76a59b2c716c988d3de619700f60a69a17823da68430ceecead10bc5c00c2fc9',
+          'b7c29c81d5a76f6a1dd8439e8f5307e5a356bbf65dd8eacfb8d416fef7891954',
+          '9934d07d8c8a22f15167143d9c733ee7a1e7386eabf65c1d48cb4ee36f22c179',
+          '8ce820f1ce7cac7433d27e3a12e702fd6527b2419af0ff7a313d4253dccb7657',
+          '211faddb3a13db7f318a3f5940b829ecc5ee73820a492158a8ffdb9ea261413f',
+          '40cac03181e27420f34f92cb078d46a41cf1cca09a55e121beb09f739d69cb28',
+          '271f12ecb869a360a21b1cef877ff1f052ead061f30b771e29379afa72cc5f8f',
+          'd6e3575c344f0377f6307876e5c46440ccf66167a0e92d9b41130c46cef29b08',
+          'e333fdee916392620d03715fd7e7e4e61259971082ca0f3cfb53549fd933c28a',
+          'c986607795c210bd29f859b473e2e0a59ca8bc82f0a29c05ca9c666d21347e97',
+          '514e8a92c60cf17478403af29567e978725d041aa15f0271e7f4b036264ba23d',
+          'ed3d31ba5187ec37f3f85b36ae500274359252d4a3c22f14500d65f6141a8f1f',
+          '640e3268702f61aa94970d86360b8eeaa7717698e27cfad9034435c55a16b794',
+          'fe71da391cadf564c60c97ddb79c53b5518fb9fe23b570e2429461e40432f38d',
+          '67c8fb9e5ec0830fd09b7783a014b16dd8a642215320413efda2898a36b4bb3b',
+          '187c304ff06b26fa4798543d28bd911107ff8cd5bde17d67329a7b6b9acf76df',
+          'bea0eabc6907f8c3ddb9bdfdea5bcec139ae1788edbadbbaeaea3d98285d16de',
+          '2706990bd2bb26973b7826312c05f47b8b804732b219d42ce71d39863852af9f',
+          '2461bef9b7d67a7c5f75dfcd188160cf2fdc119d1f34c909270512a770049b70',
+          '9f74fa4be8b96f931b75eca765a039728fa022f37d9c642f4e2b3c8be3de4c27',
+          'd11078a353d745483dc25852a83e55b60802730c3fcb5221f83b985df6a21fa3',
+          '107364bb2ba2d6b67ef065801b6b82f1835e0b6eb3a216d725a360babe30e011',
+          '6e285056446408de4cbbe5ec4b95d97d0087d974d522d924138935145fbd311e',
+          '5d72691d1301bfa7a8e5bc6f1609ae8d232d9ed220e337a90eb27885289e6f39',
+          'ec86f44b618d7f75335bac6c2931ce04f2c8a5f495a229d0e4e16b13e40a0436',
+          'c8547bcdfc66b60e1ffc968b5ec3c74311eae0838a941b2509f70f09a84ee464',
+          'a6ab2b49cfde6b72cc1b7924a441a6366ed643c98c845756548259c677ca9a86',
+          '0177478d913cd7b4cd1c45157abc8c3a147ae1e91d59b24c96456fc0b31d5b96',
+          '1e8e86287d9f1741aaca759ffd8219330b7c2b09a9c46e5dedf01d7f27794e6d',
+          '5a201862bc8a3b8664bf534d28c37307fbac09e0ef613d7a70e47a03e4f26afc',
+          'd817676735b3f5c1fe8669a884ee7e473dd70a844a8baae4276a1d8ac7e0880c',
+          'aebfa39af72e1a7ac8e64640954ad3231a23c2490ceee86400fb4767a2298c98',
+          '300600a4d0ba40441ee3a5cc466f555532d9211776db42e73e8fb4ceb0cc9993',
+          '33fbd25bcceab3083c99679342f0de5acc41e7ed83add69dea9d08f13ba2e146',
+          'b1aea3e77da477abad2be1463326f9342d6ab99d8b727e1e1f882d32375339a9',
+          '02d7c00782c996eb1f372e40167437eaf5d314e6030e16ba6d7ecc6e254869c9',
+          '47d3293db5c77138cf892a738f7369a6eba1ab2747764d7bfda8e15e04ca8fd8',
+          '23d5849497093d42c12166200bf0ed4b94435357ec1170573034dea37a8b2e80',
+          '8eae6d8a3b53da54e8fac189858aa198a9ad42dbcfe1259dcaa0d1cd43e3d95a',
+          'bdd3f619b23e3078a85112ca0409b871e3786092415dfe226ba70a6356fb5ce1',
+          '1314df31beec755ef2fd82eadedbbfa1e188d3de9a4e8e64c2c1984d52095793',
+          '6d78dd6b436ac16c3c9f59f7ebf43be91a73902d8a87d90880492626be1b97a6',
+          '96cc5a0609e5978183014d86f3d6ea6eb7f111f61601ef103137d4b7367027a4',
+          '66a6f82d9798b698a2fe166527052af333cec7c9308c2c59bedecfe403c576a2',
+          'f280ce1a10d84162d2e512cbcb0d823baea4b7266e5d7ba5f977cd2b0e42bd45',
+          '05d77f44b472997ec98c85fa5eec6d63a5ebd0497e327f18513aededcb908f2a',
+          '7968e0931ef458a4a14d5cf638aae7504a622f72c7e2ed914d9054ddf85ee391',
+          '6d0bd9f1242ea12cc3f7fac30b08f328efb84682cf91b56903a1e6be10e5ccae',
+          '830b3145828d0f1444bf4284ad6797f1f5e6bfe20f7ff46754bbe9e6f93c0ef2',
+          '177fb572f154f4f8d6bff01f1e484676975844fe183138f502a68e7c3037a59c',
+          '980365829b6185f8938c417a0db473dce73408a9215997fdaa9b522af3917d11',
+          '98218f26577fdf51d81649a17c627aff326e6ef16ad475b6b02e5edf79601b4d',
+          '72009e21e907c0ad02e131f8a85ce01c469531dfe5e725d91d5f34523771c48f',
+          'c97d91d2bc1f0f035191ff60f92fe294532a911f9723ac63e8a4080a9387cec0',
+          '433081f28319f0e03ead53afcb87fe3c17edd4db8015e2b52e04505877440929',
+          '01a429d15c4178af5f2bedd7346e8f857c16b0de672a384efd2903df65a9074f',
+          '56d2a080cbb2f0923eee4efe134e5ce73d73e190fde8b9b3c971be664ce2cee4',
+          'f4771d629b35cdf7501b00345edeaa439dfed8cc6e9b08cf62e541513e10fd71',
+          'b9d83bd89feed666ad706a27818629b68c033523382572bd03be639dd844d126',
+          '4194c5d2f26b388149709c4e388dce7614ede7f57f1165a92c6e8d3e5fa411a8',
+          'ac469922d64d680cce89c2326847e7fc3402552ce2739081b6cc3e2b0f5a2e8c',
+          '77eaf8c2a6d3724455f6cfd8e14e37c5226c0467ef60e87bfdaa1e34266d1512',
+          'cf79f2ce48d037121a5bc42f47ff877da7565749370de809ed5931861f23476c',
+          '6fa1658996aee84db6411582476b20fdf89d38d1b6c49928eeac6ad293abc36d',
+          '2ec6ef12d61ae81206a105dbc23ed9d4fdea900a49e405ea6346b7ce9c9753b1',
+          '6c6692f878edef6493a5f3383cf7251e74d7eeb67f52b6396c62c5af4bc23df5',
+          'fba8ae4c5e10f84afe8b1928e6fefe18352608842bce16780127399c238c8dd7',
+          'ff5cfcbd5b8eff6ea69441e6cead52d54307712501e4c6a5051f5c1ddc0180b2',
+          'baf5c2214dbc89779dbe4798235280284719ff72c4e6b348c16d5980611080f4',
+          'af123fd30823d8f1af2569e0b37c2e7d13542156a585031e018629a8cbe51a5e',
+          'b2d3b05c9b029cf0f5d1abdaba19ec77400f15fe0235cb2113d6f7d6fec21cbb',
+          'fa65ef8a990bc9fdc53c67fde7aa517d7e8b2c393956dc160fe9d654e3c14c05',
+          '073b75c0412aaefd413ea8186665480546fc76f3295bd4cfb0b2c9a08a35cdec',
+          '8c4bb04c32a74b629ac016eb7a976bd0261e6d67f4fdab2e984a359da891b67d',
+          '43ee165f1d97f249f912e9d3c3b2f7635b1ba2766de7b7f02f7c2902c9b71dcc',
+          'cae1805b95231e1b78633f2b5eb88d92894d59536ba9a50275dcd6d9123b61db',
+          'e78d28a43bbe231c983e8a34c6c66f9a1bd210911369560ec7f905d8d2cca562',
+          'ed905821b79d5b5b6c635787f76ebb433729ddf7cefe85ce1b1879741b009c22',
+          '83703681145d0ea9e50346b4c7ef95b02ced3d79b9ad698eee6f3ba44b58b955',
+          '235690f0b57db088ed13e357be8e70791e5de764b0b83497401b4a18c43ca8b3',
+          '98a9c62799b5b2fedde1c6806ccaf1499c1fb5a51a0000fe1694e7401c3161b0',
+          'f66bc63abbce78f89f57cd9a0fc174b989b6df9542064a4166de6484bd3acb99',
+          '4c47267dee8d900f8a6abdb62219974a090fc6c84b360b36157d1e134339d7fc',
+          'd7c125dc83964f14d6ea15a977da5be78b49e208dd01559bf39984c3fac309f4',
+          'a5ff23a87151293734aa57ccd89d11703192359fb8130227b9052c664aafefc3',
+          'b37139eb5c96f1749b4cb041a07e0ce3f8eac48baa967ad01047e9bdcfeec020',
+          '80705e7510f438e7d146b3e2c1871d1761e72db617c27f93e37397462cddb6b3',
+          '412bde863ad242c852358c7226ec8ddfbe7ca53820caffac55f0e0b79be9460f',
+          'b16f035d950ab7190ebeb9635c081a004ae8d4353751b0fbffc0d6f12cd607b7',
+          '061b5de095f341d32aa211c57c54efe15648a364ead9b5a3bbb99ceaaa552dcd',
+          '64107980080edb11e8c1b2ea043fc531812384665d2f1f94bd743aaa870cdb5f',
+          '790e8e95c3367938473db296f31945179624c2e5e9332aa5002e9a989336c6cb',
+          '978b534cead370747c54e9b883eaffe518ea1bb16674f78df058f6155ca22aac',
+          '483b21b6bafe04270abb5697370f35f3ef6f14679e83138555bb5ba6ef4a876f',
+          'cd35f2f8f010a9400c88ff7cf2a66d609d9783922089b5e3f5d3b464337ab5f6',
+          '528639b3fc8830dfbcacd9fd483d072bd30493b4f5d481c9d3161b08f72f0734',
+          '8e4b419949ecf5e39ab46f4cd72f661f49775a1520d827d2f0d589fba295366e',
+          'cda4e707f2f249965bd5b10ccb18c7c909abaab98187d9cbd1fc08810617ff22',
+          'bf44a803974a68d841756bdbb8330f12800ae21d2ada2616a3562a993fee29b5',
+          '38095047b89b4fc8e95b6a24a88524bbd1245768020d171abd7e9c18fb0169dc'
+        ];
+    }
+    match /redemptions/{code} {
+      allow get: if true;
+      allow create: if validCode(code)
+        && request.resource.data.keys().hasOnly(['student', 'at'])
+        && request.resource.data.student is string && request.resource.data.student.matches('k[0-9a-f]{20}')
+        && exists(/databases/$(database)/documents/students/$(request.resource.data.student))
+        && request.resource.data.at is timestamp;
+      allow list, delete: if isTeacher();
+      allow update: if false;
+    }
+
+    // Ranking (top 15): nombre corto, sección, estrellas ganadas en total y la ropa de Moli.
+    match /ranking/{id} {
+      allow get: if true;
+      allow list: if request.query.limit <= 50;
+      allow create, update: if id.matches('k[0-9a-f]{20}')
+        && exists(/databases/$(database)/documents/students/$(id))
+        && get(/databases/$(database)/documents/students/$(id)).data.section == request.resource.data.section
+        && request.resource.data.keys().hasOnly(['name', 'section', 'stars', 'outfit', 'updatedAt'])
+        && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 40
+        && request.resource.data.section in ['A', 'B', 'C', 'D']
+        && request.resource.data.stars is int && request.resource.data.stars >= 0 && request.resource.data.stars <= 1000
+        && request.resource.data.outfit is list && request.resource.data.outfit.size() <= 12
+        && request.resource.data.updatedAt is timestamp;
+      allow delete: if isTeacher();
     }
 
     // Marcas de la versión anterior (solo para que la docente pueda limpiarlas).

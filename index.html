@@ -1712,6 +1712,96 @@
     .shop-grid{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
   }
 
+  .code-box{ margin:-2px 0 14px; padding:14px; border-radius:18px; border:1.5px dashed #e5c887; background:linear-gradient(135deg, #fffaf0, #fff3dc); }
+  .cb-txt{ display:flex; flex-direction:column; margin-bottom:10px; }
+  .cb-txt b{ font-size:15.5px; font-weight:900; color:#7a4a12; }
+  .cb-txt small{ font-size:12.5px; font-weight:700; color:#8a6326; }
+  .cb-row{ display:flex; gap:8px; }
+  .cb-row input{ flex:1; min-width:0; padding:12px 14px; border-radius:14px; border:2px solid #f0d5a0; background:#fff; font:inherit; font-size:22px; font-weight:900; letter-spacing:.35em; text-align:center; text-transform:uppercase; color:var(--navy); }
+  .cb-row input:focus{ outline:none; border-color:var(--amber-2); box-shadow:0 0 0 4px rgba(245,166,35,.2); }
+  .cb-row .btn{ flex:none; padding:12px 18px; border-radius:14px; background:linear-gradient(135deg, var(--amber), var(--amber-2)); box-shadow:0 8px 16px rgba(245,124,35,.28); }
+  .code-box .send{ margin:10px 0 0; }
+  .code-chip{ padding:3px 9px; border-radius:8px; background:var(--navy); color:#fff; font-size:12.5px; font-weight:900; letter-spacing:.12em; }
+  .pend-badge.ok{ background:#e3f5ea; color:#13824a; }
+
+  /* metals: tint head/arms using the robot silhouette as mask */
+  .metal{
+    position:absolute;
+    inset:0;
+    background:var(--metal);
+    background-size:220% 100%;
+    -webkit-mask:var(--robot-img) center / contain no-repeat;
+    mask:var(--robot-img) center / contain no-repeat;
+    mix-blend-mode:multiply;
+    pointer-events:none;
+  }
+  .m-head{ clip-path:inset(0 0 50% 0); }
+  .m-arms{ clip-path:polygon(0 52%, 27% 52%, 27% 100%, 73% 100%, 73% 52%, 100% 52%, 100% 100%, 0 100%); }
+  .metal.fx-sheen{ animation:sheen 3.2s linear infinite; }
+  .metal.fx-lava{ animation:sheen 2.2s linear infinite, lava 1.6s ease-in-out infinite alternate; }
+  @keyframes sheen{ from{ background-position:0% 0; } to{ background-position:220% 0; } }
+  @keyframes lava{ from{ filter:brightness(1); } to{ filter:brightness(1.25) saturate(1.3); } }
+  .w-weapon{ top:50cqw; left:-10cqw; font-size:27cqw; transform:rotate(-18deg); }
+  .w-shield{ top:54cqw; left:-8cqw; font-size:26cqw; transform:none; }
+  .w-arco{ left:-12cqw; transform:rotate(-8deg); }
+  .w-laser{ top:26cqw; left:4cqw; width:6cqw; height:52cqw; transform:rotate(-24deg); font-size:0; }
+  .saber{ position:absolute; inset:0; border-radius:3cqw; background:linear-gradient(to top, #3a3f4b 0 22%, #9aa3ad 22% 25%, #eaffff 25%, #7df9ff); box-shadow:0 0 3cqw #7df9ff, 0 0 7cqw rgba(125,249,255,.65); animation:saber 1.2s ease-in-out infinite alternate; }
+  @keyframes saber{ to{ box-shadow:0 0 4.5cqw #b8fcff, 0 0 10cqw rgba(125,249,255,.85); } }
+  .wear.fx-bolt::after{ content:"⚡"; position:absolute; right:-10%; top:-30%; font-size:55%; animation:bolt 1s steps(2) infinite; }
+  @keyframes bolt{ 50%{ opacity:0; } }
+  .it-html{ position:relative; width:14px; height:44px; transform:rotate(-24deg); display:block; }
+  .it.premium{ border-color:#f3cf6b; background:linear-gradient(160deg, #fffdf5 40%, #fff3cf); }
+  .it.premium.on{ border-color:#34c170; }
+  .it-prem{ position:absolute; top:8px; left:8px; padding:2px 7px; border-radius:999px; background:linear-gradient(135deg, #7c3aed, #db2777); color:#fff; font-size:10.5px; font-weight:900; }
+
+  /* ---------- Corner: ranking + student chip ---------- */
+  .corner{ position:fixed; right:16px; bottom:calc(16px + var(--safe-b)); z-index:70; display:flex; align-items:center; gap:8px; }
+  .corner .user-chip{ position:relative; inset:auto; }
+  body.editing .corner{ display:none; }
+  .rank-btn{
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;
+    width:58px; height:58px; border-radius:20px;
+    border:1px solid #f3d49c; background:linear-gradient(160deg, #fffaf0, #ffe9bf);
+    box-shadow:0 12px 28px rgba(170,110,20,.25);
+    color:#7a4a12; font-size:10.5px; font-weight:900; cursor:pointer;
+    animation:popIn .5s .5s var(--ease) both;
+    transition:transform .25s var(--spring);
+  }
+  .rank-btn span{ font-size:24px; line-height:1; }
+  .rank-btn:hover{ transform:translateY(-3px) rotate(-4deg); }
+
+  /* ---------- Ranking dialog ---------- */
+  .podium{ display:grid; grid-template-columns:1fr 1.15fr 1fr; align-items:end; gap:8px; margin:6px 0 16px; }
+  .pod{ display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center; min-width:0; }
+  .pod .robot{ --rw:84px; margin-top:26px; }
+  .pod.p1 .robot{ --rw:104px; }
+  .pod-base{ width:100%; margin-top:-6px; padding:10px 0 8px; border-radius:14px 14px 6px 6px; color:#fff; font-size:22px; font-weight:900; }
+  .pod.p1 .pod-base{ height:74px; background:linear-gradient(160deg, #f5c542, #e0a100); }
+  .pod.p2 .pod-base{ height:56px; background:linear-gradient(160deg, #c7cfdb, #98a3b3); }
+  .pod.p3 .pod-base{ height:44px; background:linear-gradient(160deg, #e3a36c, #b86b33); }
+  .rk-medal{ font-size:26px; }
+  .rk-who{ display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px 6px; min-width:0; }
+  .rk-name{ font-size:14px; font-weight:900; color:var(--navy); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%; }
+  .rk-sec{ padding:1px 7px; border-radius:999px; background:var(--navy); color:#fff; font-size:11px; font-weight:900; }
+  .rk-stars{ padding:3px 10px; border-radius:999px; background:#fff4dc; color:#8a5a0a; font-size:13px; font-weight:900; }
+  .pod.me .rk-name, .rk-card.me .rk-name{ color:var(--blue); }
+  .rank-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:10px; margin-bottom:14px; }
+  .rk-card{ position:relative; display:flex; flex-direction:column; align-items:center; gap:4px; padding:12px 8px 6px; border-radius:18px; background:#fff; border:1px solid var(--line); text-align:center; }
+  .rk-card.me{ border:2px solid var(--blue); box-shadow:0 0 0 4px rgba(47,111,237,.12); }
+  .rk-card .robot{ --rw:78px; margin-top:22px; }
+  .rk-pos{ align-self:center; padding:1px 9px; border-radius:999px; background:var(--soft); font-size:12px; font-weight:900; color:var(--ink-2); }
+  .rk-me{ margin:0 0 14px; padding:12px 14px; border-radius:14px; background:var(--soft); border:1px solid var(--line); font-size:14px; font-weight:800; color:var(--ink-2); text-align:center; }
+  @media (max-width:560px){
+    .corner{ right:12px; bottom:calc(12px + var(--safe-b)); gap:6px; }
+    .rank-btn{ width:50px; height:50px; border-radius:17px; }
+    .rank-btn span{ font-size:21px; }
+    .pod .robot{ --rw:70px; }
+    .pod.p1 .robot{ --rw:86px; }
+    .rank-grid{ grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; }
+    .rk-card .robot{ --rw:62px; }
+    .rk-name{ font-size:12.5px; }
+  }
+
   /* ---------- Responsive ---------- */
   @media (max-width:720px){
     #app{ padding:16px 14px 44px; }
@@ -1780,7 +1870,10 @@
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
 </button>
 
-<button class="user-chip" id="userChip" type="button"></button>
+<div class="corner" id="corner">
+  <button class="rank-btn" id="rankBtn" type="button" aria-label="Ranking de estrellas"><span>🏆</span>Ranking</button>
+  <button class="user-chip" id="userChip" type="button"></button>
+</div>
 
 <div id="app">
   <section class="screen" id="screen-home" aria-label="Inicio">
@@ -1881,9 +1974,10 @@
     const eye = ITEM[o.eyes], paint = ITEM[o.paint];
     const rainbow = eye && eye.c.startsWith('linear');
     const style = `--blink-delay:${d}s${eye && !rainbow ? `;--eye:${eye.c}` : ''}${paint ? `;--paint:${paint.c}` : ''}`;
-    const wear = ['hat', 'face', 'acc'].map(slot => ITEM[o[slot]] ? `<span class="wear w-${slot} w-${o[slot]}" aria-hidden="true">${ITEM[o[slot]].e}</span>` : '').join('');
+    const wear = ['hat', 'face', 'acc', 'weapon'].map(slot => { const it = ITEM[o[slot]]; return it ? `<span class="wear w-${slot} w-${it.id}${it.fx ? ' fx-' + it.fx : ''}" aria-hidden="true">${it.html || it.e}</span>` : ''; }).join('');
+    const metal = ['head', 'arms'].map(slot => { const it = ITEM[o[slot]]; return it ? `<i class="metal m-${slot}${it.fx ? ' fx-' + it.fx : ''}" style="--metal:${it.m}"></i>` : ''; }).join('');
     return `<div class="robot${paint ? ' painted' : ''}${rainbow ? ' rainbow' : ''}" role="img" aria-label="Moli, el robot" style="${style}">
-      <div class="robot-hop"><div class="robot-bob"><div class="robot-body"><div class="robot-eyes"><i class="eye l" style="--blink:${d}s"></i><i class="eye r" style="--blink:${d}s"></i></div></div>${opts.tag === false ? '' : '<span class="robot-tag">Moli</span>'}${wear}</div></div>
+      <div class="robot-hop"><div class="robot-bob"><div class="robot-body">${metal}<div class="robot-eyes"><i class="eye l" style="--blink:${d}s"></i><i class="eye r" style="--blink:${d}s"></i></div></div>${opts.tag === false ? '' : '<span class="robot-tag">Moli</span>'}${wear}</div></div>
       <span class="robot-shadow"></span></div>`;
   }
 
@@ -2032,7 +2126,9 @@
     'Al final de cada sesión harás un Exit ticket 🎟️: unas preguntitas sobre lo que aprendiste. ¡Solo se responde una vez!',
     'Para desbloquear el Exit ticket primero te registras con tu DNI 🪪. Las siguientes veces solo escribes tu DNI y listo.',
     'En «Mi avance» 🎯 verás tus misiones cumplidas y tus estrellas ⭐. ¡Complétalas todas!',
-    'Con tus estrellas ⭐ puedes comprarme ropa en mi Tienda 🛍️: sombreros, lentes, colores y más. ¡Vísteme a tu estilo!'
+    'Hay dos formas de ganar estrellas ⭐: respondiendo tus Exit tickets (¡hasta 5 estrellas por cada uno!) y canjeando los códigos que te da tu profe en clase 🎟️ (1 estrella por código).',
+    'Los códigos se canjean en mi Tienda 🛍️. Ahí también puedes comprarme ropa, armas, cabezas y brazos de metal con tus estrellas. ¡Lo más épico es 💎 Premium!',
+    'En el Ranking 🏆 verás a los 15 estudiantes con más estrellas ganadas y a sus Molis. ¡Esfuérzate para aparecer ahí!'
   ];
 
   function typeText(text, done){
@@ -2838,12 +2934,14 @@
       b.insertAdjacentHTML('beforeend', u ? (left ? `<span class="sb-stars">⭐${left}</span>` : '') : '<span class="sb-lock">🔒</span>');
     });
     if(acct && tkDlg.open && acct.view === 'shop') renderShop();
+    syncRanking();
     if(route.name === 'session' && !editing){ const box = $('#tkCtaBox'); if(box) box.outerHTML = ticketHtml(curSession()); }
     if(route.name === 'unit' && !editing) renderUnit();
     if(route.name === 'menu' && mode === 'main' && !menuChoices.hidden) renderMainChoices();
     if(acct && tkDlg.open && acct.view === 'me') renderAccount();
   }
   userChip.addEventListener('click', () => openAccount(me() ? 'me' : 'login'));
+  $('#rankBtn').addEventListener('click', () => openRanking());
 
   let acct = null;
   function openAccount(view, opts = {}){
@@ -2857,6 +2955,7 @@
   function renderAccount(){
     const v = acct.view;
     if(v === 'shop') return renderShop();
+    if(v === 'ranking') return renderRanking();
     const head = { login: ['🪪 Mi cuenta', 'Ingresar', `${GRADE} grado`], register: ['🪪 Mi cuenta', 'Crear mi cuenta', `${GRADE} grado`], me: ['🎯 Mi avance', 'Mis misiones', `${GRADE} grado`] }[v];
     tkTop.innerHTML = `<small>${head[0]}</small><strong>${head[1]}</strong><span>${head[2]}</span><button class="tk-x" type="button" data-tk="close" aria-label="Cerrar">✕</button>`;
     const msgs = `${acct.err ? `<p class="send warn">${acct.err}</p>` : ''}${acct.info ? `<p class="send ok">${acct.info}</p>` : ''}`;
@@ -2976,6 +3075,26 @@
       { id:'p-lilac', n:'Lila', c:'#cfc2ff', p:5 },
       { id:'p-gold', n:'Dorado', c:'#fde28a', p:8 },
       { id:'p-galaxy', n:'Galaxia', c:'linear-gradient(160deg,#a5b4fc 0%,#f0abfc 45%,#7dd3fc 100%)', p:12 } ] },
+    { slot:'head', name:'Cabeza', icon:'🤖', items:[
+      { id:'h-bronze', n:'Cabeza de bronce', m:'linear-gradient(135deg,#b87333,#f0c08a 45%,#a0612a 70%,#e0a868)', p:3 },
+      { id:'h-silver', n:'Cabeza de plata', m:'linear-gradient(135deg,#9aa3ad,#f4f6f8 40%,#8a939e 65%,#dfe3e8)', p:5 },
+      { id:'h-gold', n:'Cabeza de oro', m:'linear-gradient(135deg,#d4a017,#fff0a8 40%,#c8900c 65%,#f7d56b)', p:8 },
+      { id:'h-chrome', n:'Cabeza de cromo', m:'linear-gradient(115deg,#8f9aa8 0%,#ffffff 25%,#7d8896 45%,#f2f5f8 60%,#8f9aa8 100%)', p:10, fx:'sheen' },
+      { id:'h-diamond', n:'Cabeza de diamante', m:'linear-gradient(120deg,#b9f3ff,#ffffff 25%,#c9b8ff 50%,#9ff2ff 75%,#ffffff)', p:14, fx:'sheen' } ] },
+    { slot:'arms', name:'Brazos', icon:'🦾', items:[
+      { id:'a-bronze', n:'Brazos de bronce', m:'linear-gradient(135deg,#b87333,#f0c08a 45%,#a0612a 70%,#e0a868)', p:2 },
+      { id:'a-silver', n:'Brazos de plata', m:'linear-gradient(135deg,#9aa3ad,#f4f6f8 40%,#8a939e 65%,#dfe3e8)', p:4 },
+      { id:'a-gold', n:'Brazos de oro', m:'linear-gradient(135deg,#d4a017,#fff0a8 40%,#c8900c 65%,#f7d56b)', p:7 },
+      { id:'a-titan', n:'Brazos de titanio', m:'linear-gradient(135deg,#3b82f6,#a5d8ff 40%,#2563eb 65%,#93c5fd)', p:10, fx:'sheen' },
+      { id:'a-lava', n:'Brazos de lava', m:'linear-gradient(160deg,#ff4d00,#ffb800 35%,#ff2d00 60%,#ffd35c)', p:13, fx:'lava' } ] },
+    { slot:'weapon', name:'Armas', icon:'⚔️', items:[
+      { id:'wand', n:'Varita mágica', e:'🪄', p:3 },
+      { id:'sword', n:'Espada', e:'🗡️', p:5 },
+      { id:'shield', n:'Escudo', e:'🛡️', p:6 },
+      { id:'arco', n:'Arco', e:'🏹', p:7 },
+      { id:'trident', n:'Tridente', e:'🔱', p:9 },
+      { id:'hammer', n:'Martillo del trueno', e:'🔨', p:11, fx:'bolt' },
+      { id:'laser', n:'Espada láser', html:'<i class="saber"></i>', e:'⚡', p:15 } ] },
     { slot:'face', name:'Lentes', icon:'🕶️', items:[
       { id:'goggles', n:'Gafas de laboratorio', e:'🥽', p:3 },
       { id:'shades', n:'Lentes de sol', e:'🕶️', p:5 } ] },
@@ -2986,17 +3105,24 @@
       { id:'medal', n:'Medalla', e:'🏅', p:8 } ] }
   ];
   const ITEM = {};
-  SHOP.forEach(cat => cat.items.forEach(it => { ITEM[it.id] = { ...it, slot: cat.slot }; }));
+  SHOP.forEach(cat => cat.items.forEach(it => { ITEM[it.id] = { ...it, slot: cat.slot, premium: it.p >= 10 }; }));
 
   const CLOSET_KEY = 'ciencia4b:closet:' + APP.docId;
-  const closetOf = key => { const c = lsGet(CLOSET_KEY, {})[key]; return { owned: (c && c.owned) || [], equipped: (c && c.equipped) || {} }; };
+  const closetOf = key => { const c = lsGet(CLOSET_KEY, {})[key]; return { owned: (c && c.owned) || [], equipped: (c && c.equipped) || {}, codes: (c && c.codes) || [] }; };
   function setCloset(key, c, pending = true){ const all = lsGet(CLOSET_KEY, {}); all[key] = { ...c, pending }; lsSet(CLOSET_KEY, all); }
   const currentOutfit = () => { const u = me(); return u ? closetOf(u.key).equipped : {}; };
   function starsBalance(){
     const u = me();
-    const earned = u ? missionStats().stars : 0;
+    const fromTickets = u ? missionStats().stars : 0, fromCodes = u ? closetOf(u.key).codes.length : 0;
+    const earned = fromTickets + fromCodes;
     const spent = u ? closetOf(u.key).owned.reduce((t, id) => t + ((ITEM[id] && ITEM[id].p) || 0), 0) : 0;
-    return { earned, spent, left: Math.max(0, earned - spent) };
+    return { earned, fromTickets, fromCodes, spent, left: Math.max(0, earned - spent) };
+  }
+  async function verifyCodes(c, key, codes){
+    const ok = await Promise.all(codes.map(async code => {
+      try{ const r = await fetch(`${docsBase(c)}/redemptions/${encodeURIComponent(code)}?key=${c.apiKey}`); return r.ok && fromDoc(await r.json()).student === key; }catch(e){ return false; }
+    }));
+    return codes.filter((_, i) => ok[i]);
   }
   async function loadCloset(){
     const u = me(), c = await fbConfig();
@@ -3008,20 +3134,53 @@
       const d = fromDoc(await r.json());
       const equipped = {};
       (d.equipped || []).forEach(s => { const [slot, id] = String(s).split(':'); if(ITEM[id]) equipped[slot] = id; });
-      setCloset(u.key, { owned: (d.owned || []).filter(id => ITEM[id]), equipped }, false);
+      const codes = await verifyCodes(c, u.key, d.codes || []);
+      setCloset(u.key, { owned: (d.owned || []).filter(id => ITEM[id]), equipped, codes }, false);
     }catch(e){ /* sin conexión: se usa lo guardado */ }
   }
   async function pushCloset(){
     const u = me(), c = await fbConfig();
     if(!u || !c) return true;
     const cl = closetOf(u.key);
-    const data = { owned: cl.owned, equipped: Object.entries(cl.equipped).map(([s, id]) => `${s}:${id}`), updatedAt: new Date() };
+    const data = { owned: cl.owned, equipped: Object.entries(cl.equipped).map(([s, id]) => `${s}:${id}`), codes: cl.codes, updatedAt: new Date() };
     try{
       const body = { writes: [{ update: { name: docName(c, 'closets', u.key), fields: toFields(data) } }] };
       const r = await fetch(`${docsBase(c)}:commit?key=${c.apiKey}`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body) });
       if(r.ok) setCloset(u.key, cl, false);
       return r.ok;
     }catch(e){ return false; }
+  }
+  let codeFails = 0, codeWait = 0;
+  async function redeemCode(raw){
+    const u = me();
+    if(!u || !acct) return;
+    const code = String(raw || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const say = (msg, ok) => { if(!acct) return; acct.codeMsg = msg; acct.codeOk = !!ok; onAccountChange(); if(acct.view === 'shop') renderShop(); };
+    if(code.length !== 4) return say('El código tiene 4 letras o números. Ejemplo: 4U2M');
+    if(Date.now() < codeWait) return say('Demasiados intentos. Espera un minuto e inténtalo otra vez ⏳');
+    const addCode = async () => { const cl = closetOf(u.key); if(!cl.codes.includes(code)){ cl.codes.push(code); setCloset(u.key, cl); await pushCloset(); } };
+    if(closetOf(u.key).codes.includes(code)) return say('Ya canjeaste este código antes 😉');
+    const c = await fbConfig();
+    if(!c) return say('Necesitas internet para canjear códigos.');
+    const btn = $('#codeForm button');
+    if(btn){ btn.disabled = true; btn.textContent = 'Revisando…'; }
+    try{
+      const body = { writes: [{ update: { name: docName(c, 'redemptions', code), fields: toFields({ student: u.key, at: new Date() }) }, currentDocument: { exists: false } }] };
+      const r = await fetch(`${docsBase(c)}:commit?key=${c.apiKey}`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body) });
+      if(r.ok){ codeFails = 0; await addCode(); return say('🎉 ¡Código canjeado! Ganaste 1 estrella ⭐', true); }
+      const err = await r.json().catch(() => ({}));
+      const st = err.error && err.error.status;
+      const g = await fetch(`${docsBase(c)}/redemptions/${code}?key=${c.apiKey}`);
+      if(st === 'ALREADY_EXISTS' || st === 'FAILED_PRECONDITION' || g.ok){
+        const d = g.ok ? fromDoc(await g.json()) : null;
+        if(d && d.student === u.key){ await addCode(); return say('Ya canjeaste este código antes 😉', true); }
+        return say('Este código ya fue usado por otro estudiante 😕');
+      }
+      if(g.status === 403) return say('🔧 Los códigos aún no están activados. Avísale a tu profe: falta actualizar las reglas de Firebase.');
+      codeFails++;
+      if(codeFails >= 5){ codeFails = 0; codeWait = Date.now() + 60000; }
+      return say('Ese código no existe. Revisa las letras y los números 🔍');
+    }catch(e){ return say('No se pudo conectar. Revisa tu internet e inténtalo otra vez.'); }
   }
   function refreshRobots(){
     $$('[data-robot-slot]').forEach(s => { s.innerHTML = robotHTML(); });
@@ -3040,17 +3199,22 @@
     if(acct.preview && ITEM[acct.preview]) preview[ITEM[acct.preview].slot] = acct.preview;
     tkTop.innerHTML = `<small>🛍️ Tienda de Moli</small><strong>Viste a Moli</strong><span>Compra con las estrellas de tus Exit tickets</span>
       <button class="tk-x" type="button" data-tk="close" aria-label="Cerrar">✕</button>`;
-    const swatch = it => it.e ? `<span class="it-emoji">${it.e}</span>` : `<span class="it-swatch" style="background:${it.c}"></span>`;
+    const swatch = it => it.html ? `<span class="it-emoji it-html">${it.html}</span>` : it.e ? `<span class="it-emoji">${it.e}</span>` : `<span class="it-swatch" style="background:${it.c || it.m}"></span>`;
     tkBody.innerHTML = `<div class="tk-step shop">
       <div class="shop-top">
         <div class="shop-stage">${robotHTML({ outfit: preview })}</div>
         <div class="shop-bal">
           <span class="bal-l">Tus estrellas</span>
           <b class="bal-v">⭐ ${bal.left}</b>
-          <small>Ganaste ${bal.earned} · Gastaste ${bal.spent}</small>
+          <small>Ganaste ${bal.earned}${bal.fromCodes ? ` (${bal.fromCodes} con códigos)` : ''} · Gastaste ${bal.spent}</small>
           <p>${acct.info || (bal.earned ? 'Toca una prenda para probársela a Moli 👀' : 'Responde tus Exit tickets para ganar estrellas: ¡hasta 5 por cada uno! ⭐')}</p>
         </div>
       </div>
+      <form class="code-box" id="codeForm" autocomplete="off">
+        <div class="cb-txt"><b>🎟️ Canjear código</b><small>¿Tu profe te dio un código en clase? ¡Vale 1 estrella!</small></div>
+        <div class="cb-row"><input id="codeIn" maxlength="4" placeholder="4U2M" autocapitalize="characters" autocorrect="off" spellcheck="false" aria-label="Código"><button type="submit" class="btn solid">Canjear</button></div>
+        ${acct.codeMsg ? `<p class="send ${acct.codeOk ? 'ok' : 'warn'}">${acct.codeMsg}</p>` : ''}
+      </form>
       <div class="shop-tabs" role="tablist">${SHOP.map(c => `<button type="button" role="tab" class="shop-tab${c.slot === cat.slot ? ' on' : ''}" aria-selected="${c.slot === cat.slot}" data-shop-cat="${c.slot}"><span>${c.icon}</span>${c.name}</button>`).join('')}</div>
       <div class="shop-grid">${cat.items.map(it => {
         const owned = cl.owned.includes(it.id), on = cl.equipped[cat.slot] === it.id, trying = acct.preview === it.id;
@@ -3058,7 +3222,8 @@
           : owned ? `<button type="button" class="it-btn wear" data-shop-equip="${it.id}">Ponérselo</button>`
           : bal.left >= it.p ? `<button type="button" class="it-btn buy" data-shop-buy="${it.id}">Comprar ⭐${it.p}</button>`
           : `<span class="it-btn need">Te faltan ⭐${it.p - bal.left}</span>`;
-        return `<div class="it${on ? ' on' : ''}${trying ? ' trying' : ''}${!owned && bal.left < it.p ? ' locked' : ''}" data-shop-try="${it.id}">
+        return `<div class="it${on ? ' on' : ''}${trying ? ' trying' : ''}${!owned && bal.left < it.p ? ' locked' : ''}${ITEM[it.id].premium ? ' premium' : ''}" data-shop-try="${it.id}">
+          ${ITEM[it.id].premium ? '<span class="it-prem">💎 Premium</span>' : ''}
           ${on ? '<span class="it-flag">Puesto ✓</span>' : owned ? '<span class="it-flag own">Tuyo</span>' : `<span class="it-price">⭐ ${it.p}</span>`}
           ${swatch(it)}<b>${it.n}</b>${act}</div>`;
       }).join('')}</div>
@@ -3088,6 +3253,74 @@
     const moli = $('.shop-stage .robot', tkBody);
     if(moli) react(moli);
     if(!(await pushCloset())) toast('⚠️ Se guardó en este celular; se sincronizará cuando haya conexión.');
+  }
+
+  /* ---------- ranking: top 15 by total stars earned ---------- */
+  const RANKSIG_KEY = 'ciencia4b:ranksig:' + APP.docId;
+  let rankTimer = null;
+  const rankName = name => { const p = String(name || '').trim().split(/\s+/); return p[0] + (p[1] ? ' ' + p[1].charAt(0).toUpperCase() + '.' : ''); };
+  const outfitOf = list => { const o = {}; (list || []).forEach(x => { const [slot, id] = String(x).split(':'); if(ITEM[id]) o[slot] = id; }); return o; };
+  function syncRanking(){
+    const u = me();
+    if(!u) return;
+    const data = { name: rankName(u.name), section: u.section, stars: starsBalance().earned, outfit: Object.entries(currentOutfit()).map(([s, id]) => `${s}:${id}`) };
+    const sig = u.key + JSON.stringify(data);
+    clearTimeout(rankTimer);
+    if(sig === lsGet(RANKSIG_KEY, '')) return;
+    rankTimer = setTimeout(async () => {
+      const c = await fbConfig();
+      if(!c || !me() || me().key !== u.key) return;
+      try{
+        const body = { writes: [{ update: { name: docName(c, 'ranking', u.key), fields: toFields({ ...data, updatedAt: new Date() }) } }] };
+        const r = await fetch(`${docsBase(c)}:commit?key=${c.apiKey}`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body) });
+        if(r.ok) lsSet(RANKSIG_KEY, sig);
+      }catch(e){ /* se reintenta en el próximo cambio */ }
+    }, 1500);
+  }
+  async function loadRanking(){
+    const c = await fbConfig();
+    if(!c) return [];
+    const q = { structuredQuery: { from: [{ collectionId: 'ranking' }], orderBy: [{ field: { fieldPath: 'stars' }, direction: 'DESCENDING' }], limit: 15 } };
+    const r = await fetch(`${docsBase(c)}:runQuery?key=${c.apiKey}`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(q) });
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json();
+    return j.filter(x => x.document).map(x => fromDoc(x.document));
+  }
+  function openRanking(){
+    openAccount('ranking');
+    acct.rank = null;
+    renderRanking();
+    loadRanking().then(list => { if(acct && acct.view === 'ranking'){ acct.rank = list; renderRanking(); } })
+      .catch(() => { if(acct && acct.view === 'ranking'){ acct.rank = []; acct.rankErr = 'No se pudo cargar el ranking. Revisa tu internet.'; renderRanking(); } });
+  }
+  function renderRanking(){
+    tkTop.innerHTML = `<small>🏆 Ranking</small><strong>Top 15 · ${GRADE} grado</strong><span>Estrellas ganadas en total</span>
+      <button class="tk-x" type="button" data-tk="close" aria-label="Cerrar">✕</button>`;
+    if(!acct.rank){
+      tkBody.innerHTML = `<div class="tk-step"><div class="dash-loading">${robotHTML()}<p><span class="spin"></span> Cargando el ranking…</p></div></div>`;
+      return;
+    }
+    const u = me();
+    const list = acct.rank.filter(r => r.stars > 0);
+    const mine = r => u && r.id === u.key;
+    const tag = r => `<b class="rk-name">${esc(r.name)}</b><span class="rk-sec">${GRADE.replace('to', '')}${esc(r.section)}</span>`;
+    const pod = (r, i) => r ? `<div class="pod p${i + 1}${mine(r) ? ' me' : ''}">
+        <span class="rk-medal">${['🥇', '🥈', '🥉'][i]}</span>
+        <div class="rk-who">${tag(r)}</div><span class="rk-stars">${r.stars} ⭐</span>
+        ${robotHTML({ outfit: outfitOf(r.outfit), tag: false })}
+        <div class="pod-base">${i + 1}</div></div>` : '<div class="pod empty"></div>';
+    const myPos = u ? list.findIndex(r => r.id === u.key) : -1;
+    tkBody.innerHTML = `<div class="tk-step">
+      ${acct.rankErr ? `<p class="send warn">${esc(acct.rankErr)}</p>` : ''}
+      ${!list.length ? sayRow('¡Aún nadie tiene estrellas! Responde tus Exit tickets y sé el primero del ranking 🏆') : `
+      <div class="podium">${pod(list[1], 1)}${pod(list[0], 0)}${pod(list[2], 2)}</div>
+      ${list.length > 3 ? `<div class="rank-grid">${list.slice(3).map((r, i) => `<div class="rk-card${mine(r) ? ' me' : ''}">
+        <span class="rk-pos">#${i + 4}</span>
+        <div class="rk-who">${tag(r)}</div><span class="rk-stars">${r.stars} ⭐</span>
+        ${robotHTML({ outfit: outfitOf(r.outfit), tag: false })}</div>`).join('')}</div>` : ''}`}
+      ${u ? `<p class="rk-me">${myPos >= 0 ? `🎉 ¡Estás en el puesto <b>#${myPos + 1}</b>!` : `Tienes <b>${starsBalance().earned} ⭐</b> en total. ¡Gana más estrellas para entrar al Top 15!`}</p>` : '<p class="rk-me">Ingresa con tu DNI para aparecer en el ranking 🪪</p>'}
+      <div class="tk-actions">${u ? '<button type="button" class="btn ghost" data-shop>🛍️ Tienda de Moli</button>' : '<button type="button" class="btn ghost" data-tk="acc-login">🪪 Ingresar</button>'}<button type="button" class="btn up" data-tk="close">Listo</button></div>
+    </div>`;
   }
 
   /* ---------- student flow ---------- */
@@ -3360,6 +3593,7 @@
       ]);
       panel.rows = rows;
       panel.students = roster;
+      panel.codes = c ? await cloudList(c, 'redemptions').catch(() => []) : [];
       if(!panel.wantKey[0]) panel.key = defaultKey();
     }catch(e){
       if(e.message === 'AUTH' || e.message === 'DENIED'){
@@ -3554,8 +3788,19 @@
       </div>`).join('');
   }
 
+  function codesCard(){
+    const roster = panel.students || [];
+    const list = (panel.codes || []).map(r => ({ ...r, st: roster.find(s => s.id === r.student) || {} }))
+      .filter(r => panel.section === 'ALL' || r.st.section === panel.section).sort((a, b) => b.at - a.at);
+    if(!list.length) return '';
+    return `<section class="card-d students"><div class="st-head"><h4>🎟️ Códigos canjeados <small>${list.length}</small></h4></div>
+      ${list.map((r, i) => `<div class="st-row pend"><span class="st-n">${i + 1}</span>
+        <div class="st-name"><b>${esc(r.st.name || 'Estudiante')}</b><small>${GRADE} ${esc(r.st.section || '—')} · ${fmtDate(r.at)}</small></div>
+        <div class="st-dots"></div><div class="st-score"><span class="code-chip">${esc(r.id)}</span><span class="pend-badge ok">+1 ⭐</span></div><span></span></div>`).join('')}
+    </section>`;
+  }
   function dashFooter(count){
-    return `<div class="dash-foot">
+    return `${codesCard()}<div class="dash-foot">
       ${count || (panel.pending || []).length ? `<button type="button" class="btn solid" data-tk="csv">⬇️ Descargar para Excel</button>` : ''}
       ${panel.cloud ? '<button type="button" class="btn ghost" data-tk="logout">Cerrar sesión</button>' : ''}
       <button type="button" class="btn ghost" data-tk="close">Cerrar</button>
@@ -3639,6 +3884,7 @@
       return;
     }
     if(e.target.id === 'accDni'){ const v = cleanDni(e.target.value); if(v !== e.target.value) e.target.value = v; }
+    if(e.target.id === 'codeIn'){ const v = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4); if(v !== e.target.value) e.target.value = v; }
   });
   tkBody.addEventListener('change', e => {
     if(e.target.id === 'pnSession'){ panel.key = e.target.value; panel.wantKey = panel.key.split('|'); renderPanel(); }
@@ -3646,6 +3892,7 @@
   });
   tkBody.addEventListener('submit', async e => {
     if(e.target.id === 'accForm'){ e.preventDefault(); submitAccount(); return; }
+    if(e.target.id === 'codeForm'){ e.preventDefault(); redeemCode($('#codeIn').value); return; }
     if(e.target.id !== 'loginForm') return;
     e.preventDefault();
     const btn = e.target.querySelector('button[type="submit"]');
@@ -3670,7 +3917,7 @@
     const sb = t.closest('[data-shop-buy],[data-shop-equip],[data-shop-unequip]');
     if(sb && acct){ shopAction(sb.dataset.shopBuy ? 'buy' : sb.dataset.shopEquip ? 'equip' : 'unequip', sb.dataset.shopBuy || sb.dataset.shopEquip || sb.dataset.shopUnequip); return; }
     const sc = t.closest('[data-shop-cat]');
-    if(sc && acct){ acct.cat = sc.dataset.shopCat; acct.preview = null; acct.info = ''; renderShop(); return; }
+    if(sc && acct){ acct.cat = sc.dataset.shopCat; acct.preview = null; acct.info = ''; acct.codeMsg = ''; renderShop(); return; }
     const st = t.closest('[data-shop-try]');
     if(st && acct){ acct.preview = acct.preview === st.dataset.shopTry ? null : st.dataset.shopTry; acct.info = ''; renderShop(); return; }
     const asec = t.closest('[data-asec]');

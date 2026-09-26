@@ -5318,7 +5318,7 @@ Reglas:
       if(r.status >= 500){ last = 'BUSY'; continue; }                   // saturado: se prueba el otro modelo
       if(!r.ok){
         if(r.status === 429){ last = 'QUOTA'; continue; }
-        throw new Error(/SERVICE_DISABLED|has not been used|not enabled/i.test(msg) ? 'DISABLED' : r.status === 403 ? 'DENIED' : 'HTTP');
+        throw new Error(/App Check/i.test(msg) ? 'APPCHECK' : /SERVICE_DISABLED|has not been used|not enabled/i.test(msg) ? 'DISABLED' : r.status === 403 ? 'DENIED' : 'HTTP ' + r.status);
       }
       const text = ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || '').join('');
       let data = null; try{ data = JSON.parse(text); }catch(e){}
@@ -5330,10 +5330,11 @@ Reglas:
   }
   const aiErrText = code => code === 'DISABLED' ? `🔧 Falta activar la IA en tu Firebase (una sola vez): Firebase → <b>AI Logic</b> → <b>Comenzar</b> → elige <b>Gemini Developer API</b> (gratis). <a href="https://console.firebase.google.com/project/ciencia6abcd/ailogic" target="_blank" rel="noopener">Abrir Firebase ›</a>`
     : code === 'QUOTA' ? '⏳ Se usaron muchas preguntas seguidas. Espera un minuto y vuelve a intentar.'
+    : code === 'APPCHECK' ? `🔧 Firebase tiene activado «App Check» para la IA y por eso la bloquea. Desactívalo solo para la IA: Firebase → <b>App Check</b> → pestaña <b>APIs</b> → <b>Firebase AI Logic</b> → <b>Dejar de aplicar</b> (Unenforce). <a href="https://console.firebase.google.com/project/ciencia6abcd/appcheck/products" target="_blank" rel="noopener">Abrir App Check ›</a>`
     : code === 'BUSY' ? '⏳ La IA de Google está muy ocupada en este momento. Vuelve a intentar en un minuto.'
     : code === 'OFFLINE' || code === 'NET' ? '📶 No hay conexión. Revisa tu internet.'
     : code === 'EMPTY' ? '🤔 No salieron preguntas válidas. Escribe el tema con un poco más de detalle y vuelve a intentar.'
-    : '⚠️ No se pudieron crear las preguntas. Inténtalo otra vez en un momento.';
+    : `⚠️ No se pudieron crear las preguntas. Inténtalo otra vez en un momento. <small>(código: ${esc(String(code))})</small>`;
   function aiBoxHTML(ctx, suggestion){
     const st = aiState[ctx] || (aiState[ctx] = { topic: '', loading: false, err: '', result: null });
     if(!st.topic && suggestion) st.topic = suggestion;

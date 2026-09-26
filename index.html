@@ -2200,6 +2200,7 @@
     if(code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') return '';
     if(code === 'auth/popup-blocked') return 'Tu navegador bloqueó la ventana de Google. Permite las ventanas emergentes para esta página e inténtalo otra vez.';
     if(code === 'auth/unauthorized-domain') return `Falta autorizar este sitio en Firebase: Authentication → Configuración → Dominios autorizados → agrega ${location.hostname}`;
+    if(code === 'auth/configuration-not-found') return 'Falta activar Authentication en Firebase: Authentication → Comenzar, y luego habilita Google en «Método de acceso».';
     if(code === 'auth/operation-not-allowed') return 'Falta activar Google en Firebase: Authentication → Método de acceso → Google → Habilitar.';
     if(code === 'auth/network-request-failed' || !code) return 'No se pudo conectar con Google. Revisa tu internet e inténtalo otra vez.';
     return 'No se pudo ingresar con Google (' + code + ').';
@@ -2561,7 +2562,9 @@
       await signIn(await fbConfig(), $('#lgEmail').value.trim(), $('#lgPass').value);
       await loadPanel();
     }catch(err){
-      panel.err = /INVALID|NOT_FOUND|PASSWORD|CREDENTIAL/.test(err.message) ? 'Correo o contraseña incorrectos.' : /TOO_MANY/.test(err.message) ? 'Demasiados intentos. Espera un momento.' : 'No se pudo ingresar. Revisa tu conexión.';
+      panel.err = /CONFIGURATION_NOT_FOUND/.test(err.message) ? 'Falta activar Authentication en Firebase: Authentication → Comenzar → Correo electrónico/contraseña, y crea tu usuario en «Usuarios».'
+        : /OPERATION_NOT_ALLOWED|PASSWORD_LOGIN_DISABLED/.test(err.message) ? 'Falta activar el ingreso con correo en Firebase: Authentication → Método de acceso → Correo electrónico/contraseña.'
+        : /INVALID|NOT_FOUND|PASSWORD|CREDENTIAL/.test(err.message) ? 'Correo o contraseña incorrectos.' : /TOO_MANY/.test(err.message) ? 'Demasiados intentos. Espera un momento.' : 'No se pudo ingresar. Revisa tu conexión.';
       renderPanel();
     }
   });

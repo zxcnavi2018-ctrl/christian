@@ -5081,16 +5081,19 @@
       duelBar();
       if(cur.phase === 'wait') duelMaybeEnd();
     }, 1200);
-    else botPlan(cur);
+    else { cur.botWin = Math.random() < .5; cur.myPts = []; }
     later(() => { if(duel === cur){ cur.phase = 'q'; duelQuestion(); } }, 3400);
   }
-  function botPlan(cur){
-    let t = 3400;
-    cur.qs.forEach((q, i) => {
-      const ok = Math.random() < .65, used = 1300 + Math.random() * 3200;
-      t += (i ? DUEL_T + 1200 : 0);
-      later(() => { if(duel !== cur) return; cur.opp.score += duelPts(ok, DUEL_T - used); cur.opp.a = i + 1; cur.opp.last = Date.now(); duelBar(); if(cur.phase === 'wait') duelMaybeEnd(); }, t + used);
-    });
+  // Moli Bot: al empezar decide en secreto si esta vez gana o pierde (50 % cada una) y responde
+  // cada pregunta justo después del estudiante, con un puntaje un poco mayor o un poco menor.
+  function botAnswer(cur, i){
+    if(duel !== cur || cur.opp.a > i) return;
+    const p = cur.myPts[i] || 0, r = Math.random();
+    const pts = cur.botWin ? (p ? Math.min(200, p + 5 + Math.round(r * 35)) : (r < .7 ? 100 + Math.round(r * 90) : 0))
+      : (p ? Math.max(0, p - 10 - Math.round(r * 50)) : 0);
+    cur.opp.score += pts; cur.opp.a = i + 1; cur.opp.last = Date.now();
+    duelBar();
+    if(cur.phase === 'wait') duelMaybeEnd();
   }
   function duelQuestion(){
     const cur = duel;
@@ -5104,6 +5107,7 @@
     clearTimeout(cur.qTimer);
     const q = cur.qs[cur.qi], left = DUEL_T - (Date.now() - cur.qStart), ok = k === q.a, pts = duelPts(ok, left);
     cur.picked = k; cur.gain = pts;
+    if(cur.bot){ cur.myPts[cur.qi] = pts; const qi = cur.qi; later(() => botAnswer(cur, qi), 450 + Math.random() * 1100); }
     cur.my.score += pts; cur.my.a = cur.qi + 1;
     if(!cur.bot) duelWrite(cur.c, cur.id, cur.role === 1 ? { s1: cur.my.score, a1: cur.my.a } : { s2: cur.my.score, a2: cur.my.a }, cur.role === 1 ? ['s1', 'a1'] : ['s2', 'a2']);
     renderDuel();

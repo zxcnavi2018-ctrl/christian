@@ -250,6 +250,14 @@
     animation:shine 6s ease-in-out infinite alternate, popIn .7s var(--ease) both;
   }
   @keyframes shine{ from{ background-position:0% 0; } to{ background-position:100% 0; } }
+  .home-teacher{
+    margin:10px 0 0;
+    font-size:clamp(13px, 3.2vw, 16px);
+    font-weight:800;
+    letter-spacing:.06em;
+    color:var(--ink-2);
+    animation:popIn .7s .05s var(--ease) both;
+  }
   .home-pill{
     display:inline-flex;
     align-items:center;
@@ -1540,9 +1548,10 @@
   <section class="screen" id="screen-home" aria-label="Inicio">
     <div class="home" id="homeTap" role="button" tabindex="0" aria-label="Toca para comenzar">
       <h1 class="home-title">CIENCIA</h1>
+      <p class="home-teacher">Prof. Christian Quispe Llerena</p>
       <div class="home-pill"><i></i>4to Bimestre</div>
       <div class="home-stage" data-robot-slot></div>
-      <div class="hint"><span class="tap">👆</span> Toca la pantalla para comenzar</div>
+      <div class="hint"><span class="tap">👆</span> Comenzar</div>
     </div>
   </section>
 
@@ -1567,10 +1576,6 @@
   <button class="dock-btn" id="resBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Resultados</button>
   <button class="dock-btn save" id="saveBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></svg>Guardar</button>
   <button class="dock-btn" id="exitBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/></svg>Salir</button>
-</div>
-  <button class="dock-btn res" id="resBtn" type="button">📊 <span class="lbl">Resultados</span></button>
-  <button class="dock-btn save" id="saveBtn" type="button">💾 Guardar<span class="lbl"> HTML</span></button>
-  <button class="dock-btn exit" id="exitBtn" type="button">Salir</button>
 </div>
 
 <dialog class="viewer" id="viewer" aria-label="Ver ficha">

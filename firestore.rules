@@ -2,10 +2,10 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Cambia este correo por el de tu cuenta de docente (Firebase Authentication).
+    // Cuenta de la docente (Firebase Authentication).
     function isTeacher() {
       return request.auth != null
-        && request.auth.token.email in ['TU_CORREO@gmail.com'];
+        && request.auth.token.email in ['zxc.navi2018@gmail.com'];
     }
 
     function validResult(d) {

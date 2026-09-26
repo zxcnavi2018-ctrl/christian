@@ -3314,6 +3314,7 @@
     if(v === 'shop') return renderShop();
     if(v === 'daily') return renderDaily();
     if(v === 'duel') return renderDuel();
+    if(v === 'vs-edit') return renderVsEditor();
     if(v === 'more') return renderMore();
     if(v === 'pr-edit') return renderPracticeEditor();
     if(v === 'ranking') return renderRanking();
@@ -4460,6 +4461,7 @@
         <button type="button" class="hcard c-res" data-tk="h-res"><span class="hc-ico">${HOME_ICONS.res}</span><strong>Resultados</strong><span>Notas por sección, niveles de logro y preguntas que conviene reforzar.</span></button>
         <button type="button" class="hcard c-acc" data-tk="h-acc"><span class="hc-ico">👥</span><strong>Cuentas de estudiantes</strong><span>Mira quién se registró y borra cuentas.</span></button>
         <button type="button" class="hcard c-more" data-tk="h-more"><span class="hc-ico">🎯</span><strong>Más estrellas</strong><span>Crea hasta 10 Exit tickets de práctica que dan ⭐2.</span></button>
+        <button type="button" class="hcard c-vs" data-tk="h-vs"><span class="hc-ico">⚔️</span><strong>Preguntas VS</strong><span>Agrega o edita las preguntas de los duelos (salen 5 al azar).</span></button>
         <button type="button" class="hcard c-edit" data-tk="h-edit"><span class="hc-ico">${HOME_ICONS.edit}</span><strong>Editar la página</strong><span>Toca cualquier texto, sube fichas y cambia las preguntas del Exit ticket.</span></button>
         <button type="button" class="hcard c-save" data-tk="h-save"><span class="hc-ico">${HOME_ICONS.save}</span><strong>Guardar cambios</strong><span>${dirty ? '<b>Tienes cambios sin guardar.</b> ' : ''}Descarga la página con todo lo que editaste.</span></button>
         <button type="button" class="hcard c-exit" data-tk="h-exit"><span class="hc-ico">${HOME_ICONS.exit}</span><strong>Salir del modo docente</strong><span>Vuelve a la vista que ven tus estudiantes.</span></button>
@@ -4506,6 +4508,7 @@
     if(e.target.id === 'accForm'){ e.preventDefault(); submitAccount(); return; }
     if(e.target.id === 'codeForm'){ e.preventDefault(); redeemCode($('#codeIn').value); return; }
     if(e.target.id === 'prForm'){ e.preventDefault(); submitPracticeForm(); return; }
+    if(e.target.id === 'vsForm'){ e.preventDefault(); submitVsForm(); return; }
     if(e.target.id !== 'loginForm') return;
     e.preventDefault();
     const btn = e.target.querySelector('button[type="submit"]');
@@ -4548,6 +4551,8 @@
     if(t.closest('[data-daily-claim]')){ claimDaily(); return; }
     const vs = t.closest('[data-vs]');
     if(vs){ duelAction(vs.dataset.vs, vs.dataset.k); return; }
+    const vq = t.closest('[data-vsq]');
+    if(vq){ vsBankAction(vq.dataset.vsq, vq.dataset.i); return; }
     const pr = t.closest('[data-pr]');
     if(pr){ practiceAction(pr.dataset.pr, pr.dataset.id); return; }
     const fl = t.closest('[data-shop-filter]');
@@ -4577,6 +4582,7 @@
     if(act === 'close') tkDlg.close();
     else if(act === 'h-res') openResults();
     else if(act === 'h-more') openPracticeEditor();
+    else if(act === 'h-vs') openVsEditor();
     else if(act === 'shop') openShop();
     else if(act === 'h-acc'){
       openResults();
@@ -4968,7 +4974,7 @@
 
   /* ================= ⚔️ Duelos VS: dos Molis, las mismas 5 preguntas, 5 segundos cada una ================= */
   const DUELS_KEY = 'ciencia4b:duels:' + APP.docId;
-  const DUEL_Q = 5, DUEL_T = 5000, DUEL_WAIT = 90000, DUEL_BOT_AFTER = 20000;
+  const DUEL_Q = 5, DUEL_T = 5000, DUEL_WAIT = 90000, DUEL_BOT_AFTER = 30000;
   const duelWins = () => { const u = me(); return u && u.rid ? (lsGet(DUELS_KEY, {})[u.rid] || 0) : 0; };
   function setDuelWins(n){ const u = me(); if(!u || !u.rid) return; const all = lsGet(DUELS_KEY, {}); all[u.rid] = n; lsSet(DUELS_KEY, all); }
   async function loadDuelWins(){
@@ -4980,8 +4986,39 @@
     }catch(e){}
   }
   let duel = null;
+  // Banco de preguntas del VS (lo edita la docente). Si tiene menos de 5, se usan las de los Exit tickets.
+  const VS_KEY = 'ciencia4b:vsbank:' + APP.docId, VS_MAX = 200;
+  let VSBANK = lsGet(VS_KEY, null) || [];
+  async function loadVsBank(){
+    const c = await fbConfig();
+    if(!c) return;
+    try{
+      const r = await fetch(`${docsBase(c)}/config/vs?key=${c.apiKey}`);
+      if(r.status === 404){ VSBANK = []; lsSet(VS_KEY, VSBANK); return; }
+      if(!r.ok) return;
+      const list = JSON.parse(fromDoc(await r.json()).data || '[]');
+      VSBANK = Array.isArray(list) ? list : []; lsSet(VS_KEY, VSBANK);
+    }catch(e){}
+  }
+  async function saveVsBank(list){
+    const c = await fbConfig();
+    if(!c) return 'offline';
+    const tok = await idToken(c).catch(() => null);
+    if(!tok) return 'auth';
+    try{
+      const body = { writes: [{ update: { name: docName(c, 'config', 'vs'), fields: toFields({ data: JSON.stringify(list), updatedAt: new Date() }) } }] };
+      const r = await fetch(`${docsBase(c)}:commit?key=${c.apiKey}`, { method:'POST', headers:{ 'Content-Type':'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify(body) });
+      if(r.status === 403) return 'rules';
+      if(!r.ok) return 'net';
+    }catch(e){ return 'net'; }
+    VSBANK = list; lsSet(VS_KEY, VSBANK);
+    return 'ok';
+  }
+  const bankPlayable = list => list.map(q => playable({ ticket: { questions: [q] } })[0]).filter(Boolean);
   function duelPool(){
-    const out = [];
+    const bank = bankPlayable(VSBANK);
+    if(bank.length >= DUEL_Q) return bank;
+    const out = [...bank];
     shownUnits().forEach(u => u.sessions.forEach(s => playable(s).forEach(q => out.push(q))));
     PRACTICE.tickets.forEach(t => playable({ ticket: { questions: t.qs } }).forEach(q => out.push(q)));
     return out;
@@ -5040,6 +5077,9 @@
     const u = me(), c = await fbConfig();
     duel = { phase: 'search', t0: Date.now(), timers: [], c, own: null, ownCreated: 0, err: '' };
     renderDuel();
+    const cur0 = duel;
+    await loadVsBank();
+    if(duel !== cur0) return;
     if(!c){ duel.err = 'Los duelos necesitan internet.'; renderDuel(); return; }
     if(!duelPool().length){ duel.err = 'Todavía no hay preguntas para los duelos.'; renderDuel(); return; }
     const me_ = { rid: u.rid, n: u.teacher ? 'Docente' : rankName(u.name), o: (packOutfit(currentOutfit())[0] || '') };
@@ -5075,6 +5115,7 @@
         } else duelWrite(c, cur.own, { hb: new Date() }, ['hb']);
       }catch(e){ if(e.message === 'rules'){ cur.err = '🔧 Los duelos necesitan que tu profe actualice las reglas de Firebase.'; renderDuel(); return; } }
       if(duel !== cur) return;
+      if(Date.now() - cur.t0 > DUEL_BOT_AFTER){ cur.autoBot = true; duelAction('bot'); return; }
       if(Date.now() - cur.t0 > DUEL_WAIT){ if(cur.own) duelWrite(c, cur.own, { status: 'cancel' }, ['status']); cur.own = null; cur.phase = 'timeout'; renderDuel(); return; }
       renderDuel(true);
       later(loop, 1500);
@@ -5173,11 +5214,11 @@
         </div>
         ${d.err ? `<p class="send warn">${d.err}</p>`
           : d.phase === 'timeout' ? '<p class="vs-hint">😴 Nadie estaba buscando batalla. ¡Dile a un compañero que toque ⚔️ VS al mismo tiempo que tú!</p>'
-          : `<p class="vs-hint">Esperando a que otro compañero toque <b>⚔️ VS</b>… <span id="vsClock">0:00</span></p>`}
+          : `<p class="vs-hint">Esperando a que otro compañero toque <b>⚔️ VS</b>… <span id="vsClock">0:00</span><br><small>Si en 30 segundos nadie aparece, Moli Bot 🤖 acepta tu reto.</small></p>`}
         <div class="vs-rules"><span>🧠 5 preguntas</span><span>⏱️ 5 s cada una</span><span>⚡ Más rápido = más puntos</span></div>
         <div class="tk-actions">
           ${d.phase === 'timeout' || d.err ? '<button type="button" class="btn solid" data-vs="again">🔁 Buscar otra vez</button>' : ''}
-          <button type="button" class="btn ghost" id="vsBotBtn" data-vs="bot"${d.phase === 'search' && secs * 1000 < DUEL_BOT_AFTER && !d.err ? ' hidden' : ''}>🤖 Practicar contra Moli Bot</button>
+          ${d.phase === 'timeout' || d.err ? '<button type="button" class="btn ghost" data-vs="bot">🤖 Practicar contra Moli Bot</button>' : ''}
           <button type="button" class="btn up" data-tk="close">Salir</button>
         </div>
       </div>`;
@@ -5189,7 +5230,7 @@
       <div class="vs-s opp"><span>${esc(d.opp.n || 'Rival')}</span><b>${d.opp.score}</b><small>${Math.min(d.opp.a, d.qs.length)}/${d.qs.length}</small></div>
     </div>`;
     if(d.phase === 'intro'){
-      head('¡Rival encontrado!', d.bot ? 'Práctica: no suma duelos' : 'Las mismas preguntas para los dos');
+      head(d.bot ? '🤖 ¡Moli Bot acepta tu reto!' : '¡Rival encontrado!', d.bot ? 'Nadie más estaba buscando · no suma duelos' : 'Las mismas preguntas para los dos');
       tkBody.innerHTML = `<div class="tk-step duel">
         <div class="vs-arena intro">
           <div class="vs-who">${duelRobot(d.me.o)}<b>${esc(d.me.n)}</b></div>
@@ -5229,6 +5270,90 @@
       <div class="tk-actions"><button type="button" class="btn solid" data-vs="again">⚔️ Otro duelo</button><button type="button" class="btn ghost" data-tk="ranking">🏆 Ranking</button><button type="button" class="btn up" data-tk="close">Salir</button></div>
     </div>`;
     const champ = $('.vs-who.champ .robot', tkBody); if(champ) react(champ);
+  }
+
+  // ----- editor de preguntas VS (docente) -----
+  const blankVsQ = () => ({ q: '', options: ['', '', '', ''], answer: -1, why: '' });
+  function openVsEditor(){
+    tk = null;
+    acct = { view: 'vs-edit', mode: 'list', idx: -1, draft: null, err: '', info: '' };
+    tkDlg.classList.add('wide');
+    renderVsEditor();
+    if(!tkDlg.open){ tkDlg.showModal(); tkBody.focus({ preventScroll:true }); }
+    loadVsBank().then(() => { if(acct && acct.view === 'vs-edit' && acct.mode === 'list') renderVsEditor(); });
+  }
+  function renderVsEditor(){
+    const list = VSBANK;
+    tkTop.innerHTML = `<small>🧑‍🏫 Modo docente</small><strong>⚔️ Preguntas del VS</strong><span>${list.length} ${list.length === 1 ? 'pregunta' : 'preguntas'} · en cada duelo salen 5 al azar</span>
+      <button class="tk-x" type="button" data-tk="close" aria-label="Cerrar">✕</button>`;
+    const msgs = `${acct.err ? `<p class="send warn">${acct.err}</p>` : ''}${acct.info ? `<p class="send ok">${acct.info}</p>` : ''}`;
+    if(acct.mode === 'list'){
+      tkBody.innerHTML = `<div class="tk-step">
+        ${sayRow(list.length >= DUEL_Q ? `¡Tienes ${list.length} preguntas! En cada duelo elijo 5 al azar y los dos rivales reciben las mismas ⚔️` : 'Aquí armas el banco de preguntas del VS ⚔️ Mientras tenga menos de 5, uso las preguntas de los Exit tickets.')}
+        ${msgs}
+        <div class="tk-actions" style="margin-bottom:12px">${list.length < VS_MAX ? '<button type="button" class="btn solid" data-vsq="new">➕ Nueva pregunta</button>' : ''}<button type="button" class="btn ghost" data-vsq="import">📥 Traer las de los Exit tickets</button></div>
+        ${list.length ? `<div class="pr-list">${list.map((q, i) => `<div class="pr-card"><span class="pr-n">${i + 1}</span>
+          <div class="pr-txt"><b>${esc(q.q)}</b><small>✅ ${esc(q.options[q.answer] || '')}</small></div>
+          <button type="button" class="btn ghost" data-vsq="edit" data-i="${i}">✏️</button>
+          <button type="button" class="icon-btn del" data-vsq="del" data-i="${i}" aria-label="Eliminar pregunta ${i + 1}">${ICON.trash}</button></div>`).join('')}</div>`
+          : '<div class="pr-empty">Todavía no hay preguntas propias del VS.</div>'}
+        <div class="tk-actions"><button type="button" class="btn up" data-tk="close">Listo</button></div>
+      </div>`;
+      return;
+    }
+    const q = acct.draft;
+    tkBody.innerHTML = `<div class="tk-step">
+      <form id="vsForm" class="pr-form" autocomplete="off">
+        <fieldset class="pr-q"><legend>${acct.idx >= 0 ? `Pregunta ${acct.idx + 1}` : 'Nueva pregunta'}</legend>
+          <textarea data-q="0" rows="2" maxlength="220" placeholder="Escribe la pregunta">${esc(q.q)}</textarea>
+          <div class="pr-opts">${q.options.map((o, k) => `<label class="pr-opt"><input type="radio" name="ans0" value="${k}"${q.answer === k ? ' checked' : ''} aria-label="Respuesta correcta ${LETTERS[k]}"><span class="opt-l">${LETTERS[k]}</span><input data-o="0-${k}" maxlength="120" placeholder="Opción ${LETTERS[k]}" value="${esc(o)}"></label>`).join('')}</div>
+          <input class="pr-why" data-why="0" maxlength="180" placeholder="💡 Explicación (opcional)" value="${esc(q.why || '')}">
+        </fieldset>
+        <p class="drop-hint" style="text-align:left">Marca el círculo de la respuesta correcta. Recuerda: en el duelo solo hay 5 segundos, ¡mejor preguntas cortas!</p>
+        ${msgs}
+        <div class="tk-actions"><button type="submit" class="btn solid">💾 Guardar pregunta</button><button type="button" class="btn ghost" data-vsq="list">Cancelar</button></div>
+      </form>
+    </div>`;
+  }
+  async function submitVsForm(){
+    const q = acct.draft;
+    q.q = ($('[data-q="0"]').value || '').trim();
+    q.options = q.options.map((_, k) => ($(`[data-o="0-${k}"]`).value || '').trim());
+    const r = $('input[name="ans0"]:checked'); q.answer = r ? +r.value : -1;
+    q.why = ($('[data-why="0"]').value || '').trim();
+    acct.err = ''; acct.info = '';
+    if(!q.q || q.options.filter(Boolean).length < 2 || q.answer < 0 || !q.options[q.answer]) acct.err = 'La pregunta necesita el texto, al menos 2 opciones y la respuesta correcta marcada.';
+    if(acct.err) return renderVsEditor();
+    const list = VSBANK.slice();
+    if(acct.idx >= 0) list[acct.idx] = q; else list.push(q);
+    const res = await saveVsBank(list.slice(0, VS_MAX));
+    if(res !== 'ok'){ acct.err = saveErr(res); return renderVsEditor(); }
+    acct.mode = 'list'; acct.draft = null; acct.info = acct.idx >= 0 ? '✅ Pregunta actualizada.' : '✅ Pregunta agregada al VS.';
+    renderVsEditor();
+  }
+  async function vsBankAction(kind, i){
+    if(!acct || acct.view !== 'vs-edit') return;
+    acct.err = ''; acct.info = '';
+    if(kind === 'new'){ acct.mode = 'form'; acct.idx = -1; acct.draft = blankVsQ(); }
+    else if(kind === 'edit'){ acct.mode = 'form'; acct.idx = +i; acct.draft = JSON.parse(JSON.stringify(VSBANK[+i])); while(acct.draft.options.length < 4) acct.draft.options.push(''); }
+    else if(kind === 'list'){ acct.mode = 'list'; acct.draft = null; }
+    else if(kind === 'del'){
+      const q = VSBANK[+i];
+      if(!q || !confirm(`¿Eliminar esta pregunta del VS?\n\n${q.q}`)) return;
+      const res = await saveVsBank(VSBANK.filter((_, k) => k !== +i));
+      if(res !== 'ok') acct.err = saveErr(res); else acct.info = '🗑 Pregunta eliminada.';
+    }
+    else if(kind === 'import'){
+      const seen = new Set(VSBANK.map(q => q.q.trim().toLowerCase()));
+      const add = [];
+      const push = q => { const t = (q.q || '').trim(); if(t && !seen.has(t.toLowerCase()) && q.options && q.options[q.answer]){ seen.add(t.toLowerCase()); add.push({ q: t, options: q.options.slice(0, 4), answer: q.answer, why: q.why || '' }); } };
+      APP.units.forEach(u => u.sessions.forEach(s => (s.ticket.questions || []).forEach(push)));
+      PRACTICE.tickets.forEach(t => t.qs.forEach(push));
+      if(!add.length){ acct.info = 'Ya tienes todas las preguntas de los Exit tickets.'; return renderVsEditor(); }
+      const res = await saveVsBank([...VSBANK, ...add].slice(0, VS_MAX));
+      if(res !== 'ok') acct.err = saveErr(res); else acct.info = `📥 Se agregaron ${add.length} preguntas de los Exit tickets. Puedes editarlas o borrarlas.`;
+    }
+    renderVsEditor();
   }
   function duelAction(kind, k){
     if(kind === 'ans'){ duelAnswer(+k); return; }

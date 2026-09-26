@@ -1729,6 +1729,20 @@
   @keyframes giftWiggle{ 0%, 70%, 100%{ transform:none; } 80%{ transform:rotate(-12deg) scale(1.08); } 90%{ transform:rotate(10deg) scale(1.08); } }
   @media (max-width:560px){ .side-btns{ right:calc(100% - 4px); } .side-btn{ padding:7px 7px 6px; font-size:10.5px; } .side-btn .sb-ico{ width:36px; height:36px; font-size:20px; } }
 
+
+  /* Botones a las orillas de la pantalla (no pegados a Moli) */
+  .edge-left, .edge-right{ position:fixed; top:50%; transform:translateY(-50%); z-index:40; display:flex; flex-direction:column; gap:12px; }
+  .edge-left{ left:max(10px, env(safe-area-inset-left)); }
+  .edge-right{ right:max(10px, env(safe-area-inset-right)); }
+  .edge-right .shop-btn{ position:relative; left:auto; top:auto; }
+  body.editing .edge-left, body.editing .edge-right{ display:none; }
+  #screen-menu .edge-left, #screen-menu .edge-right{ top:auto; bottom:calc(104px + var(--safe-b, 0px)); transform:none; }
+  @media (max-height:720px) and (max-width:560px){ #screen-menu .edge-left, #screen-menu .edge-right{ display:none; } }
+  @media (max-width:560px){
+    .edge-left{ left:6px; gap:10px; } .edge-right{ right:6px; }
+    .edge-left .side-btn, .edge-right .shop-btn{ padding:7px 6px 6px; font-size:10.5px; border-radius:18px; }
+    .edge-left .sb-ico, .edge-right .sb-ico{ width:38px !important; height:38px !important; font-size:20px !important; border-radius:13px !important; }
+  }
   /* ---------- Regalo diario ---------- */
   .dl-grid{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px; margin:0 0 12px; }
   .dl-day{ flex-direction:row !important; justify-content:flex-start; gap:8px !important; padding:12px 14px !important; border-radius:18px !important; }
@@ -2168,19 +2182,21 @@
       <h1 class="home-title" id="siteTitle" spellcheck="false">CIENCIA</h1>
       <p class="home-teacher">Prof. Christian Quispe Llerena</p>
       <button type="button" class="home-pill" id="bimPill"><i></i><span class="bim-txt">4to Bimestre</span><span class="bim-edit" aria-hidden="true">✏️</span></button>
-      <div class="home-stage"><div class="side-btns"><button type="button" class="side-btn gift" data-gift aria-label="Regalo diario"><span class="sb-ico">🎁</span>Regalo</button><button type="button" class="side-btn more" data-more aria-label="Más estrellas"><span class="sb-ico">🎯</span>Extras</button><button type="button" class="side-btn vs" data-vs-open aria-label="Duelos VS"><span class="sb-ico">VS</span>Duelos</button></div><div data-robot-slot></div><button type="button" class="shop-btn" data-shop aria-label="Tienda de Moli"><span class="sb-ico">🛍️</span>Tienda</button></div>
+      <div class="home-stage"><div data-robot-slot></div></div>
       <button type="button" class="hint" id="startBtn">Iniciar</button>
     </div>
+    <div class="edge-left"><button type="button" class="side-btn gift" data-gift aria-label="Regalo diario"><span class="sb-ico">🎁</span>Regalo</button><button type="button" class="side-btn more" data-more aria-label="Más estrellas"><span class="sb-ico">🎯</span>Extras</button><button type="button" class="side-btn vs" data-vs-open aria-label="Duelos VS"><span class="sb-ico">VS</span>Duelos</button></div><div class="edge-right"><button type="button" class="shop-btn" data-shop aria-label="Tienda de Moli"><span class="sb-ico">🛍️</span>Tienda</button></div>
   </section>
 
   <section class="screen" id="screen-menu" aria-label="Elegir unidad">
+    <div class="edge-left"><button type="button" class="side-btn gift" data-gift aria-label="Regalo diario"><span class="sb-ico">🎁</span>Regalo</button><button type="button" class="side-btn more" data-more aria-label="Más estrellas"><span class="sb-ico">🎯</span>Extras</button><button type="button" class="side-btn vs" data-vs-open aria-label="Duelos VS"><span class="sb-ico">VS</span>Duelos</button></div><div class="edge-right"><button type="button" class="shop-btn" data-shop aria-label="Tienda de Moli"><span class="sb-ico">🛍️</span>Tienda</button></div>
     <div class="menu-wrap">
       <div class="bubble" id="menuBubble" aria-live="polite">
         <p class="bubble-text" id="menuText"></p>
         <p class="bubble-next" id="menuNext" hidden>Toca para continuar ›</p>
         <div class="choices" id="menuChoices" hidden></div>
       </div>
-      <div class="menu-stage"><div class="side-btns"><button type="button" class="side-btn gift" data-gift aria-label="Regalo diario"><span class="sb-ico">🎁</span>Regalo</button><button type="button" class="side-btn more" data-more aria-label="Más estrellas"><span class="sb-ico">🎯</span>Extras</button><button type="button" class="side-btn vs" data-vs-open aria-label="Duelos VS"><span class="sb-ico">VS</span>Duelos</button></div><div data-robot-slot id="menuRobot"></div><button type="button" class="shop-btn" data-shop aria-label="Tienda de Moli"><span class="sb-ico">🛍️</span>Tienda</button></div>
+      <div class="menu-stage"><div data-robot-slot id="menuRobot"></div></div>
     </div>
   </section>
 

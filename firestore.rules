@@ -208,6 +208,10 @@ service cloud.firestore {
     // Portada: título, bimestre y unidades visibles. Todos la leen; solo la docente la cambia.
     match /config/{id} {
       allow get: if true;
+      allow create, update: if isTeacher() && id == 'vs'
+        && request.resource.data.keys().hasOnly(['data', 'updatedAt'])
+        && request.resource.data.data is string && request.resource.data.data.size() <= 300000
+        && request.resource.data.updatedAt is timestamp;
       allow create, update: if isTeacher() && id == 'practice'
         && request.resource.data.keys().hasOnly(['data', 'ids', 'updatedAt'])
         && request.resource.data.data is string && request.resource.data.data.size() <= 80000

@@ -1,0 +1,41 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Cambia este correo por el de tu cuenta de docente (Firebase Authentication).
+    function isTeacher() {
+      return request.auth != null
+        && request.auth.token.email in ['TU_CORREO@gmail.com'];
+    }
+
+    function validResult(d) {
+      return d.keys().hasOnly(['unit', 'unitNum', 'session', 'grade', 'section', 'name', 'score', 'total', 'answers', 'createdAt'])
+        && d.keys().hasAll(['unit', 'unitNum', 'session', 'grade', 'section', 'name', 'score', 'total', 'answers', 'createdAt'])
+        && d.unit is string && d.unit.size() <= 20
+        && d.unitNum is string && d.unitNum.size() <= 10
+        && d.session is int && d.session >= 1 && d.session <= 50
+        && d.grade == '6to'
+        && d.section in ['A', 'B', 'C', 'D']
+        && d.name is string && d.name.size() > 0 && d.name.size() <= 60
+        && d.total is int && d.total >= 1 && d.total <= 20
+        && d.score is int && d.score >= 0 && d.score <= d.total
+        && d.answers is list && d.answers.size() == d.total
+        && d.createdAt is timestamp;
+    }
+
+    // Resultados: el estudiante solo puede enviarlo una vez; solo la docente los ve o borra.
+    match /exitTickets/{id} {
+      allow create: if validResult(request.resource.data);
+      allow read, delete: if isTeacher();
+      allow update: if false;
+    }
+
+    // Marca de "ya respondió" (sin nota ni datos): se puede consultar para bloquear un segundo intento.
+    match /exitTicketsDone/{id} {
+      allow get: if true;
+      allow create: if request.resource.data.keys().hasOnly(['at']) && request.resource.data.at is timestamp;
+      allow list, delete: if isTeacher();
+      allow update: if false;
+    }
+  }
+}

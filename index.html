@@ -1238,6 +1238,59 @@
     .ring b{ width:70px; height:70px; font-size:23px; }
   }
 
+  .grade-chip{ align-self:flex-start; padding:10px 16px; border-radius:14px; background:var(--soft); border:2px solid var(--line); font-weight:900; font-size:16px; color:var(--navy-2); }
+  .sec-pick{ display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; }
+  .sec{
+    padding:14px 0;
+    border-radius:16px;
+    border:2px solid var(--line);
+    background:#fff;
+    font-size:24px;
+    font-weight:900;
+    color:var(--navy-2);
+    cursor:pointer;
+    transition:transform .2s var(--spring), border-color .2s, background .2s, color .2s, box-shadow .2s;
+  }
+  .sec:hover{ border-color:var(--blue); transform:translateY(-2px); }
+  .sec.on{ background:var(--grad); border-color:transparent; color:#fff; box-shadow:0 10px 20px rgba(47,111,237,.3); transform:translateY(-2px); }
+  .once{ margin:4px 0 14px; padding:12px 14px; border-radius:14px; background:#fff7e8; border:1px solid #f3d49c; color:#7a4a12; font-size:14px; font-weight:700; line-height:1.45; }
+  .send{ margin:0 0 16px; padding:12px 14px; border-radius:14px; font-size:14.5px; font-weight:800; line-height:1.45; display:flex; align-items:center; flex-wrap:wrap; gap:10px; }
+  .send:empty{ display:none; }
+  .send.wait{ background:var(--soft); color:var(--ink-2); border:1px solid var(--line); }
+  .send.ok{ background:var(--green-bg); color:#16693a; border:1px solid #b7e4c7; }
+  .send.warn{ background:#fff7e8; color:#7a4a12; border:1px solid #f3d49c; }
+  .send .btn{ flex:none; padding:8px 12px; font-size:13px; }
+  .spin{ width:16px; height:16px; border-radius:50%; border:3px solid rgba(47,111,237,.2); border-top-color:var(--blue); display:inline-block; vertical-align:-3px; animation:spin .8s linear infinite; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .panel-bar{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+  .panel-bar select{ flex:1; min-width:180px; padding:11px 14px; border-radius:12px; border:2px solid var(--line); background:#fff; font:inherit; font-weight:800; color:var(--navy); }
+  .panel-bar .btn{ flex:none; }
+  .sec-tabs{ display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; margin-bottom:14px; }
+  .sec-tab{
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+    padding:10px 4px;
+    border-radius:16px;
+    border:2px solid var(--line);
+    background:#fff;
+    cursor:pointer;
+    transition:background .2s, border-color .2s, color .2s;
+  }
+  .sec-tab b{ font-size:16px; font-weight:900; }
+  .sec-tab span{ font-size:12px; font-weight:800; color:var(--ink-3); }
+  .sec-tab.on{ background:var(--navy); border-color:var(--navy); color:#fff; }
+  .sec-tab.on span{ color:var(--cyan); }
+  .sec-sum{ display:flex; flex-wrap:wrap; gap:8px 18px; margin-bottom:10px; font-size:14px; font-weight:700; color:var(--ink-2); }
+  .grade{ display:inline-block; min-width:48px; text-align:center; padding:3px 10px; border-radius:999px; font-weight:900; }
+  .grade.hi{ background:var(--green-bg); color:#16693a; }
+  .grade.mid{ background:#fff4dc; color:#8a5a0a; }
+  .grade.lo{ background:#fdeceb; color:var(--red); }
+  .dock-btn.res{ background:rgba(255,255,255,.12); color:#fff; }
+  .dock-btn.res:hover{ background:rgba(255,255,255,.22); }
+  @media (max-width:560px){
+    .sec{ font-size:21px; padding:12px 0; }
+    .dock-btn .lbl{ display:none; }
+  }
+
   /* ---------- Responsive ---------- */
   @media (max-width:720px){
     #app{ padding:16px 14px 44px; }
@@ -1336,7 +1389,8 @@
 
 <div class="dock" id="dock" hidden>
   <div class="dock-status"><i></i><span id="dockText">Modo edición</span></div>
-  <button class="dock-btn save" id="saveBtn" type="button">💾 Guardar HTML</button>
+  <button class="dock-btn res" id="resBtn" type="button">📊 <span class="lbl">Resultados</span></button>
+  <button class="dock-btn save" id="saveBtn" type="button">💾 Guardar<span class="lbl"> HTML</span></button>
   <button class="dock-btn exit" id="exitBtn" type="button">Salir</button>
 </div>
 
@@ -1748,7 +1802,7 @@
         <span class="tk-cta-text"><strong>Exit ticket</strong><span>Responde ${ready} preguntas sobre lo que aprendiste hoy</span></span>
         <span class="tk-cta-go">¡Empezar!</span></button>` : '';
     }
-    const ed = editable(), count = resultsFor(route.unit, route.n).length;
+    const ed = editable();
     return `<div class="sec-title">Exit ticket</div>
       <div class="tk-edit">
         ${qs.map((q, i) => `<div class="tq">
@@ -1761,7 +1815,7 @@
         <div class="tk-tools">
           <button type="button" class="btn ghost" id="tqAdd">+ Añadir pregunta</button>
           ${ready ? '<button type="button" class="btn up" id="tkOpen">▶ Probar exit ticket</button>' : ''}
-          <button type="button" class="btn ghost" id="tkRes">📊 Resultados (${count})</button>
+          <button type="button" class="btn ghost" id="tkRes">📊 Resultados por sección</button>
         </div>
         <p class="drop-hint" style="text-align:left">🟢 Marca el círculo de la respuesta correcta de cada pregunta.</p>
       </div>`;
@@ -1827,10 +1881,10 @@
       c.classList.remove('flash'); void c.offsetWidth; c.classList.add('flash');
       return;
     }
-    if(t.closest('#tkOpen')){ commitFocused(); openTicket(route.unit, route.n); return; }
+    if(t.closest('#tkOpen')){ commitFocused(); openTicket(route.unit, route.n, editing); return; }
     if(!editing) return;
     const s = curSession();
-    if(t.closest('#tkRes')){ showResults(route.unit, route.n); return; }
+    if(t.closest('#tkRes')){ openResults(); return; }
     if(t.closest('#tqAdd')){ commitFocused(); s.ticket.questions.push({ q:'', options:['', '', ''], answer:0, why:'' }); changed(); renderSession(); focusLast('.tq h4[data-bind]'); return; }
     const tqr = t.closest('[data-tq-rm]');
     if(tqr){
@@ -1989,6 +2043,7 @@
       ], 12000);
     } else toast('✏️ Modo edición activado');
   }
+  $('#resBtn').addEventListener('click', () => openResults());
   $('#exitBtn').addEventListener('click', () => {
     commitFocused();
     if(document.activeElement) document.activeElement.blur();
@@ -2026,9 +2081,18 @@
 
   /* ================= Exit ticket ================= */
   const tkDlg = $('#ticket'), tkTop = $('#tkTop'), tkBody = $('#tkBody');
+  const LETTERS = 'ABCD', SECTIONS = ['A', 'B', 'C', 'D'], GRADE = '6to';
   const RES_KEY = 'ciencia4b:tickets:' + APP.docId;
-  const LETTERS = 'ABCD';
+  const DONE_KEY = 'ciencia4b:done:' + APP.docId;
+  const QUEUE_KEY = 'ciencia4b:queue:' + APP.docId;
+  const AUTH_KEY = 'ciencia4b:auth:' + APP.docId;
   let tk = null;
+
+  const lsGet = (k, d) => { try{ const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; }catch(e){ return d; } };
+  const lsSet = (k, v) => { try{ localStorage.setItem(k, JSON.stringify(v)); return true; }catch(e){ return false; } };
+  const slug = s => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
+  const cleanName = s => String(s).replace(/\s+/g, ' ').trim().toLocaleLowerCase('es').replace(/(^|[\s'-])(\p{L})/gu, (m, p, c) => p + c.toLocaleUpperCase('es'));
+  const ticketId = (unit, n, section, name) => `${unit}-s${n}-${section}-${slug(name)}`;
 
   function playable(s){
     return s.ticket.questions
@@ -2036,43 +2100,171 @@
       .filter(q => filled(q.q) && q.opts.length >= 2);
   }
   function shuffle(a){ for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
-  function readResults(){ try{ return JSON.parse(localStorage.getItem(RES_KEY) || '[]'); }catch(e){ return []; } }
-  function writeResults(list){ try{ localStorage.setItem(RES_KEY, JSON.stringify(list)); return true; }catch(e){ return false; } }
-  const resultsFor = (unit, n) => readResults().filter(r => r.unit === unit && r.n === n);
 
+  /* ---------- Firebase (Firestore + Auth via REST) ---------- */
+  let fbCfgPromise = null;
+  function fbConfig(){
+    if(!fbCfgPromise) fbCfgPromise = (async () => {
+      let cfg = null;
+      if(/^https?:$/.test(location.protocol)){
+        try{ const r = await fetch('/__/firebase/init.json', { cache:'no-store' }); if(r.ok) cfg = await r.json(); }catch(e){}
+      }
+      if(!(cfg && cfg.apiKey && cfg.projectId) && APP.firebase && APP.firebase.apiKey && APP.firebase.projectId) cfg = APP.firebase;
+      return cfg && cfg.apiKey && cfg.projectId ? { apiKey: cfg.apiKey, projectId: cfg.projectId } : null;
+    })();
+    return fbCfgPromise;
+  }
+  const docsBase = c => `https://firestore.googleapis.com/v1/projects/${c.projectId}/databases/(default)/documents`;
+  const docName = (c, col, id) => `projects/${c.projectId}/databases/(default)/documents/${col}/${id}`;
+  const toV = v => typeof v === 'number' ? (Number.isInteger(v) ? { integerValue: String(v) } : { doubleValue: v })
+    : typeof v === 'boolean' ? { booleanValue: v }
+    : Array.isArray(v) ? { arrayValue: { values: v.map(toV) } }
+    : v instanceof Date ? { timestampValue: v.toISOString() }
+    : { stringValue: String(v) };
+  const fromV = x => 'integerValue' in x ? +x.integerValue : 'doubleValue' in x ? x.doubleValue : 'booleanValue' in x ? x.booleanValue
+    : 'timestampValue' in x ? Date.parse(x.timestampValue) : 'arrayValue' in x ? (x.arrayValue.values || []).map(fromV) : 'stringValue' in x ? x.stringValue : null;
+  const toFields = o => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, toV(v)]));
+  const fromDoc = d => { const o = {}; Object.entries(d.fields || {}).forEach(([k, v]) => { o[k] = fromV(v); }); o.id = d.name.split('/').pop(); return o; };
+
+  function recordFor(res){
+    return { unit: res.unit, unitNum: res.unitNum, session: res.n, grade: GRADE, section: res.section, name: res.name,
+      score: res.score, total: res.total, answers: res.answers, createdAt: new Date(res.at) };
+  }
+  async function cloudAlreadyDone(c, id){
+    const r = await fetch(`${docsBase(c)}/exitTicketsDone/${encodeURIComponent(id)}?key=${c.apiKey}`);
+    if(r.status === 200) return true;
+    if(r.status === 404) return false;
+    throw new Error('check ' + r.status);
+  }
+  async function cloudSubmit(c, res){
+    const body = { writes: [
+      { update: { name: docName(c, 'exitTickets', res.id), fields: toFields(recordFor(res)) }, currentDocument: { exists: false } },
+      { update: { name: docName(c, 'exitTicketsDone', res.id), fields: toFields({ at: new Date(res.at) }) }, currentDocument: { exists: false } }
+    ] };
+    const r = await fetch(`${docsBase(c)}:commit?key=${c.apiKey}`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body) });
+    if(r.ok) return 'ok';
+    const err = await r.json().catch(() => ({}));
+    const st = err.error && err.error.status;
+    if(st === 'ALREADY_EXISTS' || st === 'FAILED_PRECONDITION') return 'dup';
+    throw new Error(st || ('HTTP ' + r.status));
+  }
+  async function flushQueue(){
+    const q = lsGet(QUEUE_KEY, []);
+    if(!q.length || !navigator.onLine) return;
+    const c = await fbConfig();
+    if(!c) return;
+    const left = [];
+    for(const res of q){
+      try{ await cloudSubmit(c, res); }catch(e){ left.push(res); }
+    }
+    lsSet(QUEUE_KEY, left);
+  }
+  addEventListener('online', flushQueue);
+  setTimeout(flushQueue, 1500);
+
+  /* teacher sign-in (Firebase Authentication, email + password) */
+  const auth = () => lsGet(AUTH_KEY, null);
+  async function signIn(c, email, password){
+    const r = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${c.apiKey}`,
+      { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ email, password, returnSecureToken:true }) });
+    const j = await r.json().catch(() => ({}));
+    if(!r.ok) throw new Error((j.error && j.error.message) || 'LOGIN');
+    lsSet(AUTH_KEY, { email: j.email, idToken: j.idToken, refreshToken: j.refreshToken, exp: Date.now() + (+j.expiresIn || 3600) * 1000 });
+  }
+  async function idToken(c){
+    const a = auth();
+    if(!a) return null;
+    if(Date.now() < a.exp - 60000) return a.idToken;
+    const r = await fetch(`https://securetoken.googleapis.com/v1/token?key=${c.apiKey}`,
+      { method:'POST', headers:{ 'Content-Type':'application/x-www-form-urlencoded' }, body: 'grant_type=refresh_token&refresh_token=' + encodeURIComponent(a.refreshToken) });
+    if(!r.ok){ try{ localStorage.removeItem(AUTH_KEY); }catch(e){} return null; }
+    const j = await r.json();
+    lsSet(AUTH_KEY, { email: a.email, idToken: j.id_token, refreshToken: j.refresh_token, exp: Date.now() + (+j.expires_in || 3600) * 1000 });
+    return j.id_token;
+  }
+  async function cloudList(c){
+    const tok = await idToken(c);
+    if(!tok) throw new Error('AUTH');
+    const out = [];
+    let page = '';
+    do{
+      const r = await fetch(`${docsBase(c)}/exitTickets?pageSize=300${page ? '&pageToken=' + encodeURIComponent(page) : ''}&key=${c.apiKey}`, { headers:{ Authorization: 'Bearer ' + tok } });
+      if(r.status === 401 || r.status === 403) throw new Error('DENIED');
+      if(!r.ok) throw new Error('HTTP ' + r.status);
+      const j = await r.json();
+      (j.documents || []).forEach(d => out.push(fromDoc(d)));
+      page = j.nextPageToken || '';
+    } while(page);
+    return out.map(r => ({ ...r, n: r.session, at: r.createdAt }));
+  }
+  async function cloudDelete(c, id){
+    const tok = await idToken(c);
+    for(const col of ['exitTickets', 'exitTicketsDone']){
+      const r = await fetch(`${docsBase(c)}/${col}/${encodeURIComponent(id)}?key=${c.apiKey}`, { method:'DELETE', headers:{ Authorization: 'Bearer ' + tok } });
+      if(!r.ok && r.status !== 404) throw new Error('HTTP ' + r.status);
+    }
+  }
+
+  /* ---------- student flow ---------- */
   function tkHead(sub, prog){
     const u = unitByKey(tk.unit);
-    tkTop.innerHTML = `<small>🎟️ Exit ticket</small><strong>Sesión ${tk.n} · Unidad ${esc(u.num)}</strong><span>${sub}</span>
+    tkTop.innerHTML = `<small>🎟️ Exit ticket${tk.practice ? ' · modo prueba' : ''}</small><strong>Sesión ${tk.n} · Unidad ${esc(u.num)}</strong><span>${sub}</span>
       ${prog != null ? `<div class="tk-prog"><i style="width:${prog}%"></i></div>` : ''}
       <button class="tk-x" type="button" data-tk="close" aria-label="Cerrar">✕</button>`;
   }
   const sayRow = (text, cls = '') => `<div class="say-row">${robotHTML()}<div class="say ${cls}" id="tkSay" aria-live="polite">${text}</div></div>`;
   const firstName = () => esc(tk.name.split(/\s+/)[0]);
+  const who = () => `${esc(tk.name)} · ${GRADE} ${esc(tk.section)}`;
 
-  function openTicket(unit, n){
+  function openTicket(unit, n, practice){
     const qs = playable(unitByKey(unit).sessions[n - 1]);
     if(!qs.length) return;
-    tk = { unit, n, qs, name:'', grade:'', i:0, answers:[] };
+    tk = { unit, n, qs, name:'', section:'', i:0, answers:[], practice: !!practice };
     stepIntro();
     tkDlg.showModal();
     setTimeout(() => { const f = $('#tkName'); f && f.focus(); }, 80);
   }
-  function stepIntro(){
+  function stepIntro(msg){
     tkHead(esc(unitByKey(tk.unit).title), 0);
     tkBody.innerHTML = `<div class="tk-step">
-      ${sayRow('¡Hola! 👋 Coloca tu nombre y tu grado ✏️')}
-      <div class="fld-row">
-        <div class="fld"><label for="tkName">Nombre y apellido</label><input id="tkName" autocomplete="off" maxlength="60" placeholder="Ej.: Ana Torres" value="${esc(tk.name)}"></div>
-        <div class="fld"><label for="tkGrade">Grado y sección</label><input id="tkGrade" autocomplete="off" maxlength="20" placeholder="Ej.: 6to A" value="${esc(tk.grade)}"></div>
-      </div>
-      <div class="tk-actions"><button type="button" class="btn solid" id="tkStart" disabled>Aceptar ✓</button></div>
-      <p class="drop-hint" style="text-align:left;margin-top:14px">Son ${tk.qs.length} preguntas sobre lo que trabajamos en esta sesión.</p>
+      ${sayRow(msg || '¡Hola! 👋 Escribe tu nombre y elige tu sección.<br><b>Recuerda:</b> este exit ticket se responde <b>solo una vez</b>, ¡hazlo con calma! 🧠', msg ? 'bad' : '')}
+      <div class="fld"><label for="tkName">Nombre y apellido</label><input id="tkName" autocomplete="off" maxlength="60" placeholder="Ej.: Ana Torres" value="${esc(tk.name)}"></div>
+      <div class="fld"><label>Grado</label><div class="grade-chip">🎓 ${GRADE} grado</div></div>
+      <div class="fld"><label id="secLbl">¿A qué sección perteneces?</label>
+        <div class="sec-pick" role="radiogroup" aria-labelledby="secLbl">${SECTIONS.map(s => `<button type="button" class="sec${tk.section === s ? ' on' : ''}" role="radio" aria-checked="${tk.section === s}" data-sec="${s}">${s}</button>`).join('')}</div></div>
+      <p class="once">⚠️ Solo tienes <b>una oportunidad</b>. Revisa que tu nombre y sección estén bien antes de aceptar.</p>
+      <div class="tk-actions"><button type="button" class="btn solid" id="tkStart"${tk.name && tk.section ? '' : ' disabled'}>Aceptar ✓</button></div>
+      <p class="drop-hint" style="text-align:left;margin-top:12px">Son ${tk.qs.length} preguntas sobre lo que trabajamos en esta sesión.</p>
     </div>`;
+  }
+  function stepBlocked(){
+    tkHead(who(), null);
+    tkBody.innerHTML = `<div class="tk-step">
+      ${sayRow(`${firstName()}, ya respondiste este exit ticket 😊<br>Solo se puede responder <b>una vez</b>. ¡Gracias por tu esfuerzo!`, 'good')}
+      <div class="tk-actions"><button type="button" class="btn ghost" data-tk="edit">✏️ No soy yo / corregir mis datos</button><button type="button" class="btn solid" data-tk="close">Entendido</button></div>
+    </div>`;
+    react($('.say-row .robot', tkBody));
+  }
+  async function beginTicket(){
+    tk.name = cleanName(tk.name);
+    if(!tk.name || !tk.section) return;
+    tk.id = ticketId(tk.unit, tk.n, tk.section, tk.name);
+    if(!tk.practice){
+      const btn = $('#tkStart');
+      btn.disabled = true; btn.textContent = 'Revisando…';
+      if(lsGet(DONE_KEY, {})[tk.id]) return stepBlocked();
+      const c = await fbConfig();
+      if(c){
+        try{ if(await cloudAlreadyDone(c, tk.id)) return stepBlocked(); }catch(e){ /* sin conexión: se verifica al enviar */ }
+      }
+    }
+    tk.i = 0; tk.answers = []; tk.order = null;
+    stepQuestion();
   }
   function stepQuestion(){
     const q = tk.qs[tk.i], total = tk.qs.length;
     if(!tk.order) tk.order = tk.qs.map(x => shuffle(x.opts.slice()));
-    tkHead(`${esc(tk.name)} · ${esc(tk.grade)}`, tk.i / total * 100);
+    tkHead(who(), tk.i / total * 100);
     const cheer = tk.i === 0 ? `¡Vamos, ${firstName()}! Tú puedes 💪` : tk.i === total - 1 ? '¡Última pregunta! 🏁' : ['¡Sigue así! 🚀', '¡Vas muy bien! ⭐', '¡Concéntrate, tú puedes! 🧠'][tk.i % 3];
     tkBody.innerHTML = `<div class="tk-step">
       ${sayRow(cheer)}
@@ -2109,23 +2301,46 @@
     next.focus({ preventScroll:true });
     next.scrollIntoView({ block:'nearest', behavior: reduceMotion ? 'auto' : 'smooth' });
   }
+
+  async function send(){
+    const box = $('#tkSend');
+    const set = (cls, html) => { if(box){ box.className = 'send ' + cls; box.innerHTML = html; } };
+    const res = tk.res;
+    const c = await fbConfig();
+    if(!c){
+      const list = lsGet(RES_KEY, []); list.push(res); lsSet(RES_KEY, list);
+      markDone(res.id);
+      set('ok', '💾 Resultado guardado en este dispositivo.');
+      return;
+    }
+    set('wait', '<span class="spin"></span> Enviando tu resultado a tu profesor(a)…');
+    try{
+      const r = await cloudSubmit(c, res);
+      markDone(res.id);
+      set(r === 'dup' ? 'warn' : 'ok', r === 'dup' ? '📌 Ya habías enviado este exit ticket antes; se conserva tu primer resultado.' : '✅ ¡Resultado enviado a tu profesor(a)!');
+    }catch(e){
+      const q = lsGet(QUEUE_KEY, []);
+      if(!q.some(x => x.id === res.id)){ q.push(res); lsSet(QUEUE_KEY, q); }
+      markDone(res.id);
+      set('warn', '📶 No hay conexión. Tu resultado quedó guardado y se enviará solo cuando vuelva el internet. <button type="button" class="btn ghost" data-tk="resend">Reintentar ahora</button>');
+    }
+  }
+  function markDone(id){ const d = lsGet(DONE_KEY, {}); d[id] = Date.now(); lsSet(DONE_KEY, d); }
+
   function stepResult(){
     const total = tk.qs.length, score = tk.answers.filter(a => a && a.ok).length, pct = Math.round(score / total * 100);
     const stars = Math.round(score / total * 5);
-    if(!tk.saved){
-      const u = unitByKey(tk.unit);
-      const list = readResults();
-      list.push({ unit: tk.unit, unitNum: u.num, n: tk.n, name: tk.name, grade: tk.grade, score, total, at: Date.now() });
-      writeResults(list);
-      tk.saved = true;
-    }
     tk.score = score;
+    const u = unitByKey(tk.unit);
+    if(!tk.practice && !tk.res){
+      tk.res = { id: tk.id, unit: tk.unit, unitNum: u.num, n: tk.n, section: tk.section, name: tk.name, score, total, answers: tk.answers.map(a => !!a.ok), at: Date.now() };
+    }
     const nm = firstName();
     const msg = score === total ? `¡Perfecto, ${nm}! Dominas el tema 🏆`
       : pct >= 80 ? `¡Muy bien, ${nm}! Aprendiste mucho hoy 🌟`
       : pct >= 60 ? `¡Buen trabajo, ${nm}! Repasa lo que fallaste 💪`
-      : `¡Sigue practicando, ${nm}! Revisa la ficha y vuelve a intentarlo 📚`;
-    tkHead(`${esc(tk.name)} · ${esc(tk.grade)}`, 100);
+      : `¡Sigue practicando, ${nm}! Revisa la ficha para reforzar 📚`;
+    tkHead(who(), 100);
     tkBody.innerHTML = `<div class="tk-step">
       ${sayRow(msg, pct >= 60 ? 'good' : '')}
       <div class="score">
@@ -2133,13 +2348,15 @@
         <div class="score-text"><strong>${score} de ${total} respuestas correctas</strong><span>${new Date().toLocaleDateString('es-PE', { weekday:'long', day:'numeric', month:'long' })}</span>
           <div class="stars" aria-label="${stars} de 5 estrellas">${[0, 1, 2, 3, 4].map(i => `<i class="${i < stars ? 'on' : ''}" style="animation-delay:${.15 + i * .12}s">⭐</i>`).join('')}</div></div>
       </div>
+      ${tk.practice ? '<div class="send warn">🧪 Modo prueba: este resultado no se guarda ni se envía.</div>' : '<div class="send wait" id="tkSend"></div>'}
       <ul class="review">${tk.qs.map((q, i) => { const a = tk.answers[i]; return `<li class="${a.ok ? '' : 'no'}"><span>${a.ok ? '✓' : '✕'}</span><div>${esc(q.q)}${a.ok ? '' : `<small>Respuesta correcta: ${esc(a.right)}</small>`}</div></li>`; }).join('')}</ul>
       <div class="tk-actions">
-        <button type="button" class="btn solid" data-tk="png">📸 Guardar resultado</button>
-        <button type="button" class="btn ghost" data-tk="retry">🔁 Intentar de nuevo</button>
+        <button type="button" class="btn solid" data-tk="png">📸 Guardar imagen</button>
+        ${tk.practice ? '<button type="button" class="btn ghost" data-tk="retry">🔁 Probar de nuevo</button>' : ''}
         <button type="button" class="btn up" data-tk="close">✔ Terminar</button>
       </div>
     </div>`;
+    if(!tk.practice) send();
     const robot = $('.say-row .robot', tkBody);
     if(pct >= 60) setTimeout(() => react(robot), 250);
     if(pct >= 80 && !reduceMotion){
@@ -2162,17 +2379,16 @@
     const rr = (x, y, w, h, r) => { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); };
     g.fillStyle = '#ffffff'; rr(40, 40, W - 80, H - 80, 34); g.fill();
     const F = (w, s) => `${w} ${s}px Nunito, "Segoe UI", Roboto, Arial, sans-serif`;
-    g.textBaseline = 'alphabetic';
     g.fillStyle = '#2f6fed'; g.font = F(900, 22); g.fillText('EXIT TICKET · CIENCIA 4TO BIMESTRE', 90, 112);
     g.fillStyle = '#4a5a86'; g.font = F(700, 24); g.fillText(`Unidad ${u.num} · Sesión ${tk.n} · ${u.title}`.slice(0, 64), 90, 150);
     g.fillStyle = '#12224a'; g.font = F(900, 50); g.fillText(tk.name.slice(0, 32), 90, 238);
-    g.fillStyle = '#4a5a86'; g.font = F(800, 28); g.fillText('Grado y sección: ' + tk.grade.slice(0, 20), 90, 284);
+    g.fillStyle = '#4a5a86'; g.font = F(800, 28); g.fillText(`${GRADE} grado · Sección ${tk.section}`, 90, 284);
     g.fillStyle = '#f4f8ff'; rr(90, 330, 520, 190, 26); g.fill();
     g.fillStyle = '#12224a'; g.font = F(900, 96); g.fillText(`${score}/${total}`, 124, 450);
     g.fillStyle = '#4a5a86'; g.font = F(800, 24); g.fillText('respuestas correctas', 124, 494);
     const stars = Math.round(score / total * 5);
     for(let i = 0; i < 5; i++){
-      const cx = 700 + (i % 5) * 44, cy = 420;
+      const cx = 700 + i * 44, cy = 420;
       g.beginPath();
       for(let k = 0; k < 10; k++){ const r = k % 2 ? 9 : 20, a = -Math.PI / 2 + k * Math.PI / 5; g.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r); }
       g.closePath(); g.fillStyle = i < stars ? '#f5a623' : '#dfe8fb'; g.fill();
@@ -2181,70 +2397,177 @@
     g.fillText(new Date().toLocaleString('es-PE', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }), 90, 568);
     cv.toBlob(b => {
       const url = URL.createObjectURL(b);
-      download(url, `exit-ticket-u${u.num}-s${tk.n}-${tk.name.replace(/[^\wÁÉÍÓÚáéíóúÑñ]+/g, '-').slice(0, 30)}.png`);
+      download(url, `exit-ticket-u${u.num}-s${tk.n}-${GRADE}${tk.section}-${slug(tk.name)}.png`);
       setTimeout(() => URL.revokeObjectURL(url), 4000);
       toast('📸 Resultado guardado como imagen');
     }, 'image/png');
   }
-  function showResults(unit, n){
-    tk = { unit, n };
-    const rows = resultsFor(unit, n).sort((a, b) => b.at - a.at);
-    tkHead(`Resultados guardados en este dispositivo`, null);
-    const fmt = t => new Date(t).toLocaleString('es-PE', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+
+  /* ---------- teacher: results by section ---------- */
+  let panel = null;
+  const sessionsWithTicket = () => APP.units.flatMap(u => u.sessions.map((s, i) => ({ u, n: i + 1, s })).filter(x => playable(x.s).length));
+  const fmtDate = t => new Date(t).toLocaleString('es-PE', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+
+  async function showResults(unit, n){
+    const list = sessionsWithTicket();
+    const first = list[0];
+    panel = { key: unit && n ? `${unit}|${n}` : first ? `${first.u.key}|${first.n}` : '', section: (panel && panel.section) || 'A', email: panel && panel.email, rows: null, err: '' };
+    tk = null;
+    if(!tkDlg.open) tkDlg.showModal();
+    await loadPanel();
+  }
+  async function loadPanel(){
+    const c = await fbConfig();
+    panel.cloud = !!c;
+    panel.err = '';
+    panel.rows = null;
+    if(c && !auth()){ renderPanel(); return; }
+    renderPanel();
+    try{
+      panel.rows = c ? await cloudList(c) : lsGet(RES_KEY, []).map(r => ({ ...r, section: r.section || '—' }));
+    }catch(e){
+      if(e.message === 'AUTH' || e.message === 'DENIED'){ try{ localStorage.removeItem(AUTH_KEY); }catch(_){} panel.err = e.message === 'DENIED' ? 'Tu cuenta no tiene permiso para ver los resultados. Revisa las reglas de Firestore.' : ''; }
+      else panel.err = 'No se pudieron cargar los resultados. Revisa tu conexión a internet.';
+      panel.rows = [];
+    }
+    renderPanel();
+  }
+  function panelRows(){
+    const [unit, n] = panel.key.split('|');
+    return (panel.rows || []).filter(r => r.unit === unit && +r.n === +n);
+  }
+  function renderPanel(){
+    const list = sessionsWithTicket();
+    const cloudNoAuth = panel.cloud && !auth();
+    tkTop.innerHTML = `<small>📊 Resultados · Exit ticket</small><strong>${GRADE} grado</strong>
+      <span>${panel.cloud ? '☁️ En línea (Firebase)' + (auth() ? ' · ' + esc(auth().email) : '') : '💾 Solo este dispositivo (sin Firebase)'}</span>
+      <button class="tk-x" type="button" data-tk="close" aria-label="Cerrar">✕</button>`;
+    if(cloudNoAuth){
+      tkBody.innerHTML = `<div class="tk-step">
+        ${sayRow('Hola, profe 👩‍🏫 Ingresa con tu cuenta de docente para ver los resultados.')}
+        <form class="login" id="loginForm">
+          <div class="fld"><label for="lgEmail">Correo</label><input id="lgEmail" type="email" autocomplete="username" required value="${esc(panel.email || '')}"></div>
+          <div class="fld"><label for="lgPass">Contraseña</label><input id="lgPass" type="password" autocomplete="current-password" required></div>
+          ${panel.err ? `<p class="send warn">${esc(panel.err)}</p>` : ''}
+          <div class="tk-actions"><button type="submit" class="btn solid">Ingresar</button></div>
+        </form>
+      </div>`;
+      setTimeout(() => { const f = panel.email ? $('#lgPass') : $('#lgEmail'); f && f.focus(); }, 60);
+      return;
+    }
+    const rows = panelRows();
+    const bySec = s => rows.filter(r => r.section === s).sort((a, b) => a.name.localeCompare(b.name, 'es'));
+    const cur = bySec(panel.section);
+    const avg = cur.length ? cur.reduce((t, r) => t + r.score / r.total, 0) / cur.length : 0;
+    const total = cur[0] ? cur[0].total : 5;
     tkBody.innerHTML = `<div class="tk-step">
-      ${rows.length ? `<div style="overflow:auto"><table class="res-table"><thead><tr><th>Estudiante</th><th>Grado</th><th>Nota</th><th>Fecha</th></tr></thead><tbody>
-        ${rows.map(r => `<tr><td>${esc(r.name)}</td><td>${esc(r.grade)}</td><td>${r.score}/${r.total}</td><td>${fmt(r.at)}</td></tr>`).join('')}</tbody></table></div>`
-        : '<p class="res-empty">Todavía no hay resultados de esta sesión en este dispositivo.</p>'}
+      <div class="panel-bar">
+        <select id="pnSession" aria-label="Sesión">${list.map(x => `<option value="${x.u.key}|${x.n}"${`${x.u.key}|${x.n}` === panel.key ? ' selected' : ''}>Unidad ${esc(x.u.num)} · Sesión ${x.n}</option>`).join('')}</select>
+        <button type="button" class="btn ghost" data-tk="reload" title="Actualizar">🔄 Actualizar</button>
+      </div>
+      <div class="sec-tabs" role="tablist">${SECTIONS.map(s => `<button type="button" role="tab" class="sec-tab${s === panel.section ? ' on' : ''}" aria-selected="${s === panel.section}" data-tab="${s}"><b>${GRADE} ${s}</b><span>${panel.rows ? bySec(s).length : '…'}</span></button>`).join('')}</div>
+      ${panel.err ? `<p class="send warn">${esc(panel.err)}</p>` : ''}
+      ${!panel.rows ? '<p class="res-empty"><span class="spin"></span> Cargando resultados…</p>'
+        : cur.length ? `
+        <div class="sec-sum"><span><b>${cur.length}</b> estudiante${cur.length === 1 ? '' : 's'}</span><span>Promedio: <b>${(avg * total).toFixed(1)}/${total}</b></span><span>Logrado (≥ 60%): <b>${cur.filter(r => r.score / r.total >= .6).length}</b></span></div>
+        <div style="overflow:auto"><table class="res-table"><thead><tr><th>N°</th><th>Estudiante</th><th>Nota</th><th>Fecha</th><th></th></tr></thead><tbody>
+        ${cur.map((r, i) => `<tr><td>${i + 1}</td><td>${esc(r.name)}</td><td><span class="grade ${r.score / r.total >= .8 ? 'hi' : r.score / r.total >= .6 ? 'mid' : 'lo'}">${r.score}/${r.total}</span></td><td>${fmtDate(r.at)}</td>
+          <td><button type="button" class="tq-mini rm" data-del="${esc(r.id)}" title="Borrar para que pueda volver a responder">🗑</button></td></tr>`).join('')}
+        </tbody></table></div>`
+        : `<p class="res-empty">Todavía no hay resultados del ${GRADE} ${panel.section} en esta sesión.</p>`}
       <div class="tk-actions" style="margin-top:16px">
-        ${rows.length ? '<button type="button" class="btn solid" data-tk="csv">⬇️ Descargar para Excel</button><button type="button" class="btn del" data-tk="clear">🗑 Borrar resultados</button>' : ''}
+        ${rows.length ? '<button type="button" class="btn solid" data-tk="csv">⬇️ Descargar para Excel (A, B, C y D)</button>' : ''}
+        ${panel.cloud ? '<button type="button" class="btn ghost" data-tk="logout">Cerrar sesión</button>' : ''}
         <button type="button" class="btn ghost" data-tk="close">Cerrar</button>
       </div>
+      ${panel.cloud ? '' : '<p class="drop-hint" style="text-align:left;margin-top:12px">Cuando publiques la página en Firebase Hosting, aquí verás los resultados de todos tus estudiantes.</p>'}
     </div>`;
-    if(!tkDlg.open) tkDlg.showModal();
   }
   function resultsCsv(){
-    const u = unitByKey(tk.unit), rows = resultsFor(tk.unit, tk.n).sort((a, b) => a.at - b.at);
+    const [unit, n] = panel.key.split('|'), u = unitByKey(unit);
+    const rows = panelRows().sort((a, b) => a.section.localeCompare(b.section) || a.name.localeCompare(b.name, 'es'));
     const q = v => '"' + String(v).replace(/"/g, '""') + '"';
-    const lines = [['Estudiante', 'Grado y sección', 'Correctas', 'Total', 'Fecha y hora'].map(q).join(';')]
-      .concat(rows.map(r => [r.name, r.grade, r.score, r.total, new Date(r.at).toLocaleString('es-PE')].map(q).join(';')));
+    const lines = [['Grado', 'Sección', 'Estudiante', 'Correctas', 'Total', 'Fecha y hora'].map(q).join(';')]
+      .concat(rows.map(r => [GRADE, r.section, r.name, r.score, r.total, new Date(r.at).toLocaleString('es-PE')].map(q).join(';')));
     const url = URL.createObjectURL(new Blob(['﻿' + lines.join('\r\n')], { type:'text/csv;charset=utf-8' }));
-    download(url, `exit-ticket-unidad${u.num}-sesion${tk.n}.csv`);
+    download(url, `exit-ticket-unidad${u.num}-sesion${n}-${GRADE}.csv`);
     setTimeout(() => URL.revokeObjectURL(url), 4000);
   }
+  function openResults(){
+    commitFocused();
+    route.name === 'session' ? showResults(route.unit, route.n) : showResults();
+  }
 
+  /* ---------- dialog events ---------- */
   tkBody.addEventListener('input', e => {
-    if(e.target.id !== 'tkName' && e.target.id !== 'tkGrade') return;
-    tk.name = $('#tkName').value.trim(); tk.grade = $('#tkGrade').value.trim();
-    $('#tkStart').disabled = !(tk.name && tk.grade);
+    if(e.target.id !== 'tkName' || !tk) return;
+    tk.name = e.target.value;
+    $('#tkStart').disabled = !(cleanName(tk.name) && tk.section);
   });
   tkBody.addEventListener('keydown', e => {
-    if(e.key !== 'Enter' || !(e.target.id === 'tkName' || e.target.id === 'tkGrade')) return;
-    e.preventDefault();
-    if(e.target.id === 'tkName' && !tk.grade) $('#tkGrade').focus();
-    else if(!$('#tkStart').disabled) $('#tkStart').click();
+    if(e.key === 'Enter' && e.target.id === 'tkName'){ e.preventDefault(); if(!$('#tkStart').disabled) beginTicket(); }
   });
-  tkDlg.addEventListener('click', e => {
+  tkBody.addEventListener('change', e => {
+    if(e.target.id === 'pnSession'){ panel.key = e.target.value; renderPanel(); }
+  });
+  tkBody.addEventListener('submit', async e => {
+    if(e.target.id !== 'loginForm') return;
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    btn.disabled = true; btn.textContent = 'Ingresando…';
+    panel.email = $('#lgEmail').value.trim();
+    try{
+      await signIn(await fbConfig(), $('#lgEmail').value.trim(), $('#lgPass').value);
+      await loadPanel();
+    }catch(err){
+      panel.err = /INVALID|NOT_FOUND|PASSWORD|CREDENTIAL/.test(err.message) ? 'Correo o contraseña incorrectos.' : /TOO_MANY/.test(err.message) ? 'Demasiados intentos. Espera un momento.' : 'No se pudo ingresar. Revisa tu conexión.';
+      renderPanel();
+    }
+  });
+  tkDlg.addEventListener('click', async e => {
     const t = e.target;
     if(t === tkDlg){ tkDlg.close(); return; }
     const o = t.closest('.opt');
     if(o && !o.disabled){ answer(+o.dataset.opt); return; }
-    if(t.closest('#tkStart')){ tk.i = 0; tk.answers = []; tk.order = null; stepQuestion(); return; }
+    const sec = t.closest('[data-sec]');
+    if(sec && tk){
+      tk.section = sec.dataset.sec;
+      $$('.sec', tkBody).forEach(b => { const on = b === sec; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); });
+      $('#tkStart').disabled = !(cleanName(tk.name) && tk.section);
+      return;
+    }
+    if(t.closest('#tkStart')){ beginTicket(); return; }
     if(t.closest('#tkNext')){ tk.i++; tk.i < tk.qs.length ? stepQuestion() : stepResult(); return; }
+    const tab = t.closest('[data-tab]');
+    if(tab){ panel.section = tab.dataset.tab; renderPanel(); return; }
+    const del = t.closest('[data-del]');
+    if(del){
+      const r = (panel.rows || []).find(x => x.id === del.dataset.del);
+      if(!r || !confirm(`¿Borrar el resultado de ${r.name} (${GRADE} ${r.section})? Podrá volver a responder el exit ticket.`)) return;
+      try{
+        const c = await fbConfig();
+        if(c) await cloudDelete(c, r.id);
+        else lsSet(RES_KEY, lsGet(RES_KEY, []).filter(x => x.id !== r.id));
+        const d = lsGet(DONE_KEY, {}); delete d[r.id]; lsSet(DONE_KEY, d);
+        panel.rows = panel.rows.filter(x => x.id !== r.id);
+        renderPanel();
+        toast('🗑 Resultado borrado');
+      }catch(err){ toast('⚠️ No se pudo borrar. Revisa tu conexión.'); }
+      return;
+    }
     const a = t.closest('[data-tk]');
     if(!a) return;
     const act = a.dataset.tk;
     if(act === 'close') tkDlg.close();
-    else if(act === 'retry'){ tk.i = 0; tk.answers = []; tk.order = null; tk.saved = false; stepQuestion(); }
+    else if(act === 'edit') stepIntro();
+    else if(act === 'retry'){ tk.i = 0; tk.answers = []; tk.order = null; stepQuestion(); }
     else if(act === 'png') resultPng();
+    else if(act === 'resend') send();
     else if(act === 'csv') resultsCsv();
-    else if(act === 'clear'){
-      if(!confirm('¿Borrar los resultados de esta sesión guardados en este dispositivo?')) return;
-      writeResults(readResults().filter(r => !(r.unit === tk.unit && r.n === tk.n)));
-      showResults(tk.unit, tk.n);
-      if(route.name === 'session') renderSession();
-    }
+    else if(act === 'reload') loadPanel();
+    else if(act === 'logout'){ try{ localStorage.removeItem(AUTH_KEY); }catch(_){} loadPanel(); }
   });
-  tkDlg.addEventListener('close', () => { tkBody.innerHTML = ''; });
+  tkDlg.addEventListener('close', () => { tkBody.innerHTML = ''; panel = panel && { section: panel.section, email: panel.email }; });
 
   /* ================= Toast ================= */
   let toastEl = null, toastTimer = null;

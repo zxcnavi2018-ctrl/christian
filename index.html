@@ -915,7 +915,7 @@
   [data-bind]:empty::before{ content:attr(data-ph); color:#9aa8c9; font-style:italic; font-weight:600; }
   .meta [data-bind]:empty::before, .chip [data-bind]:empty::before{ color:rgba(255,255,255,.5); }
 
-  /* ---------- Edit dock ---------- */
+  /* ---------- Teacher dock (bottom bar) ---------- */
   .dock{
     position:fixed;
     left:50%;
@@ -924,40 +924,215 @@
     z-index:90;
     display:flex;
     align-items:center;
-    gap:8px;
-    padding:8px 8px 8px 16px;
-    border-radius:999px;
-    background:rgba(18,34,74,.94);
+    gap:6px;
+    padding:8px;
+    border-radius:26px;
+    background:rgba(18,34,74,.92);
     color:#fff;
-    box-shadow:0 18px 40px rgba(18,34,74,.4);
-    backdrop-filter:blur(10px);
-    -webkit-backdrop-filter:blur(10px);
+    box-shadow:0 20px 44px rgba(18,34,74,.38), inset 0 1px 0 rgba(255,255,255,.08);
+    backdrop-filter:blur(14px) saturate(1.3);
+    -webkit-backdrop-filter:blur(14px) saturate(1.3);
     animation:dockIn .45s var(--spring) both;
     max-width:calc(100vw - 24px);
   }
   @keyframes dockIn{ from{ opacity:0; transform:translate(-50%, 30px) scale(.9); } to{ opacity:1; transform:translate(-50%, 0); } }
-  .dock-status{ display:flex; align-items:center; gap:8px; font-size:13px; font-weight:800; white-space:nowrap; }
-  .dock-status i{ width:9px; height:9px; border-radius:50%; background:#2ecc71; box-shadow:0 0 0 4px rgba(46,204,113,.2); }
-  .dock.dirty .dock-status i{ background:var(--amber); box-shadow:0 0 0 4px rgba(245,166,35,.25); }
+  .dock-status{ display:flex; flex-direction:column; justify-content:center; gap:2px; padding:0 14px 0 10px; margin-right:2px; border-right:1px solid rgba(255,255,255,.12); white-space:nowrap; }
+  .dock-status b{ display:flex; align-items:center; gap:7px; font-size:13px; font-weight:900; letter-spacing:.02em; }
+  .dock-status b i{ width:8px; height:8px; border-radius:50%; background:#2ecc71; box-shadow:0 0 0 4px rgba(46,204,113,.18); }
+  .dock-status span{ font-size:11.5px; font-weight:700; color:#a9bbeb; }
+  .dock.dirty .dock-status b i{ background:var(--amber); box-shadow:0 0 0 4px rgba(245,166,35,.25); }
+  .dock.dirty .dock-status span{ color:#ffd58a; }
   .dock-btn{
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:3px;
+    min-width:74px;
+    padding:8px 10px;
     border:none;
-    border-radius:999px;
-    padding:10px 16px;
-    font-weight:900;
-    font-size:13.5px;
+    border-radius:18px;
+    background:transparent;
+    color:#dbe5ff;
+    font-weight:800;
+    font-size:11.5px;
     cursor:pointer;
-    white-space:nowrap;
-    transition:transform .25s var(--spring), background .2s;
+    transition:background .2s, color .2s, transform .25s var(--spring);
   }
-  .dock-btn:hover{ transform:translateY(-2px); }
-  .dock-btn.save{ background:var(--grad); color:#fff; }
-  .dock-btn.exit{ background:rgba(255,255,255,.12); color:#fff; }
-  .dock-btn.exit:hover{ background:rgba(255,255,255,.22); }
-  body.editing #app{ padding-bottom:130px; }
+  .dock-btn svg{ width:22px; height:22px; }
+  .dock-btn:hover{ background:rgba(255,255,255,.1); color:#fff; transform:translateY(-2px); }
+  .dock-btn.save{ background:var(--grad); color:#fff; box-shadow:0 8px 18px rgba(47,111,237,.35); }
+  .dock-btn.save:hover{ background:var(--grad); filter:brightness(1.08); }
+  .dock.dirty .dock-btn.save::after{ content:""; position:absolute; top:7px; right:16px; width:9px; height:9px; border-radius:50%; background:var(--amber); border:2px solid #2f6fed; }
+  body.editing #app{ padding-bottom:140px; }
   body.editing .act{ grid-template-columns:auto 1fr; }
   body.editing .act .file{ grid-column:2; }
   body.editing .file-name{ gap:6px; }
   body.editing .file-actions .btn{ flex:none; }
+
+  /* ---------- Teacher home ---------- */
+  .home-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .hcard{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:6px;
+    padding:18px;
+    border-radius:20px;
+    border:1px solid var(--line);
+    background:#fff;
+    text-align:left;
+    cursor:pointer;
+    transition:transform .25s var(--spring), box-shadow .2s, border-color .2s;
+  }
+  .hcard:hover{ transform:translateY(-3px); box-shadow:var(--shadow); border-color:#c7d3ea; }
+  .hcard strong{ font-size:16.5px; font-weight:900; color:var(--navy); }
+  .hcard > span:last-child{ font-size:13px; font-weight:600; line-height:1.45; color:var(--ink-2); }
+  .hc-ico{ width:44px; height:44px; border-radius:14px; display:flex; align-items:center; justify-content:center; color:#fff; margin-bottom:4px; }
+  .hc-ico svg{ width:23px; height:23px; }
+  .c-res .hc-ico{ background:var(--grad); box-shadow:0 8px 16px rgba(47,111,237,.3); }
+  .c-edit .hc-ico{ background:linear-gradient(135deg, #5b4fe0, #8a7cf5); box-shadow:0 8px 16px rgba(91,79,224,.3); }
+  .c-save .hc-ico{ background:linear-gradient(135deg, #1f8a4c, #34c170); box-shadow:0 8px 16px rgba(31,138,76,.28); }
+  .c-exit .hc-ico{ background:#e8edf8; color:var(--navy-2); }
+  .c-res{ background:linear-gradient(160deg, #fff 55%, #eef5ff); }
+  .draft{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:14px; padding:12px 14px; border-radius:16px; background:#fff7e8; border:1px solid #f3d49c; color:#7a4a12; font-weight:800; font-size:14px; }
+  .draft div{ display:flex; gap:8px; }
+  .draft .btn{ flex:none; padding:8px 12px; font-size:13px; }
+
+  /* ---------- Results dashboard ---------- */
+  .tk.wide{ width:min(1100px, 96vw); height:min(94vh, 1000px); height:min(94dvh, 1000px); max-height:none; }
+  .tk.wide .tk-body{ background:#f5f8fe; }
+  .dash{ display:flex; flex-direction:column; gap:14px; }
+  .dash-filters{ display:flex; align-items:flex-end; gap:10px; flex-wrap:wrap; }
+  .dash-row{ display:flex; align-items:flex-end; gap:10px; flex:1 1 380px; min-width:0; }
+  .tk-body:focus{ outline:none; }
+  .q-card{ grid-column:1 / -1; }
+  .hbar.q{ grid-template-columns:minmax(0, 2.2fr) minmax(90px, 1.3fr) 52px 96px; }
+  .hbar-flag{ display:flex; justify-content:flex-start; }
+  .dash-select{ display:flex; flex-direction:column; gap:4px; flex:1 1 240px; min-width:0; }
+  .dash-select span{ font-size:11.5px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); }
+  .dash-select select, #pnSort{
+    width:100%;
+    padding:11px 36px 11px 14px;
+    border-radius:14px;
+    border:1px solid var(--line);
+    background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234a5a86' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") right 12px center / 16px no-repeat;
+    -webkit-appearance:none;
+    appearance:none;
+    font:inherit;
+    font-size:14.5px;
+    font-weight:800;
+    color:var(--navy);
+    box-shadow:var(--shadow-sm);
+  }
+  .seg{ display:flex; gap:4px; padding:4px; border-radius:16px; background:#e8eef9; }
+  .seg-b{
+    display:flex; align-items:center; gap:6px;
+    padding:8px 12px;
+    border:none;
+    border-radius:12px;
+    background:transparent;
+    font-weight:900;
+    font-size:14px;
+    color:var(--ink-2);
+    cursor:pointer;
+    transition:background .2s, color .2s, box-shadow .2s;
+  }
+  .seg-b small{ min-width:20px; padding:1px 6px; border-radius:999px; background:rgba(18,34,74,.08); font-size:11px; font-weight:900; text-align:center; }
+  .seg-b.on{ background:#fff; color:var(--navy); box-shadow:0 2px 8px rgba(18,34,74,.12); }
+  .seg-b.on small{ background:var(--blue); color:#fff; }
+  .icon-btn{ width:44px; height:44px; flex-shrink:0; display:flex; align-items:center; justify-content:center; border-radius:14px; border:1px solid var(--line); background:#fff; color:var(--navy-2); cursor:pointer; box-shadow:var(--shadow-sm); transition:transform .25s var(--spring), background .2s, color .2s; }
+  .icon-btn:hover{ transform:translateY(-2px); background:var(--soft); }
+  .icon-btn svg{ width:19px; height:19px; }
+  .icon-btn.del{ width:36px; height:36px; border-radius:11px; box-shadow:none; color:#b0392b; border-color:#f4d6d2; }
+  .icon-btn.del:hover{ background:#fdeceb; }
+
+  .kpis{ display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; }
+  .kpi{ display:flex; flex-direction:column; gap:3px; padding:16px; border-radius:18px; background:#fff; border:1px solid var(--line); box-shadow:var(--shadow-sm); min-width:0; }
+  .kpi-l{ font-size:11.5px; font-weight:900; letter-spacing:.07em; text-transform:uppercase; color:var(--ink-3); }
+  .kpi-v{ font-size:32px; line-height:1.1; font-weight:900; color:var(--navy); font-variant-numeric:tabular-nums; }
+  .kpi-v small{ font-size:17px; color:var(--ink-3); font-weight:800; }
+  .kpi-s{ font-size:12.5px; font-weight:700; color:var(--ink-2); }
+  .kpi.warn{ border-color:#f3cdb9; background:linear-gradient(160deg, #fff 50%, #fff3ec); }
+  .kpi.warn .kpi-l{ color:#b4552c; }
+  .meter{ display:block; height:6px; margin:6px 0 2px; border-radius:99px; background:#e6ecf8; overflow:hidden; }
+  .meter i{ display:block; height:100%; border-radius:99px; background:var(--blue); }
+
+  .dash-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .card-d{ padding:16px 18px; border-radius:20px; background:#fff; border:1px solid var(--line); box-shadow:var(--shadow-sm); min-width:0; }
+  .card-d h4{ margin:0 0 12px; font-size:15.5px; font-weight:900; color:var(--navy); display:flex; align-items:center; gap:8px; }
+  .card-d h4 small{ padding:2px 8px; border-radius:999px; background:var(--soft); color:var(--ink-2); font-size:12px; }
+  .card-note{ margin:10px 0 0; font-size:12.5px; font-weight:700; line-height:1.5; color:var(--ink-3); }
+  .hbar{ display:grid; grid-template-columns:minmax(0, 1.25fr) minmax(70px, 1fr) auto; align-items:center; gap:10px; padding:6px 0; border-radius:8px; }
+  .hbar-lbl{ display:flex; align-items:center; gap:8px; min-width:0; }
+  .hbar-lbl b{ flex-shrink:0; font-size:13.5px; font-weight:900; color:var(--navy); }
+  .hbar-lbl small{ font-size:12.5px; font-weight:700; color:var(--ink-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .hbar-track{ height:12px; border-radius:6px; background:#eef2fa; overflow:hidden; }
+  .hbar-track i{ display:block; height:100%; min-width:2px; border-radius:0 4px 4px 0; transition:width .6s var(--ease); }
+  .hbar-val{ display:flex; align-items:center; gap:6px; justify-content:flex-end; min-width:62px; font-size:13.5px; font-weight:900; color:var(--navy); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .hbar-val small{ font-weight:700; color:var(--ink-3); }
+  .flag-r{ padding:2px 7px; border-radius:999px; background:#fff1e8; color:#a34a1c; font-size:11px; font-weight:900; }
+  .lvl{ display:inline-flex; align-items:center; justify-content:center; min-width:30px; height:24px; padding:0 7px; border-radius:8px; font-size:12.5px; font-weight:900; letter-spacing:.02em; }
+
+  .students h4{ margin:0; }
+  .st-head{ display:flex; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px; }
+  .st-head h4{ flex:1 1 auto; }
+  .st-search{ display:flex; align-items:center; gap:8px; flex:1 1 200px; padding:0 12px; border-radius:14px; border:1px solid var(--line); background:var(--soft); color:var(--ink-3); }
+  .st-search svg{ width:17px; height:17px; flex-shrink:0; }
+  .st-search input{ flex:1; min-width:0; padding:10px 0; border:none; background:transparent; font:inherit; font-size:14.5px; font-weight:700; color:var(--navy); outline:none; }
+  #pnSort{ width:auto; flex:0 0 auto; padding-top:9px; padding-bottom:9px; box-shadow:none; }
+  .st-group + .st-group{ margin-top:10px; }
+  .st-gh{ position:sticky; top:-22px; z-index:1; display:flex; align-items:center; gap:8px; padding:8px 4px; background:#fff; font-size:12.5px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; color:var(--blue); border-bottom:2px solid var(--line); }
+  .st-gh small{ padding:1px 7px; border-radius:999px; background:var(--soft); color:var(--ink-2); letter-spacing:0; }
+  .st-row{ display:grid; grid-template-columns:28px minmax(0, 1fr) auto auto 36px; align-items:center; gap:12px; padding:10px 4px; border-bottom:1px solid #eef2fa; }
+  .st-row:last-child{ border-bottom:none; }
+  .st-n{ font-size:12.5px; font-weight:900; color:var(--ink-3); text-align:center; font-variant-numeric:tabular-nums; }
+  .st-name{ display:flex; flex-direction:column; min-width:0; }
+  .st-name b{ font-size:15px; font-weight:900; color:var(--navy); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .st-name small{ font-size:12px; font-weight:700; color:var(--ink-3); }
+  .st-dots{ display:flex; gap:4px; }
+  .dot{ width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-style:normal; font-size:11px; font-weight:900; color:#fff; }
+  .dot.ok{ background:#0ca30c; }
+  .dot.no{ background:#d03b3b; }
+  .dot.na{ background:#e6ecf8; color:var(--ink-3); }
+  .st-score{ display:flex; align-items:center; gap:8px; }
+  .st-score b{ font-size:15px; font-weight:900; color:var(--navy); font-variant-numeric:tabular-nums; }
+  .dash-empty{ display:flex; flex-direction:column; align-items:center; text-align:center; gap:8px; padding:30px 16px; border-radius:20px; background:#fff; border:1px dashed #c7d3ea; }
+  .dash-empty .robot{ --rw:110px; margin-bottom:6px; }
+  .dash-empty strong{ font-size:18px; font-weight:900; }
+  .dash-empty span{ max-width:420px; font-size:14px; font-weight:600; color:var(--ink-2); line-height:1.5; }
+  .dash-loading{ display:flex; flex-direction:column; align-items:center; gap:10px; padding:50px 0; color:var(--ink-2); font-weight:800; }
+  .dash-loading .robot{ --rw:100px; }
+  .dash-foot{ display:flex; gap:10px; flex-wrap:wrap; }
+  .dash-foot .btn{ flex:none; padding:12px 18px; font-size:14.5px; border-radius:14px; }
+  .tip{ position:fixed; z-index:5; padding:8px 11px; border-radius:10px; background:var(--navy); color:#fff; font-size:12.5px; font-weight:700; line-height:1.4; pointer-events:none; box-shadow:0 10px 24px rgba(8,18,44,.3); }
+  .tk .toast{ top:14px; }
+  @media (hover:none){ .tip{ display:none !important; } }
+
+  @media (max-width:720px){
+    .kpis{ grid-template-columns:1fr 1fr; gap:10px; }
+    .kpi{ padding:13px; }
+    .kpi-v{ font-size:27px; }
+    .dash-grid{ grid-template-columns:1fr; }
+    .seg{ width:100%; }
+    .seg-b{ flex:1; justify-content:center; padding:9px 4px; }
+    .st-row{ grid-template-columns:22px minmax(0, 1fr) auto 34px; grid-template-areas:"n name score del" ". dots dots dots"; row-gap:6px; column-gap:10px; }
+    .st-n{ grid-area:n; } .st-name{ grid-area:name; } .st-score{ grid-area:score; } .st-row .del{ grid-area:del; } .st-dots{ grid-area:dots; }
+    .hbar, .hbar.q{ grid-template-columns:minmax(0, 1fr) auto; row-gap:4px; column-gap:8px; }
+    .hbar.q{ grid-template-columns:minmax(0, 1fr) auto auto; }
+    .hbar-track{ grid-column:1 / -1; grid-row:2; }
+    .hbar-flag:empty{ display:none; }
+    .dash-row{ flex-basis:100%; }
+    .st-gh{ top:-18px; }
+    .home-grid{ grid-template-columns:1fr; }
+    .hcard{ flex-direction:row; flex-wrap:wrap; align-items:center; column-gap:12px; padding:14px; }
+    .hcard .hc-ico{ margin:0; }
+    .hcard > span:last-child{ flex-basis:100%; }
+    .dock{ left:10px; right:10px; transform:none; bottom:calc(10px + var(--safe-b)); justify-content:space-between; animation:none; padding:6px; border-radius:22px; }
+    .dock-status{ display:none; }
+    .dock-btn{ flex:1; min-width:0; }
+    .dock.dirty .dock-btn.save::after{ right:calc(50% - 20px); }
+  }
 
   /* ---------- Toast ---------- */
   .toast{
@@ -1289,11 +1464,8 @@
   .g-btn svg{ width:22px; height:22px; }
   .or{ display:flex; align-items:center; gap:10px; margin:16px 0 12px; font-size:12.5px; font-weight:800; color:var(--ink-3); }
   .or::before, .or::after{ content:""; flex:1; height:1px; background:var(--line); }
-  .dock-btn.res{ background:rgba(255,255,255,.12); color:#fff; }
-  .dock-btn.res:hover{ background:rgba(255,255,255,.22); }
   @media (max-width:560px){
     .sec{ font-size:21px; padding:12px 0; }
-    .dock-btn .lbl{ display:none; }
   }
 
   /* ---------- Responsive ---------- */
@@ -1320,14 +1492,11 @@
     .act-step{ width:40px; height:40px; font-size:16px; align-self:start; }
     .meta{ padding:20px 18px; }
     .flipped{ padding:20px 18px; }
-    .dock{ left:12px; right:12px; transform:none; justify-content:space-between; border-radius:22px; animation:none; }
-    .dock-status span{ display:none; }
     body.editing #app{ padding-bottom:120px; }
   }
   @media (max-width:380px){
     .tiles{ grid-template-columns:1fr 1fr; gap:10px; }
     .tile-desc{ display:none; }
-    .dock-btn{ padding:10px 12px; font-size:12.5px; }
   }
   @media (hover:none){
     .tile:hover, .choice:hover{ transform:none; }
@@ -1393,7 +1562,12 @@
 </div>
 
 <div class="dock" id="dock" hidden>
-  <div class="dock-status"><i></i><span id="dockText">Modo edición</span></div>
+  <div class="dock-status"><b><i></i>Modo docente</b><span id="dockText">Toca un texto para editarlo</span></div>
+  <button class="dock-btn" id="homeBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>Panel</button>
+  <button class="dock-btn" id="resBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Resultados</button>
+  <button class="dock-btn save" id="saveBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></svg>Guardar</button>
+  <button class="dock-btn" id="exitBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/></svg>Salir</button>
+</div>
   <button class="dock-btn res" id="resBtn" type="button">📊 <span class="lbl">Resultados</span></button>
   <button class="dock-btn save" id="saveBtn" type="button">💾 Guardar<span class="lbl"> HTML</span></button>
   <button class="dock-btn exit" id="exitBtn" type="button">Salir</button>
@@ -1411,7 +1585,7 @@
 
 <dialog class="tk" id="ticket" aria-label="Exit ticket">
   <header class="tk-top" id="tkTop"></header>
-  <div class="tk-body" id="tkBody"></div>
+  <div class="tk-body" id="tkBody" tabindex="-1"></div>
 </dialog>
 
 <input type="file" id="fileInput" hidden accept=".pdf,application/pdf,image/*,.doc,.docx,.ppt,.pptx">
@@ -2037,18 +2211,19 @@
     editing = true;
     document.body.classList.add('editing');
     dock.hidden = false;
-    dockText.textContent = dirty ? 'Cambios sin guardar' : 'Modo edición';
+    dockText.textContent = dirty ? 'Cambios sin guardar' : 'Toca un texto para editarlo';
     rerender();
+    showHome();
+  }
+  function restoreDraft(){
     const d = readDraft();
-    if(d && !dirty){
-      const when = new Date(d.at).toLocaleString('es-PE', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
-      toast(`📝 Tienes cambios sin guardar (${when})`, [
-        ['Recuperar', () => { Object.assign(APP, d.app); normalize(); dirty = true; dock.classList.add('dirty'); dockText.textContent = 'Cambios sin guardar'; rerender(); renderChoices(); toast('✅ Cambios recuperados'); }],
-        ['Descartar', () => { clearDraft(); }]
-      ], 12000);
-    } else toast('✏️ Modo edición activado');
+    if(!d) return;
+    Object.assign(APP, d.app); normalize();
+    dirty = true; dock.classList.add('dirty'); dockText.textContent = 'Cambios sin guardar';
+    rerender(); renderChoices();
   }
   $('#resBtn').addEventListener('click', () => openResults());
+  $('#homeBtn').addEventListener('click', () => { commitFocused(); showHome(); });
   $('#exitBtn').addEventListener('click', () => {
     commitFocused();
     if(document.activeElement) document.activeElement.blur();
@@ -2254,6 +2429,7 @@
     const qs = playable(unitByKey(unit).sessions[n - 1]);
     if(!qs.length) return;
     tk = { unit, n, qs, name:'', section:'', i:0, answers:[], practice: !!practice };
+    tkDlg.classList.remove('wide');
     stepIntro();
     tkDlg.showModal();
     setTimeout(() => { const f = $('#tkName'); f && f.focus(); }, 80);
@@ -2437,17 +2613,41 @@
     }, 'image/png');
   }
 
-  /* ---------- teacher: results by section ---------- */
+  /* ---------- teacher: results dashboard ---------- */
   let panel = null;
   const sessionsWithTicket = () => APP.units.flatMap(u => u.sessions.map((s, i) => ({ u, n: i + 1, s })).filter(x => playable(x.s).length));
-  const fmtDate = t => new Date(t).toLocaleString('es-PE', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+  const fmtDate = t => new Date(t).toLocaleString('es-PE', { day:'numeric', month:'numeric', hour:'2-digit', minute:'2-digit', hourCycle:'h23' });
+  const LEVELS = [
+    { k:'AD', name:'Logro destacado', min:.9, color:'#12224a', ink:'#fff' },
+    { k:'A', name:'Logro esperado', min:.7, color:'#2f6fed', ink:'#fff' },
+    { k:'B', name:'En proceso', min:.5, color:'#8fb2f5', ink:'#12224a' },
+    { k:'C', name:'En inicio', min:0, color:'#c9dafb', ink:'#12224a' }
+  ];
+  const ratio = r => r.total ? r.score / r.total : 0;
+  const levelOf = r => LEVELS.find(l => ratio(r) >= l.min - 1e-9);
+  const pctTxt = x => Math.round(x * 100) + '%';
+  const ICON = {
+    refresh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>',
+    search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
+    trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>'
+  };
 
-  async function showResults(unit, n){
+  function defaultKey(unit, n){
     const list = sessionsWithTicket();
-    const first = list[0];
-    panel = { key: unit && n ? `${unit}|${n}` : first ? `${first.u.key}|${first.n}` : '', section: (panel && panel.section) || 'A', email: panel && panel.email, rows: null, err: '' };
+    if(unit && n && list.some(x => x.u.key === unit && x.n === +n)) return `${unit}|${n}`;
+    if(panel && panel.rows && panel.rows.length){
+      const last = panel.rows.slice().sort((a, b) => b.at - a.at)[0];
+      if(list.some(x => x.u.key === last.unit && x.n === +last.n)) return `${last.unit}|${last.n}`;
+    }
+    return list[0] ? `${list[0].u.key}|${list[0].n}` : '';
+  }
+  async function showResults(unit, n){
+    const prev = panel || {};
+    panel = { key: '', wantKey: [unit, n], section: prev.section || 'ALL', sort: prev.sort || 'name', q: '', email: prev.email, rows: null, err: '' };
+    panel.key = defaultKey(unit, n);
     tk = null;
-    if(!tkDlg.open) tkDlg.showModal();
+    tkDlg.classList.add('wide');
+    if(!tkDlg.open){ tkDlg.showModal(); tkBody.focus({ preventScroll:true }); }
     await loadPanel();
   }
   async function loadPanel(){
@@ -2455,10 +2655,11 @@
     panel.cloud = !!c;
     panel.err = '';
     panel.rows = null;
-    if(c && !auth()){ renderPanel(); return; }
     renderPanel();
+    if(c && !auth()) return;
     try{
       panel.rows = c ? await cloudList(c) : lsGet(RES_KEY, []).map(r => ({ ...r, section: r.section || '—' }));
+      if(!panel.wantKey[0]) panel.key = defaultKey();
     }catch(e){
       if(e.message === 'AUTH' || e.message === 'DENIED'){
         const who = (auth() || {}).email;
@@ -2474,64 +2675,187 @@
     const [unit, n] = panel.key.split('|');
     return (panel.rows || []).filter(r => r.unit === unit && +r.n === +n);
   }
+  function sectionRows(){
+    const all = panelRows();
+    return panel.section === 'ALL' ? all : all.filter(r => r.section === panel.section);
+  }
+
   function renderPanel(){
-    const list = sessionsWithTicket();
     const cloudNoAuth = panel.cloud && !auth();
-    tkTop.innerHTML = `<small>📊 Resultados · Exit ticket</small><strong>${GRADE} grado</strong>
-      <span>${panel.cloud ? '☁️ En línea (Firebase)' + (auth() ? ' · ' + esc(auth().email) : '') : '💾 Solo este dispositivo (sin Firebase)'}</span>
+    const [unit, n] = panel.key.split('|');
+    const u = unit && unitByKey(unit);
+    tkTop.innerHTML = `<small>📊 Resultados · Exit ticket</small>
+      <strong>${GRADE} grado${u ? ` · Unidad ${esc(u.num)} · Sesión ${n}` : ''}</strong>
+      <span>${panel.cloud ? (auth() ? '☁️ En línea · ' + esc(auth().email) : '☁️ En línea (Firebase)') : '💾 Solo este dispositivo'}</span>
       <button class="tk-x" type="button" data-tk="close" aria-label="Cerrar">✕</button>`;
-    if(cloudNoAuth){
-      tkBody.innerHTML = `<div class="tk-step">
-        ${sayRow('Hola, profe 👩‍🏫 Ingresa con tu cuenta de docente para ver los resultados.')}
-        <form class="login" id="loginForm">
-          <button type="button" class="btn g-btn" data-tk="google"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg> Ingresar con Google</button>
-          <div class="or"><span>o con correo y contraseña</span></div>
-          <div class="fld"><label for="lgEmail">Correo</label><input id="lgEmail" type="email" autocomplete="username" required value="${esc(panel.email || '')}"></div>
-          <div class="fld"><label for="lgPass">Contraseña</label><input id="lgPass" type="password" autocomplete="current-password" required></div>
-          ${panel.err ? `<p class="send warn">${esc(panel.err)}</p>` : ''}
-          ${panel.info ? `<p class="send ok">${esc(panel.info)}</p>` : ''}
-          <div class="tk-actions"><button type="submit" class="btn solid">Ingresar</button><button type="button" class="btn ghost" data-tk="forgot">¿Olvidaste tu contraseña?</button></div>
-        </form>
-      </div>`;
-      fbConfig().then(c => c && googleAuth(c)).catch(() => {});
+    if(cloudNoAuth){ renderLogin(); return; }
+    if(!panel.rows){
+      tkBody.innerHTML = `<div class="tk-step dash"><div class="dash-loading">${robotHTML()}<p><span class="spin"></span> Cargando resultados…</p></div></div>`;
       return;
     }
-    const rows = panelRows();
-    const bySec = s => rows.filter(r => r.section === s).sort((a, b) => a.name.localeCompare(b.name, 'es'));
-    const cur = bySec(panel.section);
-    const avg = cur.length ? cur.reduce((t, r) => t + r.score / r.total, 0) / cur.length : 0;
-    const total = cur[0] ? cur[0].total : 5;
-    tkBody.innerHTML = `<div class="tk-step">
-      <div class="panel-bar">
-        <select id="pnSession" aria-label="Sesión">${list.map(x => `<option value="${x.u.key}|${x.n}"${`${x.u.key}|${x.n}` === panel.key ? ' selected' : ''}>Unidad ${esc(x.u.num)} · Sesión ${x.n}</option>`).join('')}</select>
-        <button type="button" class="btn ghost" data-tk="reload" title="Actualizar">🔄 Actualizar</button>
-      </div>
-      <div class="sec-tabs" role="tablist">${SECTIONS.map(s => `<button type="button" role="tab" class="sec-tab${s === panel.section ? ' on' : ''}" aria-selected="${s === panel.section}" data-tab="${s}"><b>${GRADE} ${s}</b><span>${panel.rows ? bySec(s).length : '…'}</span></button>`).join('')}</div>
-      ${panel.err ? `<p class="send warn">${esc(panel.err)}</p>` : ''}
-      ${!panel.rows ? '<p class="res-empty"><span class="spin"></span> Cargando resultados…</p>'
-        : cur.length ? `
-        <div class="sec-sum"><span><b>${cur.length}</b> estudiante${cur.length === 1 ? '' : 's'}</span><span>Promedio: <b>${(avg * total).toFixed(1)}/${total}</b></span><span>Logrado (≥ 60%): <b>${cur.filter(r => r.score / r.total >= .6).length}</b></span></div>
-        <div style="overflow:auto"><table class="res-table"><thead><tr><th>N°</th><th>Estudiante</th><th>Nota</th><th>Fecha</th><th></th></tr></thead><tbody>
-        ${cur.map((r, i) => `<tr><td>${i + 1}</td><td>${esc(r.name)}</td><td><span class="grade ${r.score / r.total >= .8 ? 'hi' : r.score / r.total >= .6 ? 'mid' : 'lo'}">${r.score}/${r.total}</span></td><td>${fmtDate(r.at)}</td>
-          <td><button type="button" class="tq-mini rm" data-del="${esc(r.id)}" title="Borrar para que pueda volver a responder">🗑</button></td></tr>`).join('')}
-        </tbody></table></div>`
-        : `<p class="res-empty">Todavía no hay resultados del ${GRADE} ${panel.section} en esta sesión.</p>`}
-      <div class="tk-actions" style="margin-top:16px">
-        ${rows.length ? '<button type="button" class="btn solid" data-tk="csv">⬇️ Descargar para Excel (A, B, C y D)</button>' : ''}
-        ${panel.cloud ? '<button type="button" class="btn ghost" data-tk="logout">Cerrar sesión</button>' : ''}
-        <button type="button" class="btn ghost" data-tk="close">Cerrar</button>
-      </div>
-      ${panel.cloud ? '' : '<p class="drop-hint" style="text-align:left;margin-top:12px">Cuando publiques la página en Firebase Hosting, aquí verás los resultados de todos tus estudiantes.</p>'}
+    renderDashboard();
+  }
+
+  function renderLogin(){
+    tkBody.innerHTML = `<div class="tk-step login-wrap">
+      ${sayRow('Hola, profe 👩‍🏫 Ingresa con tu cuenta de docente para ver los resultados.')}
+      <form class="login" id="loginForm">
+        <button type="button" class="btn g-btn" data-tk="google"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg> Ingresar con Google</button>
+        <div class="or"><span>o con correo y contraseña</span></div>
+        <div class="fld"><label for="lgEmail">Correo</label><input id="lgEmail" type="email" autocomplete="username" required value="${esc(panel.email || '')}"></div>
+        <div class="fld"><label for="lgPass">Contraseña</label><input id="lgPass" type="password" autocomplete="current-password" required></div>
+        ${panel.err ? `<p class="send warn">${esc(panel.err)}</p>` : ''}
+        ${panel.info ? `<p class="send ok">${esc(panel.info)}</p>` : ''}
+        <div class="tk-actions"><button type="submit" class="btn solid">Ingresar</button><button type="button" class="btn ghost" data-tk="forgot">¿Olvidaste tu contraseña?</button></div>
+      </form>
+    </div>`;
+    fbConfig().then(c => c && googleAuth(c)).catch(() => {});
+  }
+
+  function barRow({ label, sub, value, max, text, color, tip, flag, cls }){
+    const w = max ? Math.max(0, Math.min(100, value / max * 100)) : 0;
+    return `<div class="hbar${cls ? ' ' + cls : ''}" data-tip="${esc(tip || '')}">
+      <div class="hbar-lbl"><b>${label}</b>${sub ? `<small>${sub}</small>` : ''}</div>
+      <div class="hbar-track"><i style="width:${w}%;background:${color || 'var(--blue)'}"></i></div>
+      <div class="hbar-val">${text}</div>
+      ${cls === 'q' ? `<div class="hbar-flag">${flag || ''}</div>` : ''}
     </div>`;
   }
+
+  function renderDashboard(){
+    const list = sessionsWithTicket();
+    const countFor = key => (panel.rows || []).filter(r => `${r.unit}|${+r.n}` === key).length;
+    const all = panelRows();
+    const rows = sectionRows();
+    const [unit, n] = panel.key.split('|');
+    const sess = unit && unitByKey(unit) && unitByKey(unit).sessions[n - 1];
+    const qs = sess ? playable(sess) : [];
+    const total = rows[0] ? rows[0].total : (qs.length || 5);
+    const N = rows.length;
+    const avg = N ? rows.reduce((t, r) => t + ratio(r), 0) / N : 0;
+    const good = rows.filter(r => ratio(r) >= .7 - 1e-9).length;
+    const help = rows.filter(r => ratio(r) < .5 - 1e-9).length;
+    const secLabel = panel.section === 'ALL' ? 'las 4 secciones' : `${GRADE} ${panel.section}`;
+
+    const filters = `<div class="dash-filters">
+      <div class="dash-row"><label class="dash-select"><span>Sesión</span>
+        <select id="pnSession">${list.map(x => { const k = `${x.u.key}|${x.n}`, c = countFor(k); return `<option value="${k}"${k === panel.key ? ' selected' : ''}>Unidad ${esc(x.u.num)} · Sesión ${x.n}${c ? ` — ${c} respuesta${c === 1 ? '' : 's'}` : ''}</option>`; }).join('')}</select></label>
+      <button type="button" class="icon-btn" data-tk="reload" title="Actualizar" aria-label="Actualizar">${ICON.refresh}</button></div>
+      <div class="seg" role="tablist" aria-label="Sección">
+        ${['ALL', ...SECTIONS].map(s => { const c = s === 'ALL' ? all.length : all.filter(r => r.section === s).length; return `<button type="button" role="tab" class="seg-b${s === panel.section ? ' on' : ''}" aria-selected="${s === panel.section}" data-tab="${s}">${s === 'ALL' ? 'Todas' : s}<small>${c}</small></button>`; }).join('')}
+      </div>
+    </div>`;
+
+    if(!N){
+      tkBody.innerHTML = `<div class="tk-step dash">${filters}
+        ${panel.err ? `<p class="send warn">${esc(panel.err)}</p>` : ''}
+        <div class="dash-empty">${robotHTML()}<strong>Aún no hay respuestas</strong><span>Cuando tus estudiantes de ${secLabel} terminen el Exit ticket de esta sesión, sus notas aparecerán aquí.</span></div>
+        ${dashFooter(all.length)}
+      </div>`;
+      return;
+    }
+
+    const kpis = `<div class="kpis">
+      <div class="kpi"><span class="kpi-l">Respondieron</span><b class="kpi-v">${N}</b><span class="kpi-s">estudiante${N === 1 ? '' : 's'} de ${secLabel}</span></div>
+      <div class="kpi"><span class="kpi-l">Promedio</span><b class="kpi-v">${(avg * total).toFixed(1)}<small>/${total}</small></b>
+        <span class="meter" role="meter" aria-valuenow="${Math.round(avg * 100)}" aria-valuemin="0" aria-valuemax="100"><i style="width:${avg * 100}%"></i></span><span class="kpi-s">${pctTxt(avg)} de aciertos</span></div>
+      <div class="kpi"><span class="kpi-l">Logro esperado o más</span><b class="kpi-v">${pctTxt(good / N)}</b><span class="kpi-s">${good} con nivel AD o A</span></div>
+      <div class="kpi${help ? ' warn' : ''}"><span class="kpi-l">${help ? '⚠️ ' : ''}Necesitan apoyo</span><b class="kpi-v">${help}</b><span class="kpi-s">en inicio (C)</span></div>
+    </div>`;
+
+    const lvCounts = LEVELS.map(l => rows.filter(r => levelOf(r) === l).length);
+    const levels = `<section class="card-d${panel.section === 'ALL' ? '' : ' q-card'}">
+      <h4>Niveles de logro</h4>
+      ${LEVELS.map((l, i) => barRow({ label: `<span class="lvl" style="background:${l.color};color:${l.ink}">${l.k}</span>`, sub: l.name, value: lvCounts[i], max: N,
+        text: `${lvCounts[i]} <small>${pctTxt(lvCounts[i] / N)}</small>`, color: l.color, tip: `${l.k} · ${l.name}: ${lvCounts[i]} de ${N} estudiantes` })).join('')}
+      <p class="card-note">AD 90–100% · A 70–89% · B 50–69% · C menos de 50% de aciertos</p>
+    </section>`;
+
+    const Q = Math.max(qs.length, ...rows.map(r => (r.answers || []).length));
+    const qStats = Array.from({ length: Q }, (_, i) => {
+      const answered = rows.filter(r => (r.answers || []).length > i);
+      const ok = answered.filter(r => r.answers[i] === true).length;
+      return { i, ok, of: answered.length, p: answered.length ? ok / answered.length : 0, text: qs[i] ? qs[i].q : `Pregunta ${i + 1}` };
+    });
+    const hardest = qStats.filter(q => q.of).sort((a, b) => a.p - b.p)[0];
+    const questions = `<section class="card-d q-card">
+      <h4>Aciertos por pregunta</h4>
+      ${qStats.map(q => barRow({ label: `P${q.i + 1}`, sub: esc(q.text), value: q.p, max: 1,
+        text: pctTxt(q.p), tip: `P${q.i + 1}: ${q.ok} de ${q.of} acertaron — ${q.text}`,
+        cls: 'q', flag: q.of && q.p < .6 ? '<span class="flag-r">⚠️ Reforzar</span>' : '' })).join('')}
+      ${hardest && hardest.p < .6 ? `<p class="card-note">💡 La pregunta más difícil fue la <b>P${hardest.i + 1}</b>: solo ${pctTxt(hardest.p)} acertó. Conviene repasarla en la próxima clase.</p>` : '<p class="card-note">✅ Ninguna pregunta quedó por debajo del 60% de aciertos.</p>'}
+    </section>`;
+
+    const bySec = panel.section === 'ALL' ? `<section class="card-d">
+      <h4>Comparación por sección</h4>
+      ${SECTIONS.map(s => { const rs = all.filter(r => r.section === s), a = rs.length ? rs.reduce((t, r) => t + ratio(r), 0) / rs.length : 0;
+        return barRow({ label: `${GRADE} ${s}`, sub: rs.length ? `${rs.length} estudiante${rs.length === 1 ? '' : 's'}` : 'sin respuestas', value: a, max: 1,
+          text: rs.length ? `${(a * total).toFixed(1)}/${total}` : '—', tip: rs.length ? `${GRADE} ${s}: promedio ${(a * total).toFixed(1)} de ${total} (${pctTxt(a)}) · ${rs.length} estudiantes` : `${GRADE} ${s}: aún sin respuestas` }); }).join('')}
+      <p class="card-note">Promedio de respuestas correctas de cada salón.</p>
+    </section>` : '';
+
+    tkBody.innerHTML = `<div class="tk-step dash">
+      ${filters}
+      ${panel.err ? `<p class="send warn">${esc(panel.err)}</p>` : ''}
+      ${kpis}
+      <div class="dash-grid">${levels}${bySec}${questions}</div>
+      <section class="card-d students">
+        <div class="st-head">
+          <h4>Estudiantes <small>${N}</small></h4>
+          <label class="st-search">${ICON.search}<input id="pnSearch" type="search" placeholder="Buscar estudiante…" value="${esc(panel.q)}" autocomplete="off"></label>
+          <select id="pnSort" aria-label="Ordenar">
+            ${[['name', 'Nombre A–Z'], ['high', 'Mayor nota'], ['low', 'Menor nota'], ['recent', 'Más recientes']].map(([v, t]) => `<option value="${v}"${panel.sort === v ? ' selected' : ''}>${t}</option>`).join('')}
+          </select>
+        </div>
+        <div id="stList">${studentList(rows, Q)}</div>
+      </section>
+      ${dashFooter(all.length)}
+    </div>`;
+  }
+
+  function studentList(rows, Q){
+    const q = panel.q.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    const cmp = { name: (a, b) => a.name.localeCompare(b.name, 'es'), high: (a, b) => ratio(b) - ratio(a) || a.name.localeCompare(b.name, 'es'),
+      low: (a, b) => ratio(a) - ratio(b) || a.name.localeCompare(b.name, 'es'), recent: (a, b) => b.at - a.at }[panel.sort];
+    const shown = rows.filter(r => !q || r.name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(q)).sort(cmp);
+    if(!shown.length) return '<p class="res-empty">No hay estudiantes con ese nombre.</p>';
+    const row = (r, i) => {
+      const l = levelOf(r);
+      const dots = Array.from({ length: Q }, (_, k) => { const v = (r.answers || [])[k]; return v === undefined ? '<i class="dot na">·</i>' : `<i class="dot ${v ? 'ok' : 'no'}" title="P${k + 1}: ${v ? 'correcta' : 'incorrecta'}">${v ? '✓' : '✕'}</i>`; }).join('');
+      return `<div class="st-row">
+        <span class="st-n">${i + 1}</span>
+        <div class="st-name"><b>${esc(r.name)}</b><small>${GRADE} ${esc(r.section)} · ${fmtDate(r.at)}</small></div>
+        <div class="st-dots" aria-label="Respuestas por pregunta">${dots}</div>
+        <div class="st-score"><b>${r.score}/${r.total}</b><span class="lvl" style="background:${l.color};color:${l.ink}" title="${l.name}">${l.k}</span></div>
+        <button type="button" class="icon-btn del" data-del="${esc(r.id)}" title="Borrar para que pueda volver a responder" aria-label="Borrar resultado de ${esc(r.name)}">${ICON.trash}</button>
+      </div>`;
+    };
+    if(panel.section !== 'ALL') return shown.map(row).join('');
+    return SECTIONS.map(s => {
+      const g = shown.filter(r => r.section === s);
+      return g.length ? `<div class="st-group"><div class="st-gh">${GRADE} ${s} <small>${g.length}</small></div>${g.map(row).join('')}</div>` : '';
+    }).join('');
+  }
+
+  function dashFooter(count){
+    return `<div class="dash-foot">
+      ${count ? `<button type="button" class="btn solid" data-tk="csv">⬇️ Descargar para Excel</button>` : ''}
+      ${panel.cloud ? '<button type="button" class="btn ghost" data-tk="logout">Cerrar sesión</button>' : ''}
+      <button type="button" class="btn ghost" data-tk="close">Cerrar</button>
+    </div>
+    ${panel.cloud ? '' : '<p class="drop-hint" style="text-align:left;margin-top:10px">Sin conexión a Firebase: solo se muestran los resultados de este dispositivo.</p>'}`;
+  }
+
   function resultsCsv(){
     const [unit, n] = panel.key.split('|'), u = unitByKey(unit);
-    const rows = panelRows().sort((a, b) => a.section.localeCompare(b.section) || a.name.localeCompare(b.name, 'es'));
+    const rows = sectionRows().sort((a, b) => a.section.localeCompare(b.section) || a.name.localeCompare(b.name, 'es'));
+    const Q = Math.max(0, ...rows.map(r => (r.answers || []).length));
     const q = v => '"' + String(v).replace(/"/g, '""') + '"';
-    const lines = [['Grado', 'Sección', 'Estudiante', 'Correctas', 'Total', 'Fecha y hora'].map(q).join(';')]
-      .concat(rows.map(r => [GRADE, r.section, r.name, r.score, r.total, new Date(r.at).toLocaleString('es-PE')].map(q).join(';')));
+    const head = ['Grado', 'Sección', 'Estudiante', 'Correctas', 'Total', '% aciertos', 'Nivel', ...Array.from({ length: Q }, (_, i) => 'P' + (i + 1)), 'Fecha y hora'];
+    const lines = [head.map(q).join(';')].concat(rows.map(r => [GRADE, r.section, r.name, r.score, r.total, Math.round(ratio(r) * 100), levelOf(r).k,
+      ...Array.from({ length: Q }, (_, i) => (r.answers || [])[i] === undefined ? '' : r.answers[i] ? 1 : 0), new Date(r.at).toLocaleString('es-PE')].map(q).join(';')));
     const url = URL.createObjectURL(new Blob(['﻿' + lines.join('\r\n')], { type:'text/csv;charset=utf-8' }));
-    download(url, `exit-ticket-unidad${u.num}-sesion${n}-${GRADE}.csv`);
+    download(url, `exit-ticket-unidad${u.num}-sesion${n}-${GRADE}${panel.section === 'ALL' ? '' : panel.section}.csv`);
     setTimeout(() => URL.revokeObjectURL(url), 4000);
   }
   function openResults(){
@@ -2539,8 +2863,60 @@
     route.name === 'session' ? showResults(route.unit, route.n) : showResults();
   }
 
+  /* ---------- teacher home ---------- */
+  const HOME_ICONS = {
+    res: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+    edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>',
+    save: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></svg>',
+    exit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/></svg>'
+  };
+  function showHome(){
+    tk = null;
+    tkDlg.classList.remove('wide');
+    const d = !dirty && readDraft();
+    const when = d && fmtDate(d.at);
+    tkTop.innerHTML = `<small>🔐 Modo docente</small><strong>Panel de la profe</strong><span>Ciencia · ${GRADE} grado</span>
+      <button class="tk-x" type="button" data-tk="close" aria-label="Cerrar">✕</button>`;
+    tkBody.innerHTML = `<div class="tk-step">
+      ${sayRow('¡Hola, profe! 👋 ¿Qué deseas hacer hoy?', 'good')}
+      ${d ? `<div class="draft"><span>📝 Tienes cambios sin guardar (${when})</span><div><button type="button" class="btn solid" data-tk="draft-yes">Recuperar</button><button type="button" class="btn ghost" data-tk="draft-no">Descartar</button></div></div>` : ''}
+      <div class="home-grid">
+        <button type="button" class="hcard c-res" data-tk="h-res"><span class="hc-ico">${HOME_ICONS.res}</span><strong>Resultados</strong><span>Notas por sección, niveles de logro y preguntas que conviene reforzar.</span></button>
+        <button type="button" class="hcard c-edit" data-tk="h-edit"><span class="hc-ico">${HOME_ICONS.edit}</span><strong>Editar la página</strong><span>Toca cualquier texto, sube fichas y cambia las preguntas del Exit ticket.</span></button>
+        <button type="button" class="hcard c-save" data-tk="h-save"><span class="hc-ico">${HOME_ICONS.save}</span><strong>Guardar cambios</strong><span>${dirty ? '<b>Tienes cambios sin guardar.</b> ' : ''}Descarga la página con todo lo que editaste.</span></button>
+        <button type="button" class="hcard c-exit" data-tk="h-exit"><span class="hc-ico">${HOME_ICONS.exit}</span><strong>Salir del modo docente</strong><span>Vuelve a la vista que ven tus estudiantes.</span></button>
+      </div>
+    </div>`;
+    if(!tkDlg.open){ tkDlg.showModal(); tkBody.focus({ preventScroll:true }); }
+  }
+
+  /* hover tooltip for dashboard bars */
+  const tipEl = document.createElement('div');
+  tipEl.className = 'tip';
+  tipEl.hidden = true;
+  tkDlg.appendChild(tipEl);
+  tkDlg.addEventListener('pointerover', e => {
+    const t = e.target.closest && e.target.closest('[data-tip]');
+    if(!t || !t.dataset.tip || e.pointerType === 'touch'){ tipEl.hidden = true; return; }
+    tipEl.textContent = t.dataset.tip;
+    tipEl.hidden = false;
+    const r = t.getBoundingClientRect(), w = Math.min(320, innerWidth - 24);
+    tipEl.style.maxWidth = w + 'px';
+    tipEl.style.left = Math.max(12, Math.min(innerWidth - w - 12, r.left + r.width / 2 - w / 2)) + 'px';
+    tipEl.style.top = Math.max(8, r.top - tipEl.offsetHeight - 8) + 'px';
+  });
+  tkBody.addEventListener('scroll', () => { tipEl.hidden = true; }, { passive:true });
+  tkDlg.addEventListener('pointerout', e => { if(!e.relatedTarget || !(e.relatedTarget.closest && e.relatedTarget.closest('[data-tip]'))) tipEl.hidden = true; });
+
   /* ---------- dialog events ---------- */
   tkBody.addEventListener('input', e => {
+    if(e.target.id === 'pnSearch' && panel){
+      panel.q = e.target.value;
+      const [unit, n] = panel.key.split('|'), sess = unitByKey(unit) && unitByKey(unit).sessions[n - 1];
+      const rows = sectionRows();
+      $('#stList').innerHTML = studentList(rows, Math.max(sess ? playable(sess).length : 0, ...rows.map(r => (r.answers || []).length)));
+      return;
+    }
     if(e.target.id !== 'tkName' || !tk) return;
     tk.name = e.target.value;
     $('#tkStart').disabled = !(cleanName(tk.name) && tk.section);
@@ -2549,7 +2925,8 @@
     if(e.key === 'Enter' && e.target.id === 'tkName'){ e.preventDefault(); if(!$('#tkStart').disabled) beginTicket(); }
   });
   tkBody.addEventListener('change', e => {
-    if(e.target.id === 'pnSession'){ panel.key = e.target.value; renderPanel(); }
+    if(e.target.id === 'pnSession'){ panel.key = e.target.value; panel.wantKey = panel.key.split('|'); renderPanel(); }
+    if(e.target.id === 'pnSort'){ panel.sort = e.target.value; renderPanel(); }
   });
   tkBody.addEventListener('submit', async e => {
     if(e.target.id !== 'loginForm') return;
@@ -2603,6 +2980,12 @@
     if(!a) return;
     const act = a.dataset.tk;
     if(act === 'close') tkDlg.close();
+    else if(act === 'h-res') openResults();
+    else if(act === 'h-edit'){ tkDlg.close(); toast('✏️ Toca cualquier texto de la página para editarlo'); }
+    else if(act === 'h-save'){ tkDlg.close(); $('#saveBtn').click(); }
+    else if(act === 'h-exit'){ tkDlg.close(); $('#exitBtn').click(); }
+    else if(act === 'draft-yes'){ restoreDraft(); showHome(); toast('✅ Cambios recuperados'); }
+    else if(act === 'draft-no'){ clearDraft(); showHome(); }
     else if(act === 'edit') stepIntro();
     else if(act === 'retry'){ tk.i = 0; tk.answers = []; tk.order = null; stepQuestion(); }
     else if(act === 'png') resultPng();
@@ -2639,7 +3022,7 @@
     }
     else if(act === 'logout'){ try{ localStorage.removeItem(AUTH_KEY); }catch(_){} loadPanel(); }
   });
-  tkDlg.addEventListener('close', () => { tkBody.innerHTML = ''; panel = panel && { section: panel.section, email: panel.email }; });
+  tkDlg.addEventListener('close', () => { tkBody.innerHTML = ''; tipEl.hidden = true; panel = panel && { section: panel.section, sort: panel.sort, email: panel.email }; });
 
   /* ================= Toast ================= */
   let toastEl = null, toastTimer = null;
@@ -2658,7 +3041,7 @@
       b.onclick = () => { fn(); if(toastEl && toastEl.contains(b)) { toastEl.remove(); toastEl = null; } };
       toastEl.appendChild(b);
     });
-    document.body.appendChild(toastEl);
+    (document.querySelector('dialog[open]') || document.body).appendChild(toastEl);
     const el = toastEl;
     toastTimer = setTimeout(() => { if(el === toastEl){ el.remove(); toastEl = null; } }, ms);
   }

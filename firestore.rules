@@ -185,18 +185,22 @@ service cloud.firestore {
     }
 
     // Ranking (top 15): nombre corto, sección, estrellas ganadas en total y la ropa de Moli.
+    // El id sale de un cifrado lento del DNI, así el ranking no deja adivinar los DNI.
+    // La tarjeta "Docente" tiene su propio id y siempre va con 0 estrellas.
+    function validRank(id, d) {
+      return d.keys().hasOnly(['name', 'section', 'stars', 'outfit', 'updatedAt'])
+        && d.name is string && d.name.size() > 0 && d.name.size() <= 40
+        && d.stars is int && d.stars >= 0 && d.stars <= 1000
+        && d.outfit is list && d.outfit.size() <= 12
+        && d.updatedAt is timestamp
+        && (id == 'r3c9113e81963df4dffaa'
+          ? (d.section == 'DOC' && d.name == 'Docente' && d.stars == 0)
+          : d.section in ['A', 'B', 'C', 'D']);
+    }
     match /ranking/{id} {
       allow get: if true;
       allow list: if request.query.limit <= 50;
-      allow create, update: if id.matches('k[0-9a-f]{20}')
-        && exists(/databases/$(database)/documents/students/$(id))
-        && get(/databases/$(database)/documents/students/$(id)).data.section == request.resource.data.section
-        && request.resource.data.keys().hasOnly(['name', 'section', 'stars', 'outfit', 'updatedAt'])
-        && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 40
-        && request.resource.data.section in ['A', 'B', 'C', 'D']
-        && request.resource.data.stars is int && request.resource.data.stars >= 0 && request.resource.data.stars <= 1000
-        && request.resource.data.outfit is list && request.resource.data.outfit.size() <= 12
-        && request.resource.data.updatedAt is timestamp;
+      allow create, update: if id.matches('r[0-9a-f]{20}') && validRank(id, request.resource.data);
       allow delete: if isTeacher();
     }
 

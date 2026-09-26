@@ -1696,7 +1696,7 @@
   .it-flag.own{ background:var(--soft); color:var(--blue); }
   .it-btn{ width:100%; padding:8px 6px; border-radius:12px; border:none; font:inherit; font-size:12.5px; font-weight:900; cursor:pointer; }
   .it-btn.buy{ background:linear-gradient(135deg, var(--amber), var(--amber-2)); color:#fff; box-shadow:0 6px 12px rgba(245,124,35,.28); }
-  .it-btn.wear{ background:var(--grad); color:#fff; }
+  .it-btn.puton{ background:var(--grad); color:#fff; }
   .it-btn.off{ background:var(--soft); color:var(--ink-2); border:1px solid var(--line); }
   .it-btn.need{ display:block; background:#f3f5fa; color:var(--ink-3); cursor:default; }
   .m-shop{ display:flex; align-items:center; gap:12px; width:100%; margin-bottom:14px; padding:12px 14px; border-radius:16px; border:1px solid #f3d49c; background:linear-gradient(135deg, #fff7e8, #ffefd3); color:#7a4a12; font:inherit; font-weight:900; font-size:14.5px; text-align:left; cursor:pointer; }
@@ -1789,6 +1789,13 @@
   .rk-card{ position:relative; display:flex; flex-direction:column; align-items:center; gap:4px; padding:12px 8px 6px; border-radius:18px; background:#fff; border:1px solid var(--line); text-align:center; }
   .rk-card.me{ border:2px solid var(--blue); box-shadow:0 0 0 4px rgba(47,111,237,.12); }
   .rk-card .robot{ --rw:78px; margin-top:22px; }
+  .rk-teacher{ display:flex; align-items:center; justify-content:center; gap:18px; margin:0 auto 16px; padding:14px 22px 10px; max-width:420px; border-radius:22px; background:linear-gradient(135deg, #eef3ff, #f7efff); border:1.5px solid #d8d3ff; box-shadow:0 10px 22px rgba(76,60,190,.12); }
+  .rk-teacher.me{ border:2px solid var(--blue); }
+  .rk-teacher .robot{ --rw:92px; margin-top:26px; }
+  .rk-t-txt{ display:flex; flex-direction:column; align-items:flex-start; gap:6px; }
+  .rk-t-chip{ padding:5px 12px; border-radius:999px; background:linear-gradient(135deg, #5b4bd6, #8a5cf6); color:#fff; font-size:15px; font-weight:900; }
+  .rk-t-txt small{ font-size:12.5px; font-weight:700; color:var(--ink-2); }
+  .m-shop.rk{ border-color:#d8d3ff; background:linear-gradient(135deg, #f3f0ff, #ebe6ff); color:#4a3aa8; }
   .rk-pos{ align-self:center; padding:1px 9px; border-radius:999px; background:var(--soft); font-size:12px; font-weight:900; color:var(--ink-2); }
   .rk-me{ margin:0 0 14px; padding:12px 14px; border-radius:14px; background:var(--soft); border:1px solid var(--line); font-size:14px; font-weight:800; color:var(--ink-2); text-align:center; }
   @media (max-width:560px){
@@ -2834,6 +2841,16 @@
     const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('ciencia6|' + dni));
     return 'k' + [...new Uint8Array(buf)].slice(0, 10).map(b => b.toString(16).padStart(2, '0')).join('');
   }
+  // Id del ranking: cifrado lento del DNI (no se puede adivinar el DNI desde el ranking).
+  const TEACHER_RID = 'r3c9113e81963df4dffaa';
+  async function rankId(dni){
+    if(!(window.crypto && crypto.subtle)) throw new Error('CRYPTO');
+    const k = await crypto.subtle.importKey('raw', new TextEncoder().encode(dni), 'PBKDF2', false, ['deriveBits']);
+    const bits = await crypto.subtle.deriveBits({ name:'PBKDF2', hash:'SHA-256', salt: new TextEncoder().encode('ciencia6-rank'), iterations:150000 }, k, 80);
+    return 'r' + [...new Uint8Array(bits)].map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+  const isTeacher = () => { const u = me(); return !!(u && u.teacher); };
+  const starTxt = n => n === Infinity ? '∞' : n;
   async function getStudent(key){
     const c = await fbConfig();
     if(!c) return lsGet(LOCAL_STUDENTS, {})[key] || null;
@@ -2861,7 +2878,7 @@
     throw new Error(st || ('HTTP ' + r.status));
   }
   function logIn(key, st){
-    lsSet(ME_KEY, { key, dni: st.dni, name: st.name, section: st.section });
+    lsSet(ME_KEY, { key, dni: st.dni, name: st.name, section: st.section, rid: st.rid || null, teacher: !!st.teacher });
     onAccountChange();
     refreshProgress();
   }
@@ -2888,6 +2905,7 @@
     const u = me();
     if(!u) return;
     const c = await fbConfig();
+    if(u.teacher){ await loadCloset(); onAccountChange(); return; }
     const queued = new Set(lsGet(QUEUE_KEY, []).map(q => q.id));
     const list = sessionsWithTicket();
     if(c){
@@ -2919,6 +2937,11 @@
       userChip.setAttribute('aria-label', 'Ingresar con tu DNI');
       return;
     }
+    if(u.teacher){
+      userChip.innerHTML = '<span class="uc-av">🧑‍🏫</span><span class="uc-txt"><b>Docente</b><small>⭐ ∞ · Modo docente</small></span>';
+      userChip.setAttribute('aria-label', 'Cuenta docente');
+      return;
+    }
     const s = missionStats();
     userChip.innerHTML = `<span class="uc-av">${esc(firstOf(u.name).charAt(0).toUpperCase())}</span>
       <span class="uc-txt"><b>${esc(firstOf(u.name))}</b><small>🎯 ${s.done}/${s.total} · ⭐ ${starsBalance().left}</small></span>
@@ -2931,7 +2954,7 @@
     $$('.shop-btn').forEach(b => {
       const u = me(), left = u ? starsBalance().left : 0;
       b.querySelectorAll('.sb-lock,.sb-stars').forEach(x => x.remove());
-      b.insertAdjacentHTML('beforeend', u ? (left ? `<span class="sb-stars">⭐${left}</span>` : '') : '<span class="sb-lock">🔒</span>');
+      b.insertAdjacentHTML('beforeend', u ? (left ? `<span class="sb-stars">⭐${starTxt(left)}</span>` : '') : '<span class="sb-lock">🔒</span>');
     });
     if(acct && tkDlg.open && acct.view === 'shop') renderShop();
     syncRanking();
@@ -2956,7 +2979,7 @@
     const v = acct.view;
     if(v === 'shop') return renderShop();
     if(v === 'ranking') return renderRanking();
-    const head = { login: ['🪪 Mi cuenta', 'Ingresar', `${GRADE} grado`], register: ['🪪 Mi cuenta', 'Crear mi cuenta', `${GRADE} grado`], me: ['🎯 Mi avance', 'Mis misiones', `${GRADE} grado`] }[v];
+    const head = { login: ['🪪 Mi cuenta', 'Ingresar', `${GRADE} grado`], register: ['🪪 Mi cuenta', 'Crear mi cuenta', `${GRADE} grado`], me: isTeacher() ? ['🧑‍🏫 Mi cuenta', 'Modo docente', 'Estrellas infinitas ⭐∞'] : ['🎯 Mi avance', 'Mis misiones', `${GRADE} grado`] }[v];
     tkTop.innerHTML = `<small>${head[0]}</small><strong>${head[1]}</strong><span>${head[2]}</span><button class="tk-x" type="button" data-tk="close" aria-label="Cerrar">✕</button>`;
     const msgs = `${acct.err ? `<p class="send warn">${acct.err}</p>` : ''}${acct.info ? `<p class="send ok">${acct.info}</p>` : ''}`;
     if(v === 'login'){
@@ -2986,6 +3009,22 @@
     } else {
       const u = me();
       if(!u){ acct.view = 'login'; return renderAccount(); }
+      if(u.teacher){
+        tkBody.innerHTML = `<div class="tk-step">
+          ${sayRow('¡Hola, profe! 🧑‍🏫 Tienes estrellas infinitas: viste a tu Moli como quieras y aparecerá en el ranking como <b>Docente</b>.', 'good')}
+          ${msgs}
+          <div class="id-card">
+            <span class="id-av">🧑‍🏫</span>
+            <div class="id-txt"><b>Docente</b><small>Modo docente · DNI ${maskDni(u.dni)}</small></div>
+            <div class="id-stars" title="Estrellas infinitas">⭐ ∞</div>
+          </div>
+          <button type="button" class="m-shop" data-shop><span>🛍️</span><span>Tienda de Moli<small>Todo gratis en modo docente</small></span><b>⭐ ∞</b></button>
+          <button type="button" class="m-shop rk" data-tk="ranking"><span>🏆</span><span>Ranking<small>Tu Moli aparece arriba como Docente</small></span><b>Ver ›</b></button>
+          <p class="rk-me">🧪 Los Exit tickets que abras con esta cuenta son de prueba: no se guardan ni se envían.</p>
+          <div class="tk-actions"><button type="button" class="btn ghost" data-tk="acc-logout">Cerrar sesión</button><button type="button" class="btn up" data-tk="close">Listo</button></div>
+        </div>`;
+        return;
+      }
       const s = missionStats();
       const pct = s.total ? Math.round(s.done / s.total * 100) : 0;
       const line = !s.total ? 'Aún no hay misiones disponibles. ¡Pronto habrá más! 🚀'
@@ -3023,6 +3062,15 @@
     if(nameIn) acct.name = nameIn.value;
     acct.err = ''; acct.info = '';
     if(!validDni(acct.dni)){ acct.err = 'Tu DNI debe tener 8 números.'; return renderAccount(); }
+    btn.disabled = true; btn.textContent = 'Un momento…';
+    let rid;
+    try{ rid = await rankId(acct.dni); }catch(e){ acct.err = 'Abre la página desde su link (https) para poder ingresar.'; return renderAccount(); }
+    if(rid === TEACHER_RID){
+      const key = await dniKey(acct.dni);
+      logIn(key, { dni: acct.dni, name: 'Docente', section: 'DOC', rid, teacher: true });
+      return afterLogin('¡Bienvenido(a), profe! 🧑‍🏫 Modo docente activado: estrellas infinitas ⭐∞');
+    }
+    btn.disabled = false; btn.textContent = acct.view === 'register' ? 'Crear mi cuenta ✓' : 'Ingresar ✓';
     if(acct.view === 'register'){
       acct.name = cleanName(acct.name);
       if(acct.name.length < 3 || !/\s/.test(acct.name)){ acct.err = 'Escribe tu nombre y tu apellido.'; return renderAccount(); }
@@ -3034,12 +3082,12 @@
       if(acct.view === 'login'){
         const st = await getStudent(key);
         if(!st){ acct.err = 'No encontré una cuenta con ese DNI. Revisa los números o crea tu cuenta.'; return renderAccount(); }
-        logIn(key, st);
+        logIn(key, { ...st, rid });
         return afterLogin(`¡Bienvenido(a) de nuevo, ${esc(firstOf(st.name))}! 👋`);
       }
       const r = await createStudent(key, { dni: acct.dni, name: acct.name, section: acct.section });
       if(r === 'dup'){ acct.view = 'login'; acct.err = 'Ese DNI ya tiene una cuenta. Solo ingresa con tu DNI.'; return renderAccount(); }
-      logIn(key, { dni: acct.dni, name: acct.name, section: acct.section });
+      logIn(key, { dni: acct.dni, name: acct.name, section: acct.section, rid });
       afterLogin(`¡Listo, ${esc(firstOf(acct.name))}! Tu cuenta fue creada 🎉`);
     }catch(e){
       acct.err = e.message === 'CRYPTO' ? 'Abre la página desde su link (https) para poder ingresar.'
@@ -3108,11 +3156,12 @@
   SHOP.forEach(cat => cat.items.forEach(it => { ITEM[it.id] = { ...it, slot: cat.slot, premium: it.p >= 10 }; }));
 
   const CLOSET_KEY = 'ciencia4b:closet:' + APP.docId;
-  const closetOf = key => { const c = lsGet(CLOSET_KEY, {})[key]; return { owned: (c && c.owned) || [], equipped: (c && c.equipped) || {}, codes: (c && c.codes) || [] }; };
+  const closetOf = key => { const c = lsGet(CLOSET_KEY, {})[key]; return { owned: isTeacher() && me().key === key ? Object.keys(ITEM) : (c && c.owned) || [], equipped: (c && c.equipped) || {}, codes: (c && c.codes) || [] }; };
   function setCloset(key, c, pending = true){ const all = lsGet(CLOSET_KEY, {}); all[key] = { ...c, pending }; lsSet(CLOSET_KEY, all); }
   const currentOutfit = () => { const u = me(); return u ? closetOf(u.key).equipped : {}; };
   function starsBalance(){
     const u = me();
+    if(u && u.teacher) return { earned: Infinity, fromTickets: 0, fromCodes: 0, spent: 0, left: Infinity };
     const fromTickets = u ? missionStats().stars : 0, fromCodes = u ? closetOf(u.key).codes.length : 0;
     const earned = fromTickets + fromCodes;
     const spent = u ? closetOf(u.key).owned.reduce((t, id) => t + ((ITEM[id] && ITEM[id].p) || 0), 0) : 0;
@@ -3127,6 +3176,14 @@
   async function loadCloset(){
     const u = me(), c = await fbConfig();
     if(!u || !c) return;
+    if(u.teacher){
+      if((lsGet(CLOSET_KEY, {})[u.key] || {}).pending) return;
+      try{
+        const r = await fetch(`${docsBase(c)}/ranking/${TEACHER_RID}?key=${c.apiKey}`);
+        if(r.ok) setCloset(u.key, { owned: [], equipped: outfitOf(fromDoc(await r.json()).outfit), codes: [] }, false);
+      }catch(e){}
+      return;
+    }
     if((lsGet(CLOSET_KEY, {})[u.key] || {}).pending){ await pushCloset(); return; }
     try{
       const r = await fetch(`${docsBase(c)}/closets/${u.key}?key=${c.apiKey}`);
@@ -3141,6 +3198,7 @@
   async function pushCloset(){
     const u = me(), c = await fbConfig();
     if(!u || !c) return true;
+    if(u.teacher){ syncRanking(); return true; }
     const cl = closetOf(u.key);
     const data = { owned: cl.owned, equipped: Object.entries(cl.equipped).map(([s, id]) => `${s}:${id}`), codes: cl.codes, updatedAt: new Date() };
     try{
@@ -3205,21 +3263,21 @@
         <div class="shop-stage">${robotHTML({ outfit: preview })}</div>
         <div class="shop-bal">
           <span class="bal-l">Tus estrellas</span>
-          <b class="bal-v">⭐ ${bal.left}</b>
-          <small>Ganaste ${bal.earned}${bal.fromCodes ? ` (${bal.fromCodes} con códigos)` : ''} · Gastaste ${bal.spent}</small>
+          <b class="bal-v">⭐ ${starTxt(bal.left)}</b>
+          <small>${u.teacher ? 'Modo docente · todo gratis' : `Ganaste ${bal.earned}${bal.fromCodes ? ` (${bal.fromCodes} con códigos)` : ''} · Gastaste ${bal.spent}`}</small>
           <p>${acct.info || (bal.earned ? 'Toca una prenda para probársela a Moli 👀' : 'Responde tus Exit tickets para ganar estrellas: ¡hasta 5 por cada uno! ⭐')}</p>
         </div>
       </div>
-      <form class="code-box" id="codeForm" autocomplete="off">
+      ${u.teacher ? '' : `<form class="code-box" id="codeForm" autocomplete="off">
         <div class="cb-txt"><b>🎟️ Canjear código</b><small>¿Tu profe te dio un código en clase? ¡Vale 1 estrella!</small></div>
         <div class="cb-row"><input id="codeIn" maxlength="4" placeholder="4U2M" autocapitalize="characters" autocorrect="off" spellcheck="false" aria-label="Código"><button type="submit" class="btn solid">Canjear</button></div>
         ${acct.codeMsg ? `<p class="send ${acct.codeOk ? 'ok' : 'warn'}">${acct.codeMsg}</p>` : ''}
-      </form>
+      </form>`}
       <div class="shop-tabs" role="tablist">${SHOP.map(c => `<button type="button" role="tab" class="shop-tab${c.slot === cat.slot ? ' on' : ''}" aria-selected="${c.slot === cat.slot}" data-shop-cat="${c.slot}"><span>${c.icon}</span>${c.name}</button>`).join('')}</div>
       <div class="shop-grid">${cat.items.map(it => {
         const owned = cl.owned.includes(it.id), on = cl.equipped[cat.slot] === it.id, trying = acct.preview === it.id;
         const act = on ? `<button type="button" class="it-btn off" data-shop-unequip="${cat.slot}">Quitar</button>`
-          : owned ? `<button type="button" class="it-btn wear" data-shop-equip="${it.id}">Ponérselo</button>`
+          : owned ? `<button type="button" class="it-btn puton" data-shop-equip="${it.id}">Ponérselo</button>`
           : bal.left >= it.p ? `<button type="button" class="it-btn buy" data-shop-buy="${it.id}">Comprar ⭐${it.p}</button>`
           : `<span class="it-btn need">Te faltan ⭐${it.p - bal.left}</span>`;
         return `<div class="it${on ? ' on' : ''}${trying ? ' trying' : ''}${!owned && bal.left < it.p ? ' locked' : ''}${ITEM[it.id].premium ? ' premium' : ''}" data-shop-try="${it.id}">
@@ -3260,37 +3318,45 @@
   let rankTimer = null;
   const rankName = name => { const p = String(name || '').trim().split(/\s+/); return p[0] + (p[1] ? ' ' + p[1].charAt(0).toUpperCase() + '.' : ''); };
   const outfitOf = list => { const o = {}; (list || []).forEach(x => { const [slot, id] = String(x).split(':'); if(ITEM[id]) o[slot] = id; }); return o; };
-  function syncRanking(){
-    const u = me();
+  async function syncRanking(){
+    let u = me();
     if(!u) return;
-    const data = { name: rankName(u.name), section: u.section, stars: starsBalance().earned, outfit: Object.entries(currentOutfit()).map(([s, id]) => `${s}:${id}`) };
-    const sig = u.key + JSON.stringify(data);
+    if(!u.rid){
+      try{ u = { ...u, rid: await rankId(u.dni) }; }catch(e){ return; }
+      if(!me() || me().key !== u.key) return;
+      lsSet(ME_KEY, u);
+    }
+    const outfit = Object.entries(currentOutfit()).map(([s, id]) => `${s}:${id}`);
+    const data = u.teacher ? { name: 'Docente', section: 'DOC', stars: 0, outfit }
+      : { name: rankName(u.name), section: u.section, stars: Math.min(1000, starsBalance().earned), outfit };
+    const sig = u.rid + JSON.stringify(data);
     clearTimeout(rankTimer);
     if(sig === lsGet(RANKSIG_KEY, '')) return;
     rankTimer = setTimeout(async () => {
       const c = await fbConfig();
       if(!c || !me() || me().key !== u.key) return;
       try{
-        const body = { writes: [{ update: { name: docName(c, 'ranking', u.key), fields: toFields({ ...data, updatedAt: new Date() }) } }] };
+        const body = { writes: [{ update: { name: docName(c, 'ranking', u.rid), fields: toFields({ ...data, updatedAt: new Date() }) } }] };
         const r = await fetch(`${docsBase(c)}:commit?key=${c.apiKey}`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body) });
-        if(r.ok) lsSet(RANKSIG_KEY, sig);
+        if(r.ok){ lsSet(RANKSIG_KEY, sig); if(u.teacher) setCloset(u.key, closetOf(u.key), false); }
       }catch(e){ /* se reintenta en el próximo cambio */ }
     }, 1500);
   }
   async function loadRanking(){
     const c = await fbConfig();
-    if(!c) return [];
+    if(!c) return { list: [], teacher: null };
+    const tr = fetch(`${docsBase(c)}/ranking/${TEACHER_RID}?key=${c.apiKey}`).then(r => r.ok ? r.json() : null).then(d => d && fromDoc(d)).catch(() => null);
     const q = { structuredQuery: { from: [{ collectionId: 'ranking' }], orderBy: [{ field: { fieldPath: 'stars' }, direction: 'DESCENDING' }], limit: 15 } };
     const r = await fetch(`${docsBase(c)}:runQuery?key=${c.apiKey}`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(q) });
     if(!r.ok) throw new Error('HTTP ' + r.status);
     const j = await r.json();
-    return j.filter(x => x.document).map(x => fromDoc(x.document));
+    return { list: j.filter(x => x.document).map(x => fromDoc(x.document)).filter(r => r.id !== TEACHER_RID && r.section !== 'DOC'), teacher: await tr };
   }
   function openRanking(){
     openAccount('ranking');
     acct.rank = null;
     renderRanking();
-    loadRanking().then(list => { if(acct && acct.view === 'ranking'){ acct.rank = list; renderRanking(); } })
+    loadRanking().then(res => { if(acct && acct.view === 'ranking'){ acct.rank = res.list; acct.rankTeacher = res.teacher; renderRanking(); } })
       .catch(() => { if(acct && acct.view === 'ranking'){ acct.rank = []; acct.rankErr = 'No se pudo cargar el ranking. Revisa tu internet.'; renderRanking(); } });
   }
   function renderRanking(){
@@ -3302,23 +3368,29 @@
     }
     const u = me();
     const list = acct.rank.filter(r => r.stars > 0);
-    const mine = r => u && r.id === u.key;
+    const mine = r => u && r.id === u.rid;
+    const t = acct.rankTeacher;
+    const teacherCard = t ? `<div class="rk-teacher${u && u.teacher ? ' me' : ''}">
+        ${robotHTML({ outfit: outfitOf(t.outfit), tag: false })}
+        <div class="rk-t-txt"><span class="rk-t-chip">🧑‍🏫 Docente</span><span class="rk-stars">∞ ⭐</span><small>¡Tu profe también juega! 😎</small></div>
+      </div>` : '';
     const tag = r => `<b class="rk-name">${esc(r.name)}</b><span class="rk-sec">${GRADE.replace('to', '')}${esc(r.section)}</span>`;
     const pod = (r, i) => r ? `<div class="pod p${i + 1}${mine(r) ? ' me' : ''}">
         <span class="rk-medal">${['🥇', '🥈', '🥉'][i]}</span>
         <div class="rk-who">${tag(r)}</div><span class="rk-stars">${r.stars} ⭐</span>
         ${robotHTML({ outfit: outfitOf(r.outfit), tag: false })}
         <div class="pod-base">${i + 1}</div></div>` : '<div class="pod empty"></div>';
-    const myPos = u ? list.findIndex(r => r.id === u.key) : -1;
+    const myPos = u ? list.findIndex(r => r.id === u.rid) : -1;
     tkBody.innerHTML = `<div class="tk-step">
       ${acct.rankErr ? `<p class="send warn">${esc(acct.rankErr)}</p>` : ''}
+      ${teacherCard}
       ${!list.length ? sayRow('¡Aún nadie tiene estrellas! Responde tus Exit tickets y sé el primero del ranking 🏆') : `
       <div class="podium">${pod(list[1], 1)}${pod(list[0], 0)}${pod(list[2], 2)}</div>
       ${list.length > 3 ? `<div class="rank-grid">${list.slice(3).map((r, i) => `<div class="rk-card${mine(r) ? ' me' : ''}">
         <span class="rk-pos">#${i + 4}</span>
         <div class="rk-who">${tag(r)}</div><span class="rk-stars">${r.stars} ⭐</span>
         ${robotHTML({ outfit: outfitOf(r.outfit), tag: false })}</div>`).join('')}</div>` : ''}`}
-      ${u ? `<p class="rk-me">${myPos >= 0 ? `🎉 ¡Estás en el puesto <b>#${myPos + 1}</b>!` : `Tienes <b>${starsBalance().earned} ⭐</b> en total. ¡Gana más estrellas para entrar al Top 15!`}</p>` : '<p class="rk-me">Ingresa con tu DNI para aparecer en el ranking 🪪</p>'}
+      ${u && u.teacher ? '<p class="rk-me">🧑‍🏫 Tu Moli aparece arriba como <b>Docente</b>, sin puesto.</p>' : u ? `<p class="rk-me">${myPos >= 0 ? `🎉 ¡Estás en el puesto <b>#${myPos + 1}</b>!` : `Tienes <b>${starsBalance().earned} ⭐</b> en total. ¡Gana más estrellas para entrar al Top 15!`}</p>` : '<p class="rk-me">Ingresa con tu DNI para aparecer en el ranking 🪪</p>'}
       <div class="tk-actions">${u ? '<button type="button" class="btn ghost" data-shop>🛍️ Tienda de Moli</button>' : '<button type="button" class="btn ghost" data-tk="acc-login">🪪 Ingresar</button>'}<button type="button" class="btn up" data-tk="close">Listo</button></div>
     </div>`;
   }
@@ -3338,6 +3410,7 @@
   function openTicket(unit, n, practice){
     const qs = playable(unitByKey(unit).sessions[n - 1]);
     if(!qs.length) return;
+    if(!practice && isTeacher()) practice = true;
     if(!practice && !me()){ openAccount('login', { then: () => openTicket(unit, n) }); return; }
     const u = me();
     acct = null;
@@ -3961,6 +4034,7 @@
       openAccount(act === 'acc-register' ? 'register' : 'login', { then, dni, msg: acct && acct.msg });
     }
     else if(act === 'acc-me') openAccount('me');
+    else if(act === 'ranking') openRanking();
     else if(act === 'acc-logout'){ logOut(); tkDlg.close(); toast('👋 Cerraste tu sesión'); }
     else if(act === 'not-me'){ const { unit, n } = tk; logOut(); openAccount('login', { then: () => openTicket(unit, n) }); }
     else if(act === 'retry'){ tk.i = 0; tk.answers = []; tk.order = null; stepQuestion(); }

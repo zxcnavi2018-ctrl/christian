@@ -54,6 +54,18 @@ service cloud.firestore {
       allow update: if false;
     }
 
+    // Ropa de Moli de cada estudiante (tienda). Se guarda con el id de su cuenta.
+    match /closets/{id} {
+      allow get: if true;
+      allow create, update: if id.matches('k[0-9a-f]{20}')
+        && exists(/databases/$(database)/documents/students/$(id))
+        && request.resource.data.keys().hasOnly(['owned', 'equipped', 'updatedAt'])
+        && request.resource.data.owned is list && request.resource.data.owned.size() <= 60
+        && request.resource.data.equipped is list && request.resource.data.equipped.size() <= 10
+        && request.resource.data.updatedAt is timestamp;
+      allow list, delete: if isTeacher();
+    }
+
     // Marcas de la versión anterior (solo para que la docente pueda limpiarlas).
     match /exitTicketsDone/{id} {
       allow get: if true;

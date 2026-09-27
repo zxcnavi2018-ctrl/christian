@@ -767,6 +767,11 @@
     cursor:pointer;
   }
   .act-x:hover{ background:var(--red); color:#fff; }
+  .act.no-file{ grid-template-columns:auto 1fr; }
+  select.act-pos{ appearance:none; -webkit-appearance:none; border:0; padding:0; text-align:center; text-align-last:center; cursor:pointer; font:inherit; font-weight:900; font-size:18px; box-shadow:0 0 0 6px #fff, 0 0 0 8px #b9cdf5, 0 8px 18px rgba(47,111,237,.3); }
+  select.act-pos option{ color:var(--navy); background:#fff; }
+  .ficha-off{ display:block; margin:8px auto 0; padding:6px 12px; border:0; border-radius:999px; background:#f1f4fa; color:var(--ink-2); font:inherit; font-size:12.5px; font-weight:900; cursor:pointer; }
+  .ficha-on{ display:block; width:100%; margin-top:6px; padding:10px; border:1.5px dashed #c8d4ee; border-radius:14px; background:none; color:var(--blue); font:inherit; font-size:13px; font-weight:900; cursor:pointer; }
   .act-ins{ position:relative; display:flex; align-items:center; justify-content:center; width:100%; height:34px; margin:-6px 0; padding:0; border:0; background:none; cursor:pointer; font:inherit; }
   .act-ins::before{ content:""; position:absolute; left:8%; right:8%; top:50%; border-top:2px dashed #b9cdf5; }
   .act-ins span{ position:relative; padding:5px 14px; border-radius:999px; background:#eef3ff; border:1.5px solid #b9cdf5; color:var(--blue); font-size:12.5px; font-weight:900; transition:background .15s, color .15s, transform .2s var(--spring); }
@@ -1024,7 +1029,7 @@
   .dock.dirty .dock-btn.save::after{ content:""; position:absolute; top:7px; right:16px; width:9px; height:9px; border-radius:50%; background:var(--amber); border:2px solid #2f6fed; }
   body.editing #app{ padding-bottom:140px; }
   body.editing .act{ grid-template-columns:auto 1fr; }
-  body.editing .act .file{ grid-column:2; }
+  body.editing .act .file, body.editing .act .ficha-on{ grid-column:2; }
   body.editing .file-name{ gap:6px; }
   body.editing .file-actions .btn{ flex:none; }
 
@@ -2356,7 +2361,7 @@
     .k-long{ display:none; }
     .deco .dc{ opacity:.06 !important; }
     .act{ grid-template-columns:auto 1fr; padding:18px 16px 16px 14px; gap:14px; }
-    .act .file{ grid-column:1 / -1; }
+    .act .file, .act .ficha-on{ grid-column:1 / -1; }
     .acts::before{ left:35px; top:40px; bottom:auto; height:0; }
     .act-step{ width:40px; height:40px; font-size:16px; align-self:start; }
     .meta{ padding:20px 18px; }
@@ -2960,15 +2965,18 @@
       const mode = editing
         ? `<select class="mode ${a.mode}" data-mode="${i}" aria-label="Modalidad"><option value="individual"${a.mode !== 'group' ? ' selected' : ''}>👤 Individual</option><option value="group"${a.mode === 'group' ? ' selected' : ''}>👥 Colaborativo</option></select>`
         : `<span class="mode ${a.mode}">${a.mode === 'group' ? '👥 Colaborativo' : '👤 Individual'}</span>`;
-      return `<article class="act">
-        <span class="act-step">${i + 1}</span>
+      return `<article class="act${!a.file && !editing ? ' no-file' : ''}">
+        ${editing && s.activities.length > 1 ? `<select class="act-step act-pos" data-act-pos="${i}" aria-label="Orden de la actividad ${i + 1}" title="Cambiar el orden">${s.activities.map((_, k) => `<option value="${k}"${k === i ? ' selected' : ''}>${k + 1}</option>`).join('')}</select>` : `<span class="act-step">${i + 1}</span>`}
         <div class="act-main">
           <div class="act-top"><span class="act-label">Actividad ${i + 1}</span>${mode}${editing ? `<button type="button" class="act-x" data-act-rm="${i}">✕ Quitar</button>` : ''}</div>
           ${(editing || filled(a.title)) ? `<h3 ${ed} data-bind="s.activities.${i}.title" data-single data-ph="Título de la actividad ${i + 1}">${esc(a.title)}</h3>` : ''}
           ${(editing || filled(a.desc)) ? `<p class="act-desc" ${ed} data-bind="s.activities.${i}.desc" data-ph="Breve descripción (1-2 líneas) de lo que se hace en esta actividad…">${esc(a.desc)}</p>` : ''}
           ${ytBox(a, 'a' + i)}
         </div>
-        ${fileBox(a, 'a' + i, `s.activities.${i}.ficha`)}
+        ${a.file ? fileBox(a, 'a' + i, `s.activities.${i}.ficha`)
+          : !editing ? ''
+          : a.noFicha ? `<button type="button" class="ficha-on" data-ficha-on="${i}">📎 Añadir ficha a esta actividad</button>`
+          : fileBox(a, 'a' + i, `s.activities.${i}.ficha`).replace('<div class="drop-hint">', `<button type="button" class="ficha-off" data-ficha-off="${i}">🙈 Esta actividad no lleva ficha</button><div class="drop-hint">`)}
       </article>${editing && i < s.activities.length - 1 ? `<button type="button" class="act-ins" data-act-ins="${i + 1}"><span>＋ Añadir actividad aquí</span></button>` : ''}`;
     }).join('');
 
@@ -2979,7 +2987,7 @@
         ${(editing || filled(f.title)) ? `<h3 ${ed} data-bind="s.flipped.title" data-single data-ph="Título de la tarea Flipped">${esc(f.title)}</h3>` : ''}
         ${(editing || filled(f.desc)) ? `<p class="desc" ${ed} data-bind="s.flipped.desc" data-ph="Describe brevemente la tarea que deben hacer para la siguiente clase…">${esc(f.desc)}</p>` : ''}
         ${ytBox(f, 'fl')}
-        ${fileBox(f, 'fl', null, true)}
+        ${f.file || editing ? fileBox(f, 'fl', null, true) : ''}
       </section>` : '') + (editing ? `<label class="toggle"><input type="checkbox" id="flipToggle"${f.enabled ? ' checked' : ''}> Esta sesión tiene tarea Flipped (para la siguiente clase)</label>` : '');
 
     screens.session.innerHTML = head + `
@@ -3128,6 +3136,8 @@
     const cr = t.closest('[data-crit-rm]');
     if(cr){ commitFocused(); s.criteria.splice(+cr.dataset.critRm, 1); changed(); renderSession(); return; }
     if(t.closest('#critAdd')){ commitFocused(); s.criteria.push(''); changed(); renderSession(); focusLast('[data-bind^="s.criteria."]'); return; }
+    const fo = t.closest('[data-ficha-off],[data-ficha-on]');
+    if(fo){ commitFocused(); const a = s.activities[+(fo.dataset.fichaOff || fo.dataset.fichaOn)]; if(fo.dataset.fichaOff != null) a.noFicha = true; else delete a.noFicha; changed(); renderSession(); return; }
     const ar = t.closest('[data-act-rm]');
     if(ar){
       const i = +ar.dataset.actRm, a = s.activities[i];
@@ -3155,6 +3165,13 @@
   screens.session.addEventListener('change', e => {
     const t = e.target, s = curSession();
     if(t.matches('[data-tq-ans]')){ const [i, j] = t.dataset.tqAns.split('.').map(Number); s.ticket.questions[i].answer = j; changed(); return; }
+    if(t.matches('[data-act-pos]')){
+      commitFocused();
+      const from = +t.dataset.actPos, to = +t.value;
+      if(from !== to){ const [a] = s.activities.splice(from, 1); s.activities.splice(to, 0, a); renumberFichas(s); changed(); renderSession();
+        const el = $$('.act', screens.session)[to]; if(el) el.scrollIntoView({ block: 'center', behavior: reduceMotion ? 'auto' : 'smooth' }); toast(`↕️ Actividad movida al puesto ${to + 1}`); }
+      return;
+    }
     if(t.matches('[data-mode]')){ s.activities[+t.dataset.mode].mode = t.value; changed(); renderSession(); }
     else if(t.id === 'flipToggle'){ commitFocused(); s.flipped.enabled = t.checked; changed(); renderSession(); if(t.checked) setTimeout(() => $('#flippedCard') && $('#flippedCard').scrollIntoView({ behavior:'smooth', block:'center' }), 60); }
   });

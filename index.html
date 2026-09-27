@@ -2703,7 +2703,7 @@
   const firstOf = name => String(name || '').split(/\s+/)[0];
   const TUTORIAL = [
     () => { const n = shownUnits().map(u => u.num); return `¡Te cuento lo principal! 📚 Aquí está${n.length > 1 ? 'n las Unidades' : ' la Unidad'} ${listNums(n)}. Cada sesión es igual a tu cuaderno 📒, con sus fichas para ver o descargar.`; },
-    'Al final de cada sesión haz tu Exit ticket 🎟️ (¡solo una vez!). Para abrirlo, crea tu cuenta con tu DNI 🪪. Si ves 🔄 Flipped, es tarea para antes de la clase.',
+    'Al final de cada sesión haz tu Exit ticket 🎟️ (¡solo una vez!). Para abrirlo, crea tu cuenta con tu DNI 🪪. Si ves 🔄 Flipped, es tarea para la siguiente clase.',
     'Ganas estrellas ⭐ con tus Exit tickets (¡hasta 5!), con los códigos de tu profe, cumpliendo 📜 Misiones y en el 🏅 Torneo. ¡Y reta a tus compañeros en ⚔️ VS! Todo está en el botón Menú de abajo.',
     'Con tus estrellas vísteme en mi Tienda 🛍️: cascos, armas, alas, marcos, compañeros… ¡y hasta transformarme en un ✨ Ser legendario!',
     'En el Ranking 🏆 aparecen los 15 con más estrellas y sus Molis. ¡Tú puedes llegar ahí! 💪'
@@ -2975,16 +2975,16 @@
     const f = s.flipped;
     const flipped = (f.enabled ? `
       <section class="flipped" id="flippedCard">
-        <div class="flipped-top"><span class="flip-badge">🔄 FLIPPED</span><span class="flip-when">📌 Tarea para antes de la clase</span></div>
+        <div class="flipped-top"><span class="flip-badge">🔄 FLIPPED</span><span class="flip-when">📌 Tarea para la siguiente clase</span></div>
         ${(editing || filled(f.title)) ? `<h3 ${ed} data-bind="s.flipped.title" data-single data-ph="Título de la tarea Flipped">${esc(f.title)}</h3>` : ''}
-        ${(editing || filled(f.desc)) ? `<p class="desc" ${ed} data-bind="s.flipped.desc" data-ph="Describe brevemente la tarea que deben hacer antes de la clase…">${esc(f.desc)}</p>` : ''}
+        ${(editing || filled(f.desc)) ? `<p class="desc" ${ed} data-bind="s.flipped.desc" data-ph="Describe brevemente la tarea que deben hacer para la siguiente clase…">${esc(f.desc)}</p>` : ''}
         ${ytBox(f, 'fl')}
         ${fileBox(f, 'fl', null, true)}
-      </section>` : '') + (editing ? `<label class="toggle"><input type="checkbox" id="flipToggle"${f.enabled ? ' checked' : ''}> Esta sesión tiene tarea Flipped (para antes de la clase)</label>` : '');
+      </section>` : '') + (editing ? `<label class="toggle"><input type="checkbox" id="flipToggle"${f.enabled ? ' checked' : ''}> Esta sesión tiene tarea Flipped (para la siguiente clase)</label>` : '');
 
     screens.session.innerHTML = head + `
       <div class="worksheet">
-        ${f.enabled && !editing ? `<button type="button" class="alert" id="flipAlert"><span class="alert-ico">🔄</span><span>Esta sesión tiene tarea Flipped para antes de la clase</span><span>Ver tarea ↓</span></button>` : ''}
+        ${f.enabled && !editing ? `<button type="button" class="alert" id="flipAlert"><span class="alert-ico">🔄</span><span>Esta sesión tiene tarea Flipped para la siguiente clase</span><span>Ver tarea ↓</span></button>` : ''}
         <section class="meta">
           <span class="label">🎯 Meta</span>
           <p class="meta-text" ${ed} data-bind="s.meta" data-ph="Escribe aquí la meta de la sesión…">${esc(s.meta)}</p>

@@ -3194,7 +3194,9 @@ const u = me(); if(!u || u.teacher || lm.joining) return;
 if(lmJoined().length >= LM.MAX){ lm.err = '😮 La sala está llena.'; return lmRender(); }
 lm.joining = true; lm.err = ''; lmRender();
 const t0 = Date.now();
-const r = await lmReq('PUT', `lm/p/${u.key}`, { n: rankName(u.name).slice(0, 30), s: u.section || '', o: (packOutfit(currentOutfit())[0] || '').slice(0, 300), hp: 3, st: 'w', w: 0, x: 500, y: 750, d: '', r: u.rid || '', j: { '.sv': 'timestamp' } });
+const pj = { n: rankName(u.name).slice(0, 30), s: u.section || '', o: (packOutfit(currentOutfit())[0] || '').slice(0, 300), hp: 3, st: 'w', w: 0, x: 500, y: 750, d: '', r: u.rid || '', j: { '.sv': 'timestamp' } };
+let r = await lmReq('PUT', `lm/p/${u.key}`, pj);
+if(r === 'rules'){ delete pj.r; r = await lmReq('PUT', `lm/p/${u.key}`, pj); }
 lm.joining = false;
 if(r !== 'ok'){ lm.err = r === 'rules' ? '🔒 La sala ya se cerró o está llena.' : lmErr(r); return lmRender(); }
 lm.sendAt = (t0 + Date.now()) / 2;

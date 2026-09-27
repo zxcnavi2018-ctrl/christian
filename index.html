@@ -3129,7 +3129,7 @@ let fontkitP = null;
 const fontkitLib = () => fontkitP || (fontkitP = new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js'; sc.onload = () => window.fontkit ? res(window.fontkit) : rej(new Error('FK')); sc.onerror = () => { fontkitP = null; rej(new Error('NET')); }; document.head.appendChild(sc); }));
 const TINOS = w => `https://cdn.jsdelivr.net/npm/@fontsource/tinos@5.3.0/files/tinos-latin-${w}.woff`;
 const pdfTxt = t => String(t || '').replace(/[“”«»]/g, '"').replace(/[‘’]/g, "'").replace(/[–—]/g, '-').replace(/…/g, '...').replace(/[^\x20-\x7E -ÿ\n]/g, '').replace(/[ \t]+/g, ' ').replace(/ ([.,;:!?)])/g, '$1').trim();
-const FICHA_MARK = [['M27 20 Q36 19 44 21 Q49 29 53 38 Q42 34 30 34 Q28 27 27 20 Z', [.91, .51, .12]], ['M28 40 Q42 38 54 44 Q57 70 56 98 Q38 86 32 66 Q28 54 28 40 Z', [.55, .74, .25]], ['M58 26 Q74 32 84 46 Q82 76 58 100 Q62 64 58 26 Z', [.05, .40, .64]]];
+const FICHA_MARK = [['M27 20 Q36 19 44 21 Q49 29 53 38 Q42 34 30 34 Q28 27 27 20 Z'], ['M28 40 Q42 38 54 44 Q57 70 56 98 Q38 86 32 66 Q28 54 28 40 Z'], ['M58 26 Q74 32 84 46 Q82 76 58 100 Q62 64 58 26 Z']];
 async function fichaPDF(f, actN, want){
 const L = await pdfLib(), doc = await L.PDFDocument.create();
 let R, B, I, safe = 1;
@@ -3139,7 +3139,7 @@ const get = async w => new Uint8Array(await (await fetch(TINOS(w))).arrayBuffer(
 const [r, b, i] = await Promise.all(['400-normal', '700-normal', '400-italic'].map(get));
 [R, B, I] = await Promise.all([r, b, i].map(x => doc.embedFont(x, { subset: true })));
 }catch(e){ R = await doc.embedFont(L.StandardFonts.TimesRoman); B = await doc.embedFont(L.StandardFonts.TimesRomanBold); I = await doc.embedFont(L.StandardFonts.TimesRomanItalic); safe = .92; }
-const W = 595, H = 842, M = 64, TW = (W - 2 * M) * safe, black = L.rgb(0, 0, 0), grey = L.rgb(.35, .35, .35), FS = 13, LH = FS * 1.5;
+const W = 595, H = 842, M = 64, TW = (W - 2 * M) * safe, black = L.rgb(0, 0, 0), grey = black, FS = 13, LH = FS * 1.5;
 const foot = pdfTxt(`${String(GRADE).replace(/\D.*$/, '')}° Grado - Ciencia`);
 const sub = pdfTxt([f.subtitle, actN ? `Act. ${actN}` : ''].filter(Boolean).join(' - '));
 const words = t => pdfTxt(t).split(' ').filter(Boolean);
@@ -3155,9 +3155,9 @@ const s = .27, mw = 57 * s, logoW = mw + 4 + B.widthOfTextAtSize('innova', 10) +
 let x = W - M - logoW; const yb = 30;
 pg.drawText(foot, { x: x - 14 - I.widthOfTextAtSize(foot, 10), y: yb, size: 10, font: I, color: grey });
 pg.drawLine({ start: { x: x - 7, y: yb - 3 }, end: { x: x - 7, y: yb + 11 }, thickness: .6, color: grey });
-FICHA_MARK.forEach(([d, c]) => pg.drawSvgPath(d, { x: x - 27 * s, y: yb + 16 + 19 * s - 1, scale: s, color: L.rgb(...c) }));
-x += mw + 4; pg.drawText('innova', { x, y: yb, size: 10, font: B, color: L.rgb(.05, .40, .64) });
-x += B.widthOfTextAtSize('innova', 10) + 2; pg.drawText('schools', { x, y: yb, size: 8, font: R, color: L.rgb(.05, .40, .64) });
+FICHA_MARK.forEach(([d]) => pg.drawSvgPath(d, { x: x - 27 * s, y: yb + 16 + 19 * s - 1, scale: s, borderColor: black, borderWidth: 3.2 }));
+x += mw + 4; pg.drawText('innova', { x, y: yb, size: 10, font: B, color: black });
+x += B.widthOfTextAtSize('innova', 10) + 2; pg.drawText('schools', { x, y: yb, size: 8, font: R, color: black });
 };
 const need = h => { if(y - h < M) newPage(); };
 const para = (t, font = R, size = FS, lh = LH, x0 = M, w = TW, keep = false) => {
@@ -3182,7 +3182,7 @@ if(b.heading) para(b.heading, B);
 String(b.text).split(/\n\s*\n|\n/).map(pdfTxt).filter(Boolean).forEach(p => { para(p); y -= 4; });
 });
 if(f.sources.length){ y -= 4; para((f.sources.length > 1 ? 'Referencias: ' : 'Referencia: ') + f.sources.join('; ').replace(/\.$/, '') + '.', I, 9.5, 13); }
-const QS = 12.5, QL = 17, PAD = 7, border = L.rgb(.45, .45, .45);
+const QS = 12.5, QL = 17, PAD = 7, border = black;
 if(brk) newPage(); else need(40 + 30 + ans);
 y -= 10;
 pg.drawText('Actividades: Respondemos', { x: M, y, size: 14, font: B, color: black }); y -= 12;
@@ -3190,7 +3190,7 @@ f.tasks.forEach((t, i) => {
 const ql = lines(`${i + 1}. ${t}`, B, QS, TW - 2 * PAD), qh = ql.length * QL + 2 * PAD - 4;
 if(y - (qh + ans) < M){ newPage(); }
 const top = y;
-pg.drawRectangle({ x: M, y: top - qh, width: TW, height: qh, color: L.rgb(.92, .92, .92), borderColor: border, borderWidth: .8 });
+pg.drawRectangle({ x: M, y: top - qh, width: TW, height: qh, borderColor: border, borderWidth: .8 });
 y = top - PAD - QS + 2;
 ql.forEach((ws, k) => { const last = k === ql.length - 1, w = TW - 2 * PAD, wid = ws.reduce((a, x) => a + B.widthOfTextAtSize(x, QS), 0), gap = !last && ws.length > 1 ? (w - wid) / (ws.length - 1) : B.widthOfTextAtSize(' ', QS);
 let x = M + PAD; ws.forEach(x1 => { pg.drawText(x1, { x, y, size: QS, font: B, color: black }); x += B.widthOfTextAtSize(x1, QS) + gap; }); y -= QL; });

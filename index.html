@@ -3072,13 +3072,11 @@ const FICHA_SCHEMA = { type:'OBJECT', properties:{ title:{ type:'STRING' }, read
 images:{ type:'ARRAY', items:{ type:'OBJECT', properties:{ svg:{ type:'STRING' }, caption:{ type:'STRING' } } } },
 tasks:{ type:'ARRAY', items:{ type:'STRING' } }, tableCols:{ type:'ARRAY', items:{ type:'STRING' } }, tableRows:{ type:'INTEGER' }, draw:{ type:'STRING' },
 crit:{ type:'STRING' }, dua:{ type:'STRING' } } };
-const FICHA_RULES = `Cada ficha SIEMPRE es así (es una hoja para imprimir en blanco y negro):
+const FICHA_RULES = `Cada ficha es una FICHA DE INFORMACIÓN para imprimir en blanco y negro: da a las y los estudiantes la información que necesitan para hacer ESA actividad (por ejemplo, si la actividad es «Identificamos las enfermedades del caso», la ficha trae el caso y la información de esas enfermedades).
 - "title": el título del texto informativo (corto y atractivo).
-- "reading": un TEXTO INFORMATIVO de 150 a 260 palabras, en 2 o 3 párrafos separados por una línea en blanco, científicamente correcto, que dé la información que la actividad necesita.
-- "images": 1 o 2 imágenes que acompañan el texto, dibujadas por ti como SVG sencillo en BLANCO Y NEGRO (solo trazos negros "#000" sobre fondo blanco, sin colores, sin fotos, sin <image>, sin scripts), con viewBox "0 0 400 260", máximo 2500 caracteres cada una, con etiquetas <text> cortas si ayudan (por ejemplo las partes de algo). "caption": pie de imagen corto.
-- Debajo del texto, el trabajo: "tasks" = 3 a 5 preguntas o mini tareas relacionadas con la actividad y su criterio, de menor a mayor dificultad.
-- "tableCols": 2 a 4 encabezados si conviene completar una tabla para organizar o comparar; si no, vacío. "tableRows": 3 a 6 filas o 0.
-- "draw": una consigna corta si conviene dibujar o representar; si no, vacío.
+- "reading": el TEXTO INFORMATIVO (o el caso), de 150 a 250 palabras, en 2 o 3 párrafos separados por una línea en blanco, científicamente correcto y en español sencillo.
+- "images": 1 o 2 imágenes que acompañan el texto, dibujadas por ti como SVG sencillo en BLANCO Y NEGRO (solo trazos negros "#000" sobre fondo blanco, sin colores, sin fotos, sin <image>, sin scripts), con viewBox "0 0 400 260", máximo 2500 caracteres cada una, con etiquetas <text> cortas si ayudan. "caption": pie de imagen corto.
+- Mini actividad al final (solo se imprime si queda espacio en la hoja): "tasks" = 1 a 3 preguntas o mini tareas cortas relacionadas con la actividad; "tableCols" y "tableRows" solo si una tabla pequeña ayuda (si no, vacío y 0); "draw" solo si conviene dibujar (si no, vacío).
 - "crit": el criterio de éxito que trabaja la ficha. "dua": el principio del DUA que aplica (Representación, Acción y expresión o Compromiso).`;
 const fichaClean = f => {
 if(!f || typeof f !== 'object') return null;
@@ -3135,7 +3133,8 @@ wrap(p, R, FS, W - 2 * M).forEach(l => { need(LH); text(l, R, FS); y -= LH; });
 y -= 8;
 const im = pi === 0 ? imgs[0] : pi === paras.length - 1 ? imgs[1] : null;
 if(im){
-const iw = Math.min(W - 2 * M, 330), ih = iw * im.h / im.w;
+let iw = Math.min(W - 2 * M, 330), ih = iw * im.h / im.w;
+if(y - ih - 30 < M + 10 && y - 30 - (M + 10) >= 130){ ih = y - 30 - (M + 10); iw = ih * im.w / im.h; }
 need(ih + 30);
 const png = im.emb; // se inserta abajo
 im.at = { x: (W - iw) / 2, y: y - ih, w: iw, h: ih, page: pg }; y -= ih + 4;
@@ -3145,25 +3144,27 @@ y -= 6;
 });
 if(imgs[1] && !imgs[1].at && paras.length === 1){ const im = imgs[1], iw = Math.min(W - 2 * M, 330), ih = iw * im.h / im.w; need(ih + 30); im.at = { x: (W - iw) / 2, y: y - ih, w: iw, h: ih, page: pg }; y -= ih + 26; }
 for(const im of imgs) if(im.at){ const e = await doc.embedPng(im.bytes); im.at.page.drawImage(e, { x: im.at.x, y: im.at.y, width: im.at.w, height: im.at.h }); im.at.page.drawRectangle({ x: im.at.x, y: im.at.y, width: im.at.w, height: im.at.h, borderColor: line, borderWidth: .6 }); }
-if(f.tasks.length){ need(40); y -= 4; text('¡A trabajar!', B, 14); y -= 22; }
-f.tasks.forEach((t, i) => {
-const ls = wrap(`${i + 1}. ${t}`, B, 12.5, W - 2 * M);
-need(ls.length * 16 + 52);
+const room = h => y - h >= M + 10;
+const tl = f.tasks.map((t, i) => wrap(`${i + 1}. ${t}`, B, 12.5, W - 2 * M));
+if(tl.length && room(40 + tl[0].length * 16 + 52)){ y -= 4; text('Mini actividad', B, 14); y -= 22; }
+else tl.length = 0;
+tl.forEach(ls => {
+if(!room(ls.length * 16 + 52)) return;
 ls.forEach(l => { text(l, B, 12.5); y -= 16; });
 for(let k = 0; k < 2; k++){ y -= 18; pg.drawLine({ start: { x: M + 14, y }, end: { x: W - M, y }, thickness: .6, color: line }); } y -= 16;
 });
-if(f.cols.length){
+if(f.cols.length && !room(26 * (f.rows + 1) + 24)) f.rows = Math.max(0, Math.floor((y - M - 10 - 24) / 26) - 1);
+if(f.cols.length && f.rows >= 2){
 const rh = 26, h = rh * (f.rows + 1), cw = (W - 2 * M) / f.cols.length;
-need(h + 24);
 pg.drawRectangle({ x: M, y: y - rh + 8, width: W - 2 * M, height: rh, color: soft });
 for(let r = 0; r <= f.rows + 1; r++) pg.drawLine({ start: { x: M, y: y + 8 - r * rh }, end: { x: W - M, y: y + 8 - r * rh }, thickness: .8, color: black });
 for(let c = 0; c <= f.cols.length; c++) pg.drawLine({ start: { x: M + c * cw, y: y + 8 }, end: { x: M + c * cw, y: y + 8 - (f.rows + 1) * rh }, thickness: .8, color: black });
 f.cols.forEach((c, i) => pg.drawText(wrap(c, B, 12, cw - 10)[0] || '', { x: M + i * cw + 6, y: y - 9, size: 12, font: B, color: black }));
 y -= h + 24;
 }
-if(f.draw){
-need(230); wrap(f.draw, B, 12.5, W - 2 * M).forEach(l => { text(l, B, 12.5); y -= 16; });
-y -= 6; pg.drawRectangle({ x: M, y: y - 190, width: W - 2 * M, height: 190, borderColor: black, borderWidth: 1, borderDashArray: [5, 4] }); y -= 204;
+if(f.draw && room(150)){
+wrap(f.draw, B, 12.5, W - 2 * M).forEach(l => { text(l, B, 12.5); y -= 16; });
+const bh = Math.min(190, y - M - 16); y -= 6; pg.drawRectangle({ x: M, y: y - bh, width: W - 2 * M, height: bh, borderColor: black, borderWidth: 1, borderDashArray: [5, 4] }); y -= bh + 14;
 }
 return doc.save();
 }
@@ -3225,7 +3226,7 @@ Criterios: 1. Observa las enfermedades del caso (Comprender) · 2. Reconoce las 
 Actividad 1 [Individual · DUA Representación · criterio 1]: «Observamos el siguiente caso» — En esta actividad observaremos un fenómeno o problema y extraeremos sus elementos.
 Actividad 2 [Colaborativa · DUA Acción y expresión · criterio 2]: «Presentamos las enfermedades» — En esta actividad representaremos las enfermedades de forma ordenada en un organizador gráfico.
 ${filled(s.meta) ? `META de esta sesión: «${s.meta.trim()}»` : 'La docente todavía no escribió la meta: deduce el tema de las fichas adjuntas y escribe en "meta" una meta corta que empiece con un verbo (máximo 120 caracteres).'}
-${ex ? `\nAsí redacta esta docente en sus otras sesiones. Imita su estilo (NO copies el tema):\n${ex}\n` : ''}${pdf ? `\nTe adjunto un PDF con fichas de trabajo (${pdf.pages} páginas). Reconoce cada ficha y colócala en la actividad que corresponda con "pageFrom" y "pageTo" (páginas de 1 a ${pdf.pages}). Si una actividad no usa ficha, pon 0 en ambos.\n` : '\nNo hay fichas adjuntas: pon 0 en "pageFrom" y "pageTo".\n'}${sai.fichas ? `Fichas: para cada actividad que no tenga páginas del PDF y que necesite una hoja de trabajo (la del video puede no llevar), crea su ficha en "ficha". ${FICHA_RULES}
+${ex ? `\nAsí redacta esta docente en sus otras sesiones. Imita su estilo (NO copies el tema):\n${ex}\n` : ''}${pdf ? `\nTe adjunto un PDF con fichas de trabajo (${pdf.pages} páginas). Reconoce cada ficha y colócala en la actividad que corresponda con "pageFrom" y "pageTo" (páginas de 1 a ${pdf.pages}). Si una actividad no usa ficha, pon 0 en ambos.\n` : '\nNo hay fichas adjuntas: pon 0 en "pageFrom" y "pageTo".\n'}${sai.fichas ? `Fichas: crea en "ficha" la ficha de información de CADA actividad que no tenga páginas del PDF (la del video puede no llevar si el video ya da la información); la ficha se coloca en esa misma actividad. ${FICHA_RULES}
 ` : 'No crees fichas: deja "ficha" vacío.\n'}Reglas finales:
 - Exactamente UNA actividad es colaborativa (mode "group", en equipos); las demás son individuales (mode "individual"). Primero va al menos una individual y luego la colaborativa.
 - Exactamente UNA actividad usa un video corto de YouTube: la actividad 1 o la 2, la que mejor lo aproveche. En "video" escribe en español qué buscar en YouTube, con palabras claras del tema (máximo 70 caracteres). En las demás deja "video" vacío.

@@ -2044,7 +2044,7 @@
   .rk-duel{ padding:3px 9px; border-radius:999px; background:#fde2e2; color:#b91c1c; font-size:12px; font-weight:900; white-space:nowrap; }
   .rk-nums{ display:flex; align-items:center; justify-content:center; gap:5px; flex-wrap:nowrap; }
   .rk-card .rk-who{ flex-wrap:nowrap; max-width:100%; } .rk-card .rk-name{ min-width:0; flex:0 1 auto; } .rk-sec{ flex:none; } .rk-stars{ white-space:nowrap; }
-  .rk-card .rk-stars, .rk-card .rk-duel, .pod .rk-stars, .pod .rk-duel{ padding:2px 8px; font-size:12px; }
+  .rk-card .rk-stars, .rk-card .rk-duel{ padding:2px 8px; font-size:12px; }
   @keyframes vsPulse{ to{ transform:scale(1.08) rotate(-3deg); } }
   @keyframes radar{ from{ transform:scale(.4); opacity:1; } to{ transform:scale(1.4); opacity:0; } }
   @keyframes slideL{ from{ transform:translateX(-120%); } } @keyframes slideR{ from{ transform:translateX(120%); } }
@@ -2362,20 +2362,11 @@
   html.lite .hub-t, html.lite .hub-dot{ animation:none !important; }
 
   /* ---------- Ranking dialog ---------- */
-  .podium{ display:grid; grid-template-columns:1fr 1.15fr 1fr; align-items:end; gap:8px; margin:6px 0 16px; }
-  .pod{ display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center; min-width:0; }
-  .pod .robot{ --rw:84px; margin-top:26px; }
-  .pod.p1 .robot{ --rw:104px; }
-  .pod-base{ width:100%; margin-top:-6px; padding:10px 0 8px; border-radius:14px 14px 6px 6px; color:#fff; font-size:22px; font-weight:900; }
-  .pod.p1 .pod-base{ height:74px; background:linear-gradient(160deg, #f5c542, #e0a100); }
-  .pod.p2 .pod-base{ height:56px; background:linear-gradient(160deg, #c7cfdb, #98a3b3); }
-  .pod.p3 .pod-base{ height:44px; background:linear-gradient(160deg, #e3a36c, #b86b33); }
-  .rk-medal{ font-size:26px; }
   .rk-who{ display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px 6px; min-width:0; }
   .rk-name{ font-size:14px; font-weight:900; color:var(--navy); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%; }
   .rk-sec{ padding:1px 7px; border-radius:999px; background:var(--navy); color:#fff; font-size:11px; font-weight:900; }
   .rk-stars{ padding:3px 10px; border-radius:999px; background:#fff4dc; color:#8a5a0a; font-size:13px; font-weight:900; }
-  .pod.me .rk-name, .rk-card.me .rk-name{ color:var(--blue); }
+  .rk-card.me .rk-name{ color:var(--blue); }
   .rank-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:10px; margin-bottom:14px; }
   .rk-card{ position:relative; display:flex; flex-direction:column; align-items:center; gap:4px; padding:12px 8px 6px; border-radius:18px; background:#fff; border:1px solid var(--line); text-align:center; }
   .rk-card.me{ border:2px solid var(--blue); box-shadow:0 0 0 4px rgba(47,111,237,.12); }
@@ -2386,13 +2377,37 @@
   .rk-t-txt{ display:flex; flex-direction:column; align-items:flex-start; gap:6px; }
   .rk-t-chip{ padding:5px 12px; border-radius:999px; background:linear-gradient(135deg, #5b4bd6, #8a5cf6); color:#fff; font-size:15px; font-weight:900; }
   .m-shop.rk{ border-color:#d8d3ff; background:linear-gradient(135deg, #f3f0ff, #ebe6ff); color:#4a3aa8; }
-  .rk-pos{ align-self:center; padding:1px 9px; border-radius:999px; background:var(--soft); font-size:12px; font-weight:900; color:var(--ink-2); }
+  .rk-tier{ margin:0 0 18px; padding:0 0 4px; }
+  .rk-th{ display:flex; align-items:center; gap:8px; margin:0 0 12px; padding:9px 14px; border-radius:16px; color:#fff; font-size:16px; font-weight:900; text-shadow:0 1px 2px rgba(0,0,0,.25); background-size:200% 100%; }
+  .rk-th span{ font-size:20px; } .rk-th small{ margin-left:auto; font-size:11.5px; font-weight:800; opacity:.92; white-space:nowrap; }
+  .rk-th{ white-space:nowrap; } @media (max-width:420px){ .rk-th{ font-size:14.5px; padding:9px 12px; gap:6px; } .rk-th small{ font-size:10.5px; } }
+  .t-dia .rk-th{ background-image:linear-gradient(110deg, #22d3ee, #818cf8 35%, #e879f9 55%, #22d3ee 90%); animation:rkShine 4s linear infinite; box-shadow:0 6px 18px rgba(129,140,248,.35); }
+  .t-oro .rk-th{ background-image:linear-gradient(110deg, #fbbf24, #f59e0b 50%, #d97706); box-shadow:0 6px 16px rgba(245,158,11,.3); }
+  .t-plata .rk-th{ background-image:linear-gradient(110deg, #cbd5e1, #94a3b8 50%, #64748b); }
+  .t-cobre .rk-th{ background-image:linear-gradient(110deg, #fdba74, #c2410c 55%, #9a3412); }
+  @keyframes rkShine{ to{ background-position:-200% 0; } }
+  .t-dia .rk-card{ border:2px solid #a5b4fc; background:linear-gradient(160deg, #ecfeff, #f5f3ff 60%, #fdf4ff); }
+  .t-oro .rk-card{ border:2px solid #fcd34d; background:linear-gradient(170deg, #fffbeb, #fff 70%); }
+  .t-plata .rk-card{ border:2px solid #cbd5e1; background:linear-gradient(170deg, #f1f5f9, #fff 70%); }
+  .t-cobre .rk-card{ border:2px solid #fdba74; background:linear-gradient(170deg, #fff7ed, #fff 70%); }
+  .rank-grid.dia{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+  .rank-grid.dia .robot{ --rw:96px; }
+  .rank-grid:not(.dia) .rk-pos{ padding:2px 9px; font-size:11.5px; }
+  .rk-pos{ white-space:nowrap; align-self:center; margin:-2px 0 4px; padding:3px 12px; border-radius:999px; font-size:12.5px; font-weight:900; color:#fff; background:var(--navy); }
+  .t-dia .rk-pos{ background:linear-gradient(135deg, #22d3ee, #818cf8, #e879f9); }
+  .t-oro .rk-pos{ background:linear-gradient(135deg, #fbbf24, #d97706); }
+  .t-plata .rk-pos{ background:linear-gradient(135deg, #94a3b8, #475569); }
+  .t-cobre .rk-pos{ background:linear-gradient(135deg, #f97316, #9a3412); }
+  .rank-grid.rk-mini{ grid-template-columns:repeat(auto-fill, minmax(104px, 1fr)); gap:8px; }
+  .rank-grid.rk-mini .rk-card{ padding:10px 6px 4px; content-visibility:auto; contain-intrinsic-size:auto 150px; }
+  .rank-grid.rk-mini .robot{ --rw:54px; margin-top:16px; }
+  @media (prefers-reduced-motion:reduce){ .t-dia .rk-th{ animation:none; } }
   .rk-me{ margin:0 0 14px; padding:12px 14px; border-radius:14px; background:var(--soft); border:1px solid var(--line); font-size:14px; font-weight:800; color:var(--ink-2); text-align:center; }
   @media (max-width:560px){
     .corner{ right:12px; bottom:calc(12px + var(--safe-b)); gap:6px; }
-    .pod .robot{ --rw:70px; }
-    .pod.p1 .robot{ --rw:86px; }
     .rank-grid{ grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; }
+    .rank-grid.dia{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+    .rank-grid.dia .robot{ --rw:84px; }
     .rk-card .robot{ --rw:62px; }
     .rk-name{ font-size:12.5px; }
   }
@@ -4280,15 +4295,25 @@
       }catch(e){ /* se reintenta en el próximo cambio */ }
     }, 1500);
   }
+  // 💎 4 primeros · 🥇 7 siguientes · 🥈 10 siguientes · 🥉 todos los demás
+  const RANK_TIERS = [['dia', '💎', 'Diamante', 0, 4], ['oro', '🥇', 'Oro', 4, 11], ['plata', '🥈', 'Plata', 11, 21], ['cobre', '🥉', 'Cobre', 21, Infinity]];
+  const rankTier = i => RANK_TIERS.find(x => i < x[4]);
+  const ordinal = n => n + (n === 1 || n === 3 ? '.er' : '.º');
   async function loadRanking(){
     const c = await fbConfig();
     if(!c) return { list: [], teacher: null };
     const tr = fetch(`${docsBase(c)}/ranking/${TEACHER_CARD}?key=${c.apiKey}`).then(r => r.ok ? r.json() : null).then(d => d && fromDoc(d)).catch(() => null);
-    const q = { structuredQuery: { from: [{ collectionId: 'ranking' }], orderBy: [{ field: { fieldPath: 'stars' }, direction: 'DESCENDING' }], limit: 15 } };
-    const r = await fetch(`${docsBase(c)}:runQuery?key=${c.apiKey}`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(q) });
-    if(!r.ok) throw new Error('HTTP ' + r.status);
-    const j = await r.json();
-    return { list: j.filter(x => x.document).map(x => fromDoc(x.document)).filter(r => r.id !== TEACHER_CARD && r.id !== TEACHER_ID && r.section !== 'DOC'), teacher: await tr };
+    const docs = [];
+    for(let page = 0, cursor = null; page < 8; page++){
+      const q = { structuredQuery: { from: [{ collectionId: 'ranking' }], orderBy: [{ field: { fieldPath: 'stars' }, direction: 'DESCENDING' }, { field: { fieldPath: '__name__' }, direction: 'DESCENDING' }], limit: 50, ...(cursor ? { startAt: { values: cursor, before: false } } : {}) } };
+      const r = await fetch(`${docsBase(c)}:runQuery?key=${c.apiKey}`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(q) });
+      if(!r.ok) throw new Error('HTTP ' + r.status);
+      const got = (await r.json()).filter(x => x.document).map(x => x.document);
+      docs.push(...got);
+      if(got.length < 50) break;
+      const last = got[got.length - 1]; cursor = [last.fields.stars, { referenceValue: last.name }];
+    }
+    return { list: docs.map(fromDoc).filter(r => r.id !== TEACHER_CARD && r.id !== TEACHER_ID && r.section !== 'DOC'), teacher: await tr };
   }
   function openRanking(){
     openAccount('ranking');
@@ -4298,14 +4323,14 @@
       .catch(() => { if(acct && acct.view === 'ranking'){ acct.rank = []; acct.rankErr = 'No se pudo cargar el ranking. Revisa tu internet.'; renderRanking(); } });
   }
   function renderRanking(){
-    tkTop.innerHTML = `<small>🏆 Ranking</small><strong>Top 15 · ${GRADE} grado</strong><span>⭐ Estrellas ganadas · ⚔️ Duelos ganados</span>
+    tkTop.innerHTML = `<small>🏆 Ranking</small><strong>Ranking · ${GRADE} grado</strong><span>Categorías 💎 Diamante · 🥇 Oro · 🥈 Plata · 🥉 Cobre</span>
       <button class="tk-x" type="button" data-tk="close" aria-label="Cerrar">✕</button>`;
     if(!acct.rank){
       tkBody.innerHTML = `<div class="tk-step"><div class="dash-loading">${robotHTML()}<p><span class="spin"></span> Cargando el ranking…</p></div></div>`;
       return;
     }
     const u = me();
-    const list = acct.rank.filter(r => r.stars > 0);
+    const list = acct.rank;
     const mine = r => u && r.id === u.rid;
     const t = acct.rankTeacher;
     const teacherCard = t ? `<div class="rk-teacher${u && u.teacher ? ' me' : ''}">
@@ -4313,25 +4338,24 @@
         <div class="rk-t-txt"><span class="rk-t-chip">🧑‍🏫 Docente</span><span class="rk-stars">∞ ⭐</span></div>
       </div>` : '';
     const tag = r => `<b class="rk-name">${nameTag(r.name, r.id, outfitOf(r.outfit))}</b><span class="rk-sec">${GRADE.replace('to', '')}${esc(r.section)}</span>`;
-    const pod = (r, i) => r ? `<div class="pod p${i + 1}${mine(r) ? ' me' : ''}">
-        <span class="rk-medal">${['🥇', '🥈', '🥉'][i]}</span>
-        <div class="rk-who">${tag(r)}</div><div class="rk-nums"><span class="rk-stars">${r.stars} ⭐</span>${r.duels ? `<span class="rk-duel" title="Duelos ganados" aria-label="${r.duels} ${r.duels === 1 ? 'duelo ganado' : 'duelos ganados'}">⚔️ ${r.duels}</span>` : ''}</div>
-        ${robotHTML({ outfit: outfitOf(r.outfit), tag: false })}
-        <div class="pod-base">${i + 1}</div></div>` : '<div class="pod empty"></div>';
     const myPos = u ? list.findIndex(r => r.id === u.rid) : -1;
+    const card = (r, i) => `<div class="rk-card${mine(r) ? ' me' : ''}">
+        <div class="rk-who">${tag(r)}</div><div class="rk-nums"><span class="rk-stars">${r.stars} ⭐</span>${r.duels ? `<span class="rk-duel" title="Duelos ganados" aria-label="${r.duels} ${r.duels === 1 ? 'duelo ganado' : 'duelos ganados'}">⚔️ ${r.duels}</span>` : ''}</div>
+        ${still(robotHTML({ outfit: outfitOf(r.outfit), tag: false }))}<span class="rk-pos">${ordinal(i + 1)} lugar</span></div>`;
     tkBody.innerHTML = `<div class="tk-step">
       ${acct.rankErr ? `<p class="send warn">${esc(acct.rankErr)}</p>` : ''}
       ${teacherCard}
-      ${!list.length ? sayRow('¡Aún nadie tiene estrellas! Responde tus Exit tickets y sé el primero del ranking 🏆') : `
-      <div class="podium">${pod(list[1], 1)}${pod(list[0], 0)}${pod(list[2], 2)}</div>
-      ${list.length > 3 ? `<div class="rank-grid">${list.slice(3).map((r, i) => `<div class="rk-card${mine(r) ? ' me' : ''}">
-        <span class="rk-pos">#${i + 4}</span>
-        <div class="rk-who">${tag(r)}</div><div class="rk-nums"><span class="rk-stars">${r.stars} ⭐</span>${r.duels ? `<span class="rk-duel" title="Duelos ganados" aria-label="${r.duels} ${r.duels === 1 ? 'duelo ganado' : 'duelos ganados'}">⚔️ ${r.duels}</span>` : ''}</div>
-        ${still(robotHTML({ outfit: outfitOf(r.outfit), tag: false }))}</div>`).join('')}</div>` : ''}`}
-      ${u && u.teacher ? '<p class="rk-me">🧑‍🏫 Tu Moli aparece arriba como <b>Docente</b>, sin puesto.</p>' : u ? `<p class="rk-me">${myPos >= 0 ? `🎉 ¡Estás en el puesto <b>#${myPos + 1}</b>!` : `Tienes <b>${starsBalance().earned} ⭐</b> en total. ¡Gana más estrellas para entrar al Top 15!`}${duelWins() ? ` · ⚔️ <b>${duelWins()}</b> ${duelWins() === 1 ? 'duelo ganado' : 'duelos ganados'}` : ''}</p>` : '<p class="rk-me">Ingresa con tu DNI para aparecer en el ranking 🪪</p>'}
+      ${!list.length ? sayRow('¡Aún no hay nadie en el ranking! Responde tus Exit tickets y sé el primero 🏆') : RANK_TIERS.map(([k, ico, name, from, to]) => {
+        const part = list.slice(from, to);
+        if(!part.length) return '';
+        const cards = rs => rs.map(r => card(r, list.indexOf(r))).join('');
+        return `<section class="rk-tier t-${k}"><h4 class="rk-th"><span>${ico}</span>Categoría ${name}<small>${to === Infinity ? `Puesto ${from + 1} en adelante` : `Puestos ${from + 1} al ${Math.min(to, from + part.length)}`}</small></h4>
+          <div class="rank-grid${k === 'dia' ? ' dia' : k === 'cobre' ? ' rk-mini' : ''}">${cards(part)}</div></section>`;
+      }).join('')}
+      ${u && u.teacher ? '<p class="rk-me">🧑‍🏫 Tu Moli aparece arriba como <b>Docente</b>, sin puesto.</p>' : u ? `<p class="rk-me">${myPos >= 0 ? `🎉 ¡Estás en el puesto <b>#${myPos + 1}</b> · Categoría <b>${rankTier(myPos)[2]}</b> ${rankTier(myPos)[1]}!` : `Tienes <b>${starsBalance().earned} ⭐</b> en total. ¡Gana estrellas para subir de categoría!`}${duelWins() ? ` · ⚔️ <b>${duelWins()}</b> ${duelWins() === 1 ? 'duelo ganado' : 'duelos ganados'}` : ''}</p>` : '<p class="rk-me">Ingresa con tu DNI para aparecer en el ranking 🪪</p>'}
       <div class="tk-actions">${u ? '<button type="button" class="btn ghost" data-shop>🛍️ Tienda de Moli</button>' : '<button type="button" class="btn ghost" data-tk="acc-login">🪪 Ingresar</button>'}<button type="button" class="btn up" data-tk="close">Listo</button></div>
     </div>`;
-    const g = $('.rank-grid', tkBody); if(g) freeze(g);
+    $$('.rank-grid', tkBody).forEach(freeze);
   }
 
   /* ---------- student flow ---------- */

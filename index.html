@@ -3063,7 +3063,7 @@
           ${ready ? '<button type="button" class="btn up" id="tkOpen">▶ Probar exit ticket</button>' : ''}
           <button type="button" class="btn ghost" id="tkRes">📊 Resultados por sección</button>
         </div>
-        ${ready ? `<div class="omr-cta"><span class="omr-ico">🖨️</span><div><b>Exit ticket en papel</b><small>6 tarjetas por hoja A4: el estudiante pinta su DNI y sus respuestas; luego las pasas por el 📷 Escáner.</small></div>
+        ${ready ? `<div class="omr-cta"><span class="omr-ico">🖨️</span><div><b>Exit ticket en papel</b><small>PDF A4 a doble cara: 6 tarjetas con las preguntas al reverso. El estudiante pinta su DNI y sus respuestas; luego las pasas por el 📷 Escáner.</small></div>
           <div class="omr-btns"><button type="button" class="btn solid" data-omr-print="${route.unit}|${route.n}">📄 Descargar tarjetas (PDF)</button><button type="button" class="btn ghost" data-scan-open>📷 Escanear</button></div></div>` : ''}
         <p class="drop-hint" style="text-align:left">🟢 Marca el círculo de la respuesta correcta de cada pregunta.</p>
       </div>`;
@@ -6078,13 +6078,14 @@ Reglas:
     return bytes;
   }
   // Dibuja una tarjeta con las mismas medidas que lee el escáner (ox, oy = esquina en mm).
-  function pdfCard(P, ox, oy, u, n, s){
+  function pdfCard(P, ox, oy, u, n, s, back){
     const qs = omrQs(s), bits = omrBits(unitNumOf(u), n), D = OMR.dni, A = OMR.ans, C = OMR.code;
     const R = (x, y, w, h, o) => P.rect(ox + x, oy + y, w, h, o), Ci = (x, y, r, o) => P.circle(ox + x, oy + y, r, o), T = (x, y, t, o) => P.text(ox + x, oy + y, t, o);
     OMR.fid.forEach(([x, y]) => R(x - 3, y - 3, 6, 6, { fill: '#000000' }));
     T(11, 5.6, `EXIT TICKET · ${GRADE}`, { size: 2.6, bold: true, color: '#2f6fed' });
     T(11, 10.8, `Unidad ${u.num} · Sesión ${n}`, { size: 4.3, bold: true });
     T(11, 15, clip(s.title || u.title || '', 58), { size: 2.5, color: '#444444' });
+    if(back) T(86.5, 15, 'Preguntas al reverso', { size: 2.2, bold: true, color: '#2f6fed', align: 'right' });
     T(10, 21, 'Nombre:', { size: 2.7, bold: true });
     P.line(ox + 21, oy + 21.3, ox + 86, oy + 21.3);
     T(8.2, 25.6, 'DNI · escribe y pinta', { size: 2.4, bold: true });
@@ -6112,37 +6113,48 @@ Reglas:
     if(cur) lines.push(cur);
     return lines.length ? lines : [''];
   }
-  // Bloque de preguntas; devuelve la altura usada (con draw=false solo mide).
-  function pdfQuestions(P, x, y, w, u, n, s, draw){
-    const qs = omrQs(s), sz = 3.7, lh = 4.9, osz = 3.5, olh = 4.8;
+  // Bloque de preguntas (f = escala de la letra); devuelve la altura usada (con draw=false solo mide).
+  function pdfQuestions(P, x, y, w, u, n, s, draw, f = 1){
+    const qs = omrQs(s), sz = 3.7 * f, lh = 4.9 * f, osz = 3.5 * f, olh = 4.8 * f, cr = 2 * f;
     let yy = y;
-    if(draw) P.text(x, yy + 5, `Exit ticket · Unidad ${u.num} · Sesión ${n}`, { size: 5.2, bold: true });
-    yy += 7.5;
-    if(s.title){ if(draw) P.text(x, yy + 3, clip(s.title, 90), { size: 3.4, color: '#555555' }); yy += 6; }
+    if(draw) P.text(x, yy + 4.6 * f, `Exit ticket · Unidad ${u.num} · Sesión ${n}`, { size: 4.6 * f, bold: true });
+    yy += 6.5 * f;
     qs.forEach((q, i) => {
       pdfWrap(`${i + 1}. ${q.q}`, sz, true, w).forEach(l => { yy += lh; if(draw) P.text(x, yy, l, { size: sz, bold: true }); });
-      let cx = x + 4, line = yy + olh + .6;
+      let cx = x + 3 * f, line = yy + olh + .5 * f;
       q.opts.forEach((o, k) => {
-        const parts = pdfWrap(o.t, osz, false, w - 12), tw = pdfTextW(parts[0], osz, false) + 6.5;
-        if(cx > x + 4 && (parts.length > 1 || cx + tw > x + w)){ cx = x + 4; line += olh; }
-        if(draw){ P.circle(cx + 2, line - 1.2, 2, { stroke: '#333333', lw: .25 }); P.text(cx + 2, line - .05, LETTERS[k], { size: 2.6, bold: true, align: 'center' }); }
-        parts.forEach((l, j) => { if(draw) P.text(cx + 5.3, line + j * olh, l, { size: osz }); });
-        if(parts.length > 1){ line += (parts.length - 1) * olh; cx = x + w + 1; } else cx += tw + 5;
+        const inW = w - 3 * f - 2 * cr - 2.5 * f, parts = pdfWrap(o.t, osz, false, inW), tw = pdfTextW(parts[0], osz, false) + 2 * cr + 2.5 * f;
+        if(cx > x + 3 * f && (parts.length > 1 || cx + tw > x + w)){ cx = x + 3 * f; line += olh; }
+        if(draw){ P.circle(cx + cr, line - 1.2 * f, cr, { stroke: '#333333', lw: .25 }); P.text(cx + cr, line - .05 * f, LETTERS[k], { size: 2.6 * f, bold: true, align: 'center' }); }
+        parts.forEach((l, j) => { if(draw) P.text(cx + 2 * cr + 1.3 * f, line + j * olh, l, { size: osz }); });
+        if(parts.length > 1){ line += (parts.length - 1) * olh; cx = x + w + 1; } else cx += tw + 4 * f;
       });
-      yy = line + 2.2;
+      yy = line + 1.8 * f;
     });
-    yy += 2;
-    if(draw) P.text(x, yy + 2, 'Marca tus respuestas en tu tarjeta pintando el círculo de la letra correcta.', { size: 3, color: '#555555' });
-    return yy + 4 - y;
+    if(draw) P.text(x, yy + 3 * f, 'Pinta en el frente de tu tarjeta el círculo de la letra correcta.', { size: 2.8 * f, color: '#555555' });
+    return yy + 4 * f - y;
   }
+  const OMR_POS = [];
+  for(let r = 0; r < 3; r++) for(let c = 0; c < 2; c++) OMR_POS.push([7 + c * 100, 9.5 + r * 94]);
   function omrPDF(u, n){
     const s = u.sessions[n - 1], p1 = pdfPage(), p2 = pdfPage();
-    for(let r = 0; r < 3; r++) for(let c = 0; c < 2; c++) pdfCard(p1, 7 + c * 100, 9.5 + r * 94, u, n, s);
-    p1.line(105, 4, 105, 293, { stroke: '#b5bccb', lw: .25, dash: 1.6 });
-    [101.5, 195.5].forEach(y => p1.line(4, y, 206, y, { stroke: '#b5bccb', lw: .25, dash: 1.6 }));
-    const h = pdfQuestions(p2, 14, 12, 182, u, n, s, false);
-    if(h <= 148.5 - 20){ pdfQuestions(p2, 14, 10, 182, u, n, s, true); pdfQuestions(p2, 14, 158.5, 182, u, n, s, true); p2.line(4, 148.5, 206, 148.5, { stroke: '#b5bccb', lw: .25, dash: 1.6 }); }
-    else pdfQuestions(p2, 14, 12, 182, u, n, s, true);
+    // Reverso: las preguntas de cada tarjeta en el mismo lugar (la hoja es simétrica, sirve al voltear por el lado largo o el corto).
+    const bw = 88, bh = 82;
+    let f = 1;
+    while(f > .6 && pdfQuestions(p2, 0, 0, bw, u, n, s, false, f) > bh) f -= .05;
+    const cuts = P => { P.line(105, 4, 105, 293, { stroke: '#b5bccb', lw: .25, dash: 1.6 }); [101.5, 195.5].forEach(y => P.line(4, y, 206, y, { stroke: '#b5bccb', lw: .25, dash: 1.6 })); };
+    cuts(p1);
+    const back = pdfQuestions(p2, 0, 0, bw, u, n, s, false, f) <= bh;
+    OMR_POS.forEach(([x, y]) => pdfCard(p1, x, y, u, n, s, back));
+    if(back){ OMR_POS.forEach(([x, y]) => pdfQuestions(p2, x + 4, y + 4, bw, u, n, s, true, f)); cuts(p2); }
+    else {
+      // Preguntas muy largas para el reverso: hoja aparte (2 copias si caben, si no 1 con letra que entre).
+      let g = 1;
+      while(g > .6 && pdfQuestions(p2, 0, 0, 182, u, n, s, false, g) > 128) g -= .05;
+      if(pdfQuestions(p2, 0, 0, 182, u, n, s, false, g) <= 128){ pdfQuestions(p2, 14, 10, 182, u, n, s, true, g); pdfQuestions(p2, 14, 158.5, 182, u, n, s, true, g); p2.line(4, 148.5, 206, 148.5, { stroke: '#b5bccb', lw: .25, dash: 1.6 }); }
+      else { g = 1; while(g > .6 && pdfQuestions(p2, 0, 0, 182, u, n, s, false, g) > 272) g -= .05; pdfQuestions(p2, 14, 12, 182, u, n, s, true, g); }
+    }
+    omrPDF.back = back;
     return pdfBuild([p1, p2]);
   }
   function omrPrint(unitKey, n){
@@ -6152,7 +6164,9 @@ Reglas:
     const url = URL.createObjectURL(new Blob([omrPDF(u, n)], { type: 'application/pdf' }));
     download(url, `exit-ticket-unidad${u.num}-sesion${n}.pdf`);
     setTimeout(() => URL.revokeObjectURL(url), 60000);
-    toast(playable(s).length > OMR.ans.max ? `📄 PDF descargado. La tarjeta tiene espacio para ${OMR.ans.max} preguntas: se imprimen las primeras ${OMR.ans.max}.` : '📄 PDF descargado: ábrelo e imprímelo en A4 (tamaño real).');
+    toast(playable(s).length > OMR.ans.max ? `📄 PDF descargado. La tarjeta tiene espacio para ${OMR.ans.max} preguntas: se imprimen las primeras ${OMR.ans.max}.`
+      : omrPDF.back ? '📄 PDF descargado: imprímelo en A4 a doble cara (tamaño real). Las preguntas quedan atrás de cada tarjeta.'
+      : '📄 PDF descargado. Las preguntas son largas para ir atrás de cada tarjeta: van en la hoja 2 para proyectar o repartir.');
   }
 
   // ----- lectura de la imagen -----
@@ -6315,7 +6329,7 @@ Reglas:
       ${cam}
       <div id="scanLast">${scanLastHTML()}</div>
       ${s.list.length ? `<div class="scan-list"><b>Guardadas ahora</b>${s.list.map(r => `<div class="sl-row ${r.kind}"><span>${r.kind === 'ok' ? '✅' : r.kind === 'dup' ? '📌' : '⚠️'}</span><div><b>${esc(r.name)}</b><small>${esc(r.info)}</small></div><em>${esc(r.score || '')}</em></div>`).join('')}</div>` : ''}
-      <details class="scan-help"><summary>ℹ️ ¿Cómo se usa?</summary><p>1) En cada sesión, dentro del Exit ticket, toca <b>📄 Descargar tarjetas (PDF)</b> e imprímelo en A4 (6 tarjetas por hoja). 2) Cada estudiante escribe y pinta su DNI y pinta una letra por pregunta. 3) Aquí, encaja la tarjeta en el recuadro con buena luz: se lee sola, se guarda en la cuenta del estudiante y le llega un mensaje a su ✉️ Correo con su nota y sus errores.</p></details>
+      <details class="scan-help"><summary>ℹ️ ¿Cómo se usa?</summary><p>1) En cada sesión, dentro del Exit ticket, toca <b>📄 Descargar tarjetas (PDF)</b> e imprímelo en A4 a doble cara (6 tarjetas por hoja, con las preguntas al reverso). 2) Cada estudiante escribe y pinta su DNI y pinta una letra por pregunta. 3) Aquí, encaja la tarjeta en el recuadro con buena luz: se lee sola, se guarda en la cuenta del estudiante y le llega un mensaje a su ✉️ Correo con su nota y sus errores.</p></details>
       <div class="tk-actions">${s.err === 'auth' ? '<button type="button" class="btn solid" data-scan="connect">🔐 Conectar cuenta</button>' : ''}<button type="button" class="btn up" data-tk="close">Listo</button></div>
     </div>`;
     if(!s.err && s.stream) scanAttach();

@@ -1996,8 +1996,11 @@ function openRanking(){
 openAccount('ranking');
 acct.rank = null;
 renderRanking();
-loadRanking().then(res => { if(acct && acct.view === 'ranking'){ acct.rank = res.list; acct.rankTeacher = res.teacher; renderRanking(); } })
-.catch(() => { if(acct && acct.view === 'ranking'){ acct.rank = []; acct.rankErr = 'No se pudo cargar el ranking. Revisa tu internet.'; renderRanking(); } });
+const RC = 'ciencia4b:rankc:' + APP.docId, cached = lsGet(RC, null), fresh = cached && Date.now() - cached.at < 180000;
+if(cached){ acct.rank = cached.list; acct.rankTeacher = cached.teacher; renderRanking(); }
+if(fresh) return;
+loadRanking().then(res => { lsSet(RC, { at: Date.now(), list: res.list, teacher: res.teacher }); if(acct && acct.view === 'ranking'){ acct.rank = res.list; acct.rankTeacher = res.teacher; renderRanking(); } })
+.catch(() => { if(acct && acct.view === 'ranking' && !cached){ acct.rank = []; acct.rankErr = 'No se pudo cargar el ranking. Revisa tu internet.'; renderRanking(); } });
 }
 function renderRanking(){
 tkTop.innerHTML = `<small>🏆 Ranking</small><strong>Ranking · ${GRADE} grado</strong><span>Categorías 💎 Diamante · 🥇 Oro · 🥈 Plata · 🥉 Cobre</span>

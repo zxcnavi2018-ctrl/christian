@@ -181,6 +181,9 @@
   #splash.out{ opacity:0; visibility:hidden; }
   .sp-glow{ position:absolute; top:calc(50% - 190px); left:50%; width:300px; height:300px; margin-left:-150px; border-radius:50%; background:radial-gradient(circle, rgba(56,189,248,.35), rgba(56,189,248,0) 70%); animation:spPulse 2.4s ease-in-out infinite; }
   .sp-moli{ position:relative; width:min(46vw, 190px); aspect-ratio:577 / 557; background:var(--robot-img) center / contain no-repeat; filter:drop-shadow(0 16px 20px rgba(18,34,74,.2)); animation:spFloat 2.2s ease-in-out infinite; }
+  .sp-moli{ container-type:inline-size; }
+  .sp-pin{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+  .sp-moli .robot-tag{ left:40%; }
   .sp-moli::before, .sp-moli::after{ content:""; position:absolute; top:17.1%; width:9%; height:18.3%; border-radius:50% / 30%; background:radial-gradient(ellipse at 38% 28%, #b8f1ff 0 16%, #38c8f5 42%); box-shadow:0 0 12px rgba(60,195,240,.8); animation:blink 4s infinite; }
   .sp-moli::before{ left:31.2%; } .sp-moli::after{ left:58.1%; }
   .sp-row{ position:relative; display:flex; align-items:center; gap:14px; max-width:420px; padding:14px 18px; border-radius:22px; background:#fff; box-shadow:0 14px 34px rgba(18,34,74,.14); border:1.5px solid #d6e2fb; }
@@ -2410,8 +2413,8 @@
 <body>
 <div id="splash" role="status" aria-live="polite" title="Toca para continuar">
   <div class="sp-glow" aria-hidden="true"></div>
-  <div class="sp-moli" aria-hidden="true"></div>
-  <div class="sp-row"><span class="sp-spin" aria-hidden="true"></span><p class="sp-tip" id="spTip">Aquí encontrarás tus <b>actividades</b>, <b>tareas</b> y <b>fichas</b>.</p></div>
+  <div class="sp-moli" aria-hidden="true"><svg class="sp-pin" viewBox="0 0 577 557"><g transform="translate(305 296) scale(1.5)"><path d="M27 20 Q36 19 44 21 Q49 29 53 38 Q42 34 30 34 Q28 27 27 20 Z" fill="#e8821e"/><path d="M28 40 Q42 38 54 44 Q57 70 56 98 Q38 86 32 66 Q28 54 28 40 Z" fill="#8cbd3f"/><path d="M58 26 Q74 32 84 46 Q82 76 58 100 Q62 64 58 26 Z" fill="#0e67a4"/></g></svg><span class="robot-tag">Moli</span></div>
+  <div class="sp-row"><span class="sp-spin" aria-hidden="true"></span><p class="sp-tip" id="spTip">Aquí encontrarás las <b>actividades</b>, <b>tareas</b> y <b>fichas</b> de cada sesión de Ciencia y Tecnología.</p></div>
   <div class="sp-dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i></div>
 </div>
 <script>if(navigator.webdriver && !/[?&]splash=1/.test(location.search)) document.getElementById('splash').remove();</script>
@@ -7270,12 +7273,12 @@ Reglas:
     if(!sp) return;
     const tip = document.getElementById('spTip'), dots = sp.querySelectorAll('.sp-dots i'), u = me();
     const tips = [tip.innerHTML,
-      u && !u.teacher ? `¡Hola de nuevo, <b>${esc(firstOf(u.name))}</b>! Tus notas y estrellas se guardan con tu <b>DNI</b>.`
-        : u && u.teacher ? '¡Hola, profe! Tu <b>modo docente</b> ya está listo.'
-        : 'Con tu <b>DNI</b> podrás registrarte. Coloca tus <b>nombres y apellidos</b> para asignarte las notas correctamente.',
-      'Al final de cada sesión resuelve tu <b>Exit ticket</b> y gana <b>estrellas</b>.',
-      'Usa tus estrellas en la <b>Tienda</b> para vestir a Moli con ropa y accesorios.',
-      'Reta a tus compañeros en los <b>Duelos</b> y participa en los <b>Torneos</b>.'];
+      u && !u.teacher ? `Hola de nuevo, <b>${esc(firstOf(u.name))}</b>. Tus notas y estrellas están guardadas en tu cuenta.`
+        : u && u.teacher ? 'Hola, profe. El <b>modo docente</b> ya está activo.'
+        : 'Regístrate con tu <b>DNI</b> y escribe tus <b>nombres y apellidos completos</b>: así tus notas se guardan en tu cuenta.',
+      'Al terminar cada sesión, resuelve el <b>Exit ticket</b>: tienes un solo intento y ganas hasta <b>5 estrellas</b>.',
+      'Canjea tus estrellas en la <b>Tienda</b> para vestir a Moli con ropa, cascos y accesorios.',
+      'Reta a tus compañeros en los <b>Duelos</b> y gana los <b>Torneos</b> para conseguir sets exclusivos.'];
     const STEP = 3000;
     let done = false;
     const close = () => { if(done) return; done = true; timers.forEach(clearTimeout); sp.classList.add('out'); setTimeout(() => sp.remove(), 600); };

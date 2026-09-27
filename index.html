@@ -5274,15 +5274,15 @@ const sel = (st, n, r, label) => { const k = r ? levelOf(r).k : '', b = a.busy[`
 return `<select class="rg-sel${k ? ' on' : ''}" data-rg-set="${st.id}|${n}" aria-label="${label} de ${esc(st.name)}"${b ? ' disabled' : ''}><option value="">${b ? '…' : '—'}</option>${Object.keys(RG_K).map(x => `<option${x === k ? ' selected' : ''}>${x}</option>`).join('')}</select>`; };
 const table = `<div class="rg-wrap"><table class="rg-tab">
 <thead><tr><th rowspan="2" class="rg-st">Estudiante</th>${cols.map(o => `<th colspan="2" class="rg-s"><b>S${o.n}</b><small>${esc(clip(filled(o.x.meta) ? o.x.meta : filled(o.x.title) ? o.x.title : 'Sin meta', 110))}</small></th>`).join('')}<th rowspan="2" class="rg-prod">Producto</th><th rowspan="2" class="rg-avg">Promedio</th></tr>
-<tr>${cols.map(o => `<th class="rg-sub">Aula<button type="button" class="rg-fill" data-rg-fill="${o.n}" title="Llenado rápido: pone A a todos los que no tienen nota de Aula en la S${o.n}"${a.filling ? ' disabled' : ''}>⚡ Llenado rápido</button></th><th class="rg-sub rg-v">Virtual</th>`).join('')}</tr></thead>
+<tr>${cols.map(o => `<th class="rg-sub">Class<button type="button" class="rg-fill" data-rg-fill="${o.n}" title="Llenado rápido: pone A a todos los que no tienen nota de Class en la S${o.n}"${a.filling ? ' disabled' : ''}>⚡ Llenado rápido</button></th><th class="rg-sub rg-v">Virtual</th>`).join('')}</tr></thead>
 <tbody>${students.map((st, i) => { const av = avg(st);
-return `<tr><td class="rg-st"><span>${i + 1}</span><b>${esc(st.name)}</b></td>${cols.map(o => `<td class="rg-c">${sel(st, RG_AULA + o.n, aula(st, o), `Aula S${o.n}`)}</td><td class="rg-c rg-v">${chip(cell(st, o))}</td>`).join('')}
+return `<tr><td class="rg-st"><span>${i + 1}</span><b>${esc(st.name)}</b></td>${cols.map(o => `<td class="rg-c">${sel(st, RG_AULA + o.n, aula(st, o), `Class S${o.n}`)}</td><td class="rg-c rg-v">${chip(cell(st, o))}</td>`).join('')}
 <td class="rg-prod">${sel(st, RG_PROD, prod(st), 'Producto')}</td>
 <td class="rg-avg">${av ? lvChip({ score: av.score, total: 100 }).replace(/<small>.*<\/small>/, `<small>${av.n} ${av.n === 1 ? 'nota' : 'notas'}</small>`) : '<span class="nt-empty">—</span>'}</td></tr>`; }).join('') || `<tr><td colspan="${cols.length * 2 + 3}">Aún no hay estudiantes registrados en ${GRADE} ${a.sec}.</td></tr>`}</tbody></table></div>`;
 tkBody.innerHTML = `<div class="tk-step nt rg">${secs}${tabs}
 <p class="nt-now">📍 <b>${GRADE} ${a.sec}</b> · ${esc(uName(un))} · ${esc(unitTitle(un))} · ${students.length} estudiantes</p>
 ${table}
-<p class="rg-note">✨ <b>Virtual</b> se llena solo con cada Exit ticket (en la página o en papel escaneado). <b>Aula</b> y <b>Producto</b> los eliges tú (AD, A, B o C) y se guardan al instante. El <b>Promedio</b> junta todas las notas.</p>
+<p class="rg-note">✨ <b>Virtual</b> se llena solo con cada Exit ticket (en la página o en papel escaneado). <b>Class</b> y <b>Producto</b> los eliges tú (AD, A, B o C) y se guardan al instante. El <b>Promedio</b> junta todas las notas.</p>
 <div class="rg-dl"><label class="rg-doc">🧑‍🏫 Docente <input type="text" id="rgDoc" maxlength="60" value="${esc(rgTeacher())}"></label>
 <div class="tk-actions"><button type="button" class="btn solid" data-tk="rg-pdf">📄 Descargar registro ${G}${a.sec}</button><button type="button" class="btn ghost" data-tk="rg-pdf4">📄 Los 4 registros</button><button type="button" class="btn ghost" data-tk="rg-csv">⬇️ Excel</button></div></div>
 ${NT_LEGEND}</div>`;
@@ -5294,8 +5294,8 @@ document.addEventListener('input', e => { if(e.target.id === 'rgDoc') lsSet(RG_D
 async function rgFill(n){
 const a = acct, un = unitByKey(a.unit), { students, aula } = rgData(), o = { n };
 const todo = students.filter(st => !aula(st, o) && st.dni);
-if(!todo.length){ toast(`✅ Todos ya tienen nota de Aula en la S${n}.`); return; }
-if(!confirm(`⚡ Llenado rápido\n\nSe pondrá «A» en Aula (S${n}) a ${todo.length} ${todo.length === 1 ? 'estudiante' : 'estudiantes'} de ${GRADE} ${a.sec} que aún no tienen nota.\nLuego puedes cambiar cada una a AD, B o C.`)) return;
+if(!todo.length){ toast(`✅ Todos ya tienen nota de Class en la S${n}.`); return; }
+if(!confirm(`⚡ Llenado rápido\n\nSe pondrá «A» en Class (S${n}) a ${todo.length} ${todo.length === 1 ? 'estudiante' : 'estudiantes'} de ${GRADE} ${a.sec} que aún no tienen nota.\nLuego puedes cambiar cada una a AD, B o C.`)) return;
 a.filling = true; renderRegistro();
 const c = await fbConfig(), m = RG_AULA + n, recs = todo.map(st => ({ id: resultId(un.key, m, st.id), key: st.id, dni: String(st.dni), unit: un.key, unitNum: String(un.num), n: m, section: st.section, name: st.name, score: RG_K.A, total: 4, answers: [0, 1, 2, 3].map(i => i < RG_K.A), at: Date.now() }));
 try{
@@ -5305,7 +5305,7 @@ const r = await fetch(`${docsBase(c)}:commit?key=${c.apiKey}`, { method:'POST', 
 if(!r.ok) throw new Error('SAVE');
 }
 recs.forEach(r => a.rows.push({ ...r, student: r.key, session: r.n }));
-toast(`⚡ Listo: ${recs.length} ${recs.length === 1 ? 'nota' : 'notas'} de Aula en «A» (S${n}).`);
+toast(`⚡ Listo: ${recs.length} ${recs.length === 1 ? 'nota' : 'notas'} de Class en «A» (S${n}).`);
 }catch(e){ toast('📶 No se pudo hacer el llenado rápido. Inténtalo otra vez.'); }
 a.filling = false;
 if(acct === a) renderRegistro();
@@ -5346,7 +5346,7 @@ box(x, top, 2 * wS, hA);
 pg.drawText(`S${o.n}`, { x: x + (2 * wS - B.widthOfTextAtSize(`S${o.n}`, 8.5)) / 2, y: top - 10, size: 8.5, font: B, color: black });
 const ms = Math.max(5.8, Math.min(8, 2 * wS / 20)), ml = Math.floor((hA - 20) / (ms * 1.12));
 wrap(filled(o.x.meta) ? o.x.meta : o.x.title || '', R, ms, 2 * wS - 4, ml).forEach((ln, k) => pg.drawText(ln, { x: x + 2, y: top - 18 - k * ms * 1.12, size: ms, font: R, color: black }));
-box(x, top - hA, wS, hB); ctext('Aula', x, top - hA, wS, hB, B, 6.5);
+box(x, top - hA, wS, hB); ctext('Class', x, top - hA, wS, hB, B, 6.5);
 box(x + wS, top - hA, wS, hB); ctext(B.widthOfTextAtSize('Virtual', 6.5) > wS - 4 ? 'Virt.' : 'Virtual', x + wS, top - hA, wS, hB, B, 6.5);
 });
 const xp = x0 + wN + wName + cols.length * 2 * wS;
@@ -5355,7 +5355,7 @@ box(xp + wP, top, wA, hA + hB); ctext('Promedio', xp + wP, top, wA, hA + hB, B, 
 y = top - hA - hB;
 };
 const foot = () => {
-const leg = 'AD = Logro destacado   ·   A = Logro esperado   ·   B = En proceso   ·   C = En inicio   ·   Aula: nota de la docente   ·   Virtual: Exit ticket';
+const leg = 'AD = Logro destacado   ·   A = Logro esperado   ·   B = En proceso   ·   C = En inicio   ·   Class: nota de la docente   ·   Virtual: Exit ticket';
 pg.drawText(T(leg), { x: M, y: 18, size: 7, font: I, color: grey });
 pg.drawLine({ start: { x: W - M - 170, y: 30 }, end: { x: W - M, y: 30 }, thickness: .6, color: black });
 pg.drawText('Firma del docente', { x: W - M - 85 - R.widthOfTextAtSize('Firma del docente', 8) / 2, y: 19, size: 8, font: R, color: black });
@@ -5383,7 +5383,7 @@ async function rgSet(stId, n, k){
 const a = acct, st = (a.roster || []).find(x => x.id === stId), un = unitByKey(a.unit), bk = `${stId}|${n}`;
 if(!st || !un || !st.dni || a.busy[bk]) return;
 a.busy[bk] = 1; renderRegistro();
-const c = await fbConfig(), id = resultId(un.key, n, st.id), what = n === RG_PROD ? 'Producto' : `Aula S${n - RG_AULA}`;
+const c = await fbConfig(), id = resultId(un.key, n, st.id), what = n === RG_PROD ? 'Producto' : `Class S${n - RG_AULA}`;
 try{
 const tok = await idToken(c);
 const d = await fetch(`${docsBase(c)}/exitTickets/${id}?key=${c.apiKey}`, { method:'DELETE', headers:{ Authorization: 'Bearer ' + tok } });
@@ -5404,7 +5404,7 @@ const { un, cols, students, cell, aula, prod, avg } = rgData(), q = v => '"' + S
 const g = r => r ? `${levelOf(r).k}` : '', gv = r => r ? `${levelOf(r).k} (${r.score}/${r.total})` : '';
 const lines = [
 ['Registro de notas', `${GRADE} ${acct.sec}`, `${uName(un)} - ${unitTitle(un)}`].map(q).join(';'),
-['N°', 'Estudiante', 'DNI', ...cols.flatMap(o => [`S${o.n} Aula`, `S${o.n} Virtual`]), 'Producto', 'Promedio'].map(q).join(';'),
+['N°', 'Estudiante', 'DNI', ...cols.flatMap(o => [`S${o.n} Class`, `S${o.n} Virtual`]), 'Producto', 'Promedio'].map(q).join(';'),
 ['', 'Meta de la sesión', '', ...cols.flatMap(o => [clip(o.x.meta || o.x.title, 200), '']), '', ''].map(q).join(';')
 ].concat(students.map((st, i) => { const av = avg(st);
 return [i + 1, st.name, st.dni || '', ...cols.flatMap(o => [g(aula(st, o)), gv(cell(st, o))]), g(prod(st)), av ? levelOf({ score: av.score, total: 100 }).k : ''].map(q).join(';'); }));

@@ -192,7 +192,14 @@ activities: [
 ],
 ticket: { questions: [] }
 });
-const normalize = () => (APP.site = APP.site || { title: 'CIENCIA', bimestre: 4 }, APP.units).forEach(u => { u.hidden = !!u.hidden; u.sessions.forEach(s => { if(!s.ticket) s.ticket = { questions: [] }; }); });
+const isExtra = u => !!u && u.key === 'extra';
+const uName = u => isExtra(u) ? 'Adicionales' : `Unidad ${u.num}`;
+const sName = (u, n) => isExtra(u) ? `Sesión adicional ${n}` : `Sesión ${n}`;
+const normalize = () => {
+(APP.site = APP.site || { title: 'CIENCIA', bimestre: 4 }, APP.units).forEach(u => { u.hidden = !!u.hidden; u.sessions.forEach(s => { if(!s.ticket) s.ticket = { questions: [] }; }); });
+if(!APP.units.some(isExtra)) APP.units.push({ key: 'extra', num: '15', icon: '⭐', title: 'Sesiones adicionales', hidden: false, sessions: [1, 2, 3, 4].map(() => blankSession()) });
+const x = APP.units.find(isExtra); x.hidden = false;
+};
 const shownUnits = () => APP.units.filter(u => !u.hidden);
 const unitTitle = u => u.title || 'Próximamente';
 const listNums = a => a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' y ' + a[a.length - 1];
@@ -264,12 +271,48 @@ robot.classList.add('hop', 'happy');
 clearTimeout(robot._t);
 robot._t = setTimeout(() => robot.classList.remove('hop', 'happy'), 1100);
 }
+/* ================= 🔊 Sonidos hechos aquí mismo (sin archivos de audio) ================= */
+let AC = null, pendingAlarm = false, voiceAt = 0;
+const audio = () => { try{ AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if(AC.state === 'suspended') AC.resume(); return AC; }catch(e){ return null; } };
+function moliVoice(){
+if(Date.now() - voiceAt < 700) return; voiceAt = Date.now();
+const ac = audio(); if(!ac) return;
+const t0 = ac.currentTime + .02, out = ac.createGain(); out.gain.value = .45; out.connect(ac.destination);
+const syl = (t, dur, f0, f1, F, amp) => {
+const o = ac.createOscillator(), rm = ac.createOscillator(), rg = ac.createGain(), vg = ac.createGain(), g = ac.createGain(), mix = ac.createGain();
+o.type = 'sawtooth'; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+rm.frequency.value = 58; rg.gain.value = .5; vg.gain.value = .5; rm.connect(rg); rg.connect(vg.gain);
+F.forEach(([fr, q, a]) => { const b = ac.createBiquadFilter(), bg = ac.createGain(); b.type = 'bandpass'; b.frequency.value = fr; b.Q.value = q; bg.gain.value = a; o.connect(b); b.connect(bg); bg.connect(mix); });
+g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(amp, t + .03); g.gain.setValueAtTime(amp, t + dur - .05); g.gain.linearRampToValueAtTime(0, t + dur);
+mix.connect(vg); vg.connect(g); g.connect(out);
+o.start(t); rm.start(t); o.stop(t + dur + .02); rm.stop(t + dur + .02);
+};
+syl(t0, .2, 170, 240, [[450, 5, 1.6], [850, 6, 1]], .9);             // «Mo»
+syl(t0 + .24, .32, 260, 390, [[300, 6, 1.2], [2300, 9, 1.4]], .8);   // «li»
+const b = ac.createOscillator(), bg = ac.createGain(); b.type = 'sine';
+b.frequency.setValueAtTime(1300, t0 + .62); b.frequency.exponentialRampToValueAtTime(2100, t0 + .72);
+bg.gain.setValueAtTime(0, t0 + .62); bg.gain.linearRampToValueAtTime(.1, t0 + .64); bg.gain.linearRampToValueAtTime(0, t0 + .76);
+b.connect(bg); bg.connect(out); b.start(t0 + .62); b.stop(t0 + .8);
+}
+function softAlarm(){
+const ac = audio();
+if(!ac || ac.state !== 'running'){ pendingAlarm = true; return; }
+pendingAlarm = false;
+const t0 = ac.currentTime + .05;
+for(let i = 0; i < 3; i++) [[880, 0], [660, .17]].forEach(([f, dt]) => {
+const o = ac.createOscillator(), g = ac.createGain(), t = t0 + i * .9 + dt;
+o.type = 'sine'; o.frequency.value = f; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.08, t + .02); g.gain.exponentialRampToValueAtTime(.0001, t + .38);
+o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + .42);
+});
+}
+document.addEventListener('pointerdown', () => { if(pendingAlarm){ const ac = audio(); if(ac) ac.resume().then(() => { if(pendingAlarm && me()) softAlarm(); }); } }, true);
 /* ================= Secret gesture: 10 taps on a robot in 4 s ================= */
 let taps = 0, tapTimer = null;
 document.addEventListener('click', e => {
 const robot = e.target.closest('.robot');
 if(!robot || robot.closest('#presDlg')) return;
 react(robot);
+if(robot.closest('[data-robot-slot], .s-head')) moliVoice();
 if(editing) return;
 taps++;
 clearTimeout(tapTimer);
@@ -333,8 +376,8 @@ if(r.name === 'menu') startMenu(prev.name === 'home');
 else stopMenu();
 if(r.name === 'unit') renderUnit();
 if(r.name === 'session'){ renderSession(); setTimeout(prefetchSession, 1200); }
-document.title = r.name === 'session' ? `Sesión ${r.n} · Unidad ${unitByKey(r.unit).num} · Ciencia`
-: r.name === 'unit' ? `Unidad ${unitByKey(r.unit).num} · Ciencia` : `${siteTitleCase()} · ${BIM[APP.site.bimestre]}`;
+document.title = r.name === 'session' ? `${sName(unitByKey(r.unit), r.n)} · ${uName(unitByKey(r.unit))} · Ciencia`
+: r.name === 'unit' ? `${uName(unitByKey(r.unit))} · Ciencia` : `${siteTitleCase()} · ${BIM[APP.site.bimestre]}`;
 if(dir !== undefined) window.scrollTo(0, 0);
 applyLook();
 }
@@ -381,7 +424,7 @@ let mode = null, typing = null, stageTimer = null, tutStep = 0;
 const menuRobot = () => $('#menuRobot .robot');
 const firstOf = name => String(name || '').split(/\s+/)[0];
 const TUTORIAL = [
-() => { const n = shownUnits().map(u => u.num); return `¡Te cuento lo principal! 📚 Aquí está${n.length > 1 ? 'n las Unidades' : ' la Unidad'} ${listNums(n)}. Cada sesión es igual a tu cuaderno 📒, con sus fichas para ver o descargar.`; },
+() => { const n = shownUnits().filter(u => !isExtra(u)).map(u => u.num); return `¡Te cuento lo principal! 📚 Aquí está${n.length > 1 ? 'n las Unidades' : ' la Unidad'} ${listNums(n)}. Cada sesión es igual a tu cuaderno 📒, con sus fichas para ver o descargar.`; },
 'Al final de cada sesión haz tu Exit ticket 🎟️ (¡solo una vez!). Para abrirlo, crea tu cuenta con tu DNI 🪪. Si ves 🔄 Flipped, es tarea para la siguiente clase.',
 'Ganas estrellas ⭐ con tus Exit tickets (¡hasta 5!) y con los códigos de tu profe. ¡Reta a tus compañeros en ⚔️ VS! Todo está en tu fotocheck, abajo.',
 'Con tus estrellas vísteme en mi Tienda 🛍️: cascos, alas, marcos, compañeros… Los sets legendarios solo se ganan en 🧪 La última Moli.',
@@ -418,7 +461,8 @@ function renderMainChoices(){
 menuChoices.innerHTML = [
 me() ? '' : moliBtn('register', '🪪', 'Registrarse', 'Crea tu cuenta con tu DNI', 0),
 moliBtn('tutorial', '📖', 'Tutorial', 'Moli te explica cómo funciona', 1),
-moliBtn('units', '🔬', 'Unidades', 'Elige qué aprender hoy', 2)
+moliBtn('units', '🔬', 'Unidades', 'Elige qué aprender hoy', 2),
+moliBtn('extra', '⭐', 'Adicionales', 'Sesiones adicionales de refuerzo', 3)
 ].join('');
 }
 function setMode(m, opts = {}){
@@ -481,6 +525,7 @@ if(k === 'register') openAccount('register');
 else if(k === 'mine') openAccount('me');
 else if(k === 'tutorial') setMode('tutorial', { step:0 });
 else if(k === 'units') setMode('units');
+else if(k === 'extra') go({ name:'unit', unit:'extra' });
 else if(k === 'main' || k === 'skip') setMode('main', { again:true });
 return;
 }
@@ -488,7 +533,7 @@ if(!e.target.closest('.choices')) advance();
 });
 $('#menuRobot').addEventListener('click', advance);
 function renderChoices(){
-const list = editing ? APP.units : shownUnits();
+const list = (editing ? APP.units : shownUnits()).filter(u => !isExtra(u));
 menuChoices.innerHTML = (editing ? '<p class="unit-edit-hint">👁 Toca el ojo para mostrar u ocultar cada unidad a tus estudiantes.</p>' : '') + list.map((u, i) => {
 const n = readyCount(u), t = u.sessions.length;
 const card = `<button class="choice${u.hidden ? ' is-hidden' : ''}" type="button" style="--i:${i}" data-go="#/u/${u.key}">
@@ -502,7 +547,7 @@ return editing ? `<div class="unit-row">${card}<button type="button" class="vis-
 function toggleUnit(key){
 const u = unitByKey(key);
 if(!u || !editing) return;
-if(!u.hidden && shownUnits().length === 1){ toast('Deja al menos una unidad visible para tus estudiantes 🙂'); return; }
+if(!u.hidden && shownUnits().filter(x => !isExtra(x)).length === 1){ toast('Deja al menos una unidad visible para tus estudiantes 🙂'); return; }
 u.hidden = !u.hidden;
 changed();
 saveSiteSoon();
@@ -519,21 +564,21 @@ const desc = empty ? 'Próximamente' : [s.title, s.meta, ...s.activities.map(x =
 const acts = s.activities.filter(a => filled(a.title) || a.file || a.yt).length;
 const hasTk = !editing && playable(s).length, st = me(), pr = st && progressOf(st.key)[`${u.key}|${i + 1}`];
 const tkChip = hasTk ? (pr ? `<span class="mini ok">✅ Exit ticket ${pr.score}/${pr.total}</span>` : '<span class="mini tkt">🎟️ Exit ticket</span>') : '';
-return `<button type="button" class="tile${empty ? ' soon' : ''}" style="--i:${i}" data-go="#/u/${u.key}/s/${i + 1}" aria-label="Sesión ${i + 1}${empty ? ', próximamente' : ''}">
+return `<button type="button" class="tile${empty ? ' soon' : ''}" style="--i:${i}" data-go="#/u/${u.key}/s/${i + 1}" aria-label="${sName(u, i + 1)}${empty ? ', próximamente' : ''}">
 ${s.flipped.enabled ? '<span class="flag">🔄 Flipped</span>' : ''}
 <span class="tile-num">${i + 1}</span>
-<span class="tile-name">Sesión ${i + 1}</span>
+<span class="tile-name">${sName(u, i + 1)}</span>
 <span class="tile-desc">${esc(desc)}</span>
 ${!empty && (acts || tkChip) ? `<span class="tile-foot">${acts ? `<span class="mini">📝 ${acts} ${acts === 1 ? 'actividad' : 'actividades'}</span>` : ''}${tkChip}</span>` : ''}
 </button>`;
 }).join('') + (editing ? `<button type="button" class="tile add" id="addSession" style="--i:${t}"><span class="tile-num">+</span><span class="tile-name">Añadir sesión</span></button>` : '');
 screens.unit.innerHTML = `
 <header class="page-head">
-<span class="kicker"><span ${ed} data-bind="u.icon" data-single data-ph="🔬">${esc(u.icon)}</span> Unidad ${esc(u.num)}</span>
+<span class="kicker"><span ${ed} data-bind="u.icon" data-single data-ph="🔬">${esc(u.icon)}</span> ${esc(uName(u))}</span>
 <h1 class="page-title" ${ed} data-bind="u.title" data-single data-ph="Título de la unidad">${esc(editing ? u.title : unitTitle(u))}</h1>
 <p class="page-sub"><span class="bar"><i style="width:${t ? Math.round(n / t * 100) : 0}%"></i></span><span>${n} de ${t} sesiones disponibles</span></p>
 </header>
-${editing ? `<label class="toggle unit-vis"><input type="checkbox" id="unitVis"${u.hidden ? '' : ' checked'}> 👁 Los estudiantes pueden ver esta unidad</label>` : ''}
+${editing && !isExtra(u) ? `<label class="toggle unit-vis"><input type="checkbox" id="unitVis"${u.hidden ? '' : ' checked'}> 👁 Los estudiantes pueden ver esta unidad</label>` : ''}
 <div class="tiles">${tiles}</div>`;
 const vis = $('#unitVis');
 if(vis) vis.addEventListener('change', () => { if((vis.checked ? u.hidden : !u.hidden)) toggleUnit(u.key); vis.checked = !u.hidden; });
@@ -616,14 +661,14 @@ const head = `
 <header class="s-head">
 ${empty ? '' : robotHTML({ tag:false })}
 <div class="s-head-text">
-<button type="button" class="kicker" data-go="#/u/${u.key}">${esc(u.icon)} Unidad ${esc(u.num)}<span class="k-long"> · ${esc(u.title)}</span></button>
-<h1 class="page-title">Sesión ${n}</h1>
+<button type="button" class="kicker" data-go="#/u/${u.key}">${esc(u.icon)} ${esc(uName(u))}${isExtra(u) ? '' : `<span class="k-long"> · ${esc(u.title)}</span>`}</button>
+<h1 class="page-title">${sName(u, n)}</h1>
 ${(filled(s.title) || editing) ? `<p class="s-subtitle" ${ed} data-bind="s.title" data-single data-ph="Título de la sesión (opcional)">${esc(s.title)}</p>` : ''}
 </div>
 </header>`;
 const pager = `<nav class="pager" aria-label="Otras sesiones">
-${n > 1 ? `<button type="button" class="pager-btn" data-go="#/u/${u.key}/s/${n - 1}" data-replace="1"><small>‹ Anterior</small><strong>Sesión ${n - 1}</strong></button>` : ''}
-${n < total ? `<button type="button" class="pager-btn next" data-go="#/u/${u.key}/s/${n + 1}" data-replace="1"><small>Siguiente ›</small><strong>Sesión ${n + 1}</strong></button>` : ''}
+${n > 1 ? `<button type="button" class="pager-btn" data-go="#/u/${u.key}/s/${n - 1}" data-replace="1"><small>‹ Anterior</small><strong>${sName(u, n - 1)}</strong></button>` : ''}
+${n < total ? `<button type="button" class="pager-btn next" data-go="#/u/${u.key}/s/${n + 1}" data-replace="1"><small>Siguiente ›</small><strong>${sName(u, n + 1)}</strong></button>` : ''}
 </nav>`;
 if(empty){
 screens.session.innerHTML = head + `
@@ -907,7 +952,7 @@ return;
 }
 if(t.closest('#sessionRm')){
 const u = curUnit();
-if(!confirm(`¿Eliminar la Sesión ${route.n} de la Unidad ${u.num}? Las sesiones siguientes se renumerarán.`)) return;
+if(!confirm(`¿Eliminar la ${sName(u, route.n)} de ${isExtra(u) ? 'Adicionales' : 'la Unidad ' + u.num}? Las sesiones siguientes se renumerarán.`)) return;
 u.sessions.splice(route.n - 1, 1);
 changed();
 go({ name:'unit', unit:u.key }, { replace:true });
@@ -1989,7 +2034,7 @@ $$('.rank-grid', tkBody).forEach(freeze);
 /* ---------- student flow ---------- */
 function tkHead(sub, prog){
 const u = unitByKey(tk.unit);
-tkTop.innerHTML = `<small>🎟️ Exit ticket${tk.practice ? ' · modo prueba' : ''}</small><strong>Sesión ${tk.n} · Unidad ${esc(u.num)}</strong><span>${sub}</span>
+tkTop.innerHTML = `<small>🎟️ Exit ticket${tk.practice ? ' · modo prueba' : ''}</small><strong>${sName(u, tk.n)} · ${esc(uName(u))}</strong><span>${sub}</span>
 ${prog != null ? `<div class="tk-prog"><i style="width:${prog}%"></i></div>` : ''}
 <button class="tk-x" type="button" data-tk="close" aria-label="Cerrar">✕</button>`;
 }
@@ -2180,7 +2225,7 @@ const rr = (x, y, w, h, r) => { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w
 g.fillStyle = '#ffffff'; rr(40, 40, W - 80, H - 80, 34); g.fill();
 const F = (w, s) => `${w} ${s}px Nunito, "Segoe UI", Roboto, Arial, sans-serif`;
 g.fillStyle = '#2f6fed'; g.font = F(900, 22); g.fillText('EXIT TICKET · CIENCIA 4TO BIMESTRE', 90, 112);
-g.fillStyle = '#4a5a86'; g.font = F(700, 24); g.fillText(`Unidad ${u.num} · Sesión ${tk.n} · ${u.title}`.slice(0, 64), 90, 150);
+g.fillStyle = '#4a5a86'; g.font = F(700, 24); g.fillText(`${uName(u)} · ${sName(u, tk.n)}${isExtra(u) ? '' : ' · ' + u.title}`.slice(0, 64), 90, 150);
 g.fillStyle = '#12224a'; g.font = F(900, 50); g.fillText(tk.name.slice(0, 32), 90, 238);
 g.fillStyle = '#4a5a86'; g.font = F(800, 28); g.fillText(`${GRADE} grado · Sección ${tk.section}`, 90, 284);
 g.fillStyle = '#f4f8ff'; rr(90, 330, 520, 190, 26); g.fill();
@@ -2279,7 +2324,7 @@ const cloudNoAuth = panel.cloud && !auth();
 const [unit, n] = panel.key.split('|');
 const u = unit && unitByKey(unit);
 tkTop.innerHTML = `<small>📊 Resultados · Exit ticket</small>
-<strong>${GRADE} grado${u ? ` · Unidad ${esc(u.num)} · Sesión ${n}` : ''}</strong>
+<strong>${GRADE} grado${u ? ` · ${esc(uName(u))} · ${sName(u, n)}` : ''}</strong>
 <span>${panel.cloud ? (auth() ? '☁️ En línea · ' + esc(auth().email) : '☁️ En línea (Firebase)') : '💾 Solo este dispositivo'}</span>
 <button class="tk-x" type="button" data-tk="close" aria-label="Cerrar">✕</button>`;
 if(cloudNoAuth){ renderLogin(); return; }
@@ -2338,7 +2383,7 @@ const pending = roster.filter(st => !doneKeys.has(st.id));
 panel.pending = pending;
 const filters = `<div class="dash-filters">
 <div class="dash-row"><label class="dash-select"><span>Sesión</span>
-<select id="pnSession">${list.map(x => { const k = `${x.u.key}|${x.n}`, c = countFor(k); return `<option value="${k}"${k === panel.key ? ' selected' : ''}>Unidad ${esc(x.u.num)} · Sesión ${x.n}${c ? ` — ${c} respuesta${c === 1 ? '' : 's'}` : ''}</option>`; }).join('')}</select></label>
+<select id="pnSession">${list.map(x => { const k = `${x.u.key}|${x.n}`, c = countFor(k); return `<option value="${k}"${k === panel.key ? ' selected' : ''}>${esc(uName(x.u))} · ${sName(x.u, x.n)}${c ? ` — ${c} respuesta${c === 1 ? '' : 's'}` : ''}</option>`; }).join('')}</select></label>
 <button type="button" class="icon-btn" data-tk="reload" title="Actualizar" aria-label="Actualizar">${ICON.refresh}</button></div>
 <div class="seg" role="tablist" aria-label="Sección">
 ${['ALL', ...SECTIONS].map(s => { const c = s === 'ALL' ? all.length : all.filter(r => r.section === s).length; return `<button type="button" role="tab" class="seg-b${s === panel.section ? ' on' : ''}" aria-selected="${s === panel.section}" data-tab="${s}">${s === 'ALL' ? 'Todas' : s}<small>${c}</small></button>`; }).join('')}
@@ -2925,7 +2970,7 @@ return `<div class="ai-box" data-ai-ctx="${ctx}">
 <div class="ai-head"><span class="ai-moli">${still(robotHTML({ outfit: {}, tag: false }))}</span><div class="ai-say"><b>Pedir ayuda a Moli</b><small>${whole ? `Leo toda la sesión (meta, criterios, actividades y fichas) y te preparo ${n} preguntas. Solo toca <em>Generar</em>.` : `Escríbeme el tema y te preparo ${n} preguntas. Luego toca <em>Generar</em>.`}</small></div></div>
 ${whole ? `<button type="button" class="btn solid ai-gen" data-ai="gen"${st.loading ? ' disabled' : ''}>${st.loading ? `<span class="spin"></span> ${st.loading === 'files' ? 'Leyendo las fichas…' : 'Moli está pensando…'}` : '✨ Generar Exit ticket desde la sesión'}</button>` : `<div class="ai-row"><input class="ai-topic" maxlength="220" placeholder="¿Sobre qué tema? Ej.: microorganismos en los alimentos" value="${esc(st.topic)}" aria-label="Tema de las preguntas"${st.loading ? ' disabled' : ''}>
 <button type="button" class="btn solid ai-gen" data-ai="gen"${st.loading ? ' disabled' : ''}>${st.loading ? `<span class="spin"></span> ${st.loading === 'files' ? 'Leyendo…' : 'Moli está pensando…'}` : '✨ Generar'}</button></div>`}
-${ctx === 'lm' || ctx === 'vs' ? `<div class="ai-src"><select class="ai-ses" aria-label="Sacar preguntas de una sesión"${st.loading ? ' disabled' : ''}><option value="">📚 O elige una sesión…</option>${APP.units.map(u => u.sessions.map((x, i) => (filled(x.meta) || x.activities.some(a => filled(a.title)) || x.ticket.questions.length) ? `<option value="${u.key}|${i + 1}"${st.ses === `${u.key}|${i + 1}` ? ' selected' : ''}>Unidad ${esc(u.num)} · Sesión ${i + 1}${filled(x.title) ? ' · ' + esc(clip(x.title, 40)) : ''}</option>` : '').join('')).join('')}</select>
+${ctx === 'lm' || ctx === 'vs' ? `<div class="ai-src"><select class="ai-ses" aria-label="Sacar preguntas de una sesión"${st.loading ? ' disabled' : ''}><option value="">📚 O elige una sesión…</option>${APP.units.map(u => u.sessions.map((x, i) => (filled(x.meta) || x.activities.some(a => filled(a.title)) || x.ticket.questions.length) ? `<option value="${u.key}|${i + 1}"${st.ses === `${u.key}|${i + 1}` ? ' selected' : ''}>${esc(uName(u))} · ${sName(u, i + 1)}${filled(x.title) ? ' · ' + esc(clip(x.title, 40)) : ''}</option>` : '').join('')).join('')}</select>
 ${st.pdf ? `<span class="sai-file">📄 <b>${esc(clip(st.pdf.name, 28))}</b><button type="button" data-ai="nopdf" aria-label="Quitar PDF">✕</button></span>` : `<button type="button" class="btn ghost" data-ai="pdf"${st.loading ? ' disabled' : ''}>📎 Usar un PDF</button>`}</div>
 <p class="ai-hint">Escribe un tema, <b>o</b> elige una sesión (leo su meta, actividades y fichas), <b>o</b> súbeme un PDF. También puedes combinarlos.</p>` : ''}
 ${st.err ? `<p class="send warn ai-err">${st.err}</p>` : ''}
@@ -3244,6 +3289,9 @@ const m = +($('#mailBtn.ready .mb-n') || {}).textContent || 0, ev = $('#hub .t-l
 a.textContent = m ? `✉️ ${m} mensaje${m > 1 ? 's' : ''} nuevo${m > 1 ? 's' : ''}` : ev ? `🧪 La última Moli: ${ev.textContent}` : '';
 a.hidden = !n;
 if(d) d.textContent = (m + (ev ? 1 : 0)) || n;
+const tot = (m + (ev ? 1 : 0)) || n;
+if(tot > (hubDot.last || 0)) softAlarm();
+hubDot.last = tot;
 }
 }
 const HOUSE_LIST = [['h-orange', 'Naranja', 'Caballo'], ['h-white', 'Blanca', 'Gaviota'], ['h-green', 'Verde', 'Águila'], ['h-blue', 'Azul', 'Delfín']];

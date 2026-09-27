@@ -779,6 +779,10 @@
   .ub-row b{ display:block; font-size:12.5px; font-weight:900; letter-spacing:.02em; color:var(--ink-2); }
   .ub-row p{ margin:2px 0 0; font-size:15.5px; font-weight:800; line-height:1.45; color:var(--navy); white-space:pre-line; }
   .u-bubble .file{ margin-top:2px; }
+  .ub-row p.ub-empty{ color:var(--ink-3); font-style:italic; font-weight:700; }
+  .ub-edit{ align-self:flex-start; max-width:100%; white-space:normal; }
+  .u-bubble{ overflow-wrap:anywhere; }
+  .ub-note{ font-size:12px; font-weight:700; color:var(--ink-3); }
   @media (max-width:560px){ .u-intro{ flex-direction:column; align-items:stretch; gap:10px; margin-bottom:18px; } .u-moli{ width:84px; margin-left:14px; } .u-moli .robot{ --rw:84px; } .u-bubble{ padding:14px; } .u-bubble::before{ left:48px; top:-12px; bottom:auto; transform:rotate(135deg); } .ub-row p{ font-size:14.5px; } }
   select.act-pos{ appearance:none; -webkit-appearance:none; border:0; padding:0; text-align:center; text-align-last:center; cursor:pointer; font:inherit; font-weight:900; font-size:18px; box-shadow:0 0 0 6px #fff, 0 0 0 8px #b9cdf5, 0 8px 18px rgba(47,111,237,.3); }
   select.act-pos option{ color:var(--navy); background:#fff; }
@@ -2855,9 +2859,10 @@
   // 🤖 Moli presenta la unidad: producto, competencia y un archivo (lo edita la docente).
   function unitIntroHTML(u, ed){
     const hasP = filled(u.product), hasC = filled(u.competence);
-    if(!editing && !hasP && !hasC && !u.file) return '';
+    const prof = !editing && isTeacher();
+    if(!editing && !prof && !hasP && !hasC && !u.file) return '';
     const st = me(), hi = st && !st.teacher ? `¡Hola, ${esc(firstOf(st.name))}!` : '¡Hola!';
-    const row = (ico, t, key, has, ph) => editing || has ? `<div class="ub-row"><span class="ub-ico">${ico}</span><div><b>${t}</b><p ${ed} data-bind="u.${key}" data-ph="${ph}">${esc(u[key] || '')}</p></div></div>` : '';
+    const row = (ico, t, key, has, ph) => editing || has || prof ? `<div class="ub-row"><span class="ub-ico">${ico}</span><div><b>${t}</b><p ${ed} data-bind="u.${key}" data-ph="${ph}"${!has && prof ? ' class="ub-empty"' : ''}>${has ? esc(u[key]) : prof ? 'Aún no escribes esto.' : ''}</p></div></div>` : '';
     return `<section class="u-intro">
       <div class="u-moli">${robotHTML({ tag: false })}</div>
       <div class="u-bubble">
@@ -2865,12 +2870,14 @@
         ${row('🎯', 'En esta unidad, el producto será:', 'product', hasP, 'Escribe el producto de la unidad…')}
         ${row('🧠', 'La competencia a trabajar es:', 'competence', hasC, 'Escribe la competencia…')}
         ${u.file || editing ? fileBox(u, 'u', null, false, 'Archivo de la unidad') : ''}
+        ${prof ? `<button type="button" class="btn solid ub-edit" data-ub-edit>✏️ Escribir y subir archivo</button><small class="ub-note">Solo tú ves este botón. ${hasP || hasC || u.file ? '' : 'Mientras esté vacío, los estudiantes no ven el globo.'}</small>` : ''}
       </div></section>`;
   }
   screens.unit.addEventListener('click', e => {
     const t = e.target, v = t.closest('[data-view]'), d = t.closest('[data-dl]');
     if(v){ openFile(curUnit().file, 'view'); return; }
     if(d){ openFile(curUnit().file, 'dl'); return; }
+    if(t.closest('[data-ub-edit]')){ enterEdit(true); setTimeout(() => { const p = $('.u-intro [data-bind="u.product"]', screens.unit); if(p){ p.focus(); p.scrollIntoView({ block: 'center' }); } }, 80); return; }
     if(!editing) return;
     if(t.closest('[data-up]')){ commitFocused(); pickFile('u'); return; }
     if(t.closest('[data-rm]')){ commitFocused(); delete curUnit().file; changed(); renderUnit(); }

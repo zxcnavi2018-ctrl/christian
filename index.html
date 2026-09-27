@@ -4284,7 +4284,7 @@
     const tag = r => `<b class="rk-name">${nameTag(r.name, r.id, outfitOf(r.outfit))}</b><span class="rk-sec">${GRADE.replace('to', '')}${esc(r.section)}</span>`;
     const pod = (r, i) => r ? `<div class="pod p${i + 1}${mine(r) ? ' me' : ''}">
         <span class="rk-medal">${['🥇', '🥈', '🥉'][i]}</span>
-        <div class="rk-who">${tag(r)}</div><span class="rk-stars">${r.stars} ⭐</span>${r.duels ? `<span class="rk-duel" title="Duelos ganados">⚔️ ${r.duels} ${r.duels === 1 ? 'duelo' : 'duelos'}</span>` : ''}
+        <div class="rk-who">${tag(r)}</div><span class="rk-stars">${r.stars} ⭐</span>${r.duels ? `<span class="rk-duel" title="Duelos ganados" aria-label="${r.duels} ${r.duels === 1 ? 'duelo ganado' : 'duelos ganados'}">⚔️ ${r.duels}</span>` : ''}
         ${robotHTML({ outfit: outfitOf(r.outfit), tag: false })}
         <div class="pod-base">${i + 1}</div></div>` : '<div class="pod empty"></div>';
     const myPos = u ? list.findIndex(r => r.id === u.rid) : -1;
@@ -4295,7 +4295,7 @@
       <div class="podium">${pod(list[1], 1)}${pod(list[0], 0)}${pod(list[2], 2)}</div>
       ${list.length > 3 ? `<div class="rank-grid">${list.slice(3).map((r, i) => `<div class="rk-card${mine(r) ? ' me' : ''}">
         <span class="rk-pos">#${i + 4}</span>
-        <div class="rk-who">${tag(r)}</div><span class="rk-stars">${r.stars} ⭐</span>${r.duels ? `<span class="rk-duel" title="Duelos ganados">⚔️ ${r.duels} ${r.duels === 1 ? 'duelo' : 'duelos'}</span>` : ''}
+        <div class="rk-who">${tag(r)}</div><span class="rk-stars">${r.stars} ⭐</span>${r.duels ? `<span class="rk-duel" title="Duelos ganados" aria-label="${r.duels} ${r.duels === 1 ? 'duelo ganado' : 'duelos ganados'}">⚔️ ${r.duels}</span>` : ''}
         ${still(robotHTML({ outfit: outfitOf(r.outfit), tag: false }))}</div>`).join('')}</div>` : ''}`}
       ${u && u.teacher ? '<p class="rk-me">🧑‍🏫 Tu Moli aparece arriba como <b>Docente</b>, sin puesto.</p>' : u ? `<p class="rk-me">${myPos >= 0 ? `🎉 ¡Estás en el puesto <b>#${myPos + 1}</b>!` : `Tienes <b>${starsBalance().earned} ⭐</b> en total. ¡Gana más estrellas para entrar al Top 15!`}${duelWins() ? ` · ⚔️ <b>${duelWins()}</b> ${duelWins() === 1 ? 'duelo ganado' : 'duelos ganados'}` : ''}</p>` : '<p class="rk-me">Ingresa con tu DNI para aparecer en el ranking 🪪</p>'}
       <div class="tk-actions">${u ? '<button type="button" class="btn ghost" data-shop>🛍️ Tienda de Moli</button>' : '<button type="button" class="btn ghost" data-tk="acc-login">🪪 Ingresar</button>'}<button type="button" class="btn up" data-tk="close">Listo</button></div>

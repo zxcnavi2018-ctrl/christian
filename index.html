@@ -768,6 +768,18 @@
   }
   .act-x:hover{ background:var(--red); color:#fff; }
   .act.no-file{ grid-template-columns:auto 1fr; }
+  .u-intro{ display:flex; align-items:flex-end; gap:6px; max-width:880px; margin:0 auto 22px; }
+  .u-moli{ flex-shrink:0; width:120px; }
+  .u-moli .robot{ --rw:120px; }
+  .u-bubble{ position:relative; flex:1; min-width:0; display:flex; flex-direction:column; gap:10px; padding:16px 18px; border-radius:24px; background:#fff; border:1.5px solid #d6e2fb; box-shadow:var(--shadow); }
+  .u-bubble::before{ content:""; position:absolute; left:-12px; bottom:34px; width:24px; height:24px; background:#fff; border-left:1.5px solid #d6e2fb; border-bottom:1.5px solid #d6e2fb; transform:rotate(45deg); border-radius:0 0 0 6px; }
+  .ub-hi{ margin:0; font-size:14px; font-weight:900; color:var(--blue); }
+  .ub-row{ display:flex; gap:10px; align-items:flex-start; }
+  .ub-ico{ flex-shrink:0; width:36px; height:36px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:19px; background:#eef3ff; }
+  .ub-row b{ display:block; font-size:12.5px; font-weight:900; letter-spacing:.02em; color:var(--ink-2); }
+  .ub-row p{ margin:2px 0 0; font-size:15.5px; font-weight:800; line-height:1.45; color:var(--navy); white-space:pre-line; }
+  .u-bubble .file{ margin-top:2px; }
+  @media (max-width:560px){ .u-intro{ flex-direction:column; align-items:stretch; gap:10px; margin-bottom:18px; } .u-moli{ width:84px; margin-left:14px; } .u-moli .robot{ --rw:84px; } .u-bubble{ padding:14px; } .u-bubble::before{ left:48px; top:-12px; bottom:auto; transform:rotate(135deg); } .ub-row p{ font-size:14.5px; } }
   select.act-pos{ appearance:none; -webkit-appearance:none; border:0; padding:0; text-align:center; text-align-last:center; cursor:pointer; font:inherit; font-weight:900; font-size:18px; box-shadow:0 0 0 6px #fff, 0 0 0 8px #b9cdf5, 0 8px 18px rgba(47,111,237,.3); }
   select.act-pos option{ color:var(--navy); background:#fff; }
   .ficha-off{ display:block; margin:8px auto 0; padding:6px 12px; border:0; border-radius:999px; background:#f1f4fa; color:var(--ink-2); font:inherit; font-size:12.5px; font-weight:900; cursor:pointer; }
@@ -2840,6 +2852,31 @@
   }
 
   /* ================= Unit screen ================= */
+  // 🤖 Moli presenta la unidad: producto, competencia y un archivo (lo edita la docente).
+  function unitIntroHTML(u, ed){
+    const hasP = filled(u.product), hasC = filled(u.competence);
+    if(!editing && !hasP && !hasC && !u.file) return '';
+    const st = me(), hi = st && !st.teacher ? `¡Hola, ${esc(firstOf(st.name))}!` : '¡Hola!';
+    const row = (ico, t, key, has, ph) => editing || has ? `<div class="ub-row"><span class="ub-ico">${ico}</span><div><b>${t}</b><p ${ed} data-bind="u.${key}" data-ph="${ph}">${esc(u[key] || '')}</p></div></div>` : '';
+    return `<section class="u-intro">
+      <div class="u-moli">${robotHTML({ tag: false })}</div>
+      <div class="u-bubble">
+        <p class="ub-hi">${hi} Soy Moli 🤖 Te cuento de esta unidad:</p>
+        ${row('🎯', 'En esta unidad, el producto será:', 'product', hasP, 'Escribe el producto de la unidad…')}
+        ${row('🧠', 'La competencia a trabajar es:', 'competence', hasC, 'Escribe la competencia…')}
+        ${u.file || editing ? fileBox(u, 'u', null, false, 'Archivo de la unidad') : ''}
+      </div></section>`;
+  }
+  screens.unit.addEventListener('click', e => {
+    const t = e.target, v = t.closest('[data-view]'), d = t.closest('[data-dl]');
+    if(v){ openFile(curUnit().file, 'view'); return; }
+    if(d){ openFile(curUnit().file, 'dl'); return; }
+    if(!editing) return;
+    if(t.closest('[data-up]')){ commitFocused(); pickFile('u'); return; }
+    if(t.closest('[data-rm]')){ commitFocused(); delete curUnit().file; changed(); renderUnit(); }
+  });
+  screens.unit.addEventListener('dragover', e => { if(editing && e.target.closest('[data-drop]')){ e.preventDefault(); e.target.closest('[data-drop]').classList.add('drag'); } });
+  screens.unit.addEventListener('drop', e => { const box = editing && e.target.closest('[data-drop]'); if(!box) return; e.preventDefault(); box.classList.remove('drag'); const f = e.dataTransfer.files[0]; if(f) attach('u', f); });
   function renderUnit(){
     const u = unitByKey(route.unit), n = readyCount(u), t = u.sessions.length;
     const ed = editable();
@@ -2864,6 +2901,7 @@
         <p class="page-sub"><span class="bar"><i style="width:${t ? Math.round(n / t * 100) : 0}%"></i></span><span>${n} de ${t} sesiones disponibles</span></p>
       </header>
       ${editing ? `<label class="toggle unit-vis"><input type="checkbox" id="unitVis"${u.hidden ? '' : ' checked'}> 👁 Los estudiantes pueden ver esta unidad</label>` : ''}
+      ${unitIntroHTML(u, ed)}
       <div class="tiles">${tiles}</div>`;
     const vis = $('#unitVis');
     if(vis) vis.addEventListener('change', () => { if((vis.checked ? u.hidden : !u.hidden)) toggleUnit(u.key); vis.checked = !u.hidden; });
@@ -2882,7 +2920,7 @@
   function editable(){ return editing ? (supportsPlain ? 'contenteditable="plaintext-only"' : 'contenteditable="true"') : ''; }
   const supportsPlain = (() => { const d = document.createElement('div'); try{ d.contentEditable = 'plaintext-only'; return d.contentEditable === 'plaintext-only'; }catch(e){ return false; } })();
 
-  function fileBox(obj, slot, label, amber){
+  function fileBox(obj, slot, label, amber, title){
     const f = obj.file && APP.files[obj.file];
     const kind = f ? fileKind(f) : '';
     const ed = editable();
@@ -2897,7 +2935,7 @@
     }
     const labelHtml = label != null
       ? `<span class="ficha-badge" ${ed} data-bind="${label}" data-single data-ph="Nombre de la ficha">${esc(resolve(label)[0][resolve(label)[1]])}</span>`
-      : `<span class="ficha-badge">Ficha de la tarea</span>`;
+      : `<span class="ficha-badge">${esc(title || 'Ficha de la tarea')}</span>`;
     return `<div class="file" data-drop="${slot}">
       <div class="file-head"><span class="file-ico${f ? '' : ' none'}" data-ext="${f ? kind : '—'}"></span>
         <span class="file-name">${labelHtml}<span class="file-sub">${f ? esc(f.name) : 'Sin ficha todavía'}</span></span></div>
@@ -3053,6 +3091,7 @@
   const curUnit = () => unitByKey(route.unit);
   const curSession = () => curUnit().sessions[route.n - 1];
   function slotObj(slot){
+    if(slot === 'u') return curUnit();
     const s = curSession();
     return slot === 'fl' ? s.flipped : s.activities[+slot.slice(1)];
   }
@@ -3231,7 +3270,7 @@
       if(!id){ id = 'f' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); APP.files[id] = { name:file.name, type:file.type || 'application/octet-stream', b64, size:file.size }; }
       target.file = id;
       changed();
-      renderSession();
+      if(route.name === 'unit') renderUnit(); else renderSession();
       toast('✅ Archivo añadido: ' + file.name);
     };
     reader.readAsDataURL(file);
@@ -3351,7 +3390,7 @@
 
   function pruneFiles(){
     const used = new Set();
-    APP.units.forEach(u => u.sessions.forEach(s => { if(s.flipped.file) used.add(s.flipped.file); s.activities.forEach(a => a.file && used.add(a.file)); }));
+    APP.units.forEach(u => { if(u.file) used.add(u.file); }); APP.units.forEach(u => u.sessions.forEach(s => { if(s.flipped.file) used.add(s.flipped.file); s.activities.forEach(a => a.file && used.add(a.file)); }));
     Object.keys(APP.files).forEach(k => { if(!used.has(k)) delete APP.files[k]; });
   }
   const MARK_A = '/' + '*DATA_START*' + '/', MARK_B = '/' + '*DATA_END*' + '/';

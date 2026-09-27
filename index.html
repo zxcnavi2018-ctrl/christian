@@ -3067,110 +3067,53 @@ if(!box) return;
 e.preventDefault(); e.stopPropagation();
 aiAction(b.dataset.ai, box);
 }, true);
-/* ---------- 📄 Moli crea fichas de trabajo: texto informativo + imágenes en blanco y negro + preguntas (PDF A4) ---------- */
-const FICHA_SCHEMA = { type:'OBJECT', properties:{ title:{ type:'STRING' }, reading:{ type:'STRING' },
-images:{ type:'ARRAY', items:{ type:'OBJECT', properties:{ svg:{ type:'STRING' }, caption:{ type:'STRING' } } } },
-tasks:{ type:'ARRAY', items:{ type:'STRING' } }, tableCols:{ type:'ARRAY', items:{ type:'STRING' } }, tableRows:{ type:'INTEGER' }, draw:{ type:'STRING' },
-crit:{ type:'STRING' }, dua:{ type:'STRING' } } };
-const FICHA_RULES = `Cada ficha es una FICHA DE INFORMACIÓN para imprimir en blanco y negro: da a las y los estudiantes la información que necesitan para hacer ESA actividad (por ejemplo, si la actividad es «Identificamos las enfermedades del caso», la ficha trae el caso y la información de esas enfermedades).
-- "title": el título del texto informativo (corto y atractivo).
-- "reading": el TEXTO INFORMATIVO (o el caso), de 150 a 250 palabras, en 2 o 3 párrafos separados por una línea en blanco, científicamente correcto y en español sencillo.
-- "images": 1 o 2 imágenes que acompañan el texto, dibujadas por ti como SVG sencillo en BLANCO Y NEGRO (solo trazos negros "#000" sobre fondo blanco, sin colores, sin fotos, sin <image>, sin scripts), con viewBox "0 0 400 260", máximo 2500 caracteres cada una, con etiquetas <text> cortas si ayudan. "caption": pie de imagen corto.
-- Mini actividad al final (solo se imprime si queda espacio en la hoja): "tasks" = 1 a 3 preguntas o mini tareas cortas relacionadas con la actividad; "tableCols" y "tableRows" solo si una tabla pequeña ayuda (si no, vacío y 0); "draw" solo si conviene dibujar (si no, vacío).
-- "crit": el criterio de éxito que trabaja la ficha. "dua": el principio del DUA que aplica (Representación, Acción y expresión o Compromiso).`;
+/* ---------- 📄 Moli crea fichas de información: título de la meta, texto con fuentes y «Actividades: Respondemos» (PDF A4) ---------- */
+const FICHA_SCHEMA = { type:'OBJECT', properties:{ title:{ type:'STRING' }, reading:{ type:'STRING' }, sources:{ type:'ARRAY', items:{ type:'STRING' } }, tasks:{ type:'ARRAY', items:{ type:'STRING' } } } };
+const FICHA_RULES = `Cada ficha es una FICHA DE INFORMACIÓN para imprimir: da a las y los estudiantes la información que necesitan para hacer ESA actividad (por ejemplo, si la actividad es «Identificamos las enfermedades del caso», la ficha trae el caso y la información de esas enfermedades).
+- "title": un título en MAYÚSCULAS sacado de la meta de ESTA sesión (solo como ejemplo del formato: si la meta fuera «Organiza las enfermedades infectocontagiosas y sus tipos», el título sería «LAS ENFERMEDADES Y SUS TIPOS»). El tema siempre es el de la sesión, no el del ejemplo.
+- "reading": el TEXTO INFORMATIVO sobre el tema de la sesión, de 180 a 280 palabras, en 2 o 3 párrafos separados por una línea en blanco, con información tomada de fuentes confiables (MINEDU, MINSA, OMS, UNICEF, libros de texto escolares, enciclopedias de ciencia), científicamente correcto y en español sencillo.
+- REQUISITO: dentro del texto incluye SIEMPRE 1 o 2 CITAS con autor y año, por ejemplo «Según el MINEDU (2024), …» o «… (OMS, 2023).». Cita solo instituciones o libros reales y conocidos.
+- "sources": las 1 a 3 fuentes citadas, con autor y año (por ejemplo «MINEDU (2024). Ciencia y Tecnología 6.° grado», «Organización Mundial de la Salud - OMS (2023)»). No inventes enlaces ni páginas.
+- "tasks": EXACTAMENTE 3 preguntas cortas sobre el texto para responder por escrito, de menor a mayor dificultad.
+- No pongas imágenes, nombre, fecha ni criterio de éxito.`;
 const fichaClean = f => {
 if(!f || typeof f !== 'object') return null;
-const tasks = (Array.isArray(f.tasks) ? f.tasks : []).map(t => clip(t, 220)).filter(Boolean).slice(0, 6);
-const cols = (Array.isArray(f.tableCols) ? f.tableCols : []).map(t => clip(t, 30)).filter(Boolean).slice(0, 4);
-const images = (Array.isArray(f.images) ? f.images : []).filter(im => im && typeof im.svg === 'string' && /<svg[\s>]/i.test(im.svg) && im.svg.length <= 6000).slice(0, 2).map(im => ({ svg: im.svg, caption: clip(im.caption, 90) }));
-const out = { title: clip(f.title, 80), reading: String(f.reading || '').trim().slice(0, 2200), images, tasks, cols: cols.length >= 2 ? cols : [], rows: cols.length >= 2 ? Math.max(3, Math.min(6, +f.tableRows || 4)) : 0, draw: clip(f.draw, 160), crit: clip(f.crit, 160), dua: clip(f.dua, 40) };
-return out.title && (out.tasks.length || out.reading) ? out : null;
+const tasks = (Array.isArray(f.tasks) ? f.tasks : []).map(t => clip(t, 220)).filter(Boolean).slice(0, 3);
+const sources = (Array.isArray(f.sources) ? f.sources : []).map(t => clip(t, 120)).filter(t => t && !/https?:|www\./i.test(t)).slice(0, 3);
+const out = { title: clip(f.title, 90).toUpperCase(), reading: String(f.reading || '').trim().slice(0, 2600), sources, tasks };
+out.cited = /\(\s*(?:[^()]{1,60},\s*)?(?:19|20)\d{2}\s*\)/.test(out.reading);
+return out.title && out.reading && out.tasks.length ? out : null;
 };
-async function svgPng(svg){
-try{
-const d = new DOMParser().parseFromString(svg, 'image/svg+xml'), root = d.documentElement;
-if(root.nodeName.toLowerCase() !== 'svg' || d.querySelector('parsererror')) return null;
-const OK = /^(svg|g|path|circle|ellipse|rect|line|polyline|polygon|text|tspan)$/i;
-[...root.querySelectorAll('*')].forEach(el => { if(!OK.test(el.nodeName)) el.remove(); });
-[root, ...root.querySelectorAll('*')].forEach(el => [...el.attributes].forEach(at => { if(/^on|href|style/i.test(at.name)) el.removeAttribute(at.name); }));
-if(root.querySelectorAll('*').length > 400) return null;
-const vb = (root.getAttribute('viewBox') || '0 0 400 260').split(/[\s,]+/).map(Number), vw = vb[2] > 0 ? vb[2] : 400, vh = vb[3] > 0 ? vb[3] : 260;
-root.setAttribute('viewBox', `${vb[0] || 0} ${vb[1] || 0} ${vw} ${vh}`); root.setAttribute('width', 900); root.setAttribute('height', Math.round(900 * vh / vw));
-root.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-const img = new Image(); img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(root));
-await img.decode();
-const cv = document.createElement('canvas'); cv.width = 900; cv.height = Math.round(900 * vh / vw);
-const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height); g.filter = 'grayscale(1) contrast(1.2)'; g.drawImage(img, 0, 0, cv.width, cv.height);
-return { bytes: bytesOf(cv.toDataURL('image/png').split(',')[1]), w: cv.width, h: cv.height };
-}catch(e){ return null; }
-}
 const pdfTxt = t => String(t || '').replace(/[“”«»]/g, '"').replace(/[‘’]/g, "'").replace(/[–—]/g, '-').replace(/…/g, '...').replace(/[^\x20-\x7E -ÿ\n]/g, '').replace(/[ \t]+/g, ' ').replace(/ ([.,;:!?)])/g, '$1').trim();
-async function fichaPDF(f, actN, s, u, n){
+async function fichaPDF(f){
 const L = await pdfLib(), doc = await L.PDFDocument.create();
 const R = await doc.embedFont(L.StandardFonts.TimesRoman), B = await doc.embedFont(L.StandardFonts.TimesRomanBold), I = await doc.embedFont(L.StandardFonts.TimesRomanItalic);
-const W = 595, H = 842, M = 50, black = L.rgb(0, 0, 0), grey = L.rgb(.35, .35, .35), line = L.rgb(.6, .6, .6), soft = L.rgb(.94, .94, .94), FS = 13, LH = 17;
+const W = 595, H = 842, M = 56, TW = (W - 2 * M) * .9, black = L.rgb(0, 0, 0), grey = L.rgb(.35, .35, .35), line = L.rgb(.6, .6, .6), FS = 13, LH = 17.5;
+const foot = pdfTxt(`${String(GRADE).toUpperCase()} - Ciencia`);
 let pg, y;
-const wrap = (t, font, size, width) => { const out = []; let cur = ''; pdfTxt(t).split(' ').forEach(w => { const tr = cur ? cur + ' ' + w : w; if(font.widthOfTextAtSize(tr, size) > width && cur){ out.push(cur); cur = w; } else cur = tr; }); if(cur) out.push(cur); return out; };
-const text = (t, font, size, x = M, color = black) => { pg.drawText(t, { x, y, size, font, color }); };
-const newPage = () => { pg = doc.addPage([W, H]); y = H - M; pg.drawText(pdfTxt(`${uName(u)} · ${sName(u, n)} · Ficha de la actividad ${actN}`), { x: M, y: 26, size: 9, font: I, color: grey }); };
-const need = h => { if(y - h < M + 10) newPage(); };
+const wrap = (t, font, size, width = TW) => { const out = []; let cur = ''; pdfTxt(t).split(' ').forEach(w => { const tr = cur ? cur + ' ' + w : w; if(font.widthOfTextAtSize(tr, size) > width && cur){ out.push(cur); cur = w; } else cur = tr; }); if(cur) out.push(cur); return out; };
+const newPage = () => { pg = doc.addPage([W, H]); y = H - M; pg.drawText(foot, { x: W - M - I.widthOfTextAtSize(foot, 10), y: 28, size: 10, font: I, color: grey }); pg.drawLine({ start: { x: M, y: 42 }, end: { x: W - M, y: 42 }, thickness: .6, color: line }); };
+const need = h => { if(y - h < M + 14) newPage(); };
+const put = (t, font, size, x = M) => pg.drawText(t, { x, y, size, font, color: black });
 newPage();
-const ses = pdfTxt(`${sName(u, n)}${filled(s.title) ? ': ' + s.title : ''}`);
-text(pdfTxt(`CIENCIA Y TECNOLOGÍA · ${GRADE} GRADO · FICHA DE LA ACTIVIDAD ${actN}`), B, 10, M, grey); y -= 22;
-wrap(ses, B, 18, W - 2 * M).slice(0, 2).forEach(l => { text(l, B, 18); y -= 22; });
-pg.drawLine({ start: { x: M, y: y + 8 }, end: { x: W - M, y: y + 8 }, thickness: 1.5, color: black }); y -= 14;
-text('Nombre: ____________________________________   Sección: ______   Fecha: ___________', R, 12); y -= 22;
-const crit = f.crit || (s.criteria || []).filter(filled).join(' / '), rows = [];
-if(crit) rows.push(...wrap('Criterio de éxito: ' + crit, B, 11.5, W - 2 * M - 20));
-if(f.dua) rows.push(...wrap('DUA: ' + f.dua, R, 11.5, W - 2 * M - 20));
-if(rows.length){ const h = rows.length * 15 + 14; pg.drawRectangle({ x: M, y: y - h + 12, width: W - 2 * M, height: h, color: soft, borderColor: black, borderWidth: .8 }); y -= 4; rows.forEach(l => { text(l, l.startsWith('Criterio') ? B : R, 11.5, M + 10); y -= 15; }); y -= 16; }
-need(60); wrap(f.title, B, 16, W - 2 * M).forEach(l => { text(l, B, 16); y -= 20; }); y -= 4;
-const imgs = [];
-for(const im of f.images) { const p = await svgPng(im.svg); if(p) imgs.push({ ...p, caption: im.caption }); }
-const paras = String(f.reading || '').split(/\n\s*\n|\n/).map(pdfTxt).filter(Boolean);
-paras.forEach((p, pi) => {
-wrap(p, R, FS, W - 2 * M).forEach(l => { need(LH); text(l, R, FS); y -= LH; });
+wrap(f.title, B, 17, TW).forEach(l => { put(l, B, 17, (W - B.widthOfTextAtSize(l, 17)) / 2); y -= 22; });
+pg.drawLine({ start: { x: M, y: y + 8 }, end: { x: W - M, y: y + 8 }, thickness: 1.2, color: black }); y -= 18;
+String(f.reading).split(/\n\s*\n|\n/).map(pdfTxt).filter(Boolean).forEach(p => {
+wrap(p, R, FS).forEach(l => { need(LH); put(l, R, FS); y -= LH; });
 y -= 8;
-const im = pi === 0 ? imgs[0] : pi === paras.length - 1 ? imgs[1] : null;
-if(im){
-let iw = Math.min(W - 2 * M, 330), ih = iw * im.h / im.w;
-if(y - ih - 30 < M + 10 && y - 30 - (M + 10) >= 130){ ih = y - 30 - (M + 10); iw = ih * im.w / im.h; }
-need(ih + 30);
-const png = im.emb; // se inserta abajo
-im.at = { x: (W - iw) / 2, y: y - ih, w: iw, h: ih, page: pg }; y -= ih + 4;
-if(im.caption){ const cl = pdfTxt(im.caption); pg.drawText(cl, { x: (W - I.widthOfTextAtSize(cl, 10.5)) / 2, y: y - 10, size: 10.5, font: I, color: grey }); y -= 22; }
-y -= 6;
-}
 });
-if(imgs[1] && !imgs[1].at && paras.length === 1){ const im = imgs[1], iw = Math.min(W - 2 * M, 330), ih = iw * im.h / im.w; need(ih + 30); im.at = { x: (W - iw) / 2, y: y - ih, w: iw, h: ih, page: pg }; y -= ih + 26; }
-for(const im of imgs) if(im.at){ const e = await doc.embedPng(im.bytes); im.at.page.drawImage(e, { x: im.at.x, y: im.at.y, width: im.at.w, height: im.at.h }); im.at.page.drawRectangle({ x: im.at.x, y: im.at.y, width: im.at.w, height: im.at.h, borderColor: line, borderWidth: .6 }); }
-const room = h => y - h >= M + 10;
-const tl = f.tasks.map((t, i) => wrap(`${i + 1}. ${t}`, B, 12.5, W - 2 * M));
-if(tl.length && room(40 + tl[0].length * 16 + 52)){ y -= 4; text('Mini actividad', B, 14); y -= 22; }
-else tl.length = 0;
-tl.forEach(ls => {
-if(!room(ls.length * 16 + 52)) return;
-ls.forEach(l => { text(l, B, 12.5); y -= 16; });
-for(let k = 0; k < 2; k++){ y -= 18; pg.drawLine({ start: { x: M + 14, y }, end: { x: W - M, y }, thickness: .6, color: line }); } y -= 16;
+if(f.sources.length){ need(20); wrap((f.sources.length > 1 ? 'Fuentes: ' : 'Fuente: ') + f.sources.join('; ').replace(/\.$/, '') + '.', I, 10.5).forEach(l => { need(14); put(l, I, 10.5); y -= 14; }); y -= 6; }
+need(40 + 90); y -= 6; put('Actividades: Respondemos', B, 14); y -= 22;
+f.tasks.forEach((t, i) => {
+const ls = wrap(`${i + 1}. ${t}`, B, FS);
+need(ls.length * LH + 74);
+ls.forEach(l => { put(l, B, FS); y -= LH; });
+for(let k = 0; k < 3; k++){ y -= 20; pg.drawLine({ start: { x: M + 16, y }, end: { x: W - M, y }, thickness: .6, color: line }); } y -= 16;
 });
-if(f.cols.length && !room(26 * (f.rows + 1) + 24)) f.rows = Math.max(0, Math.floor((y - M - 10 - 24) / 26) - 1);
-if(f.cols.length && f.rows >= 2){
-const rh = 26, h = rh * (f.rows + 1), cw = (W - 2 * M) / f.cols.length;
-pg.drawRectangle({ x: M, y: y - rh + 8, width: W - 2 * M, height: rh, color: soft });
-for(let r = 0; r <= f.rows + 1; r++) pg.drawLine({ start: { x: M, y: y + 8 - r * rh }, end: { x: W - M, y: y + 8 - r * rh }, thickness: .8, color: black });
-for(let c = 0; c <= f.cols.length; c++) pg.drawLine({ start: { x: M + c * cw, y: y + 8 }, end: { x: M + c * cw, y: y + 8 - (f.rows + 1) * rh }, thickness: .8, color: black });
-f.cols.forEach((c, i) => pg.drawText(wrap(c, B, 12, cw - 10)[0] || '', { x: M + i * cw + 6, y: y - 9, size: 12, font: B, color: black }));
-y -= h + 24;
-}
-if(f.draw && room(150)){
-wrap(f.draw, B, 12.5, W - 2 * M).forEach(l => { text(l, B, 12.5); y -= 16; });
-const bh = Math.min(190, y - M - 16); y -= 6; pg.drawRectangle({ x: M, y: y - bh, width: W - 2 * M, height: bh, borderColor: black, borderWidth: 1, borderDashArray: [5, 4] }); y -= bh + 14;
-}
 return doc.save();
 }
-async function fichaToFile(f, actN, s, u){
-const n = u.sessions.indexOf(s) + 1 || route.n;
-const b64 = b64Of(await fichaPDF(f, actN, s, u, n)), id = 'f' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+async function fichaToFile(f, actN){
+const b64 = b64Of(await fichaPDF(f)), id = 'f' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 APP.files[id] = { name: pdfTxt(`Ficha actividad ${actN} - ${f.title}`).slice(0, 80) + '.pdf', type: 'application/pdf', b64, size: Math.round(b64.length * .75) };
 return id;
 }
@@ -3184,11 +3127,10 @@ fgenBusy.add(i); renderSession(); toast('📝 Moli está creando la ficha…', [
 const prompt = `Eres una docente experta de Ciencia y Tecnología de 6.° grado de primaria en Perú. Crea UNA ficha de trabajo para esta actividad de la sesión.
 ${filled(s.meta) ? `Meta: ${clip(s.meta, 240)}\n` : ''}${s.criteria.some(filled) ? `Criterios de éxito: ${s.criteria.filter(filled).map(c => clip(c, 140)).join(' | ')}\n` : ''}Actividad ${i + 1} (${a.mode === 'group' ? 'colaborativa, en equipos' : 'individual'}): ${clip(a.title, 90)} — ${clip(a.desc, 260)}
 ${FICHA_RULES}
-En "crit" pon el criterio de éxito (de los de arriba) que más trabaja esta actividad.
 Español sencillo para 11 y 12 años y datos científicamente correctos.`;
 try{
 const f = await aiRequest(prompt, FICHA_SCHEMA, d => fichaClean(d), { timeout: 90000, maxTokens: 12000 });
-const id = await fichaToFile(f, i + 1, s, u);
+const id = await fichaToFile(f, i + 1);
 if(curSession() === s){ a.file = id; delete a.noFicha; changed(); }
 toast('✅ ¡Ficha lista! Moli la puso en la Actividad ' + (i + 1) + '.');
 }catch(e){ toast(aiErrText(e.message).replace(/<[^>]+>/g, ''), [], 5000); }
@@ -3306,7 +3248,7 @@ const R = sai.result, busy = !!sai.loading;
 return `<div class="ai-box sai-box">
 <div class="ai-head"><span class="ai-moli">${still(robotHTML({ outfit: {}, tag: false }))}</span><div class="ai-say"><b>Moli arma tu sesión</b><small>Escribe solo la <em>meta</em> aquí abajo (o súbeme tus fichas en PDF). Yo creo <em>3 criterios de éxito</em> con la taxonomía de Bloom y las actividades con <em>DUA</em>: máximo 3, siempre una colaborativa y una con video. Yo pongo cada ficha en su actividad.</small></div></div>
 <div class="sai-pdf">${sai.pdf ? `<span class="sai-file">📄 <b>${esc(sai.pdf.name)}</b> · ${sai.pdf.pages} ${sai.pdf.pages === 1 ? 'página' : 'páginas'}<button type="button" data-sai="nopdf" aria-label="Quitar PDF">✕</button></span>` : `<button type="button" class="btn ghost" data-sai="pdf"${busy ? ' disabled' : ''}>${sai.loading === 'pdf' ? '<span class="spin"></span> Leyendo el PDF…' : '📎 Subir fichas (PDF)'}</button>`}</div>
-<label class="sai-chk"><input type="checkbox" data-sai-f${sai.fichas ? ' checked' : ''}${busy ? ' disabled' : ''}> 📄 Que Moli cree las fichas de las actividades (texto, preguntas, tabla o dibujo)</label>
+<label class="sai-chk"><input type="checkbox" data-sai-f${sai.fichas ? ' checked' : ''}${busy ? ' disabled' : ''}> 📄 Que Moli cree las fichas de información de las actividades (texto con fuentes y 3 preguntas)</label>
 <div class="ai-row sai-row"><div class="sai-n" role="radiogroup" aria-label="Cuántas actividades">${[2, 3].map(k => `<button type="button" role="radio" aria-checked="${sai.n === k}" class="${sai.n === k ? 'on' : ''}" data-sai-n="${k}">${k} actividades</button>`).join('')}</div>
 <button type="button" class="btn solid ai-gen" data-sai="gen"${busy ? ' disabled' : ''}>${sai.loading === 'gen' ? '<span class="spin"></span> Moli está pensando…' : sai.loading === 'video' ? '<span class="spin"></span> Buscando el video…' : '✨ Generar actividades'}</button></div>
 ${sai.err ? `<p class="send warn ai-err">${sai.err}</p>` : ''}
@@ -3314,7 +3256,7 @@ ${R ? `<div class="sai-sug">${R.meta && !filled(curSession().meta) ? `<p>🎯 <b
 <ol class="sai-crit">${R.criteria.map(c => `<li>${esc(c.text)}${c.level ? ` <span class="sai-bl">${esc(c.level)}</span>` : ''}</li>`).join('')}</ol></div>
 <ol class="ai-prev">${R.acts.map(a => `<li><b>${esc(a.title)} <span class="mode ${a.mode}">${a.mode === 'group' ? '👥 Colaborativo' : '👤 Individual'}</span></b><small>${esc(a.desc)}</small>
 ${a.dua ? `<span class="sai-tag dua">🧩 DUA: ${esc(a.dua)}</span>` : ''}${a.crit ? `<span class="sai-tag crit">✓ Criterio ${a.crit}</span>` : ''}
-${a.from ? `<span class="sai-tag">📄 Ficha: ${a.from === a.to ? `página ${a.from}` : `páginas ${a.from} a ${a.to}`}</span>` : ''}${a.ficha ? `<span class="sai-tag">📝 Ficha de Moli: ${esc(a.ficha.title)}${a.ficha.tasks.length ? ` · ${a.ficha.tasks.length} consignas` : ''}${a.ficha.cols.length ? ' · tabla' : ''}${a.ficha.draw ? ' · dibujo' : ''}</span>` : ''}
+${a.from ? `<span class="sai-tag">📄 Ficha: ${a.from === a.to ? `página ${a.from}` : `páginas ${a.from} a ${a.to}`}</span>` : ''}${a.ficha ? `<span class="sai-tag">📝 Ficha de Moli: ${esc(a.ficha.title)} · texto con fuentes + 3 preguntas</span>` : ''}
 ${a.yt ? `<span class="sai-vid"><img src="https://i.ytimg.com/vi/${a.yt}/mqdefault.jpg" alt="" loading="lazy"><span>🎬 ${esc(a.ytTitle || 'Video de YouTube')}<a href="https://youtu.be/${a.yt}" target="_blank" rel="noopener">Ver en YouTube ›</a></span></span>`
 : a.video ? `<a class="sai-tag" href="https://www.youtube.com/results?search_query=${encodeURIComponent(a.video)}" target="_blank" rel="noopener">🔎 Buscar video: «${esc(a.video)}»</a>` : ''}</li>`).join('')}</ol>
 ${R.sep ? `<iframe class="sai-sep" title="Sugerencias de Google" sandbox="allow-popups allow-popups-to-escape-sandbox" srcdoc="${esc(R.sep)}"></iframe>` : ''}
@@ -3338,7 +3280,7 @@ const b64 = b64Of(await pdfSlice(a.from, a.to)), id = 'f' + Date.now().toString(
 APP.files[id] = { name: `Ficha actividad ${i + 1}.pdf`, type: 'application/pdf', b64, size: Math.round(b64.length * .75) };
 o.file = id; delete o.noFicha;
 }
-else if(a.ficha){ const cr = R.criteria[(a.crit || i + 1) - 1]; o.file = await fichaToFile({ ...a.ficha, crit: a.ficha.crit || (cr && cr.text) || '', dua: a.dua || a.ficha.dua }, i + 1, s, curUnit()); delete o.noFicha; }
+else if(a.ficha){ o.file = await fichaToFile(a.ficha, i + 1); delete o.noFicha; }
 if(a.yt){ o.yt = a.yt; o.yts = 0; delete o.ytq; } else if(a.video && !o.yt) o.ytq = a.video;
 acts.push(o);
 }

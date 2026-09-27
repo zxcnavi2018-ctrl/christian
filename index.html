@@ -1521,15 +1521,6 @@
   .send .btn{ flex:none; padding:8px 12px; font-size:13px; }
   .spin{ width:16px; height:16px; border-radius:50%; border:3px solid rgba(47,111,237,.2); border-top-color:var(--blue); display:inline-block; vertical-align:-3px; animation:spin .8s linear infinite; }
   @keyframes spin{ to{ transform:rotate(360deg); } }
-  .sec-tab{
-    display:flex; flex-direction:column; align-items:center; gap:2px;
-    padding:10px 4px;
-    border-radius:16px;
-    border:2px solid var(--line);
-    background:#fff;
-    cursor:pointer;
-    transition:background .2s, border-color .2s, color .2s;
-  }
   .grade{ display:inline-block; min-width:48px; text-align:center; padding:3px 10px; border-radius:999px; font-weight:900; }
   .grade.hi{ background:var(--green-bg); color:#16693a; }
   .grade.mid{ background:#fff4dc; color:#8a5a0a; }
@@ -1651,18 +1642,6 @@
     .uc-txt b{ font-size:13px; }
     .uc-txt small{ font-size:10.5px; }
   }
-
-  /* ---------- Moli's outfit ---------- */
-  .robot.painted .robot-body::before{
-    content:"";
-    position:absolute;
-    inset:0;
-    background:var(--paint);
-    -webkit-mask:var(--robot-img) center / contain no-repeat;
-    mask:var(--robot-img) center / contain no-repeat;
-    mix-blend-mode:multiply;
-    pointer-events:none;
-  }
   .robot[style*="--eye"] .eye{ box-shadow:0 0 1.8cqw var(--eye); }
   .robot.rainbow .eye{
     background:linear-gradient(160deg, #f87171, #fbbf24, #4ade80, #38bdf8, #a78bfa);
@@ -1672,23 +1651,6 @@
   }
   .robot.rainbow.happy .eye{ border-color:#f472b6; background:transparent; }
   @keyframes rainbow{ to{ filter:hue-rotate(360deg); } }
-  .wear{
-    position:absolute;
-    left:50%;
-    z-index:2;
-    line-height:1;
-    transform:translateX(-50%);
-    pointer-events:none;
-    filter:drop-shadow(0 1cqw 1.4cqw rgba(18,34,74,.28));
-  }
-  .w-hat{ top:-27cqw; font-size:38cqw; }
-  .w-crown{ top:-20cqw; font-size:31cqw; }
-  .w-cap{ top:-22cqw; font-size:36cqw; }
-  .w-face{ top:4cqw; font-size:46cqw; }
-  .w-bow{ top:45cqw; font-size:17cqw; }
-  .w-scarf{ top:45cqw; font-size:26cqw; }
-  .w-medal{ top:54cqw; left:36%; font-size:16cqw; }
-  .w-tube{ top:56cqw; left:auto; right:-6cqw; font-size:24cqw; transform:rotate(18deg); }
   .robot-tag{ z-index:3; }
 
   /* ---------- Shop button next to Moli ---------- */
@@ -1737,10 +1699,10 @@
     .viewer::backdrop, .tk::backdrop{ backdrop-filter:none; -webkit-backdrop-filter:none; background:rgba(12,22,50,.72); }
   }
   /* Modo liviano: sin adornos infinitos */
-  html.lite .deco .dc, html.lite .tk:has(.tk-step.duel)::before, html.lite .vs-track::after, html.lite .vs-spark, html.lite .vs-logo,
+  html.lite .deco .dc, html.lite .tk.is-duel::before, html.lite .vs-track::after, html.lite .vs-spark, html.lite .vs-logo,
   html.lite .vs-ic.go i::after, html.lite .vs-side.champ .vs-bot::before, html.lite .vs-radar,
   html.lite .vs-bot.ghost span{ animation:none !important; }
-  html.lite .tk:has(.tk-step.duel)::before{ display:none; }
+  html.lite .tk.is-duel::before{ display:none; }
   /* ---------- ✨ Generador de preguntas con IA ---------- */
   .ai-box{ display:flex; flex-direction:column; gap:10px; margin:0 0 16px; padding:14px; border-radius:18px;
     background:linear-gradient(135deg, #f5f3ff, #eef6ff); border:1.5px solid #d8cffc; box-shadow:0 6px 18px rgba(91,79,224,.1); }
@@ -1945,9 +1907,6 @@
   .bal-chips{ display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
   .bal-chip{ padding:3px 8px; border-radius:999px; background:rgba(255,255,255,.14); font-size:11.5px; font-weight:900; }
   .v-msg{ margin:0; font-size:13.5px; font-weight:700; line-height:1.45; color:var(--ink-2); }
-  .v-quick{ display:flex; gap:8px; flex-wrap:wrap; }
-  .v-q{ position:relative; flex:1; min-width:120px; padding:10px 10px; border-radius:14px; border:1.5px solid var(--line); background:#fff; font:inherit; font-size:13px; font-weight:900; color:var(--navy); cursor:pointer; }
-  .v-q:hover{ border-color:#b9cdf5; }
   details.code-box{ padding:0; }
   details.code-box summary{ list-style:none; display:flex; align-items:center; gap:8px; padding:12px 14px; cursor:pointer; }
   details.code-box summary::-webkit-details-marker{ display:none; }
@@ -1988,8 +1947,6 @@
     .bal-card small{ font-size:11px; }
     .bal-chip{ font-size:10.5px; padding:2px 6px; }
     .v-msg{ font-size:12px; line-height:1.35; }
-    .v-quick{ flex-direction:column; gap:6px; }
-    .v-q{ min-width:0; padding:8px; font-size:12px; }
     .strip-all, .v-trying{ font-size:11px; padding:5px 9px; }
     details.code-box summary small{ display:none; }
     details.code-box summary b{ font-size:13.5px; }
@@ -2006,28 +1963,28 @@
   @keyframes count{ 0%{ content:"3"; } 33%{ content:"2"; } 66%{ content:"1"; } 95%{ content:"¡YA!"; } }
   @keyframes vsTime{ from{ width:100%; background-position:0 0; } to{ width:0; background-position:100% 0; } }
   /* ---------- ⚔️ Duelo VS: arena oscura, dos Molis, VS y la barrita ---------- */
-  .tk:has(.tk-step.duel){ color:#fff; background:
+  .tk.is-duel{ color:#fff; background:
       radial-gradient(90% 55% at 0% 18%, rgba(59,130,246,.42), transparent 62%),
       radial-gradient(90% 55% at 100% 18%, rgba(244,63,94,.38), transparent 62%),
       radial-gradient(70% 40% at 50% 100%, rgba(124,58,237,.35), transparent 70%),
       linear-gradient(180deg, #1a1147 0%, #0f0b2b 100%); }
-  .tk:has(.tk-step.duel)::before{ content:""; position:absolute; top:0; left:0; right:0; pointer-events:none; opacity:.55;
+  .tk.is-duel::before{ content:""; position:absolute; top:0; left:0; right:0; pointer-events:none; opacity:.55;
     background-image:radial-gradient(1.6px 1.6px at 12% 18%, #fff, transparent), radial-gradient(1.4px 1.4px at 78% 9%, #c4b5fd, transparent),
       radial-gradient(2px 2px at 36% 62%, #93c5fd, transparent), radial-gradient(1.4px 1.4px at 88% 48%, #fda4af, transparent),
       radial-gradient(1.8px 1.8px at 58% 30%, #fff, transparent), radial-gradient(1.4px 1.4px at 22% 86%, #fde68a, transparent);
     background-size:320px 420px; bottom:-420px; will-change:transform; animation:vsDrift 16s linear infinite; }
   @keyframes vsDrift{ to{ transform:translateY(-420px); } }
-  .tk:has(.tk-step.duel) > *{ position:relative; z-index:1; }
-  .tk:has(.tk-step.duel) .tk-top{ background:transparent; padding:12px 60px 0 18px; min-height:50px; }
-  .tk:has(.tk-step.duel) .tk-top small, .tk:has(.tk-step.duel) .tk-top span{ display:none; }
-  .tk:has(.tk-step.duel) .tk-top strong{ position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
-  .tk:has(.tk-step.duel) .tk-x{ top:12px; transform:none; background:rgba(255,255,255,.1); }
-  .tk:has(.tk-step.duel) .tk-body{ padding:0 20px 24px; }
+  .tk.is-duel > *{ position:relative; z-index:1; }
+  .tk.is-duel .tk-top{ background:transparent; padding:12px 60px 0 18px; min-height:50px; }
+  .tk.is-duel .tk-top small, .tk.is-duel .tk-top span{ display:none; }
+  .tk.is-duel .tk-top strong{ position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+  .tk.is-duel .tk-x{ top:12px; transform:none; background:rgba(255,255,255,.1); }
+  .tk.is-duel .tk-body{ padding:0 20px 24px; }
   .tk-step.duel{ max-width:560px; margin:0 auto; padding-top:16px; }
 
   /* ---------- ⚔️ Pantalla partida: tu Moli en una mitad, el rival en la otra ---------- */
-  .tk:has(.tk-step.duel.split) .tk-top{ position:absolute; top:0; left:0; right:0; z-index:30; }
-  .tk:has(.tk-step.duel.split) .tk-body{ padding:0; display:flex; flex-direction:column; }
+  .tk.is-split .tk-top{ position:absolute; top:0; left:0; right:0; z-index:30; }
+  .tk.is-split .tk-body{ padding:0; display:flex; flex-direction:column; }
   .tk-step.duel.split{ flex:1; display:flex; flex-direction:column; max-width:none; margin:0; padding:0; min-height:min(660px, 86dvh); }
   .vs-split{ position:relative; flex:1; min-height:380px; overflow:hidden; }
   .vs-half{ position:absolute; z-index:1; left:0; right:0; height:55%; display:flex; }
@@ -2167,7 +2124,7 @@
   @keyframes goRing{ from{ transform:scale(1); opacity:1; } to{ transform:scale(1.5); opacity:0; } }
   @media (max-width:560px){ .vs-bot .robot{ --rw:96px; } .vs-logo{ font-size:36px; } .vs-stage.compact .vs-bot .robot{ --rw:62px; } .vs-stage.compact .vs-logo{ font-size:26px; }
     .vs-opts{ grid-template-columns:1fr; gap:8px; } .vs-opt{ min-height:50px; } .vs-bot.ghost span{ width:90px; height:90px; font-size:40px; } }
-  @media (prefers-reduced-motion:reduce){ .tk:has(.tk-step.duel)::before, .vs-logo, .vs-track::after, .vs-spark, .vs-ic.go i::after, .vs-side.champ .vs-bot::before{ animation:none; } }
+  @media (prefers-reduced-motion:reduce){ .tk.is-duel::before, .vs-logo, .vs-track::after, .vs-spark, .vs-ic.go i::after, .vs-side.champ .vs-bot::before{ animation:none; } }
   /* ---------- special eyes ---------- */
   .robot.ey-anime .eye{ background:radial-gradient(circle at 36% 26%, #fff 0 15%, transparent 16%), radial-gradient(circle at 62% 64%, #fff 0 8%, transparent 9%), linear-gradient(#1e3a8a, #2563eb 45%, #38bdf8 80%, #a5f3fc); box-shadow:0 0 1.8cqw rgba(56,189,248,.8); }
   .robot.ey-heart .eye, .robot.ey-star .eye{ top:18.5%; width:12.5%; height:15.5%; border-radius:0; box-shadow:none; filter:drop-shadow(0 0 1.2cqw var(--glow)); }
@@ -2175,7 +2132,6 @@
   .robot.ey-star .eye{ --glow:#fbbf24; background:linear-gradient(#fff7c2, #fbbf24 55%, #f59e0b); -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 2 L63 36 L98 38 L70 60 L80 96 L50 75 L20 96 L30 60 L2 38 L37 36Z'/%3E%3C/svg%3E") center / contain no-repeat; mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 2 L63 36 L98 38 L70 60 L80 96 L50 75 L20 96 L30 60 L2 38 L37 36Z'/%3E%3C/svg%3E") center / contain no-repeat; }
   .robot.ey-heart .eye.l, .robot.ey-star .eye.l{ left:29.5%; } .robot.ey-heart .eye.r, .robot.ey-star .eye.r{ left:56.5%; }
   @keyframes beat{ 50%{ scale:1.12; } }
-  .robot.ey-ghoul .eye.r{ background:radial-gradient(circle at 50% 50%, #ff2d2d 0 26%, #8a0000 30% 40%, #050505 44%); box-shadow:0 0 2.2cqw #ff2d2d; }
   .robot.ey-fire .eye{ background:linear-gradient(to top, #fff3b0, #ffb000 40%, #ff4d00 80%, #b91c1c); box-shadow:0 0 2.4cqw #ff7a00; animation:blink 5.2s infinite, flick .25s steps(2) infinite; }
   @keyframes flick{ 50%{ filter:brightness(1.3) saturate(1.3); } }
   .robot.happy[class*=" ey-"] .eye{ -webkit-mask:none; mask:none; filter:none; }
@@ -2239,32 +2195,8 @@
   .code-box .send{ margin:10px 0 0; }
   .code-chip{ padding:3px 9px; border-radius:8px; background:var(--navy); color:#fff; font-size:12.5px; font-weight:900; letter-spacing:.12em; }
   .pend-badge.ok{ background:#e3f5ea; color:#13824a; }
-
-  /* metals: tint head/arms using the robot silhouette as mask */
-  .metal{
-    position:absolute;
-    inset:0;
-    background:var(--metal);
-    background-size:220% 100%;
-    -webkit-mask:var(--robot-img) center / contain no-repeat;
-    mask:var(--robot-img) center / contain no-repeat;
-    mix-blend-mode:multiply;
-    pointer-events:none;
-  }
   .m-head{ clip-path:inset(0 0 50% 0); }
   .m-arms{ clip-path:polygon(0 52%, 27% 52%, 27% 100%, 73% 100%, 73% 52%, 100% 52%, 100% 100%, 0 100%); }
-  .metal.fx-sheen{ animation:sheen 3.2s linear infinite; }
-  .metal.fx-lava{ animation:sheen 2.2s linear infinite, lava 1.6s ease-in-out infinite alternate; }
-  @keyframes sheen{ from{ background-position:0% 0; } to{ background-position:220% 0; } }
-  @keyframes lava{ from{ filter:brightness(1); } to{ filter:brightness(1.25) saturate(1.3); } }
-  .w-weapon{ top:50cqw; left:-10cqw; font-size:27cqw; transform:rotate(-18deg); }
-  .w-shield{ top:54cqw; left:-8cqw; font-size:26cqw; transform:none; }
-  .w-arco{ left:-12cqw; transform:rotate(-8deg); }
-  .w-laser{ top:26cqw; left:4cqw; width:6cqw; height:52cqw; transform:rotate(-24deg); font-size:0; }
-  .saber{ position:absolute; inset:0; border-radius:3cqw; background:linear-gradient(to top, #3a3f4b 0 22%, #9aa3ad 22% 25%, #eaffff 25%, #7df9ff); box-shadow:0 0 3cqw #7df9ff, 0 0 7cqw rgba(125,249,255,.65); animation:saber 1.2s ease-in-out infinite alternate; }
-  @keyframes saber{ to{ box-shadow:0 0 4.5cqw #b8fcff, 0 0 10cqw rgba(125,249,255,.85); } }
-  .wear.fx-bolt::after{ content:"⚡"; position:absolute; right:-10%; top:-30%; font-size:55%; animation:bolt 1s steps(2) infinite; }
-  @keyframes bolt{ 50%{ opacity:0; } }
   .it-html{ position:relative; width:14px; height:44px; transform:rotate(-24deg); display:block; }
   .it.premium{ border-color:#f3cf6b; background:linear-gradient(160deg, #fffdf5 40%, #fff3cf); }
   .it.premium.on{ border-color:#34c170; }
@@ -3394,6 +3326,9 @@
     if(!open) contentAfterModal();
   };
   const modalObs = new MutationObserver(syncModal);
+  // Modo duelo del diálogo con una clase (antes :has(), que el navegador revisaba en cada cambio del duelo).
+  new MutationObserver(() => { const st = tkBody.firstElementChild, duel = !!(st && st.classList.contains('duel'));
+    tkDlg.classList.toggle('is-duel', duel); tkDlg.classList.toggle('is-split', duel && st.classList.contains('split')); }).observe(tkBody, { childList: true });
   document.querySelectorAll('dialog').forEach(d => modalObs.observe(d, { attributes:true, attributeFilter:['open'] }));
   const LETTERS = 'ABCD', SECTIONS = ['A', 'B', 'C', 'D'], GRADE = '6to';
   const RES_KEY = 'ciencia4b:tickets:' + APP.docId;
@@ -5052,7 +4987,7 @@
     else if(act === 'logout'){ try{ localStorage.removeItem(AUTH_KEY); }catch(_){} loadPanel(); }
   });
   tkDlg.addEventListener('close', () => {
-    duelStop(); scanStop(); if(tq){ clearInterval(tq.tick); clearTimeout(tq.to); tq = null; }
+    tkDlg.classList.remove('is-duel', 'is-split'); duelStop(); scanStop(); if(tq){ clearInterval(tq.tick); clearTimeout(tq.to); tq = null; }
     tkBody.innerHTML = ''; tipEl.hidden = true;
     panel = panel && { section: panel.section, sort: panel.sort, email: panel.email };
     if(acct){ acct = null; if(route.name === 'menu' && mode !== 'units' && mode !== 'tutorial') setMode('main', { again:true }); }

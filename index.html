@@ -2042,7 +2042,9 @@
 
   /* ---------- ⚔️ Duelos VS ---------- */
   .rk-duel{ padding:3px 9px; border-radius:999px; background:#fde2e2; color:#b91c1c; font-size:12px; font-weight:900; white-space:nowrap; }
-  .pod .rk-duel{ display:inline-block; margin-top:4px; }
+  .rk-nums{ display:flex; align-items:center; justify-content:center; gap:5px; flex-wrap:nowrap; }
+  .rk-card .rk-who{ flex-wrap:nowrap; max-width:100%; } .rk-card .rk-name{ min-width:0; flex:0 1 auto; } .rk-sec{ flex:none; } .rk-stars{ white-space:nowrap; }
+  .rk-card .rk-stars, .rk-card .rk-duel, .pod .rk-stars, .pod .rk-duel{ padding:2px 8px; font-size:12px; }
   @keyframes vsPulse{ to{ transform:scale(1.08) rotate(-3deg); } }
   @keyframes radar{ from{ transform:scale(.4); opacity:1; } to{ transform:scale(1.4); opacity:0; } }
   @keyframes slideL{ from{ transform:translateX(-120%); } } @keyframes slideR{ from{ transform:translateX(120%); } }
@@ -2383,7 +2385,6 @@
   .rk-teacher .robot{ --rw:92px; margin:26px 34px 0; }
   .rk-t-txt{ display:flex; flex-direction:column; align-items:flex-start; gap:6px; }
   .rk-t-chip{ padding:5px 12px; border-radius:999px; background:linear-gradient(135deg, #5b4bd6, #8a5cf6); color:#fff; font-size:15px; font-weight:900; }
-  .rk-t-txt small{ font-size:12.5px; font-weight:700; color:var(--ink-2); }
   .m-shop.rk{ border-color:#d8d3ff; background:linear-gradient(135deg, #f3f0ff, #ebe6ff); color:#4a3aa8; }
   .rk-pos{ align-self:center; padding:1px 9px; border-radius:999px; background:var(--soft); font-size:12px; font-weight:900; color:var(--ink-2); }
   .rk-me{ margin:0 0 14px; padding:12px 14px; border-radius:14px; background:var(--soft); border:1px solid var(--line); font-size:14px; font-weight:800; color:var(--ink-2); text-align:center; }
@@ -4309,12 +4310,12 @@
     const t = acct.rankTeacher;
     const teacherCard = t ? `<div class="rk-teacher${u && u.teacher ? ' me' : ''}">
         ${robotHTML({ outfit: outfitOf(t.outfit), tag: false })}
-        <div class="rk-t-txt"><span class="rk-t-chip">🧑‍🏫 Docente</span><span class="rk-stars">∞ ⭐</span><small>¡Tu profe también juega! 😎</small></div>
+        <div class="rk-t-txt"><span class="rk-t-chip">🧑‍🏫 Docente</span><span class="rk-stars">∞ ⭐</span></div>
       </div>` : '';
     const tag = r => `<b class="rk-name">${nameTag(r.name, r.id, outfitOf(r.outfit))}</b><span class="rk-sec">${GRADE.replace('to', '')}${esc(r.section)}</span>`;
     const pod = (r, i) => r ? `<div class="pod p${i + 1}${mine(r) ? ' me' : ''}">
         <span class="rk-medal">${['🥇', '🥈', '🥉'][i]}</span>
-        <div class="rk-who">${tag(r)}</div><span class="rk-stars">${r.stars} ⭐</span>${r.duels ? `<span class="rk-duel" title="Duelos ganados" aria-label="${r.duels} ${r.duels === 1 ? 'duelo ganado' : 'duelos ganados'}">⚔️ ${r.duels}</span>` : ''}
+        <div class="rk-who">${tag(r)}</div><div class="rk-nums"><span class="rk-stars">${r.stars} ⭐</span>${r.duels ? `<span class="rk-duel" title="Duelos ganados" aria-label="${r.duels} ${r.duels === 1 ? 'duelo ganado' : 'duelos ganados'}">⚔️ ${r.duels}</span>` : ''}</div>
         ${robotHTML({ outfit: outfitOf(r.outfit), tag: false })}
         <div class="pod-base">${i + 1}</div></div>` : '<div class="pod empty"></div>';
     const myPos = u ? list.findIndex(r => r.id === u.rid) : -1;
@@ -4325,7 +4326,7 @@
       <div class="podium">${pod(list[1], 1)}${pod(list[0], 0)}${pod(list[2], 2)}</div>
       ${list.length > 3 ? `<div class="rank-grid">${list.slice(3).map((r, i) => `<div class="rk-card${mine(r) ? ' me' : ''}">
         <span class="rk-pos">#${i + 4}</span>
-        <div class="rk-who">${tag(r)}</div><span class="rk-stars">${r.stars} ⭐</span>${r.duels ? `<span class="rk-duel" title="Duelos ganados" aria-label="${r.duels} ${r.duels === 1 ? 'duelo ganado' : 'duelos ganados'}">⚔️ ${r.duels}</span>` : ''}
+        <div class="rk-who">${tag(r)}</div><div class="rk-nums"><span class="rk-stars">${r.stars} ⭐</span>${r.duels ? `<span class="rk-duel" title="Duelos ganados" aria-label="${r.duels} ${r.duels === 1 ? 'duelo ganado' : 'duelos ganados'}">⚔️ ${r.duels}</span>` : ''}</div>
         ${still(robotHTML({ outfit: outfitOf(r.outfit), tag: false }))}</div>`).join('')}</div>` : ''}`}
       ${u && u.teacher ? '<p class="rk-me">🧑‍🏫 Tu Moli aparece arriba como <b>Docente</b>, sin puesto.</p>' : u ? `<p class="rk-me">${myPos >= 0 ? `🎉 ¡Estás en el puesto <b>#${myPos + 1}</b>!` : `Tienes <b>${starsBalance().earned} ⭐</b> en total. ¡Gana más estrellas para entrar al Top 15!`}${duelWins() ? ` · ⚔️ <b>${duelWins()}</b> ${duelWins() === 1 ? 'duelo ganado' : 'duelos ganados'}` : ''}</p>` : '<p class="rk-me">Ingresa con tu DNI para aparecer en el ranking 🪪</p>'}
       <div class="tk-actions">${u ? '<button type="button" class="btn ghost" data-shop>🛍️ Tienda de Moli</button>' : '<button type="button" class="btn ghost" data-tk="acc-login">🪪 Ingresar</button>'}<button type="button" class="btn up" data-tk="close">Listo</button></div>

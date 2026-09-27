@@ -1758,7 +1758,6 @@
   .v-side .bal-card::after{ content:"⭐"; position:absolute; right:-14px; bottom:-26px; font-size:110px; opacity:.13; transform:rotate(-14deg); pointer-events:none; }
   .v-side .bal-card .bal-v{ font-size:clamp(46px, 13vw, 68px); line-height:1; letter-spacing:-.02em; text-shadow:0 4px 0 rgba(0,0,0,.18); }
   .v-side .bal-card small{ font-size:13px; }
-  .it-flag.free{ background:linear-gradient(135deg, #22c55e, #16a34a); color:#fff; }
   .it-price.tour{ background:linear-gradient(135deg, #7c3aed, #db2777); color:#fff; }
   .it-btn.tour{ background:linear-gradient(135deg, #7c3aed, #db2777); color:#fff; box-shadow:0 6px 12px rgba(124,58,237,.28); }
   /* ---------- botones Torneo y Correo ---------- */
@@ -1951,6 +1950,8 @@
   .cat-f button.on{ background:#fff; color:var(--navy); box-shadow:0 2px 6px rgba(18,34,74,.12); }
   .shop-grid .it{ --rc:#94a3b8; --rbg:#f4f6fa; padding:30px 10px 12px; border-width:2px; border-color:color-mix(in srgb, var(--rc) 35%, #fff); }
   .shop-grid .it.r-rare{ --rc:#3b82f6; --rbg:#eaf2ff; }
+  .shop-grid .it.r-gift{ --rc:#ec4899; --rbg:#fff0f7; }
+  .it-btn.gift{ background:linear-gradient(135deg, #ec4899, #f97316); color:#fff; }
   .shop-grid .it.r-epic{ --rc:#a855f7; --rbg:#f5ecff; }
   .shop-grid .it.r-leg{ --rc:#f59e0b; --rbg:#fff5dc; }
   .it-rar{ position:absolute; top:8px; left:8px; padding:2px 8px; border-radius:999px; background:var(--rc); color:#fff; font-size:10px; font-weight:900; letter-spacing:.06em; text-transform:uppercase; }
@@ -3626,8 +3627,8 @@
   }
   function missionStats(){
     const u = me(), list = sessionsWithTicket(), prog = u ? progressOf(u.key) : {};
-    const done = list.filter(x => prog[`${x.u.key}|${x.n}`]);
-    const stars = done.reduce((t, x) => { const p = prog[`${x.u.key}|${x.n}`]; return t + Math.round(p.score / p.total * 5); }, 0);
+    const done = list.filter(x => prog[`${x.u.key}|${x.n}`]), wait = u && !u.teacher ? paperPending(u.key) : new Set();
+    const stars = done.reduce((t, x) => { const k = `${x.u.key}|${x.n}`, p = prog[k]; return t + (wait.has(k) ? 0 : Math.round(p.score / p.total * 5)); }, 0);
     return { list, prog, done: done.length, total: list.length, stars };
   }
   async function refreshProgress(){
@@ -3865,8 +3866,8 @@
     { slot:'supreme', name:'Suprema', icon:'👑', supreme:true, items:[
       { id:'sk-suprema', s:'skin', n:'Coloso Nova Supremo', sv:1, bk:'sk-suprema-bk', noeyes:1, pk:'pk-suprema', p:40 } ] },
     { slot:'helm', name:'Cascos', icon:'🪖', items:[
-      { id:'hl-antenna', n:'Antenas de radar', sv:1, p:0 },
-      { id:'hl-cat', n:'Orejas de gato robot', sv:1, p:0 },
+      { id:'hl-antenna', n:'Antenas de radar', sv:1, p:1 },
+      { id:'hl-cat', n:'Orejas de gato robot', sv:1, p:1 },
       { id:'hl-horns', n:'Cuernos de metal', sv:1, p:6 },
       { id:'hl-crest', n:'Cresta de caballero', sv:1, p:8 },
       { id:'hl-kabuto', n:'Kabuto samurái', sv:1, p:11 },
@@ -3876,9 +3877,9 @@
       { id:'f-guard-t', s:'face', n:'Máscara de guardia △', sv:1, p:7 },
       { id:'f-guard-s', s:'face', n:'Máscara de guardia □', sv:1, p:8 } ] },
     { slot:'eyes', name:'Ojos', icon:'👀', items:[
-      { id:'e-green', n:'Verdes', c:'#4ade80', p:0 },
-      { id:'e-pink', n:'Rosados', c:'#f472b6', p:0 },
-      { id:'e-violet', n:'Morados', c:'#a78bfa', p:0 },
+      { id:'e-green', n:'Verdes', c:'#4ade80', p:1 },
+      { id:'e-pink', n:'Rosados', c:'#f472b6', p:1 },
+      { id:'e-violet', n:'Morados', c:'#a78bfa', p:1 },
       { id:'e-gold', n:'Dorados', c:'#fbbf24', p:6 },
       { id:'e-anime', n:'Ojos de anime', es:'anime', c:'#38bdf8', p:5 },
       { id:'e-heart', n:'Ojos de corazón', es:'heart', c:'#ff4fa3', p:6 },
@@ -3886,7 +3887,7 @@
       { id:'e-rainbow', n:'Arcoíris', c:'linear-gradient(135deg,#f87171,#fbbf24,#4ade80,#38bdf8,#a78bfa)', p:9 },
       { id:'e-fire', n:'Ojos de fuego', es:'fire', c:'#ff7a00', p:11 } ] },
     { slot:'body', name:'Cuerpo', icon:'🛡️', items:[
-      { id:'b-belt', n:'Cinturón de herramientas', sv:1, p:0 },
+      { id:'b-belt', n:'Cinturón de herramientas', sv:1, p:1 },
       { id:'b-plate', n:'Placa de blindaje', sv:1, p:5 },
       { id:'b-reactor', n:'Reactor núcleo', sv:1, p:8 },
       { id:'b-knight', n:'Armadura de caballero', sv:1, p:11 },
@@ -3894,7 +3895,7 @@
       { id:'b-track', n:'Buzo verde N.° 457', sv:1, p:5 },
       { id:'b-guard', n:'Traje rosa de guardia', sv:1, p:7 } ] },
     { slot:'back', name:'Espalda', icon:'🪽', items:[
-      { id:'bk-cape', n:'Capa de héroe', sv:1, back:1, p:0 },
+      { id:'bk-cape', n:'Capa de héroe', sv:1, back:1, p:1 },
       { id:'bk-vampire', n:'Capa de vampiro', sv:1, back:1, p:6 },
       { id:'bk-jet', n:'Mochila cohete', sv:1, back:1, p:7 },
       { id:'bk-royal', n:'Capa real', sv:1, back:1, fr:'bk-royal-fr', p:8 },
@@ -3910,13 +3911,13 @@
       { id:'fx-cosmic', n:'Aura cósmica', sv:1, bk:'fx-cosmic-bk', p:16 },
       { id:'fx-kiblue', n:'Aura azul divina', sv:1, bk:'fx-kiblue-bk', p:18 } ] },
     { slot:'acc', name:'Accesorios', icon:'🎖️', items:[
-      { id:'a-escarapela', n:'Escarapela', sv:1, p:0 },
-      { id:'a-bandera', n:'Bandera del Perú', sv:1, p:0 },
-      { id:'a-escudo', n:'Escudo Nacional', sv:1, p:0 },
-      { id:'a-sello', n:'Gran Sello del Estado', sv:1, p:0 },
-      { id:'a-tacna', n:'Escudo de Tacna', sv:1, p:0 },
-      { id:'a-badge', n:'Gafete N.° 457', sv:1, p:0 },
-      { id:'a-innova', n:'Pin Innova Schools', sv:1, p:0 },
+      { id:'a-escarapela', n:'Escarapela', sv:1, p:1 },
+      { id:'a-bandera', n:'Bandera del Perú', sv:1, p:1 },
+      { id:'a-escudo', n:'Escudo Nacional', sv:1, p:1 },
+      { id:'a-sello', n:'Gran Sello del Estado', sv:1, p:1 },
+      { id:'a-tacna', n:'Escudo de Tacna', sv:1, p:1 },
+      { id:'a-badge', n:'Gafete N.° 457', sv:1, p:1 },
+      { id:'a-innova', n:'Pin Innova Schools', sv:1, p:0, gift:1 },
       { id:'a-emblem', n:'Emblema robot rojo', sv:1, p:5 },
       { id:'a-scarf', n:'Bufanda roja', sv:1, p:6 },
       { id:'a-sphere', n:'Esfera de captura', sv:1, p:5 },
@@ -4055,7 +4056,7 @@
   }
   // Solo el Moli grande se anima; las miniaturas quedan quietas (más fluido en celulares).
   const freeze = root => $$('svg.parts, .it-svg', root).forEach(g => { if(g.pauseAnimations) g.pauseAnimations(); });
-  const RARITY = it => it.supreme ? ['sup', 'Suprema'] : it.legend || it.p >= 16 ? ['leg', 'Legendario'] : it.p >= 10 ? ['epic', 'Épico'] : it.p >= 5 ? ['rare', 'Raro'] : ['common', 'Común'];
+  const RARITY = it => it.gift ? ['gift', 'Regalo'] : it.supreme ? ['sup', 'Suprema'] : it.legend || it.p >= 16 ? ['leg', 'Legendario'] : it.p >= 10 ? ['epic', 'Épico'] : it.p >= 5 ? ['rare', 'Raro'] : ['common', 'Común'];
   const CAT_DESC = { supreme: 'La skin más épica: se desbloquea ganando 3 torneos seguidos.', skin: 'Transforma a Moli en otro robot, con partículas propias.', squid: 'Jugadores y guardias del famoso juego.', anime: 'Inspirado en tus animes y juegos favoritos.',
     hat: 'Sombreros y gorras para la cabeza.', helm: 'Cascos con forma: antenas, cuernos, torreta láser…', eyes: 'Cambia el color y la forma de sus ojos.',
     head: 'Cabeza de metales brillantes.', body: 'Ropa y armaduras que también cambian los brazos.', shoulder: 'Armas y aparatos sobre el hombro.',
@@ -4096,7 +4097,7 @@
           ${robotHTML({ outfit: preview })}
           ${trying ? `<button type="button" class="v-trying" data-shop-try="${trying.id}">👀 Probando: <b>${esc(trying.n)}</b> ✕</button>` : Object.keys(cl.equipped).length ? '<button type="button" class="strip-all" data-shop-strip>🧹 Quitar todo</button>' : ''}
         </div>`;
-    const msgHTML = () => acct.info || (trying && trying.supreme && !own(trying.id) && !supremeOK() ? `👑 ¡Así se ve la Suprema! Para comprarla gana <b>3 torneos seguidos</b> y junta ⭐${trying.p}.` : trying ? `${own(trying.id) ? 'Ya es tuyo.' : `Cuesta ⭐${trying.p}.`} ¿Te gusta cómo se ve? 😎` : 'Toca cualquier objeto para probárselo a Moli 👀');
+    const msgHTML = () => acct.info || (trying && trying.supreme && !own(trying.id) && !supremeOK() ? `👑 ¡Así se ve la Suprema! Para comprarla gana <b>3 torneos seguidos</b> y junta ⭐${trying.p}.` : trying ? `${own(trying.id) ? 'Ya es tuyo.' : trying.gift ? '🎁 Es un regalo de Moli: recíbelo en tu 📥 Bandeja.' : `Cuesta ⭐${trying.p}.`} ¿Te gusta cómo se ve? 😎` : 'Toca cualquier objeto para probárselo a Moli 👀');
     const floatHTML = () => trying ? `<div class="v-float-wrap"><div class="v-float">${robotHTML({ outfit: preview, tag: false })}<span>${esc(trying.n)}</span></div></div>` : '';
     const ownedIn = c => c.items.filter(it => own(it.id)).length;
     const tabsHTML = () => SHOP.map(c => `<button type="button" role="tab" class="shop-tab${c.slot === cat.slot ? ' on' : ''}" aria-selected="${c.slot === cat.slot}" data-shop-cat="${c.slot}"${c.legend ? ' data-legend' : ''}><span>${c.icon}</span>${c.name}${!u.teacher && ownedIn(c) ? `<em>${ownedIn(c)}</em>` : ''}</button>`).join('');
@@ -4106,21 +4107,22 @@
         ${u.teacher ? '' : `<div class="cat-f" role="group" aria-label="Filtrar">${[['all', 'Todo'], ['afford', 'Puedo comprar'], ['mine', 'Míos']].map(([k, t]) => `<button type="button" class="${filter === k ? 'on' : ''}" data-shop-filter="${k}">${t}</button>`).join('')}</div>`}
       </div>`;
     const gridHTML = () => {
-      const items = cat.items.filter(it => filter === 'mine' ? own(it.id) : filter === 'afford' ? !own(it.id) && bal.left >= it.p && (ITEM[it.id].slot !== 'skin' || (ITEM[it.id].supreme && supremeOK())) : true);
+      const items = cat.items.filter(it => filter === 'mine' ? own(it.id) : filter === 'afford' ? !own(it.id) && !ITEM[it.id].gift && bal.left >= it.p && (ITEM[it.id].slot !== 'skin' || (ITEM[it.id].supreme && supremeOK())) : true);
       return `<div class="shop-grid">${items.map(it => {
         const slot = ITEM[it.id].slot, owned = own(it.id), on = cl.equipped[slot] === it.id, tr = acct.preview === it.id, [rk, rn] = RARITY(ITEM[it.id]);
         const sup = ITEM[it.id].supreme, supLock = sup && !owned && !supremeOK();
-        const tourOnly = slot === 'skin' && !owned && !sup;
-        const locked = !owned && (tourOnly || supLock || bal.left < it.p);
+        const tourOnly = slot === 'skin' && !owned && !sup, gift = ITEM[it.id].gift && !owned;
+        const locked = !owned && !gift && (tourOnly || supLock || bal.left < it.p);
         const act = on ? `<button type="button" class="it-btn off" data-shop-unequip="${slot}">Quitar</button>`
           : owned ? `<button type="button" class="it-btn puton" data-shop-equip="${it.id}">Ponérselo</button>`
+          : gift ? `<button type="button" class="it-btn gift" data-mail>🎁 Recíbelo en tu Bandeja</button>`
           : tourOnly ? `<button type="button" class="it-btn tour" data-tour>🏅 Gánalo en el Torneo</button>`
           : supLock ? `<button type="button" class="it-btn sup" data-sup-info>🏆🏆🏆 Gana 3 torneos seguidos</button>`
           : !locked ? `<button type="button" class="it-btn buy" data-shop-buy="${it.id}">Comprar ⭐${it.p}</button>`
           : `<span class="it-btn need">🔒 Te faltan ⭐${it.p - bal.left}</span>`;
         return `<div class="it r-${rk}${on ? ' on' : ''}${tr ? ' trying' : ''}${locked ? ' locked' : ''}" data-shop-try="${it.id}">
           <span class="it-rar">${rn}</span>
-          ${on ? '<span class="it-flag">Puesto ✓</span>' : owned && it.p === 0 ? '<span class="it-flag free">Gratis</span>' : owned ? '<span class="it-flag own">Tuyo</span>' : tourOnly ? '<span class="it-price tour" title="Solo en torneos">🏅</span>' : `<span class="it-price">⭐ ${it.p}</span>`}
+          ${on ? '<span class="it-flag">Puesto ✓</span>' : owned ? '<span class="it-flag own">Tuyo</span>' : gift ? '<span class="it-price tour" title="Regalo de Moli">🎁</span>' : tourOnly ? '<span class="it-price tour" title="Solo en torneos">🏅</span>' : `<span class="it-price">⭐ ${it.p}</span>`}
           <div class="it-art">${still(itemArt(ITEM[it.id]))}</div>
           <b>${it.n}</b>${it.th ? `<small class="it-th">${it.th}</small>` : ''}${act}</div>`;
       }).join('') || `<div class="pr-empty">${filter === 'mine' ? 'Todavía no tienes objetos de esta sección.' : 'No te alcanza para ninguno todavía. ¡Gana más estrellas! 📜'}</div>`}</div>`;
@@ -4181,7 +4183,7 @@
     acct.info = '';
     if(kind === 'buy'){
       const it = ITEM[id];
-      if(!it || ownsItem(u.key, id) || starsBalance().left < it.p || (it.slot === 'skin' && !it.supreme) || (it.supreme && !supremeOK())) return;   // los sets se ganan en torneos; la Suprema pide 3 torneos seguidos
+      if(!it || it.gift || ownsItem(u.key, id) || starsBalance().left < it.p || (it.slot === 'skin' && !it.supreme) || (it.supreme && !supremeOK())) return;   // los sets se ganan en torneos; la Suprema pide 3 torneos seguidos
       cl.owned.push(id);
       cl.equipped[it.slot] = id;
       (CLASH[it.slot] || []).forEach(x => delete cl.equipped[x]);
@@ -5127,8 +5129,8 @@
   const DAILY_KEY = 'ciencia4b:daily:' + APP.docId;
   const dailyOf = key => { const d = lsGet(DAILY_KEY, {})[key]; return { day: (d && d.day) || 0, streak: (d && d.streak) || 0, total: (d && d.total) || 0, gifts: (d && d.gifts) || [] }; };
   function setDaily(key, d){ const all = lsGet(DAILY_KEY, {}); all[key] = d; lsSet(DAILY_KEY, all); }
-  // Lo Común (⭐0) es gratis para todos: ya viene en el clóset de cada estudiante.
-  const ownsItem = (key, id) => (ITEM[id] && ITEM[id].p === 0 && ITEM[id].slot !== 'skin') || closetOf(key).owned.includes(id) || dailyOf(key).gifts.includes(id) || mailSets(key).includes(id);
+  // Todo se compra (lo Común cuesta ⭐1); el pin Innova es el regalo de bienvenida que se recibe en la 📥 Bandeja.
+  const ownsItem = (key, id) => closetOf(key).owned.includes(id) || dailyOf(key).gifts.includes(id) || mailSets(key).includes(id);
   async function loadDaily(){
     const u = me(), c = await fbConfig();
     if(!u || u.teacher || !c) return;
@@ -5561,18 +5563,22 @@ Reglas:
   const mailOf = key => { const m = lsGet(MAIL_KEY, {})[key]; return { items: (m && m.items) || [], claimed: (m && m.claimed) || [] }; };
   function setMail(key, m){ const all = lsGet(MAIL_KEY, {}); all[key] = m; lsSet(MAIL_KEY, all); }
   const mailClaimed = key => { const m = mailOf(key); return m.items.filter(it => m.claimed.includes(it.id)); };
-  // 🎉 Bienvenida de Moli: la reciben quienes crean su cuenta desde que existe (con ⭐5 de regalo, ya sumadas).
-  const WELCOME_FROM = Date.UTC(2026, 8, 26, 5), WELCOME_STARS = 5, WELCOME_KEY = 'ciencia4b:welcome:' + APP.docId;
+  // 🎉 Bienvenida de Moli: a cada estudiante le llega el pin Innova (y ⭐5 si creó su cuenta desde que existe el regalo).
+  // Se recibe con «Recibir»: el pin queda en su clóset (así vale en cualquier celular) y recién ahí suman las estrellas.
+  const WELCOME_FROM = Date.UTC(2026, 8, 26, 5), WELCOME_STARS = 5, WELCOME_PIN = 'a-innova';
   function welcomeOf(key){
     const u = me();
-    if(!u || u.key !== key || u.teacher || !(u.createdAt >= WELCOME_FROM)) return null;
-    const bim = ['', '1er Bimestre', '2do Bimestre', '3er Bimestre', '4to Bimestre'][APP.site.bimestre] || 'bimestre';
-    return { id: 'welcome', kind: 'welcome', stars: WELCOME_STARS, at: u.createdAt, from: 'Moli',
-      title: `🎉 ¡Bienvenido(a) al ${bim.toLowerCase()}, ${firstOf(u.name)}!`,
-      msg: `Tu docente y Moli te damos la bienvenida y te deseamos mucha suerte y muchos éxitos. Como obsequio te regalamos ⭐${WELCOME_STARS} que ya están en tu cuenta. ¡Úsalas en la 🛍️ Tienda!` };
+    if(!u || u.key !== key || u.teacher) return null;
+    const stars = u.createdAt >= WELCOME_FROM ? WELCOME_STARS : 0;
+    return { id: 'welcome', kind: 'welcome', stars, at: u.createdAt || 0, from: 'Moli',
+      title: `🎉 ¡Felicidades por tu registro, ${firstOf(u.name)}!`,
+      msg: `Moli te premia con la insignia de Innova Schools${stars ? ` y ⭐${stars} estrellas` : ''}. Aprieta «Recibir» y la insignia aparecerá en la 🛍️ Tienda, en 🎖️ Accesorios.` };
   }
-  const welcomeRead = key => !!lsGet(WELCOME_KEY, {})[key];
-  const mailStars = key => mailClaimed(key).reduce((t, it) => t + (it.kind === 'stars' ? it.stars : 0), 0) + (welcomeOf(key) ? WELCOME_STARS : 0);
+  const welcomeRead = key => closetOf(key).owned.includes(WELCOME_PIN);
+  const welcomeStars = key => { const w = welcomeOf(key); return w && welcomeRead(key) ? w.stars : 0; };
+  // Las estrellas de un Exit ticket en físico se suman cuando el estudiante aprieta «Recibir» en su Bandeja.
+  const paperPending = key => { const m = mailOf(key); return new Set(m.items.filter(it => it.kind === 'paper' && !m.claimed.includes(it.id)).map(it => `${it.unit}|${it.n}`)); };
+  const mailStars = key => mailClaimed(key).reduce((t, it) => t + (it.kind === 'stars' ? it.stars : 0), 0) + welcomeStars(key);
   const mailSets = key => mailClaimed(key).filter(it => it.kind === 'set').map(it => it.set);
   const mailPending = key => { const m = mailOf(key); return m.items.filter(it => !m.claimed.includes(it.id)).length + (welcomeOf(key) && !welcomeRead(key) ? 1 : 0); };
   async function loadMail(){
@@ -5604,21 +5610,21 @@ Reglas:
       ${items.length ? `<div class="ml-list">${items.map(it => { const got = m.claimed.includes(it.id), set = it.kind === 'set' && ITEM[it.set];
         if(it.kind === 'welcome'){ const rd = welcomeRead(u.key);
           return `<div class="ml-card welcome${rd ? ' got' : ''}">
-          <div class="ml-art">${still(robotHTML({ tag:false }))}</div>
-          <div class="ml-txt"><small>🤖 Moli · 🎁 Regalo de bienvenida</small><b>${esc(it.title)}</b><span>${esc(it.msg)}</span><p class="pp-stars">⭐ Se asignaron <b>${it.stars} estrellas</b> a tu cuenta.</p></div>
-          ${rd ? '<span class="ml-done">✅ Leído</span>' : `<button type="button" class="btn solid ml-claim" data-mail-claim="welcome">💙 ¡Gracias, Moli!</button>`}
+          <div class="ml-art">${still(robotHTML({ outfit: { acc: WELCOME_PIN }, tag:false }))}</div>
+          <div class="ml-txt"><small>🤖 Moli · 🎁 Regalo por tu registro</small><b>${esc(it.title)}</b><span>${esc(it.msg)}</span>${rd ? `<p class="pp-stars">🎖️ La insignia ya es tuya${it.stars ? ` y se sumaron <b>⭐${it.stars}</b> a tu cuenta` : ''}.</p>` : ''}</div>
+          ${rd ? `<span class="ml-done">✅ Recibido</span>${currentOutfit().acc !== WELCOME_PIN ? `<button type="button" class="btn ghost ml-wear" data-mail-wear="${WELCOME_PIN}">Ponérmelo</button>` : ''}` : `<button type="button" class="btn solid ml-claim" data-mail-claim="welcome">🎁 Recibir</button>`}
         </div>`; }
         const pp = it.kind === 'paper';
         if(pp) return `<div class="ml-card paper${got ? ' got' : ''}">
           <div class="ml-art"><span class="ml-paper"><b>${it.score}</b><i>/${it.total}</i></span></div>
-          <div class="ml-txt"><small>🤖 Moli · 📝 Exit ticket en físico</small><b>${esc(it.title || '')}</b><span>${esc(it.msg || '')}</span>${paperStarsHTML(it)}${paperDetailHTML(it)}</div>
-          ${got ? '<span class="ml-done">✅ Leído</span>' : `<button type="button" class="btn solid ml-claim" data-mail-claim="${esc(it.id)}">✅ Leído</button>`}
+          <div class="ml-txt"><small>🤖 Moli · 📝 Exit ticket en físico</small><b>${esc(it.title || '')}</b><span>${esc(it.msg || '')}</span>${paperStarsHTML(it, got)}${paperDetailHTML(it)}</div>
+          ${got ? '<span class="ml-done">✅ Recibido</span>' : `<button type="button" class="btn solid ml-claim" data-mail-claim="${esc(it.id)}">🎁 Recibir${it.total && starsOf(it) ? ` ⭐${starsOf(it)}` : ''}</button>`}
         </div>`;
         return `<div class="ml-card${got ? ' got' : ''}${set ? ' set' : ''}">
           <div class="ml-art">${set ? still(robotHTML({ outfit: { skin: it.set }, tag:false })) : `<span class="ml-star">⭐<b>${it.stars}</b></span>`}</div>
           <div class="ml-txt"><small>✉️ ${esc(it.from || 'Tu profe')}</small><b>${esc(it.title || '')}</b><span>${esc(it.msg || '')}</span></div>
-          ${got ? `<span class="ml-done">✅ Reclamado</span>${set && currentOutfit().skin !== it.set ? `<button type="button" class="btn ghost ml-wear" data-mail-wear="${esc(it.set)}">Ponérmelo</button>` : ''}`
-            : `<button type="button" class="btn solid ml-claim" data-mail-claim="${esc(it.id)}">${set ? '🎁 Reclamar set' : `⭐ Reclamar ${it.stars}`}</button>`}
+          ${got ? `<span class="ml-done">✅ Recibido</span>${set && currentOutfit().skin !== it.set ? `<button type="button" class="btn ghost ml-wear" data-mail-wear="${esc(it.set)}">Ponérmelo</button>` : ''}`
+            : `<button type="button" class="btn solid ml-claim" data-mail-claim="${esc(it.id)}">${set ? '🎁 Recibir set' : `🎁 Recibir ⭐${it.stars}`}</button>`}
         </div>`; }).join('')}</div>`
         : `${sayRow('Tu buzón está vacío por ahora ✉️ Cuando ganes un premio en un torneo, te llegará aquí.')}`}
       <div class="tk-actions"><button type="button" class="btn ghost" data-tour>🏅 Ver torneo</button><button type="button" class="btn up" data-tk="close">Listo</button></div>
@@ -5628,9 +5634,15 @@ Reglas:
     const u = me(), c = await fbConfig();
     if(!u || !c || !acct) return;
     if(id === 'welcome'){
-      const all = lsGet(WELCOME_KEY, {}); all[u.key] = 1; lsSet(WELCOME_KEY, all);
-      acct.err = ''; acct.info = `🎉 ¡Disfruta tus ⭐${WELCOME_STARS} de bienvenida! Moli y tu docente te acompañan en este bimestre.`;
-      mailBadge(); onAccountChange(); renderMail(); confettiIn(tkBody); return;
+      const w = welcomeOf(u.key), cl = closetOf(u.key);
+      if(!w || welcomeRead(u.key)) return;
+      cl.owned.push(WELCOME_PIN);
+      if(!cl.equipped.acc) cl.equipped.acc = WELCOME_PIN;
+      setCloset(u.key, cl);
+      acct.err = ''; acct.info = `🎉 ¡La insignia de Innova Schools ya es tuya${w.stars ? ` y sumaste ⭐${w.stars}` : ''}! Búscala en la 🛍️ Tienda, en 🎖️ Accesorios.`;
+      mailBadge(); onAccountChange(); renderMail(); confettiIn(tkBody);
+      if(!(await pushCloset())) toast('⚠️ Se guardó en este celular; se sincronizará cuando haya conexión.');
+      return;
     }
     const m = mailOf(u.key), it = m.items.find(x => x.id === id);
     if(!it || m.claimed.includes(id)) return;
@@ -6501,9 +6513,9 @@ Reglas:
   addEventListener('resize', () => { if(scan) scanLayout(); });
 
   // Estrellas que da un Exit ticket (las mismas que en línea: de 0 a 5 según los aciertos).
-  function paperStarsHTML(it){
-    const n = it.total ? starsOf(it) : 0;
-    return `<p class="pp-stars">${n ? `⭐ Se ${n === 1 ? 'asignó <b>1 estrella</b>' : `asignaron <b>${n} estrellas</b>`} a tu cuenta. ¡Úsalas en la 🛍️ Tienda!` : '💪 Esta vez no sumaste estrellas. ¡Repasa tus errores y vas a mejorar!'}</p>`;
+  function paperStarsHTML(it, got){
+    const n = it.total ? starsOf(it) : 0, t = n === 1 ? '<b>1 estrella</b>' : `<b>${n} estrellas</b>`;
+    return `<p class="pp-stars">${!n ? '💪 Esta vez no sumaste estrellas. ¡Repasa tus errores y vas a mejorar!' : got ? `⭐ Se ${n === 1 ? 'asignó' : 'asignaron'} ${t} a tu cuenta. ¡Úsalas en la 🛍️ Tienda!` : `⭐ Ganaste ${t}. Aprieta «Recibir» para sumarlas a tu cuenta.`}</p>`;
   }
   // Detalle del mensaje «Exit ticket en físico» en el Correo del estudiante.
   function paperDetailHTML(it){

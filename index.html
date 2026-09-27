@@ -3106,7 +3106,7 @@ const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, 
 return { bytes: bytesOf(cv.toDataURL('image/png').split(',')[1]), w: cv.width, h: cv.height };
 }catch(e){ return null; }
 }
-const pdfTxt = t => String(t || '').replace(/[“”«»]/g, '"').replace(/[‘’]/g, "'").replace(/[–—]/g, '-').replace(/…/g, '...').replace(/[^\x20-\x7E -ÿ\n]/g, '').replace(/[ \t]+/g, ' ').trim();
+const pdfTxt = t => String(t || '').replace(/[“”«»]/g, '"').replace(/[‘’]/g, "'").replace(/[–—]/g, '-').replace(/…/g, '...').replace(/[^\x20-\x7E -ÿ\n]/g, '').replace(/[ \t]+/g, ' ').replace(/ ([.,;:!?)])/g, '$1').trim();
 async function fichaPDF(f, actN, s, u, n){
 const L = await pdfLib(), doc = await L.PDFDocument.create();
 const R = await doc.embedFont(L.StandardFonts.TimesRoman), B = await doc.embedFont(L.StandardFonts.TimesRomanBold), I = await doc.embedFont(L.StandardFonts.TimesRomanItalic);

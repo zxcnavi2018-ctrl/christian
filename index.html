@@ -3009,7 +3009,7 @@ const ex = saiExamples(s), pdf = sai.pdf;
 return `Eres una docente experta de Ciencia y Tecnología de 6.° grado de primaria en Perú (enfoque por indagación del CNEB). Planificas así, siempre en este orden:
 1) Lees la META de la sesión.
 2) Escribes EXACTAMENTE 3 criterios de éxito aplicando la taxonomía de Bloom: van de menor a mayor nivel (por ejemplo Comprender → Analizar → Aplicar) y el último llega al nivel del verbo de la meta. Cada criterio es corto (3 a 8 palabras), empieza con un verbo en tercera persona (Observa, Reconoce, Compara, Utiliza, Explica, Organiza…) y dice algo observable. En "level" pon el nivel de Bloom de ese verbo.
-3) Diseñas exactamente ${n} actividades aplicando el DUA (Diseño Universal para el Aprendizaje): cada actividad usa un principio del DUA ("dua": Representación = presentar la información de varias formas, como video, imágenes, casos u objetos; Acción y expresión = que expresen lo aprendido de distintas formas, como organizadores, dibujos, maquetas o exposiciones; Compromiso = motivar, dar opciones y trabajar en equipo). Intenta usar principios distintos. Las actividades siguen el orden de los criterios: en "crit" pon el número del criterio (1, 2 o 3) que trabaja cada una.
+3) Diseñas exactamente ${n} actividades aplicando el DUA (Diseño Universal para el Aprendizaje): cada actividad usa un principio del DUA ("dua": Representación = presentar la información de varias formas, como video, imágenes, casos u objetos; Acción y expresión = que expresen lo aprendido de distintas formas, como organizadores, dibujos, maquetas o exposiciones; Compromiso = motivar, dar opciones y trabajar en equipo). Intenta usar principios distintos. Las actividades NACEN de los criterios: primero tomas un criterio y luego diseñas la actividad que permite lograrlo y verlo logrado (el verbo del criterio se nota en lo que hacen). Van en el mismo orden que los criterios${n === 3 ? ': la actividad 1 nace del criterio 1, la 2 del criterio 2 y la 3 del criterio 3' : ': entre las 2 actividades cubren los 3 criterios'}. En "crit" pon el número del criterio (1, 2 o 3) del que nace cada una.
 - Todas las actividades (la individual y la colaborativa) se redactan con el MISMO formato:
 - "title": en primera persona del plural y en presente, de 2 a 6 palabras (por ejemplo «Observamos el siguiente caso», «Presentamos las enfermedades»).
 - "desc": UNA explicación breve (máximo 170 caracteres) que SIEMPRE empieza con «En esta actividad» y sigue en futuro de primera persona del plural (por ejemplo «En esta actividad observaremos un fenómeno o problema y extraeremos sus elementos.»).
@@ -3040,6 +3040,7 @@ let g = acts.findIndex(a => a.mode === 'group');
 if(g < 0) g = acts.length > 1 ? 1 : 0;
 acts.forEach((a, i) => { a.mode = i === g ? 'group' : 'individual'; });
 if(g === 0 && acts.length > 1) acts.splice(1, 0, acts.shift());   // primero la individual, luego la colaborativa
+if(n === 3) acts.forEach((a, i) => { if(!a.crit) a.crit = i + 1; });   // cada actividad nace de su criterio
 let v = acts.findIndex(a => a.video);
 acts.forEach((a, i) => { if(i !== v) a.video = ''; });
 return { acts, criteria, meta: clip(d.meta, 200) };

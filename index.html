@@ -3074,61 +3074,91 @@ if(!box) return;
 e.preventDefault(); e.stopPropagation();
 aiAction(b.dataset.ai, box);
 }, true);
-/* ---------- 📄 Moli crea fichas de información: título de la meta, texto con fuentes y «Actividades: Respondemos» (PDF A4) ---------- */
-const FICHA_SCHEMA = { type:'OBJECT', properties:{ title:{ type:'STRING' }, reading:{ type:'STRING' }, sources:{ type:'ARRAY', items:{ type:'STRING' } }, tasks:{ type:'ARRAY', items:{ type:'STRING' } } } };
-const FICHA_RULES = `Cada ficha es una FICHA DE INFORMACIÓN para imprimir: da a las y los estudiantes la información que necesitan para hacer ESA actividad (por ejemplo, si la actividad es «Identificamos las enfermedades del caso», la ficha trae el caso y la información de esas enfermedades).
-- "title": el TEMA de la meta en MAYÚSCULAS, no la meta copiada: quita el verbo y la acción y deja solo el tema. Ejemplos del formato (el tema real siempre es el de ESTA sesión): meta «Organiza las enfermedades infectocontagiosas y sus tipos» → «LAS ENFERMEDADES Y SUS TIPOS»; meta «Explica cómo funciona el sistema digestivo» → «EL SISTEMA DIGESTIVO»; meta «Formula una pregunta de indagación sobre las plantas» → «LAS PLANTAS».
-- "reading": el TEXTO INFORMATIVO sobre ese tema, de 180 a 280 palabras, en 2 o 3 párrafos separados por una línea en blanco, con información tomada de fuentes confiables (MINEDU, MINSA, OMS, UNICEF, libros de texto escolares, enciclopedias de ciencia), científicamente correcto y en español sencillo.
-- REQUISITO: dentro del texto incluye SIEMPRE 1 o 2 CITAS con autor y año, por ejemplo «Según el MINEDU (2024), …» o «… (OMS, 2023).». Cita solo instituciones o libros reales y conocidos.
-- "sources": las 1 a 3 fuentes citadas, con autor y año (por ejemplo «MINEDU (2024). Ciencia y Tecnología 6.° grado», «Organización Mundial de la Salud - OMS (2023)»). No inventes enlaces ni páginas.
-- "tasks": EXACTAMENTE 3 preguntas cortas sobre el texto para responder por escrito, de menor a mayor dificultad.
-- No pongas imágenes, nombre, fecha ni criterio de éxito.`;
+/* ---------- 📄 Moli crea la ficha de una actividad: el MATERIAL que la actividad pide (casos, fichas, noticia, texto…) ---------- */
+const FICHA_SCHEMA = { type:'OBJECT', required:['title', 'subtitle', 'reading', 'blocks', 'sources', 'tasks'], properties:{ title:{ type:'STRING' }, subtitle:{ type:'STRING' }, reading:{ type:'STRING' },
+blocks:{ type:'ARRAY', items:{ type:'OBJECT', required:['heading', 'text'], properties:{ heading:{ type:'STRING' }, text:{ type:'STRING' } } } },
+sources:{ type:'ARRAY', items:{ type:'STRING' } }, tasks:{ type:'ARRAY', items:{ type:'STRING' } } } };
+const FICHA_RULES = `CÓMO CREAR LA FICHA (síguelo en orden):
+PASO 1. Lee el TÍTULO y la DESCRIPCIÓN de la actividad y decide: ¿qué material van a leer, observar o analizar las y los estudiantes en ESA actividad?
+PASO 2. La ficha ES ese material. Ejemplos: si la actividad dice «casos prácticos», la ficha trae 3 o 4 casos prácticos; si dice «fichas médicas», trae fichas médicas de pacientes (nombre inventado, edad, síntomas, causa, si se contagia); si dice «noticia», trae la noticia; si dice «experimento», trae el procedimiento; si dice «datos» o «tabla», trae los datos; si solo pide «información», trae el texto informativo. Nunca entregues un texto general que no sirva para hacer la actividad.
+Campos:
+- "title": el TEMA de la meta en MAYÚSCULAS (sin el verbo). Ej.: meta «Explica las transformaciones de la energía» → «LAS TRANSFORMACIONES DE LA ENERGÍA».
+- "subtitle": el nombre del material según la actividad (ej.: «Casos prácticos para analizar», «Fichas médicas de pacientes»).
+- "reading": una introducción informativa breve (60 a 140 palabras) sobre el tema. REQUISITO: incluye CITAS con autor y año (al menos 1; puedes usar varias en la introducción y en los bloques), de cualquier autor o institución confiable, escritas de forma sencilla para niñas y niños de 6.° grado (por ejemplo «Según Pérez (2021), …» o «… (OMS, 2023).»).
+- "blocks": el material de la actividad, de 2 a 4 bloques; "heading" es su nombre (ej.: «Caso 1: La linterna de Ana», «Ficha médica 2: Luis, 11 años») y "text" su contenido (40 a 100 palabras). Si el material es un solo texto, usa 1 bloque.
+- "sources": las referencias de todas las citas, con autor, año y título (sin enlaces).
+- "tasks": EXACTAMENTE 3 preguntas que piden hacer justo lo que dice la actividad con ese material (ej.: «En cada caso, ¿qué forma de energía se transforma en cuál?»).
+- Español sencillo para 11 y 12 años; información científicamente correcta. Sin imágenes, nombre, fecha ni criterio de éxito.`;
 const fichaClean = f => {
 if(!f || typeof f !== 'object') return null;
-const tasks = (Array.isArray(f.tasks) ? f.tasks : []).map(t => clip(t, 220)).filter(Boolean).slice(0, 3);
-const sources = (Array.isArray(f.sources) ? f.sources : []).map(t => clip(t, 120)).filter(t => t && !/https?:|www\./i.test(t)).slice(0, 3);
-const out = { title: clip(f.title, 90).toUpperCase(), reading: String(f.reading || '').trim().slice(0, 2600), sources, tasks };
-out.cited = /\(\s*(?:[^()]{1,60},\s*)?(?:19|20)\d{2}\s*\)/.test(out.reading);
-return out.title && out.reading && out.tasks.length ? out : null;
+const blocks = (Array.isArray(f.blocks) ? f.blocks : []).map(b => ({ heading: clip(b && b.heading, 100), text: String((b && b.text) || '').trim().slice(0, 900) })).filter(b => b.text).slice(0, 5);
+const tasks = (Array.isArray(f.tasks) ? f.tasks : []).map(t => clip(t, 240)).filter(Boolean).slice(0, 3);
+const sources = (Array.isArray(f.sources) ? f.sources : []).map(t => clip(t, 160)).filter(t => t && !/https?:|www\./i.test(t)).slice(0, 6);
+const out = { title: clip(f.title, 90).toUpperCase(), subtitle: clip(f.subtitle, 110), reading: String(f.reading || '').trim().slice(0, 1400), blocks, sources, tasks };
+return out.title && blocks.length && tasks.length ? out : null;
 };
+let fontkitP = null;
+const fontkitLib = () => fontkitP || (fontkitP = new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js'; sc.onload = () => window.fontkit ? res(window.fontkit) : rej(new Error('FK')); sc.onerror = () => { fontkitP = null; rej(new Error('NET')); }; document.head.appendChild(sc); }));
+const TINOS = w => `https://cdn.jsdelivr.net/npm/@fontsource/tinos@5.3.0/files/tinos-latin-${w}.woff`;
 const pdfTxt = t => String(t || '').replace(/[“”«»]/g, '"').replace(/[‘’]/g, "'").replace(/[–—]/g, '-').replace(/…/g, '...').replace(/[^\x20-\x7E -ÿ\n]/g, '').replace(/[ \t]+/g, ' ').replace(/ ([.,;:!?)])/g, '$1').trim();
 async function fichaPDF(f){
 const L = await pdfLib(), doc = await L.PDFDocument.create();
-const R = await doc.embedFont(L.StandardFonts.TimesRoman), B = await doc.embedFont(L.StandardFonts.TimesRomanBold), I = await doc.embedFont(L.StandardFonts.TimesRomanItalic);
-const W = 595, H = 842, M = 56, TW = (W - 2 * M) * .9, black = L.rgb(0, 0, 0), grey = L.rgb(.35, .35, .35), line = L.rgb(.6, .6, .6), FS = 13, LH = 17.5;
+let R, B, I, safe = 1;
+try{
+doc.registerFontkit(await fontkitLib());
+const get = async w => new Uint8Array(await (await fetch(TINOS(w))).arrayBuffer());
+const [r, b, i] = await Promise.all(['400-normal', '700-normal', '400-italic'].map(get));
+[R, B, I] = await Promise.all([r, b, i].map(x => doc.embedFont(x, { subset: true })));
+}catch(e){ R = await doc.embedFont(L.StandardFonts.TimesRoman); B = await doc.embedFont(L.StandardFonts.TimesRomanBold); I = await doc.embedFont(L.StandardFonts.TimesRomanItalic); safe = .92; }
+const W = 595, H = 842, M = 64, TW = (W - 2 * M) * safe, black = L.rgb(0, 0, 0), grey = L.rgb(.4, .4, .4), line = L.rgb(.72, .72, .72), FS = 13, LH = FS * 1.5;
 const foot = pdfTxt(`${String(GRADE).toUpperCase()} - Ciencia`);
 let pg, y;
-const wrap = (t, font, size, width = TW) => { const out = []; let cur = ''; pdfTxt(t).split(' ').forEach(w => { const tr = cur ? cur + ' ' + w : w; if(font.widthOfTextAtSize(tr, size) > width && cur){ out.push(cur); cur = w; } else cur = tr; }); if(cur) out.push(cur); return out; };
-const newPage = () => { pg = doc.addPage([W, H]); y = H - M; pg.drawText(foot, { x: W - M - I.widthOfTextAtSize(foot, 10), y: 28, size: 10, font: I, color: grey }); pg.drawLine({ start: { x: M, y: 42 }, end: { x: W - M, y: 42 }, thickness: .6, color: line }); };
-const need = h => { if(y - h < M + 14) newPage(); };
-const put = (t, font, size, x = M) => pg.drawText(t, { x, y, size, font, color: black });
-newPage();
-wrap(f.title, B, 17, TW).forEach(l => { put(l, B, 17, (W - B.widthOfTextAtSize(l, 17)) / 2); y -= 22; });
-pg.drawLine({ start: { x: M, y: y + 8 }, end: { x: W - M, y: y + 8 }, thickness: 1.2, color: black }); y -= 18;
-String(f.reading).split(/\n\s*\n|\n/).map(pdfTxt).filter(Boolean).forEach(p => {
-wrap(p, R, FS).forEach(l => { need(LH); put(l, R, FS); y -= LH; });
-y -= 8;
+const words = t => pdfTxt(t).split(' ').filter(Boolean);
+const lines = (t, font, size) => { const out = []; let cur = []; words(t).forEach(w => { const tr = [...cur, w].join(' '); if(font.widthOfTextAtSize(tr, size) > TW && cur.length){ out.push(cur); cur = [w]; } else cur.push(w); }); if(cur.length) out.push(cur); return out; };
+const newPage = () => { pg = doc.addPage([W, H]); y = H - M; pg.drawText(foot, { x: W - M - I.widthOfTextAtSize(foot, 10), y: 30, size: 10, font: I, color: grey }); };
+const need = h => { if(y - h < M) newPage(); };
+const para = (t, font = R, size = FS, lh = LH, x0 = M) => {
+const ls = lines(t, font, size);
+ls.forEach((ws, k) => {
+need(lh);
+const last = k === ls.length - 1, wid = ws.reduce((a, w) => a + font.widthOfTextAtSize(w, size), 0), gap = !last && ws.length > 1 ? (TW - wid) / (ws.length - 1) : font.widthOfTextAtSize(' ', size);
+let x = x0; ws.forEach(w => { pg.drawText(w, { x, y, size, font, color: black }); x += font.widthOfTextAtSize(w, size) + gap; });
+y -= lh;
 });
-if(f.sources.length){ need(20); wrap((f.sources.length > 1 ? 'Fuentes: ' : 'Fuente: ') + f.sources.join('; ').replace(/\.$/, '') + '.', I, 10.5).forEach(l => { need(14); put(l, I, 10.5); y -= 14; }); y -= 6; }
-need(40 + 90); y -= 6; put('Actividades: Respondemos', B, 14); y -= 22;
+};
+const center = (t, font, size) => lines(t, font, size).forEach(ws => { const s = ws.join(' '); need(size * 1.5); pg.drawText(s, { x: M + (TW - font.widthOfTextAtSize(s, size)) / 2, y, size, font, color: black }); y -= size * 1.5; });
+newPage();
+center(f.title, B, 16);
+if(f.subtitle){ y += 2; center(f.subtitle, I, 13); }
+y -= 10;
+String(f.reading || '').split(/\n\s*\n|\n/).map(pdfTxt).filter(Boolean).forEach(p => { para(p); y -= 6; });
+f.blocks.forEach(b => {
+need(LH * 3); y -= 4;
+if(b.heading) para(b.heading, B);
+String(b.text).split(/\n\s*\n|\n/).map(pdfTxt).filter(Boolean).forEach(p => { para(p); y -= 4; });
+});
+if(f.sources.length){ y -= 4; para((f.sources.length > 1 ? 'Referencias: ' : 'Referencia: ') + f.sources.join('; ').replace(/\.$/, '') + '.', I, 9.5, 13); }
+need(LH * 4); y -= 10;
+pg.drawText('Actividades: Respondemos', { x: M, y, size: 14, font: B, color: black }); y -= LH + 2;
 f.tasks.forEach((t, i) => {
-const ls = wrap(`${i + 1}. ${t}`, B, FS);
-need(ls.length * LH + 74);
-ls.forEach(l => { put(l, B, FS); y -= LH; });
-for(let k = 0; k < 3; k++){ y -= 20; pg.drawLine({ start: { x: M + 16, y }, end: { x: W - M, y }, thickness: .6, color: line }); } y -= 16;
+need(LH * 2 + 3 * 22 + 10);
+para(`${i + 1}. ${t}`, B);
+for(let k = 0; k < 3; k++){ y -= 18; pg.drawLine({ start: { x: M + 14, y }, end: { x: M + TW, y }, thickness: .5, color: line, dashArray: [2, 3] }); } y -= 16;
 });
 return doc.save();
 }
 async function fichaToFile(f, actN){
 const b64 = b64Of(await fichaPDF(f)), id = 'f' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-APP.files[id] = { name: pdfTxt(`Ficha actividad ${actN} - ${f.title}`).slice(0, 80) + '.pdf', type: 'application/pdf', b64, size: Math.round(b64.length * .75) };
+APP.files[id] = { name: pdfTxt(`Ficha actividad ${actN} - ${f.subtitle || f.title}`).slice(0, 80) + '.pdf', type: 'application/pdf', b64, size: Math.round(b64.length * .75) };
 return id;
 }
 const fgenBusy = new Set();
-const fichaPrompt = (meta, crits, a, i) => `Eres una docente experta de Ciencia y Tecnología de 6.° grado de primaria en Perú. Crea UNA ficha para esta actividad de la sesión.
-${filled(meta) ? `Meta: ${clip(meta, 240)}\n` : ''}${crits.length ? `Criterios de éxito: ${crits.map(c => clip(c, 140)).join(' | ')}\n` : ''}Actividad ${i + 1} (${a.mode === 'group' ? 'colaborativa, en equipos' : 'individual'}): ${clip(a.title, 90)} — ${clip(a.desc, 260)}
-${FICHA_RULES}
-Español sencillo para 11 y 12 años y datos científicamente correctos.`;
+const fichaPrompt = (meta, crits, a, i) => `Eres una docente experta de Ciencia y Tecnología de 6.° grado de primaria en Perú. Vas a crear LA FICHA DE UNA ACTIVIDAD de la sesión.
+ACTIVIDAD ${i + 1} (${a.mode === 'group' ? 'colaborativa, en equipos' : 'individual'}):
+Título: «${clip(a.title, 120)}»
+Descripción: «${clip(a.desc, 320)}»
+Contexto de la sesión: ${filled(meta) ? `meta «${clip(meta, 240)}»` : 'sin meta'}${crits.length ? `; criterios de éxito: ${crits.map(c => clip(c, 140)).join(' | ')}` : ''}.
+${FICHA_RULES}`;
 const fichaGen = (meta, crits, a, i) => aiRequest(fichaPrompt(meta, crits, a, i), FICHA_SCHEMA, d => fichaClean(d), { timeout: 60000, maxTokens: 4096 });
 async function fichaForActivity(i){
 const s = curSession(), u = curUnit(), a = s && s.activities[i];

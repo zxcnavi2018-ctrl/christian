@@ -2571,7 +2571,7 @@
     const front = [...got(['back']).filter(it => it.fr).map(it => it.fr), ...got(['body', 'acc', 'face', 'armtech', 'shoulder', 'weapon', 'helm', 'pet', 'fx']).map(it => it.id), ...(sk && sk.pk ? [sk.pk] : [])];
     const geared = back.length || front.length || sk;
     return `<div class="robot${geared ? ' geared' : ''}${rainbow ? ' rainbow' : ''}${sk ? ' skinned' : ''}${supSkin ? ' sup' : ''}${sk && sk.noeyes ? ' noeyes' : ''}${eye && eye.es ? ' ey-' + eye.es : ''}" role="img" aria-label="Moli, el robot" style="${style}">
-      <div class="robot-hop"><div class="robot-bob">${layer('back', back)}<div class="robot-body">${sk ? layer('skin', [sk.id]) : ''}${metal}<div class="robot-eyes"><i class="eye l" style="--blink:${d}s"></i><i class="eye r" style="--blink:${d}s"></i></div></div>${layer('front', front)}${opts.tag === false ? '' : '<span class="robot-tag">Moli</span>'}${wear}</div></div>
+      <div class="robot-hop"><div class="robot-bob">${layer('back', back)}<div class="robot-body">${sk ? layer('skin', [sk.id]) : ''}${metal}<div class="robot-eyes"><i class="eye l" style="--blink:${d}s"></i><i class="eye r" style="--blink:${d}s"></i></div></div>${layer('front', front)}${opts.tag === false || Object.values(o).some(id => ITEM[id]) ? '' : '<span class="robot-tag">Moli</span>'}${wear}</div></div>
       <span class="robot-shadow"></span></div>`;
   }
 
@@ -5569,10 +5569,10 @@ Reglas:
   function welcomeOf(key){
     const u = me();
     if(!u || u.key !== key || u.teacher) return null;
-    const stars = u.createdAt >= WELCOME_FROM ? WELCOME_STARS : 0;
+    const stars = u.createdAt >= WELCOME_FROM ? WELCOME_STARS : 0, bim = (['', '1er ', '2do ', '3er ', '4to '][APP.site.bimestre] || '') + 'bimestre';
     return { id: 'welcome', kind: 'welcome', stars, at: u.createdAt || 0, from: 'Moli',
-      title: `🎉 ¡Felicidades por tu registro, ${firstOf(u.name)}!`,
-      msg: `Moli te premia con la insignia de Innova Schools${stars ? ` y ⭐${stars} estrellas` : ''}. Aprieta «Recibir» y la insignia aparecerá en la 🛍️ Tienda, en 🎖️ Accesorios.` };
+      title: `🎉 ¡Bienvenido(a) al ${bim}, ${firstOf(u.name)}!`,
+      msg: `Por tu inscripción, Moli te premia con la insignia de Innova Schools${stars ? ` y ⭐${stars}` : ''}.` };
   }
   const welcomeRead = key => closetOf(key).owned.includes(WELCOME_PIN);
   const welcomeStars = key => { const w = welcomeOf(key); return w && welcomeRead(key) ? w.stars : 0; };

@@ -610,9 +610,9 @@ const ed = editable();
 let actions = '';
 if(f){
 actions += `<button type="button" class="btn ${amber ? 'amber-ghost' : 'ghost'}" data-view="${slot}">${ICON_EYE} Ver ficha</button>`;
-actions += `<button type="button" class="btn ${amber ? 'amber' : 'solid'}" data-dl="${slot}">${ICON_DL} Descargar</button>`;
-if(f.gdoc) actions += `<a class="btn gdoc" href="https://docs.google.com/document/d/${esc(f.gdoc)}/copy" target="_blank" rel="noopener">📝 Mi copia en Google Docs</a>`;
-if(f.ficha) actions += `<button type="button" class="btn word" data-docx="${slot}">⬇️ Word</button>`;
+if(f.gdoc) actions += `<a class="btn gdoc" href="https://docs.google.com/document/d/${esc(f.gdoc)}/edit?usp=sharing" target="_blank" rel="noopener">📝 Obtener</a>`;
+else actions += `<button type="button" class="btn ${amber ? 'amber' : 'solid'}" data-dl="${slot}">${ICON_DL} Descargar</button>`;
+if(f.ficha && !f.gdoc) actions += `<button type="button" class="btn word" data-docx="${slot}">⬇️ Word</button>`;
 if(editing && f.ficha && !f.gdoc) actions += `<button type="button" class="btn gdoc" data-gup="${slot}">☁️ Pasar a Google Docs</button>`;
 if(editing) actions += `<button type="button" class="btn ghost" data-glink="${slot}">🔗 ${f.gdoc ? 'Cambiar link de Docs' : 'Pegar link de Docs'}</button>`;
 }
@@ -922,7 +922,7 @@ if(gl){ const id = slotObj(gl.dataset.glink).file, f = APP.files[id]; if(!f) ret
 const v = prompt('Pega el link de Google Docs de esta ficha (compártelo como «Cualquier persona con el enlace»). Déjalo vacío para quitarlo.', f.gdoc ? `https://docs.google.com/document/d/${f.gdoc}/edit` : '');
 if(v === null) return; const m = String(v).match(/\/d\/([\w-]{20,})/) || String(v).match(/^([\w-]{25,})$/);
 if(v.trim() && !m){ toast('⚠️ Ese link no parece de Google Docs.'); return; }
-if(m) f.gdoc = m[1]; else delete f.gdoc; changed(); renderSession(); toast(m ? '✅ Link guardado: tus estudiantes ya ven «Mi copia en Google Docs».' : '🗑 Link quitado.'); return; }
+if(m) f.gdoc = m[1]; else delete f.gdoc; changed(); renderSession(); toast(m ? '✅ Link guardado: tus estudiantes ya ven «Obtener».' : '🗑 Link quitado.'); return; }
 const wd = t.closest('[data-docx]');
 if(wd){ const id = slotObj(wd.dataset.docx).file, f = APP.files[id]; if(f && f.ficha) fichaDocx(f.ficha, f.name); return; }
 if(t.closest('#flipAlert')){

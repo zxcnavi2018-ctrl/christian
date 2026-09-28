@@ -286,6 +286,29 @@ service cloud.firestore {
         && request.resource.data.at is timestamp;
     }
 
+    // 🏆 Adicional completo: el estudiante lo marca una vez (con su Exit ticket y sus actividades ya subidas),
+    // a la docente le llega el aviso y el estudiante recibe ⭐10 de Moli («got» pasa a true una sola vez).
+    match /xbonus/{id} {
+      allow get: if id.matches('extra-s[0-9]{1,2}-k[0-9a-f]{20}') || isTeacher();
+      allow list, delete: if isTeacher();
+      allow create: if id.matches('extra-s[0-9]{1,2}-k[0-9a-f]{20}')
+        && request.resource.data.keys().hasOnly(['session', 'student', 'n', 'sec', 'dni', 'acts', 'a', 'got', 'at'])
+        && request.resource.data.keys().hasAll(['session', 'student', 'n', 'sec', 'dni', 'acts', 'a', 'got', 'at'])
+        && request.resource.data.session is int && request.resource.data.session >= 1 && request.resource.data.session <= 50
+        && request.resource.data.student is string && request.resource.data.student.matches('k[0-9a-f]{20}')
+        && id == 'extra-s' + string(request.resource.data.session) + '-' + request.resource.data.student
+        && request.resource.data.n is string && request.resource.data.n.size() > 0 && request.resource.data.n.size() <= 60
+        && request.resource.data.acts is int && request.resource.data.acts >= 1 && request.resource.data.acts <= 20
+        && request.resource.data.a is int && request.resource.data.a >= 1 && request.resource.data.a <= 20
+        && request.resource.data.got == false
+        && request.resource.data.at is timestamp
+        && get(/databases/$(database)/documents/students/$(request.resource.data.student)).data.dni == request.resource.data.dni
+        && get(/databases/$(database)/documents/students/$(request.resource.data.student)).data.section == request.resource.data.sec
+        && exists(/databases/$(database)/documents/tasks/$('extra-s' + string(request.resource.data.session) + '-a' + string(request.resource.data.a) + '-' + request.resource.data.student));
+      allow update: if resource.data.got == false && request.resource.data.got == true
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['got']);
+    }
+
     // Fichas que sube la docente, partidas en trozos de hasta 900 000 caracteres (base64).
     match /files/{id} {
       allow get: if true;

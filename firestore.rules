@@ -223,6 +223,11 @@ service cloud.firestore {
         && request.resource.data.data is string && request.resource.data.data.size() <= 900000
         && request.resource.data.savedAt is int
         && request.resource.data.updatedAt is timestamp;
+      // Mensajitos aprobados que salen en el chat del Inicio (los pone la docente).
+      allow create, update: if isTeacher() && id == 'chat'
+        && request.resource.data.keys().hasOnly(['data', 'updatedAt'])
+        && request.resource.data.data is string && request.resource.data.data.size() <= 20000
+        && request.resource.data.updatedAt is timestamp;
       allow create, update: if isTeacher() && id == 'site'
         && request.resource.data.keys().hasOnly(['title', 'bimestre', 'hidden', 'updatedAt'])
         && request.resource.data.title is string && request.resource.data.title.size() > 0 && request.resource.data.title.size() <= 40
@@ -230,6 +235,24 @@ service cloud.firestore {
         && request.resource.data.hidden is list && request.resource.data.hidden.size() <= 20
         && request.resource.data.updatedAt is timestamp;
       allow delete: if isTeacher();
+    }
+
+    // Mensajitos de los estudiantes para el chat del Inicio: cada estudiante deja uno (máx. 8 palabras),
+    // llega «pendiente» a la docente y solo ella lo aprueba o lo rechaza.
+    match /notes/{id} {
+      allow get: if true;
+      allow list, delete: if isTeacher();
+      allow create, update: if id.matches('k[0-9a-f]{20}')
+        && request.resource.data.keys().hasOnly(['n', 'sec', 'dni', 'text', 'status', 'at'])
+        && request.resource.data.n is string && request.resource.data.n.size() > 0 && request.resource.data.n.size() <= 30
+        && request.resource.data.text is string && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 80
+        && request.resource.data.status == 'pending'
+        && request.resource.data.at is timestamp
+        && get(/databases/$(database)/documents/students/$(id)).data.dni == request.resource.data.dni
+        && get(/databases/$(database)/documents/students/$(id)).data.section == request.resource.data.sec;
+      allow update: if isTeacher()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status in ['ok', 'no'];
     }
 
     // Fichas que sube la docente, partidas en trozos de hasta 900 000 caracteres (base64).

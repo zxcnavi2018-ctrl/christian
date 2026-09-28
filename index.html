@@ -3083,7 +3083,7 @@ const AI_MODELS = ['gemini-3.5-flash-lite', 'gemini-3.8-flash'];
 const aiState = {};   // por lugar: tk (Exit ticket de la sesión), vs (Preguntas VS), lm (La última Moli)
 const AI_CTX = {
 tk: { n: 5, what: 'Exit ticket de la sesión', short: false },
-vs: { n: 5, what: 'duelo rápido (5 segundos por pregunta)', short: true },
+vs: { n: 20, what: 'duelo rápido (5 segundos por pregunta; en cada duelo salen 5 al azar, así que que sean variadas y no se repitan)', short: true },
 lm: { n: 40, what: 'evento de duelos «La última Moli» (duelos de 3 preguntas, 10 segundos por pregunta)', short: 10 }
 };
 const aiSchema = { type:'OBJECT', required:['questions'], properties:{ questions:{ type:'ARRAY', items:{ type:'OBJECT', required:['q', 'options', 'answer'],

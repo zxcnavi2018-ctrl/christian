@@ -23,7 +23,7 @@ service cloud.firestore {
         && d.keys().hasAll(['unit', 'unitNum', 'session', 'grade', 'section', 'name', 'student', 'dni', 'score', 'total', 'answers', 'createdAt'])
         && d.unit is string && d.unit.size() <= 20
         && d.unitNum is string && d.unitNum.size() <= 10
-        && d.session is int && d.session >= 1 && d.session <= 50
+        && d.session is int && d.session >= 1 && d.session <= 99
         && d.grade == '6to'
         && d.section in ['A', 'B', 'C', 'D']
         && d.name is string && d.name.size() > 0 && d.name.size() <= 60

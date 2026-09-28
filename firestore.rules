@@ -298,7 +298,7 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['session', 'student', 'n', 'sec', 'dni', 'acts', 'a', 'got', 'status', 'tier', 'stars', 'at'])
         && request.resource.data.keys().hasAll(['session', 'student', 'n', 'sec', 'dni', 'acts', 'a', 'got', 'status', 'tier', 'stars', 'at'])
         && request.resource.data.status == 'pending'
-        && request.resource.data.tier in ['diamante', 'oro', 'plata', 'cobre']
+        && request.resource.data.tier in ['celestial', 'diamante', 'oro', 'plata', 'cobre']
         && request.resource.data.stars is int && request.resource.data.stars >= 0 && request.resource.data.stars <= 15
         && request.resource.data.session is int && request.resource.data.session >= 1 && request.resource.data.session <= 50
         && request.resource.data.student is string && request.resource.data.student.matches('k[0-9a-f]{20}')

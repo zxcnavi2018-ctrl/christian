@@ -953,7 +953,7 @@ const oadd = t.closest('[data-tq-oadd]');
 if(oadd){ commitFocused(); s.ticket.questions[+oadd.dataset.tqOadd].options.push(''); changed(); renderSession(); return; }
 const up = t.closest('[data-up]'), rm = t.closest('[data-rm]');
 if(up){ pickFile(up.dataset.up); return; }
-if(rm){ slotObj(rm.dataset.rm).file = ''; changed(); renderSession(); return; }
+if(rm){ const o = slotObj(rm.dataset.rm), old = o.file; o.file = ''; changed(); renderSession(); gdocTrash(old); return; }
 const cr = t.closest('[data-crit-rm]');
 if(cr){ commitFocused(); s.criteria.splice(+cr.dataset.critRm, 1); changed(); renderSession(); return; }
 if(t.closest('#critAdd')){ commitFocused(); s.criteria.push(''); changed(); renderSession(); focusLast('[data-bind^="s.criteria."]'); return; }
@@ -3443,6 +3443,18 @@ return id;
 }
 const gdocErr = e => e.message === 'API' ? '🔧 Falta activar «Google Drive API» en tu proyecto (una sola vez): console.cloud.google.com → APIs y servicios → Biblioteca → Google Drive API → Habilitar.'
 : e.message === 'AUTH' ? '🔐 Se venció el permiso de Google. Toca otra vez «Pasar a Google Docs».' : (typeof googleError === 'function' && e.code ? googleError(e) : '') || '📶 No se pudo subir a Google Docs. Inténtalo otra vez.';
+async function gdocTrash(fileId){
+const f = fileId && APP.files[fileId], gid = f && f.gdoc;
+if(!gid) return;
+try{
+const tok = driveOk() || await driveToken();
+const r = await fetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(gid)}`, { method:'PATCH', headers:{ Authorization: 'Bearer ' + tok, 'Content-Type': 'application/json' }, body: JSON.stringify({ trashed: true }) });
+if(r.status === 401){ lsSet(DRIVE_KEY, null); throw new Error('AUTH'); }
+if(!r.ok) throw new Error(r.status === 404 || r.status === 403 ? 'MINE' : 'NET');
+delete f.gdoc; changed();
+toast('🗑 La ficha también se mandó a la papelera de tu Google Drive.');
+}catch(e){ toast(e.message === 'MINE' ? '🗑 Ficha quitada. Su Google Docs no lo creó la página: si ya no lo quieres, bórralo tú en tu Drive.' : '🗑 Ficha quitada. No se pudo borrar su copia de Google Drive: bórrala tú desde tu Drive si ya no la quieres.', [], 7000); }
+}
 async function gdocUpload(fileId){
 try{ toast('☁️ Pasando la ficha a Google Docs…', [], 6000); const tok = await driveToken(); await toGoogleDocs(fileId, tok); toast('✅ ¡Listo! Tus estudiantes ya pueden hacer su copia en Google Docs.'); }
 catch(e){ const m = gdocErr(e); if(m) toast(m, [], 9000); }

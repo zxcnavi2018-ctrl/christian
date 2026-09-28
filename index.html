@@ -300,6 +300,7 @@ b.connect(bg); bg.connect(out); b.start(t0 + dt); b.stop(t0 + dt + .4);
 });
 }
 function softAlarm(){
+try{ if(navigator.vibrate) navigator.vibrate([220, 120, 220, 120, 220]); }catch(e){}
 const ac = audio();
 if(!ac || ac.state !== 'running'){ pendingAlarm = true; return; }
 pendingAlarm = false;
@@ -310,7 +311,8 @@ o.type = 'sine'; o.frequency.value = f; g.gain.setValueAtTime(0, t); g.gain.line
 o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + .42);
 });
 }
-document.addEventListener('pointerdown', () => { if(pendingAlarm){ const ac = audio(); if(ac) ac.resume().then(() => { if(pendingAlarm && me()) softAlarm(); }); } }, true);
+const unlockAudio = () => { const ac = audio(); if(ac) ac.resume().then(() => { if(pendingAlarm && me()) softAlarm(); }).catch(() => {}); };
+['pointerdown', 'keydown', 'touchend'].forEach(ev => document.addEventListener(ev, unlockAudio, true));
 /* ================= Secret gesture: 10 taps on a robot in 4 s ================= */
 let taps = 0, tapTimer = null;
 document.addEventListener('click', e => {
@@ -1359,6 +1361,14 @@ const j = await r.json();
 page = j.nextPageToken || '';
 } while(page);
 return col === 'exitTickets' ? out.map(r => ({ ...r, n: r.session, at: r.createdAt })) : out;
+}
+async function cloudQuery(c, col, field, op, value){
+const tok = await idToken(c);
+if(!tok) throw new Error('AUTH');
+const r = await fetch(`${docsBase(c)}:runQuery?key=${c.apiKey}`, { method:'POST', headers:{ 'Content-Type':'application/json', Authorization: 'Bearer ' + tok },
+body: JSON.stringify({ structuredQuery: { from: [{ collectionId: col }], where: { fieldFilter: { field: { fieldPath: field }, op, value } }, limit: 100 } }) });
+if(!r.ok) throw new Error('HTTP ' + r.status);
+return (await r.json()).filter(x => x.document).map(x => fromDoc(x.document));
 }
 async function cloudDelete(c, id){
 const tok = await idToken(c);
@@ -4434,12 +4444,13 @@ const mailPending = key => { const m = mailOf(key); return m.items.filter(it => 
 async function loadMail(){
 const u = me(), c = await fbConfig();
 if(!u || u.teacher || !c) return;
+const before = JSON.stringify(mailOf(u.key));
 try{
 const r = await fetch(`${docsBase(c)}/mail/${u.key}?key=${c.apiKey}`);
 if(r.status === 404) setMail(u.key, { items: [], claimed: [] });
 else if(r.ok){ const d = fromDoc(await r.json()); let items = []; try{ items = JSON.parse(d.items || '[]'); }catch(e){} setMail(u.key, { items, claimed: d.claimed || [] }); }
 }catch(e){ return; }
-mailBadge(); onAccountChange();
+if(JSON.stringify(mailOf(u.key)) !== before || !loadMail.done){ loadMail.done = true; mailBadge(); onAccountChange(); }
 await xbSync();
 }
 function mailBadge(){
@@ -6185,11 +6196,12 @@ let xbNew = 0;
 const xbSeen = () => +lsGet(XB_SEEN, 0) || 0;
 let notesPending = 0, notesCheckAt = 0;
 async function checkNotes(force){
-if(!isTeacher() || !auth() || (!force && Date.now() - notesCheckAt < 60000)) return;
+if(!isTeacher() || !auth() || (!force && Date.now() - notesCheckAt < 25000)) return;
 notesCheckAt = Date.now();
 const c = await fbConfig(); if(!c) return;
-try{ const list = await cloudList(c, 'notes'); notesPending = list.filter(x => x.status === 'pending').length; mailBadge(); }catch(e){}
-try{ const xs = await cloudList(c, 'xbonus'), seen = xbSeen(); xbNew = xs.filter(x => (x.at || 0) > seen).length; mailBadge(); }catch(e){}
+try{ notesPending = (await cloudQuery(c, 'notes', 'status', 'EQUAL', { stringValue: 'pending' })).length; }catch(e){}
+try{ xbNew = (await cloudQuery(c, 'xbonus', 'at', 'GREATER_THAN', { timestampValue: new Date(xbSeen()).toISOString() })).length; }catch(e){}
+mailBadge();
 }
 async function openNotesInbox(){
 tk = null; acct = { view: 'notes-in', list: null, err: '', busy: {} };
@@ -6281,6 +6293,12 @@ onAccountChange();
 loadSite();
 loadChat();
 setTimeout(() => checkNotes(true), 3000);
+setInterval(() => {
+if(document.visibilityState !== 'visible') return;
+const u = me(); if(!u) return;
+if(u.teacher) checkNotes(true);
+else if(!(acct && acct.view === 'mail')) loadMail();
+}, 30000);
 document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible'){ loadChat(); checkNotes(); } });
 /* ================= ☁️ Contenido en la nube: la docente edita, se publica solo y la página de todos se actualiza ================= */
 const CONTENT_KEY = 'ciencia4b:content:' + APP.docId;   // última versión publicada (sin fichas) para abrir rápido

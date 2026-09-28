@@ -261,7 +261,7 @@ service cloud.firestore {
       allow get: if id.matches('extra-s[0-9]{1,2}-a[0-9]{1,2}-k[0-9a-f]{20}') || isTeacher();
       allow list, delete: if isTeacher();
       allow create, update: if id.matches('extra-s[0-9]{1,2}-a[0-9]{1,2}-k[0-9a-f]{20}')
-        && request.resource.data.keys().hasOnly(['session', 'act', 'student', 'n', 'sec', 'dni', 'fname', 'ftype', 'size', 'parts', 'at'])
+        && request.resource.data.keys().hasOnly(['session', 'act', 'student', 'n', 'sec', 'dni', 'fname', 'ftype', 'size', 'parts', 'url', 'at'])
         && request.resource.data.keys().hasAll(['session', 'act', 'student', 'n', 'sec', 'dni', 'fname', 'ftype', 'size', 'parts', 'at'])
         && request.resource.data.session is int && request.resource.data.session >= 1 && request.resource.data.session <= 50
         && request.resource.data.act is int && request.resource.data.act >= 1 && request.resource.data.act <= 20
@@ -271,7 +271,10 @@ service cloud.firestore {
         && request.resource.data.fname is string && request.resource.data.fname.size() > 0 && request.resource.data.fname.size() <= 80
         && request.resource.data.ftype is string && request.resource.data.ftype.size() <= 100
         && request.resource.data.size is int && request.resource.data.size >= 0 && request.resource.data.size <= 8000000
-        && request.resource.data.parts is int && request.resource.data.parts >= 1 && request.resource.data.parts <= 6
+        && request.resource.data.parts is int && request.resource.data.parts >= 0 && request.resource.data.parts <= 6
+        && (request.resource.data.parts >= 1
+          ? !('url' in request.resource.data)
+          : (request.resource.data.url is string && request.resource.data.url.size() <= 500 && request.resource.data.url.matches('https?://.+')))
         && request.resource.data.at is timestamp
         && get(/databases/$(database)/documents/students/$(request.resource.data.student)).data.dni == request.resource.data.dni
         && get(/databases/$(database)/documents/students/$(request.resource.data.student)).data.section == request.resource.data.sec;
@@ -286,14 +289,17 @@ service cloud.firestore {
         && request.resource.data.at is timestamp;
     }
 
-    // 🏆 Adicional completo: el estudiante lo marca una vez (con su Exit ticket y sus actividades ya subidas),
-    // a la docente le llega el aviso y el estudiante recibe ⭐10 de Moli («got» pasa a true una sola vez).
+    // 🏆 Adicional completo: el estudiante lo envía una vez (con su Exit ticket y sus actividades ya subidas) «por revisar»;
+    // la docente lo aprueba o lo rechaza; aprobado, el estudiante recibe las estrellas de la categoría («got» pasa a true una sola vez).
     match /xbonus/{id} {
       allow get: if id.matches('extra-s[0-9]{1,2}-k[0-9a-f]{20}') || isTeacher();
       allow list, delete: if isTeacher();
       allow create: if id.matches('extra-s[0-9]{1,2}-k[0-9a-f]{20}')
-        && request.resource.data.keys().hasOnly(['session', 'student', 'n', 'sec', 'dni', 'acts', 'a', 'got', 'at'])
-        && request.resource.data.keys().hasAll(['session', 'student', 'n', 'sec', 'dni', 'acts', 'a', 'got', 'at'])
+        && request.resource.data.keys().hasOnly(['session', 'student', 'n', 'sec', 'dni', 'acts', 'a', 'got', 'status', 'tier', 'stars', 'at'])
+        && request.resource.data.keys().hasAll(['session', 'student', 'n', 'sec', 'dni', 'acts', 'a', 'got', 'status', 'tier', 'stars', 'at'])
+        && request.resource.data.status == 'pending'
+        && request.resource.data.tier in ['diamante', 'oro', 'plata', 'cobre']
+        && request.resource.data.stars is int && request.resource.data.stars >= 0 && request.resource.data.stars <= 15
         && request.resource.data.session is int && request.resource.data.session >= 1 && request.resource.data.session <= 50
         && request.resource.data.student is string && request.resource.data.student.matches('k[0-9a-f]{20}')
         && id == 'extra-s' + string(request.resource.data.session) + '-' + request.resource.data.student
@@ -305,8 +311,19 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/students/$(request.resource.data.student)).data.dni == request.resource.data.dni
         && get(/databases/$(database)/documents/students/$(request.resource.data.student)).data.section == request.resource.data.sec
         && exists(/databases/$(database)/documents/tasks/$('extra-s' + string(request.resource.data.session) + '-a' + string(request.resource.data.a) + '-' + request.resource.data.student));
+      // el estudiante recibe sus estrellas solo si la docente lo aprobó
       allow update: if resource.data.got == false && request.resource.data.got == true
+        && resource.data.get('status', 'ok') == 'ok'
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['got']);
+      // si la docente lo rechazó, el estudiante lo corrige y lo envía otra vez
+      allow update: if resource.data.get('status', 'ok') == 'no' && request.resource.data.status == 'pending'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'at'])
+        && request.resource.data.at is timestamp;
+      // la docente aprueba o rechaza (y fija las estrellas según la categoría de la sesión)
+      allow update: if isTeacher()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'tier', 'stars', 'rv'])
+        && request.resource.data.status in ['ok', 'no', 'pending']
+        && request.resource.data.stars is int && request.resource.data.stars >= 0 && request.resource.data.stars <= 15;
     }
 
     // Fichas que sube la docente, partidas en trozos de hasta 900 000 caracteres (base64).

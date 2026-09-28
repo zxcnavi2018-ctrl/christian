@@ -3117,7 +3117,7 @@ const AI_MODELS = ['gemini-3.5-flash-lite', 'gemini-3.8-flash'];
 const aiState = {};   // por lugar: tk (Exit ticket de la sesión), vs (Preguntas VS)
 const AI_CTX = {
 tk: { n: 5, what: 'Exit ticket de la sesión', short: false },
-vs: { n: 20, what: 'duelo rápido (8 segundos por pregunta; en cada duelo salen 5 al azar, así que que sean variadas y no se repitan)', short: true },
+vs: { n: 60, what: 'banco de duelos rápidos (8 segundos por pregunta; en cada duelo salen 5 al azar, así que que sean variadas, cortas y no se repitan)', short: true, maxTokens: 24000, timeout: 150000 },
 };
 const aiSchema = { type:'OBJECT', required:['questions'], properties:{ questions:{ type:'ARRAY', items:{ type:'OBJECT', required:['q', 'options', 'answer'],
 properties:{ q:{ type:'STRING' }, options:{ type:'ARRAY', items:{ type:'STRING' } }, answer:{ type:'INTEGER' }, why:{ type:'STRING' } } } } } };
@@ -3150,7 +3150,7 @@ out.push({ q, options: order.map(i => opts[i]), answer: order.indexOf(a), why: c
 });
 return out.slice(0, want);
 }
-const aiGenerate = (topic, ctx, opt) => aiRequest(aiPrompt(topic, ctx, opt && opt.parts, opt && opt.ses), aiSchema, d => { const qs = aiClean(d && d.questions, AI_CTX[ctx].n); return qs.length ? qs : null; }, opt);
+const aiGenerate = (topic, ctx, opt) => (C => (opt = { ...(opt || {}), ...(C.maxTokens ? { maxTokens: C.maxTokens, timeout: Math.max((opt && opt.timeout) || 0, C.timeout) } : {}) }))(AI_CTX[ctx]) && aiRequest(aiPrompt(topic, ctx, opt && opt.parts, opt && opt.ses), aiSchema, d => { const qs = aiClean(d && d.questions, AI_CTX[ctx].n); return qs.length ? qs : null; }, opt);
 async function aiRequest(prompt, schema, pick, opt = {}){
 try{ return await aiRequestOnce(prompt, schema, pick, opt); }
 catch(e){ if(e.message !== 'BUSY' || opt.retried) throw e; await new Promise(r => setTimeout(r, 2500)); return aiRequestOnce(prompt, schema, pick, { ...opt, retried: true }); }
@@ -3214,7 +3214,7 @@ ${st.pdf ? `<span class="sai-file">📄 <b>${esc(clip(st.pdf.name, 28))}</b><but
 ${st.err ? `<p class="send warn ai-err">${st.err}</p>` : ''}
 ${st.result && st.read ? `<p class="ai-read">📚 Leí: ${[st.read.meta ? 'la meta' : '', st.read.crits ? `${st.read.crits} ${st.read.crits === 1 ? 'criterio' : 'criterios'}` : '', st.read.acts ? `${st.read.acts} ${st.read.acts === 1 ? 'actividad' : 'actividades'}` : '', st.read.files.length ? `${st.read.files.length === 1 ? 'la ficha' : `${st.read.files.length} fichas`} (${st.read.files.join(', ')})` : 'ninguna ficha'].filter(Boolean).join(', ')}.</p>${st.read.skip.length ? `<p class="send warn ai-err">⚠️ No pude leer: ${st.read.skip.map(esc).join('; ')}.</p>` : ''}` : ''}
 ${st.result ? `<ol class="ai-prev">${st.result.map(q => `<li><b>${esc(q.q)}</b><span class="ai-ok">✅ ${esc(q.options[q.answer])}</span><small>Otras: ${q.options.filter((_, i) => i !== q.answer).map(esc).join(' · ')}</small></li>`).join('')}</ol>
-<div class="ai-acts"><button type="button" class="btn solid" data-ai="use">✅ Usar estas preguntas</button><button type="button" class="btn ghost" data-ai="gen">🔁 Crear otras</button><button type="button" class="btn ghost" data-ai="cancel">Descartar</button></div>
+<div class="ai-acts">${ctx === 'vs' ? `<button type="button" class="btn solid" data-ai="use">➕ Agregar al banco</button>${VSBANK.length ? '<button type="button" class="btn ghost" data-ai="replace">🔁 Reemplazar todo el banco</button>' : ''}` : '<button type="button" class="btn solid" data-ai="use">✅ Usar estas preguntas</button>'}<button type="button" class="btn ghost" data-ai="gen">🔁 Crear otras</button><button type="button" class="btn ghost" data-ai="cancel">Descartar</button></div>
 <p class="ai-note">${ctx === 'tk' ? 'Reemplazarán las preguntas del Exit ticket de esta sesión.' : ctx === 'vs' ? 'Se agregarán al banco de preguntas del VS.' : ''} Revísalas: la IA puede equivocarse.</p>` : ''}
 </div>`;
 }
@@ -3295,8 +3295,9 @@ st.loading = false; aiRedraw(ctx);
 return;
 }
 if(kind === 'use' && st.result) aiUse(ctx, st.result);
+if(kind === 'replace' && st.result && confirm(`¿Reemplazar TODAS las preguntas del VS (${VSBANK.length}) por estas ${st.result.length}?`)) aiUse(ctx, st.result, true);
 }
-function aiUse(ctx, qs){
+function aiUse(ctx, qs, replace){
 const st = aiState[ctx];
 if(ctx === 'tk' && editing && route.name === 'session'){
 const s = curUnit().sessions[route.n - 1];
@@ -3307,9 +3308,9 @@ toast('✅ Exit ticket listo con preguntas nuevas. Se publica solo ☁️');
 }
 else if(ctx === 'vs' && acct && acct.view === 'vs-edit'){
 (async () => {
-const res = await saveVsBank([...VSBANK, ...qs.map(q => ({ q: q.q, options: q.options.slice(), answer: q.answer, why: q.why }))].slice(0, VS_MAX));
+const res = await saveVsBank([...(replace ? [] : VSBANK), ...qs.map(q => ({ q: q.q, options: q.options.slice(), answer: q.answer, why: q.why }))].slice(0, VS_MAX));
 if(res !== 'ok'){ acct.err = saveErr(res); }
-else { acct.info = `✨ Se agregaron ${qs.length} preguntas al VS.`; st.result = null; }
+else { acct.info = replace ? `✨ Listo: el VS ahora tiene estas ${qs.length} preguntas.` : `✨ Se agregaron ${qs.length} preguntas al VS.`; st.result = null; }
 renderVsEditor();
 })();
 }
@@ -5379,7 +5380,7 @@ if(acct.mode === 'list'){
 tkBody.innerHTML = `<div class="tk-step">
 ${sayRow(list.length >= DUEL_Q ? `¡Tienes ${list.length} preguntas! En cada duelo elijo 5 al azar y los dos rivales reciben las mismas ⚔️` : 'Aquí armas el banco de preguntas del VS ⚔️ Mientras tenga menos de 5, uso las preguntas de los Exit tickets.')}
 ${msgs}
-<div class="tk-actions" style="margin-bottom:12px">${list.length < VS_MAX ? '<button type="button" class="btn solid" data-vsq="new">➕ Nueva pregunta</button>' : ''}<button type="button" class="btn ghost" data-vsq="import">📥 Traer las de los Exit tickets</button></div>
+<div class="tk-actions" style="margin-bottom:12px">${list.length < VS_MAX ? '<button type="button" class="btn solid" data-vsq="new">➕ Nueva pregunta</button>' : ''}<button type="button" class="btn ghost" data-vsq="import">📥 Traer las de los Exit tickets</button>${list.length ? '<button type="button" class="btn ghost" data-vsq="clear">🗑 Borrar todas</button>' : ''}</div>
 ${list.length < VS_MAX ? aiBoxHTML('vs') : ''}
 ${list.length ? `<div class="pr-list">${list.map((q, i) => `<div class="pr-card"><span class="pr-n">${i + 1}</span>
 <div class="pr-txt"><b>${esc(q.q)}</b><small>✅ ${esc(q.options[q.answer] || '')}</small></div>
@@ -5426,6 +5427,11 @@ acct.err = ''; acct.info = '';
 if(kind === 'new'){ acct.mode = 'form'; acct.idx = -1; acct.draft = blankVsQ(); }
 else if(kind === 'edit'){ acct.mode = 'form'; acct.idx = +i; acct.draft = JSON.parse(JSON.stringify(VSBANK[+i])); while(acct.draft.options.length < 4) acct.draft.options.push(''); }
 else if(kind === 'list'){ acct.mode = 'list'; acct.draft = null; }
+else if(kind === 'clear'){
+if(!VSBANK.length || !confirm(`¿Borrar las ${VSBANK.length} preguntas del VS? Mientras no haya 5, los duelos usan las de los Exit tickets.`)) return;
+const res = await saveVsBank([]); acct.info = res === 'ok' ? '🗑 Se borraron todas las preguntas del VS.' : ''; if(res !== 'ok') acct.err = saveErr(res);
+return renderVsEditor();
+}
 else if(kind === 'del'){
 const q = VSBANK[+i];
 if(!q || !confirm(`¿Eliminar esta pregunta del VS?\n\n${q.q}`)) return;

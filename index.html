@@ -4578,6 +4578,7 @@ W: 96, H: 90, fid: [[5, 5], [91, 5], [5, 85], [91, 85]],
 code: { y: 85, x0: 17, dx: 5, n: 13, s: 3.4 },
 dni: { x0: 9.5, dx: 5.6, y0: 25.5, dy: 5.6, r: 2.2 },
 ans: { x0: 63.5, dx: 7.6, y0: 27, dy: 6.8, r: 2.6, max: 8 },
+cls: { x0: 63.5, dx: 7.6, y: 72.4, r: 2.6, max: 6, k: ['AD', 'A', 'B', 'C'] },   // «Trabajo en clase» (lo pinta el docente)
 paper: [[53, 30], [53, 50], [53, 70], [75, 80.3]]
 };
 function omrBits(unitNum, n){
@@ -4610,7 +4611,15 @@ L.push({ t: 'rect', x: x - 2.4, y: 16.6, w: 4.8, h: 4.8, stroke: '#999999', lw: 
 for(let r = 0; r < 10; r++){ const y = D.y0 + r * D.dy; L.push({ t: 'circle', x, y, r: D.r, stroke: '#333333', lw: .24 }, { t: 'text', x, y: y + .85, s: String(r), size: 2.4, color: '#a9b1bf', align: 'center' }); }
 }
 const maxO = Math.max(2, ...qs.map(q => q.opts.length));
-L.push({ t: 'text', x: A.x0 + (maxO - 1) * A.dx / 2, y: 15.2, s: 'Respuestas', size: 2.8, bold: true, align: 'center' });
+L.push({ t: 'text', x: A.x0 + (maxO - 1) * A.dx / 2, y: 15.2, s: 'Exit ticket', size: 2.8, bold: true, align: 'center' });
+L.push({ t: 'text', x: A.x0 + (maxO - 1) * A.dx / 2, y: 18.5, s: '(lo llena el estudiante)', size: 1.75, color: '#555555', align: 'center' });
+if(qs.length <= OMR.cls.max && !isExtra(u)){
+const K = OMR.cls, bx = 56.2, by = 64.2, bw = 37, bh = 14, dash = { stroke: '#111111', lw: .3, dash: .8 };
+[[bx, by, bx + bw, by], [bx, by + bh, bx + bw, by + bh], [bx, by, bx, by + bh], [bx + bw, by, bx + bw, by + bh]].forEach(([x1, y1, x2, y2]) => L.push({ t: 'line', x1, y1, x2, y2, ...dash }));
+L.push({ t: 'text', x: bx + bw / 2, y: by + 3.4, s: 'Trabajo en clase', size: 2.5, bold: true, align: 'center' });
+K.k.forEach((l, k) => L.push({ t: 'circle', x: K.x0 + k * K.dx, y: K.y, r: K.r, stroke: '#333333', lw: .24 }, { t: 'text', x: K.x0 + k * K.dx, y: K.y + .85, s: l, size: l.length > 1 ? 2.1 : 2.6, color: '#a9b1bf', align: 'center' }));
+L.push({ t: 'text', x: bx + bw / 2, y: by + bh - .9, s: '(lo llena el docente)', size: 1.7, color: '#555555', align: 'center' });
+}
 for(let k = 0; k < maxO; k++) L.push({ t: 'text', x: A.x0 + k * A.dx, y: 21.6, s: LETTERS[k], size: 2.6, bold: true, color: '#555555', align: 'center' });
 qs.forEach((q, i) => {
 const y = A.y0 + i * A.dy;
@@ -4622,7 +4631,8 @@ bits.forEach((b, i) => { const x = C.x0 + i * C.dx - C.s / 2, y = C.y - C.s / 2;
 return L;
 }
 function omrCardSVG(u, n, s){
-const t = omrLayout(u, n, s).map(e => e.t === 'rect' ? `<rect x="${e.x}" y="${e.y}" width="${e.w}" height="${e.h}" fill="${e.fill || 'none'}"${e.stroke ? ` stroke="${e.stroke}" stroke-width="${e.lw}"` : ''}/>`
+const t = omrLayout(u, n, s).map(e => e.t === 'line' ? `<line x1="${e.x1}" y1="${e.y1}" x2="${e.x2}" y2="${e.y2}" stroke="${e.stroke}" stroke-width="${e.lw}"${e.dash ? ` stroke-dasharray="${e.dash}"` : ''}/>`
+: e.t === 'rect' ? `<rect x="${e.x}" y="${e.y}" width="${e.w}" height="${e.h}" fill="${e.fill || 'none'}"${e.stroke ? ` stroke="${e.stroke}" stroke-width="${e.lw}"` : ''}/>`
 : e.t === 'circle' ? `<circle cx="${e.x}" cy="${e.y}" r="${e.r}" fill="${e.fill || 'none'}" stroke="${e.stroke}" stroke-width="${e.lw}"/>`
 : `<text x="${e.x}" y="${e.y}" font-size="${e.size}"${e.bold ? ' font-weight="700"' : ''} fill="${e.color || '#111'}"${e.align === 'center' ? ' text-anchor="middle"' : ''}>${esc(e.s)}</text>`);
 return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 90" width="96mm" height="90mm" font-family="Arial, Helvetica, sans-serif">${t.join('')}</svg>`;
@@ -4643,14 +4653,30 @@ return '(' + o + ')';
 }
 const pdfN = v => (Math.round(v * 100) / 100).toString();
 const pdfRGB = hex => { const h = hex.replace('#', ''), f = h.length === 3 ? h.split('').map(c => c + c).join('') : h; return [0, 2, 4].map(i => pdfN(parseInt(f.slice(i, i + 2), 16) / 255)).join(' '); };
-function pdfPage(){
-const ops = [], X = x => pdfN(x * PT), Y = y => pdfN((PDF_H - y) * PT);
+function pdfPage(w = 210, h = PDF_H){   // tamaño en mm (A4 vertical por defecto; 297 × 210 = horizontal)
+const ops = [], X = x => pdfN(x * PT), Y = y => pdfN((h - y) * PT);
 const P = {
-ops,
+ops, w, h,
 rect(x, y, w, h, o = {}){ ops.push(`q ${o.fill ? pdfRGB(o.fill) + ' rg ' : ''}${o.stroke ? pdfRGB(o.stroke) + ' RG ' + pdfN((o.lw || .2) * PT) + ' w ' : ''}${X(x)} ${Y(y + h)} ${pdfN(w * PT)} ${pdfN(h * PT)} re ${o.fill && o.stroke ? 'B' : o.fill ? 'f' : 'S'} Q`); },
 circle(cx, cy, r, o = {}){
 const k = .5523 * r, p = (a, b) => `${X(a)} ${Y(b)}`;
 ops.push(`q ${o.fill ? pdfRGB(o.fill) + ' rg ' : ''}${pdfRGB(o.stroke || '#333333')} RG ${pdfN((o.lw || .22) * PT)} w ${p(cx + r, cy)} m ${p(cx + r, cy - k)} ${p(cx + k, cy - r)} ${p(cx, cy - r)} c ${p(cx - k, cy - r)} ${p(cx - r, cy - k)} ${p(cx - r, cy)} c ${p(cx - r, cy + k)} ${p(cx - k, cy + r)} ${p(cx, cy + r)} c ${p(cx + k, cy + r)} ${p(cx + r, cy + k)} ${p(cx + r, cy)} c ${o.fill ? 'b' : 's'} Q`);
+},
+path(d, ox, oy, k, o = {}){
+const tk = d.match(/[MLHVQZ]|-?[\d.]+/g) || [], out = [];
+let i = 0, cmd = '', cx = 0, cy = 0;
+const num = () => +tk[i++], pt = (x, y) => `${X(ox + x * k)} ${Y(oy + y * k)}`;
+while(i < tk.length){
+if(/[A-Z]/.test(tk[i])) cmd = tk[i++];
+if(cmd === 'M'){ cx = num(); cy = num(); out.push(pt(cx, cy) + ' m'); cmd = 'L'; }
+else if(cmd === 'L'){ cx = num(); cy = num(); out.push(pt(cx, cy) + ' l'); }
+else if(cmd === 'H'){ cx = num(); out.push(pt(cx, cy) + ' l'); }
+else if(cmd === 'V'){ cy = num(); out.push(pt(cx, cy) + ' l'); }
+else if(cmd === 'Q'){ const qx = num(), qy = num(), x = num(), y = num(); out.push(`${pt(cx + 2 / 3 * (qx - cx), cy + 2 / 3 * (qy - cy))} ${pt(x + 2 / 3 * (qx - x), y + 2 / 3 * (qy - y))} ${pt(x, y)} c`); cx = x; cy = y; }
+else if(cmd === 'Z'){ out.push('h'); cmd = ''; }
+else i++;
+}
+ops.push(`q ${pdfRGB(o.stroke || '#111111')} RG ${pdfN((o.lw || .3) * PT)} w 1 J 1 j ${out.join(' ')} S Q`);
 },
 line(x1, y1, x2, y2, o = {}){ ops.push(`q ${pdfRGB(o.stroke || '#777777')} RG ${pdfN((o.lw || .2) * PT)} w ${o.dash ? `[${pdfN(o.dash * PT)} ${pdfN(o.dash * PT)}] 0 d ` : ''}${X(x1)} ${Y(y1)} m ${X(x2)} ${Y(y2)} l S Q`); },
 text(x, y, s, o = {}){      // y = línea base, tamaño en mm
@@ -4668,7 +4694,7 @@ const kids = [];
 pages.forEach(p => {
 const body = p.ops.join('\n');
 objs.push(`<< /Length ${body.length} >>\nstream\n${body}\nendstream`);
-objs.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pdfN(210 * PT)} ${pdfN(297 * PT)}] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${objs.length} 0 R >>`);
+objs.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pdfN((p.w || 210) * PT)} ${pdfN((p.h || 297) * PT)}] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${objs.length} 0 R >>`);
 kids.push(`${objs.length} 0 R`);
 });
 objs[1] = `<< /Type /Pages /Kids [${kids.join(' ')}] /Count ${kids.length} >>`;
@@ -4681,7 +4707,7 @@ for(let i = 0; i < out.length; i++) bytes[i] = out.charCodeAt(i) & 255;
 return bytes;
 }
 function pdfCard(P, ox, oy, u, n, s){
-omrLayout(u, n, s).forEach(e => e.t === 'rect' ? P.rect(ox + e.x, oy + e.y, e.w, e.h, e) : e.t === 'circle' ? P.circle(ox + e.x, oy + e.y, e.r, e) : P.text(ox + e.x, oy + e.y, e.s, e));
+omrLayout(u, n, s).forEach(e => e.t === 'line' ? P.line(ox + e.x1, oy + e.y1, ox + e.x2, oy + e.y2, e) : e.t === 'rect' ? P.rect(ox + e.x, oy + e.y, e.w, e.h, e) : e.t === 'circle' ? P.circle(ox + e.x, oy + e.y, e.r, e) : P.text(ox + e.x, oy + e.y, e.s, e));
 }
 function pdfWrap(txt, mm, bold, maxW){
 const words = pdfClean(txt).split(/\s+/).filter(Boolean), lines = [];
@@ -4709,23 +4735,37 @@ yy = line + 1.8 * f;
 });
 return yy - y;
 }
-const OMR_POS = [];
-for(let r = 0; r < 3; r++) for(let c = 0; c < 2; c++) OMR_POS.push([7 + c * 100, 9.5 + r * 94]);
+const OMR_PW = 297, OMR_PH = 210, OMR_CW = OMR_PW / 2, OMR_CH = OMR_PH / 2, OMR_POS = [];
+for(let r = 0; r < 2; r++) for(let c = 0; c < 2; c++) OMR_POS.push([c * OMR_CW + 5, r * OMR_CH + (OMR_CH - OMR.H) / 2]);
+function pdfMoliNote(P, x, y, msg){
+const w = 38, k = .3;
+MOLI_LINES.forEach(d => P.path(d, x + (w - 100 * k) / 2, y, k, { lw: .35 }));
+P.text(x + w / 2, y + 100 * k + 2.2, 'Moli', { size: 3.2, bold: true, align: 'center' });
+const ls = pdfWrap(msg, 3.3, true, w - 6), bt = y + 100 * k + 6.5, bh = ls.length * 4.6 + 6;
+P.rect(x, bt, w, bh, { stroke: '#111111', lw: .35 });
+P.line(x + w / 2 - 3, bt, x + w / 2, bt - 3.2, { stroke: '#111111', lw: .35 }); P.line(x + w / 2, bt - 3.2, x + w / 2 + 3, bt, { stroke: '#111111', lw: .35 });
+P.line(x + w / 2 - 2.7, bt, x + w / 2 + 2.7, bt, { stroke: '#ffffff', lw: .6 });
+ls.forEach((l, i) => P.text(x + w / 2, bt + 5.8 + i * 4.6, l, { size: 3.3, bold: true, align: 'center' }));
+}
 function omrPDF(u, n){
-const s = u.sessions[n - 1], p1 = pdfPage(), p2 = pdfPage();
-const bw = 88, bh = 82;
+const s = u.sessions[n - 1], p1 = pdfPage(OMR_PW, OMR_PH), p2 = pdfPage(OMR_PW, OMR_PH);
+const bw = OMR_CW - 16, bh = OMR_CH - 14;
 let f = 1;
 while(f > .6 && pdfQuestions(p2, 0, 0, bw, u, n, s, false, f) > bh) f -= .05;
-const cuts = P => { P.line(105, 4, 105, 293, { stroke: '#b5bccb', lw: .25, dash: 1.6 }); [101.5, 195.5].forEach(y => P.line(4, y, 206, y, { stroke: '#b5bccb', lw: .25, dash: 1.6 })); };
+const cuts = P => { P.line(OMR_CW, 4, OMR_CW, OMR_PH - 4, { stroke: '#b5bccb', lw: .25, dash: 1.6 }); P.line(4, OMR_CH, OMR_PW - 4, OMR_CH, { stroke: '#b5bccb', lw: .25, dash: 1.6 }); };
 cuts(p1);
 const back = pdfQuestions(p2, 0, 0, bw, u, n, s, false, f) <= bh;
-OMR_POS.forEach(([x, y]) => pdfCard(p1, x, y, u, n, s));
-if(back){ OMR_POS.forEach(([x, y]) => pdfQuestions(p2, x + 4, y + 4, bw, u, n, s, true, f)); cuts(p2); }
+const two = omrQs(s).length <= OMR.cls.max && !isExtra(u);
+const note = two ? '¡Hoy te llevarás dos notas: tu Exit ticket y tu trabajo en clase! Revisa «Mis notas» en la aplicación.'
+: isExtra(u) ? '¡Pinta bien cada círculo! Tu profe verá tu resultado en la aplicación.' : 'Revisa tu nota en «Mis notas» en la aplicación.';
+OMR_POS.forEach(([x, y]) => { pdfCard(p1, x, y, u, n, s); pdfMoliNote(p1, x + OMR.W + 4.5, y + 6, note); });
+if(back) OMR_POS.forEach(([x, y]) => { const cx = x - 5, cy = y - (OMR_CH - OMR.H) / 2; pdfQuestions(p2, cx + 8, cy + 7, bw, u, n, s, true, f); }), cuts(p2);
 else {
+const hw = OMR_CW - 20, hh = OMR_PH - 22;
 let g = 1;
-while(g > .6 && pdfQuestions(p2, 0, 0, 182, u, n, s, false, g) > 128) g -= .05;
-if(pdfQuestions(p2, 0, 0, 182, u, n, s, false, g) <= 128){ pdfQuestions(p2, 14, 10, 182, u, n, s, true, g); pdfQuestions(p2, 14, 158.5, 182, u, n, s, true, g); p2.line(4, 148.5, 206, 148.5, { stroke: '#b5bccb', lw: .25, dash: 1.6 }); }
-else { g = 1; while(g > .6 && pdfQuestions(p2, 0, 0, 182, u, n, s, false, g) > 272) g -= .05; pdfQuestions(p2, 14, 12, 182, u, n, s, true, g); }
+while(g > .6 && pdfQuestions(p2, 0, 0, hw, u, n, s, false, g) > hh) g -= .05;
+if(pdfQuestions(p2, 0, 0, hw, u, n, s, false, g) <= hh){ pdfQuestions(p2, 10, 11, hw, u, n, s, true, g); pdfQuestions(p2, OMR_CW + 10, 11, hw, u, n, s, true, g); p2.line(OMR_CW, 4, OMR_CW, OMR_PH - 4, { stroke: '#b5bccb', lw: .25, dash: 1.6 }); }
+else { g = 1; while(g > .6 && pdfQuestions(p2, 0, 0, OMR_PW - 28, u, n, s, false, g) > hh) g -= .05; pdfQuestions(p2, 14, 11, OMR_PW - 28, u, n, s, true, g); }
 }
 omrPDF.back = back;
 return pdfBuild([p1, p2]);
@@ -4738,7 +4778,7 @@ const url = URL.createObjectURL(new Blob([omrPDF(u, n)], { type: 'application/pd
 download(url, `exit-ticket-unidad${u.num}-sesion${n}.pdf`);
 setTimeout(() => URL.revokeObjectURL(url), 60000);
 toast(playable(s).length > OMR.ans.max ? `📄 PDF descargado. La tarjeta tiene espacio para ${OMR.ans.max} preguntas: se imprimen las primeras ${OMR.ans.max}.`
-: omrPDF.back ? '📄 PDF descargado: imprímelo en A4 a doble cara (tamaño real). Las preguntas quedan atrás de cada tarjeta.'
+: omrPDF.back ? '📄 PDF descargado: imprímelo en A4 horizontal a doble cara (tamaño real). Van 4 tarjetas y las preguntas quedan atrás de cada una.'
 : '📄 PDF descargado. Las preguntas son largas para ir atrás de cada tarjeta: van en la hoja 2 para proyectar o repartir.');
 }
 function omrSolve(A, b){
@@ -4844,7 +4884,9 @@ const vals = Array.from({ length: no }, (_, k) => disk(A.x0 + k * A.dx, A.y0 + i
 const ref = Math.max(...vals, paper * .9);
 return pickOne(vals, ref);
 });
-return { code, dni, marks, map };
+const K = OMR.cls, gv = nq && nq.length <= K.max ? K.k.map((_, k) => disk(K.x0 + k * K.dx, K.y, K.r * .6)) : null;
+const grade = gv ? pickOne(gv, Math.max(...gv, paper * .9)) : -1;
+return { code, dni, marks, grade, map };
 };
 return tryRead(pts) || tryRead([pts[3], pts[2], pts[1], pts[0]]);   // tarjeta al revés
 }
@@ -4972,6 +5014,7 @@ g.fillStyle = 'rgba(34,197,94,.75)';
 const dot = (x, y) => { const [px, py] = res.map(x, y); g.beginPath(); g.arc(px, py, W / 160, 0, 7); g.fill(); };
 res.dni.forEach((dg, col) => dg >= 0 && dot(OMR.dni.x0 + col * OMR.dni.dx, OMR.dni.y0 + dg * OMR.dni.dy));
 res.marks.forEach((k, i) => k >= 0 && dot(OMR.ans.x0 + k * OMR.ans.dx, OMR.ans.y0 + i * OMR.ans.dy));
+if(res.grade >= 0) dot(OMR.cls.x0 + res.grade * OMR.cls.dx, OMR.cls.y);
 }
 }
 function scanSay(msg){ const m = $('#scanMsg', tkBody); if(m && m.textContent !== msg) m.textContent = msg; if(scan) scan.msg = msg; }
@@ -4983,7 +5026,7 @@ const x = omrSession(res.code);
 if(!x){ s.prev = ''; return scanSay(`La Unidad ${res.code.num} · Sesión ${res.code.n} no tiene Exit ticket`); }
 const bad = res.dni.findIndex(d => d < 0);
 if(bad >= 0){ s.prev = ''; return scanSay(res.dni[bad] === -2 ? `DNI: la columna ${bad + 1} tiene dos números pintados` : `DNI: falta pintar la columna ${bad + 1}`); }
-const key = `${res.code.num}|${res.code.n}|${res.dni.join('')}|${res.marks.join(',')}`;
+const key = `${res.code.num}|${res.code.n}|${res.dni.join('')}|${res.marks.join(',')}|${res.grade}`;
 if(key !== s.prev){ s.prev = key; return scanSay('Leyendo… no muevas la tarjeta'); }   // dos lecturas iguales seguidas
 s.prev = '';
 scanSave(res, x);
@@ -4991,7 +5034,7 @@ scanSave(res, x);
 async function scanSave(res, x){
 const s = scan;
 const dni = res.dni.join('');
-if(s.list.some(r => r.dni === dni && r.sk === `${x.u.key}|${x.n}`)){ scanSay('Esta tarjeta ya se guardó ✅ Pasa a la siguiente'); return; }
+if(s.list.some(r => r.dni === dni && r.sk === `${x.u.key}|${x.n}` && r.grade === res.grade)){ scanSay('Esta tarjeta ya se guardó ✅ Pasa a la siguiente'); return; }
 s.busy = true;
 scanSay('Guardando…');
 const st = (s.roster || []).find(r => r.dni === dni);
@@ -5011,14 +5054,28 @@ const score = answers.filter(Boolean).length, total = qs.length;
 const marks = qs.map((_, i) => res.marks[i] >= 0 ? LETTERS[res.marks[i]] : res.marks[i] === -2 ? '*' : '-').join('');
 const c = await fbConfig();
 const rec = { id: resultId(x.u.key, x.n, st.id), key: st.id, dni, unit: x.u.key, unitNum: x.u.num, n: x.n, section: st.section, name: st.name, score, total, answers, at: Date.now() };
-const base = { name: st.name, dni, sk: `${x.u.key}|${x.n}` };
+const base = { name: st.name, dni, sk: `${x.u.key}|${x.n}`, grade: res.grade };
+let cls = '';
+if(!isExtra(x.u) && x.n + RG_AULA < RG_PROD){
+if(res.grade === -2) cls = ' · ⚠️ Trabajo en clase: hay dos notas pintadas (no se guardó)';
+else if(res.grade >= 0){
+const k = OMR.cls.k[res.grade], sc = RG_K[k], cid = resultId(x.u.key, RG_AULA + x.n, st.id);
+try{
+const tok = await idToken(c);
+const d = await fetch(`${docsBase(c)}/exitTickets/${cid}?key=${c.apiKey}`, { method:'DELETE', headers:{ Authorization: 'Bearer ' + tok } });
+if(!d.ok && d.status !== 404) throw new Error('DEL');
+const cr = await cloudSubmit(c, { id: cid, key: st.id, dni, unit: x.u.key, unitNum: x.u.num, n: RG_AULA + x.n, section: st.section, name: st.name, score: sc, total: 4, answers: [0, 1, 2, 3].map(i => i < sc), at: Date.now() });
+cls = cr === 'ok' ? ` · Clase: ${k}` : ' · ⚠️ No se pudo guardar la nota de clase';
+}catch(e){ cls = ' · ⚠️ No se pudo guardar la nota de clase'; }
+}
+}
 let r;
 try{ r = await cloudSubmit(c, rec); }
 catch(e){ return finish({ kind: 'warn', ...base, info: e.message === 'PERMISSION_DENIED' ? '🔧 No se pudo guardar (revisa las reglas).' : '📶 No se pudo guardar. Revisa tu internet y vuelve a pasar la tarjeta.' }, 3000); }
 if(r === 'dup'){
 let old = null;
 try{ const g = await fetch(`${docsBase(c)}/exitTickets/${rec.id}?key=${c.apiKey}`); if(g.ok) old = fromDoc(await g.json()); }catch(e){}
-return finish({ kind: 'dup', ...base, info: `${GRADE} ${st.section} · U${x.u.num} S${x.n} · ya tenía este Exit ticket (no se cambió)`, score: old ? `${old.score}/${old.total}` : '' });
+return finish({ kind: 'dup', ...base, info: `${GRADE} ${st.section} · U${x.u.num} S${x.n} · ya tenía este Exit ticket (no se cambió)${cls}`, score: old ? `${old.score}/${old.total}` : '' });
 }
 const item = { id: mid(), kind: 'paper', unit: x.u.key, n: x.n, score, total, marks, at: Date.now(),
 title: '🎉 ¡Felicidades! Hiciste tu Exit ticket en físico', msg: `${isExtra(x.u) ? sName(x.u, x.n) : `Unidad ${x.u.num} · Sesión ${x.n}`}: obtuviste ${score} de ${total} ${total === 1 ? 'punto' : 'puntos'}.` };
@@ -5029,7 +5086,7 @@ const writes = tok && await mailWrites(c, tok, [[st.id, [item]]]);
 const m = writes && await fetch(`${docsBase(c)}:commit?key=${c.apiKey}`, { method:'POST', headers:{ 'Content-Type':'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify({ writes }) });
 mailed = !!(m && m.ok);
 }catch(e){}
-finish({ kind: 'ok', ...base, info: `${GRADE} ${st.section} · U${x.u.num} S${x.n} · ${mailed ? 'mensaje enviado a su 📥 Bandeja' : 'guardado (no se pudo enviar el mensaje)'}`, score: `${score}/${total}` });
+finish({ kind: 'ok', ...base, info: `${GRADE} ${st.section} · U${x.u.num} S${x.n} · ${mailed ? 'mensaje enviado a su 📥 Bandeja' : 'guardado (no se pudo enviar el mensaje)'}${cls}`, score: `${score}/${total}` });
 }
 function renderScanList(){
 const s = scan, old = $('.scan-list', tkBody), html = s.list.length ? `<div class="scan-list"><b>Guardadas ahora</b>${s.list.map(r => `<div class="sl-row ${r.kind}"><span>${r.kind === 'ok' ? '✅' : '📌'}</span><div><b>${esc(r.name)}</b><small>${esc(r.info)}</small></div><em>${esc(r.score || '')}</em></div>`).join('')}</div>` : '';

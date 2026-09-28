@@ -255,6 +255,37 @@ service cloud.firestore {
         && request.resource.data.status in ['ok', 'no'];
     }
 
+    // 📦 Caja de actividades (sesiones adicionales): cada estudiante sube su trabajo de cada actividad.
+    // «tasks» guarda los datos (id = extra-s<sesión>-a<actividad>-<cuenta>); «taskFiles» el archivo en trozos.
+    match /tasks/{id} {
+      allow get: if id.matches('extra-s[0-9]{1,2}-a[0-9]{1,2}-k[0-9a-f]{20}') || isTeacher();
+      allow list, delete: if isTeacher();
+      allow create, update: if id.matches('extra-s[0-9]{1,2}-a[0-9]{1,2}-k[0-9a-f]{20}')
+        && request.resource.data.keys().hasOnly(['session', 'act', 'student', 'n', 'sec', 'dni', 'fname', 'ftype', 'size', 'parts', 'at'])
+        && request.resource.data.keys().hasAll(['session', 'act', 'student', 'n', 'sec', 'dni', 'fname', 'ftype', 'size', 'parts', 'at'])
+        && request.resource.data.session is int && request.resource.data.session >= 1 && request.resource.data.session <= 50
+        && request.resource.data.act is int && request.resource.data.act >= 1 && request.resource.data.act <= 20
+        && request.resource.data.student is string && request.resource.data.student.matches('k[0-9a-f]{20}')
+        && id == 'extra-s' + string(request.resource.data.session) + '-a' + string(request.resource.data.act) + '-' + request.resource.data.student
+        && request.resource.data.n is string && request.resource.data.n.size() > 0 && request.resource.data.n.size() <= 60
+        && request.resource.data.fname is string && request.resource.data.fname.size() > 0 && request.resource.data.fname.size() <= 80
+        && request.resource.data.ftype is string && request.resource.data.ftype.size() <= 100
+        && request.resource.data.size is int && request.resource.data.size >= 0 && request.resource.data.size <= 8000000
+        && request.resource.data.parts is int && request.resource.data.parts >= 1 && request.resource.data.parts <= 6
+        && request.resource.data.at is timestamp
+        && get(/databases/$(database)/documents/students/$(request.resource.data.student)).data.dni == request.resource.data.dni
+        && get(/databases/$(database)/documents/students/$(request.resource.data.student)).data.section == request.resource.data.sec;
+    }
+    match /taskFiles/{id} {
+      allow get: if id.matches('extra-s[0-9]{1,2}-a[0-9]{1,2}-k[0-9a-f]{20}-[0-9]') || isTeacher();
+      allow list, delete: if isTeacher();
+      allow create, update: if id.matches('extra-s[0-9]{1,2}-a[0-9]{1,2}-k[0-9a-f]{20}-[0-5]')
+        && exists(/databases/$(database)/documents/students/$(id.split('-')[3]))
+        && request.resource.data.keys().hasOnly(['b64', 'at'])
+        && request.resource.data.b64 is string && request.resource.data.b64.size() <= 900000
+        && request.resource.data.at is timestamp;
+    }
+
     // Fichas que sube la docente, partidas en trozos de hasta 900 000 caracteres (base64).
     match /files/{id} {
       allow get: if true;

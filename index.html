@@ -3191,22 +3191,31 @@ aiAction(b.dataset.ai, box);
 /* ---------- 📄 Moli crea la ficha de una actividad: el MATERIAL que la actividad pide (casos, fichas, noticia, texto…) ---------- */
 const FICHA_SCHEMA = { type:'OBJECT', required:['title', 'subtitle', 'reading', 'blocks', 'sources', 'tasks'], properties:{ title:{ type:'STRING' }, subtitle:{ type:'STRING' }, reading:{ type:'STRING' },
 blocks:{ type:'ARRAY', items:{ type:'OBJECT', required:['heading', 'text'], properties:{ heading:{ type:'STRING' }, text:{ type:'STRING' } } } },
-sources:{ type:'ARRAY', items:{ type:'STRING' } }, tasks:{ type:'ARRAY', items:{ type:'STRING' } } } };
+sources:{ type:'ARRAY', items:{ type:'STRING' } },
+tasks:{ type:'ARRAY', items:{ type:'OBJECT', required:['q'], properties:{ q:{ type:'STRING' }, help:{ type:'STRING' }, frame:{ type:'STRING' }, cols:{ type:'ARRAY', items:{ type:'STRING' } } } } } } };
 const FICHA_RULES = `CÓMO CREAR LA FICHA (síguelo en orden):
 PASO 1. Lee el TÍTULO y la DESCRIPCIÓN de la actividad y decide: ¿qué material van a leer, observar o analizar las y los estudiantes en ESA actividad?
-PASO 2. La ficha ES ese material. Ejemplos: si la actividad dice «casos prácticos», la ficha trae 3 o 4 casos prácticos; si dice «fichas médicas», trae fichas médicas de pacientes (nombre inventado, edad, síntomas, causa, si se contagia); si dice «noticia», trae la noticia; si dice «experimento», trae el procedimiento; si dice «datos» o «tabla», trae los datos; si solo pide «información», trae el texto informativo. Nunca entregues un texto general que no sirva para hacer la actividad.
+Es para niñas y niños de 5.° y 6.° grado de primaria (10 a 12 años): todo en su lenguaje.
+PASO 2. La ficha ES ese material y RESPETA LA CANTIDAD que dice la actividad: si dice «un caso», «una noticia», «una ficha médica», trae SOLO UNO (más completo y con más datos); si dice «casos» sin número, 2 o 3; si da un número, ese número. Ejemplos: si la actividad dice «analizamos casos prácticos», la ficha trae casos prácticos; si dice «fichas médicas», trae fichas médicas de pacientes (nombre inventado, edad, síntomas, causa, si se contagia); si dice «noticia», trae la noticia; si dice «experimento», trae el procedimiento; si dice «datos» o «tabla», trae los datos; si solo pide «información», trae el texto informativo. Nunca entregues un texto general que no sirva para hacer la actividad.
 Campos:
 - "title": el TEMA de la meta en MAYÚSCULAS (sin el verbo). Ej.: meta «Explica las transformaciones de la energía» → «LAS TRANSFORMACIONES DE LA ENERGÍA».
 - "subtitle": el nombre del material según la actividad (ej.: «Casos prácticos para analizar», «Fichas médicas de pacientes»), sin el número de actividad.
 - "reading": una introducción informativa (el largo lo indica EXTENSIÓN) que dé contexto real del tema (por ejemplo un dato o recomendación de la OMS, del MINEDU u otra institución, si viene al caso) y prepare para la actividad. REQUISITO: incluye CITAS con autor y año (al menos 1; puedes usar varias en la introducción y en los bloques), de cualquier autor o institución confiable, escritas de forma sencilla para niñas y niños de 6.° grado (por ejemplo «Según Pérez (2021), …» o «… (OMS, 2023).»).
-- "blocks": el material de la actividad, bien desarrollado y con el ENFOQUE PUESTO EN LO QUE LA ACTIVIDAD PIDE HACER; "heading" es su nombre (ej.: «Caso 1: La linterna de Ana», «Ficha médica 2: Luis, 11 años») y "text" su contenido (el largo total lo indica EXTENSIÓN; con los datos que las y los estudiantes necesitan para responder). Adapta la cantidad a la actividad: si trabaja con casos, fichas o ejemplos para comparar, trae 3 o 4 (variados, para que la comparación sea rica); si el material es un solo texto, noticia o procedimiento, usa 1 o 2 bloques más completos.
+- "blocks": el material de la actividad, bien desarrollado y con el ENFOQUE PUESTO EN LO QUE LA ACTIVIDAD PIDE HACER; "heading" es su nombre (ej.: «Caso 1: La linterna de Ana», «Ficha médica 2: Luis, 11 años») y "text" su contenido (el largo total lo indica EXTENSIÓN; con los datos que las y los estudiantes necesitan para responder). Respeta la cantidad que pide la actividad (ver PASO 2): «un caso» = 1 solo bloque muy completo; varios casos para comparar = 2 a 4 variados; un texto, noticia o procedimiento = 1 o 2 bloques completos.
 - "sources": las referencias de todas las citas, con autor, año y título (sin enlaces).
-- "tasks": EXACTAMENTE 3 preguntas que piden hacer justo lo que dice la actividad con ese material (ej.: «En cada caso, ¿qué forma de energía se transforma en cuál?»).
+- "tasks": EXACTAMENTE 3 preguntas en el lenguaje de niñas y niños de 10 a 12 años, que piden hacer justo lo que dice la actividad (y lo que busca la meta) con ese material, de la más fácil a la más difícil. Cada pregunta lleva un ANDAMIO que ayude a responder, más fuerte cuanto más difícil sea lo que se pide:
+· "q": la pregunta, corta y clara. Sin palabras técnicas sin explicar: si usas una, explícala entre paréntesis (ej.: «variable (lo que cambia)», «hipótesis (lo que creo que pasará)»).
+· "help": una pista corta que oriente, empezando con «Pista:» (ej.: «Pista: fíjate qué hizo Mateo antes de enfermarse.»).
+· "frame": una frase para completar con espacios ________ cuando la tarea sea explicar, relacionar, concluir o formular (ej.: «Creo que la causa es ________ y por eso ________.», «¿Qué pasará con ________ si ________?»). Vacío ("") si no hace falta.
+· "cols": si conviene ordenar la respuesta en una tablita, 2 o 3 títulos cortos de columna (ej.: ["Posible causa", "Efecto en la salud"], ["Síntoma", "¿Cómo se contagió?"]). Lista vacía si no hace falta.
+Si la meta o la actividad pide formular una pregunta de indagación, guía paso a paso: 1) anotar posibles causas y sus efectos en una tablita, 2) elegir una causa que se pueda comprobar, 3) completar la plantilla «¿Qué pasará con ________ si ________?».
 - Español sencillo para 11 y 12 años; información científicamente correcta. Sin imágenes, nombre, fecha ni criterio de éxito.`;
 const fichaClean = f => {
 if(!f || typeof f !== 'object') return null;
 const blocks = (Array.isArray(f.blocks) ? f.blocks : []).map(b => ({ heading: clip(b && b.heading, 100), text: String((b && b.text) || '').trim().slice(0, 900) })).filter(b => b.text).slice(0, 5);
-const tasks = (Array.isArray(f.tasks) ? f.tasks : []).map(t => clip(t, 240)).filter(Boolean).slice(0, 3);
+const tasks = (Array.isArray(f.tasks) ? f.tasks : []).map(t => typeof t === 'string' ? { q: clip(t, 240), help: '', frame: '', cols: [] }
+: { q: clip(t && t.q, 240), help: clip(t && t.help, 200), frame: clip(t && t.frame, 200), cols: (Array.isArray(t && t.cols) ? t.cols : []).map(c => clip(c, 34)).filter(Boolean).slice(0, 3) })
+.map(t => ({ ...t, cols: t.cols.length >= 2 ? t.cols : [] })).filter(t => t.q).slice(0, 3);
 const sources = (Array.isArray(f.sources) ? f.sources : []).map(t => clip(t, 160)).filter(t => t && !/https?:|www\./i.test(t)).slice(0, 6);
 const out = { title: clip(f.title, 90).toUpperCase(), subtitle: clip(f.subtitle, 110), reading: String(f.reading || '').trim().slice(0, 1400), blocks, sources, tasks };
 return out.title && blocks.length && tasks.length ? out : null;
@@ -3289,20 +3298,34 @@ const QS = 12.5, QL = 17, PAD = 7, border = black;
 if(brk) newPage(); else need(40 + 30 + ans);
 y -= 10;
 pg.drawText('Actividades: Respondemos', { x: M, y, size: 14, font: B, color: black }); y -= 12;
+const HS = 11, HL = 14.5, CH = 17, CR = 3;
+const justify = (ws, last, font, size, x0, w) => { const wid = ws.reduce((a, x) => a + font.widthOfTextAtSize(x, size), 0), gap = !last && ws.length > 1 ? (w - wid) / (ws.length - 1) : font.widthOfTextAtSize(' ', size); let x = x0; ws.forEach(x1 => { pg.drawText(x1, { x, y, size, font, color: black }); x += font.widthOfTextAtSize(x1, size) + gap; }); };
 f.tasks.forEach((t, i) => {
-const ql = lines(`${i + 1}. ${t}`, B, QS, TW - 2 * PAD), qh = ql.length * QL + 2 * PAD - 4;
-if(y - (qh + ans) < M){ newPage(); }
+const w = TW - 2 * PAD, ql = lines(`${i + 1}. ${t.q}`, B, QS, w), hl = t.help ? lines(t.help, I, HS, w) : [], fl = t.frame ? lines(t.frame, I, 12, w) : [];
+const qh = ql.length * QL + hl.length * HL + 2 * PAD - 4, fh = fl.length ? fl.length * 17 + 8 : 0, th = t.cols.length ? CH + CR * 18 + 8 : 0, cell = ans + fh + th;
+if(y - (qh + cell) < M){ newPage(); }
 const top = y;
 pg.drawRectangle({ x: M, y: top - qh, width: TW, height: qh, borderColor: border, borderWidth: .8 });
 y = top - PAD - QS + 2;
-ql.forEach((ws, k) => { const last = k === ql.length - 1, w = TW - 2 * PAD, wid = ws.reduce((a, x) => a + B.widthOfTextAtSize(x, QS), 0), gap = !last && ws.length > 1 ? (w - wid) / (ws.length - 1) : B.widthOfTextAtSize(' ', QS);
-let x = M + PAD; ws.forEach(x1 => { pg.drawText(x1, { x, y, size: QS, font: B, color: black }); x += B.widthOfTextAtSize(x1, QS) + gap; }); y -= QL; });
-pg.drawRectangle({ x: M, y: top - qh - ans, width: TW, height: ans, borderColor: border, borderWidth: .8 });
-y = top - qh - ans;
+ql.forEach((ws, k) => { justify(ws, k === ql.length - 1, B, QS, M + PAD, w); y -= QL; });
+hl.forEach((ws, k) => { justify(ws, true, I, HS, M + PAD, w); y -= HL; });
+pg.drawRectangle({ x: M, y: top - qh - cell, width: TW, height: cell, borderColor: border, borderWidth: .8 });
+y = top - qh - PAD - 10;
+fl.forEach(ws => { justify(ws, true, I, 12, M + PAD, w); y -= 17; });
+if(t.cols.length){
+const tt = top - qh - PAD - fh, tw = TW - 2 * PAD, cw = tw / t.cols.length, tb = top - qh - cell + PAD, rh = (tt - CH - tb) / CR;
+pg.drawRectangle({ x: M + PAD, y: tb, width: tw, height: tt - tb, borderColor: border, borderWidth: .7 });
+pg.drawLine({ start: { x: M + PAD, y: tt - CH }, end: { x: M + PAD + tw, y: tt - CH }, thickness: .7, color: border });
+for(let r = 1; r < CR; r++) pg.drawLine({ start: { x: M + PAD, y: tt - CH - r * rh }, end: { x: M + PAD + tw, y: tt - CH - r * rh }, thickness: .4, color: border });
+t.cols.forEach((c, k) => { const cx = M + PAD + k * cw, tx = pdfTxt(c); if(k) pg.drawLine({ start: { x: cx, y: tt }, end: { x: cx, y: tb }, thickness: .7, color: border });
+pg.drawText(tx, { x: cx + (cw - B.widthOfTextAtSize(tx, 10.5)) / 2, y: tt - CH + 5, size: 10.5, font: B, color: black }); });
+}
+y = top - qh - cell;
 });
 return { pages, y };
 };
-const MIN = 48, MAX = 250, brk = want === 2 && render(MIN, false).pages === 1, pages = render(MIN, false, brk).pages;
+const MIN = 48, MAX = 250, one = render(MIN, false).pages === 1, brk = want === 2 && one && render(MAX, false).pages < 2;
+const pages = want === 2 && one && !brk ? 2 : render(MIN, false, brk).pages;
 let ans = MAX;
 if(render(MAX, false, brk).pages > pages){ let lo = MIN, hi = MAX; for(let k = 0; k < 14; k++){ const mid = (lo + hi) / 2; if(render(mid, false, brk).pages > pages) hi = mid; else lo = mid; } ans = Math.floor(lo) - 1; }
 render(ans, true, brk);
@@ -3322,7 +3345,7 @@ Descripción: «${clip(a.desc, 320)}»
 Contexto de la sesión: ${filled(meta) ? `meta «${clip(meta, 240)}»` : 'sin meta'}${crits.length ? `; criterios de éxito: ${crits.map(c => clip(c, 140)).join(' | ')}` : ''}.
 ${FICHA_RULES}`;
 const fichaGen = (meta, crits, a, i, pages = 1) => aiRequest(fichaPrompt(meta, crits, a, i) + `
-EXTENSIÓN: la ficha debe llenar ${pages === 2 ? 'DOS hojas A4 con letra 13: "reading" de 100 a 140 palabras y el material ("blocks") de 300 a 380 palabras en total (si la actividad es de casos o ejemplos, 4 bien desarrollados)' : 'UNA hoja A4 con letra 13: "reading" de 50 a 70 palabras y el material ("blocks") de 130 a 170 palabras en total (si la actividad es de casos o ejemplos, 2 o 3 breves)'}. Las 3 preguntas van al final en una tabla.`, FICHA_SCHEMA, d => fichaClean(d), { timeout: 60000, maxTokens: 4096 });
+EXTENSIÓN: la ficha debe llenar ${pages === 2 ? 'DOS hojas A4 con letra 13: "reading" de 100 a 140 palabras y el material ("blocks") de 300 a 380 palabras en total (si la actividad pide varios casos, hasta 4 bien desarrollados; si pide uno, uno solo muy completo)' : 'UNA hoja A4 con letra 13: "reading" de 50 a 70 palabras y el material ("blocks") de 130 a 170 palabras en total (si la actividad pide varios casos, 2 o 3 breves; si pide uno, uno solo completo)'}. Las 3 preguntas van al final en una tabla, cada una con su andamio.`, FICHA_SCHEMA, d => fichaClean(d), { timeout: 60000, maxTokens: 4096 });
 async function fichaForActivity(i, pages = 1){
 const s = curSession(), u = curUnit(), a = s && s.activities[i];
 if(!a || fgenBusy.has(i)) return;

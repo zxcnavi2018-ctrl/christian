@@ -58,6 +58,7 @@ table.chk td:not(:first-child),table.chk th:not(:first-child){{width:62px;text-a
 .grid{{height:230px;border:1px solid #000;background-image:linear-gradient(#bbb 1px,transparent 1px),linear-gradient(90deg,#bbb 1px,transparent 1px);background-size:14px 14px;margin:6px 0}}
 .lg{{margin-left:auto;display:flex;align-items:center;gap:5px;font-size:10pt}}.lg b.i{{font-weight:700}}.lg span{{letter-spacing:.02em}}
 .bank{{border:1px solid #000;border-radius:8px;padding:6px 10px;text-align:center}}.cards{{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:6px 0;break-inside:avoid}}.cards b{{grid-column:1/-1;font-weight:700}}.card{{border:1.2px dashed #000;border-radius:6px;padding:8px 6px;min-height:52px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:9pt}}.fig{{text-align:center;margin:4px 0}}.strip{{width:7cm;height:1.2cm;border:1.2px dashed #000;display:flex;align-items:center;justify-content:center;margin:6px 0}}
+.sab{{margin:8px 2px 0}}.sab h3{{margin:0 0 3px}}.sab ul{{margin:0;padding-left:18px}}.sab li{{margin:2px 0;font-size:9.6pt}}.moli{{vertical-align:middle;margin-right:6px}}.sopa{{width:auto;border-collapse:collapse;margin:4px auto}}.sopa td{{width:22px;height:22px!important;text-align:center;vertical-align:middle;border:.6px solid #000;font-size:10pt;padding:0}}.wb{{font-weight:400;border:1px solid #000;padding:1px 6px;border-radius:6px}}.sop{{break-inside:avoid}}.sab p{{font-size:9.8pt;line-height:1.4}}.vf{{list-style:none;padding-left:4px!important}}.vf li{{margin:5px 0}}.draw{{border:1px solid #000;border-radius:12px;margin-top:8px;padding:6px 10px;font-size:9pt;break-inside:avoid}}
 .foot{{margin-top:8px;font-size:8pt;text-align:center}}
 </style></head><body>
 <div class="hd"><div class="n"><small>SESIÓN</small>{num}</div><div><h1>{e(title)}</h1><p>Ciencia y Tecnología · 6.° grado · Unidad 8: El sistema reproductor humano</p></div><div class="lg"><svg viewBox="22 14 68 92" width="22" height="30" fill="none" stroke="#000" stroke-width="3"><path d="M27 20 Q36 19 44 21 Q49 29 53 38 Q42 34 30 34 Q28 27 27 20 Z"/><path d="M28 40 Q42 38 54 44 Q57 70 56 98 Q38 86 32 66 Q28 54 28 40 Z"/><path d="M58 26 Q74 32 84 46 Q82 76 58 100 Q62 64 58 26 Z"/></svg><span><b class="i">innova</b> schools</span></div></div>
@@ -67,6 +68,30 @@ table.chk td:not(:first-child),table.chk th:not(:first-child){{width:62px;text-a
 
 ORG=["Características","Funciones","Dato interesante"]
 def organ(orgs):return table(["Órgano"]+orgs,[[x] for x in ORG])
+
+import random as _rnd,unicodedata as _ud
+def _plain(w):return ''.join(c for c in _ud.normalize('NFD',w) if _ud.category(c)!='Mn').upper()
+def sopa(words,seed,N=10):
+    r=_rnd.Random(seed);G=[['']*N for _ in range(N)];dirs=[(0,1),(1,0),(1,1)]
+    for w in sorted(words,key=len,reverse=True):
+        for _ in range(500):
+            dx,dy=r.choice(dirs);x=r.randrange(N-(len(w)-1)*dx if dx else N);y=r.randrange(N-(len(w)-1)*dy if dy else N)
+            if all(G[y+k*dy][x+k*dx] in ('',w[k]) for k in range(len(w))):
+                for k in range(len(w)):G[y+k*dy][x+k*dx]=w[k]
+                break
+    AB='ABCDEFGHIJLMNOPRSTUV'
+    return '<table class="sopa">'+''.join('<tr>'+''.join(f'<td>{c or r.choice(AB)}</td>' for c in row)+'</tr>' for row in G)+'</table>'
+def cloze(text,words):
+    import re as _re
+    out=[];bank=[]
+    sents=_re.split(r'(?<=[.!?])\s+',text)
+    for w in words:
+        for k,sent in enumerate(sents):
+            m=_re.search(_re.escape(w),sent,_re.I)
+            if m:
+                out.append(sent[:m.start()]+'__________'+sent[m.end():]);bank.append(w);sents[k]='';break
+    return out,sorted(bank)
+MOLI='<svg class="moli" viewBox="0 0 100 100" width="46" height="46" fill="none" stroke="#000" stroke-width="2.2">'+''.join(f'<path d="{d}"/>' for d in ["M26 8 H74 Q90 8 90 24 V36 Q90 52 74 52 H26 Q10 52 10 36 V24 Q10 8 26 8 Z","M31 16 H69 Q80 16 80 27 V33 Q80 44 69 44 H31 Q20 44 20 33 V27 Q20 16 31 16 Z","M36 24 Q41 24 41 30 Q41 36 36 36 Q31 36 31 30 Q31 24 36 24 Z","M64 24 Q69 24 69 30 Q69 36 64 36 Q59 36 59 30 Q59 24 64 24 Z","M10 25 Q4 25 4 30.5 Q4 36 10 36","M90 25 Q96 25 96 30.5 Q96 36 90 36","M29 57 H71 Q78 57 76 67 L72 85 Q70 93 61 93 H39 Q30 93 28 85 L24 67 Q22 57 29 57 Z","M25 63 Q14 70 16 82","M75 63 Q86 70 84 82","M44 70 Q50 74 56 70"])+'</svg>'
 P=[]
 CARD=lambda t:f'<div class="card">{t}</div>'
 P.append(dict(t="Conocemos el sistema reproductor",acts=[
@@ -123,7 +148,10 @@ act(3,"i","Me evalúo",'<p>Marca tu nivel en cada criterio de la rúbrica.</p>'+
  '<p>¿Qué conocimientos son nuevos para ti en esta unidad?</p>'+lines(1)+'<p>¿Qué te gustaría investigar?</p>'+lines(1))]))
 pk=json.load(open('/home/user/christian/packs/unidad8.json'))
 for i,(p,s) in enumerate(zip(P,pk["sessions"]),1):
-    h=page(i,p["t"],s["meta"],s["criteria"],p["acts"]).replace("⭐","★")
+    _W=json.load(open('/home/user/christian/packs/words.json'))['8'][i-1]
+    _E=json.load(open('/home/user/christian/packs/extras.json'))['8'][i-1];_F=json.load(open('/home/user/christian/packs/facts.json'))['8'][i-1]+_E["f"];_C={"k":0,"r":0,"v":0,"h":0,**((json.load(open('/home/user/christian/packs/fill.json')) if __import__('os').path.exists('/home/user/christian/packs/fill.json') else {}).get('8-'+str(i),{}))}
+    _X=(f'<div class="sab"><h3>Lectura breve: {e(_E["r"][0])}</h3><p>{e(_E["r"][1])}</p></div>' if _C["r"] else '')+('<div class="sab"><h3>¿Verdadero o falso?</h3><p>Escribe V o F en cada paréntesis.</p><ul class="vf">'+''.join(f'<li>(   ) {e(x)}</li>' for x in _E["v"])+'</ul></div>' if _C["v"] else '')+(lambda cz:('<div class="sab"><h3>Completa</h3><p>Usa las palabras del recuadro: <b class="wb">'+' · '.join(cz[1])+'</b></p><ol>'+''.join(f'<li>{e(x)}</li>' for x in cz[0])+'</ol></div>') if _C.get("c") and cz[0] else '')(cloze(_E["r"][1],json.load(open('/home/user/christian/packs/cloze.json'))['8'][i-1]))+(f'<div class="sab sop"><h3>Sopa de letras</h3><p>Encuentra estas palabras: {" · ".join(_W)}</p>{sopa([_plain(w) for w in _W],"{n}-"+str(i))}</div>' if _C.get("s") else '')+('<div class="sab"><h3>'+MOLI+'¿Sabías que…?</h3><ul>'+''.join(f'<li>{e(x)}</li>' for x in _F[:_C["k"]])+'</ul></div>' if _C["k"] else '')+(f'<div class="draw" style="height:{_C["h"]}px"><span>Dibuja o escribe lo que más te gustó de hoy</span></div>' if _C["h"] else '')
+    h=page(i,p["t"],s["meta"],s["criteria"],p["acts"],_X).replace("⭐","★")
     h=re.sub(r'[\U0001F000-\U0001FAFF⌀-⏿☀-☄☆-☏☑-✓✕-➿️‍]\s?','',h)
     open(f'{OUT}s{i}.html','w').write(h)
 print('ok',len(P))

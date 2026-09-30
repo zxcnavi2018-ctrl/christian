@@ -69,6 +69,8 @@ Este archivo reúne **todo lo que Moli aprendió** con el profesor y con Claude.
   - los procesos con flechas;
   - los cables son líneas, no flechas.
 - Las formas redondas usan círculos y óvalos perfectos.
+- **Piezas de materia y del cuerpo:** átomo (núcleo, órbitas y electrones), molécula de agua (oxígeno e hidrógenos), molécula de oxígeno, y los sistemas reproductores femenino y masculino en esquema escolar de frente (útero, trompas, ovarios, vagina; vejiga, próstata, conductos deferentes, vesículas seminales, uretra, pene, testículos y escroto). Estas piezas van **fijas** en su lugar para que el sistema no se desarme, y cada órgano es una parte con su nombre.
+- Las partes con el mismo nombre («hidrógeno izquierdo», «hidrógeno derecho») se unen en una sola, y los trazos repetidos se eliminan.
 - Para animales, personas u órganos: diagrama de cajas con flechas, con el espacio para escribir dentro de cada caja.
 
 **Letra y diseño.** Letra de mínimo 11 puntos en toda la ficha (son niños); solo el Exit ticket puede ser más pequeño según el espacio. Márgenes pequeños para aprovechar la hoja, blanco y negro, sin dibujos de Moli ni iconos y con el logo de Innova en líneas delgadas. Todo lo que rellena espacio se relaciona con las actividades y la meta de la sesión, nunca es relleno genérico.

@@ -32,6 +32,15 @@ Este archivo reúne **todo lo que Moli aprendió** con el profesor y con Claude.
 - Una pregunta del Exit ticket citaba a un autor («Según Chang (2016)…»). En el Exit ticket nunca se citan autores.
 - Las palabras difíciles (moléculas, cohesión, adhesión) se usan solo si la meta o los criterios las piden, y siempre explicadas con palabras de niño.
 
+**Espacio para responder y texto.**
+
+- La información va primero, bien desarrollada y con el texto **justificado** (parejito). Las preguntas van después, idealmente en la hoja siguiente.
+- Cada pregunta abierta tiene como máximo **5 líneas**. Si hacen falta más, la ficha dice una sola vez: «Si necesitas más espacio, continúa en tu cuaderno».
+- Las tablas para responder se mantienen, con filas de altura moderada.
+- No siempre son 3 hojas: si el cierre cabe en la hoja 2, va ahí.
+- Las actividades del tema (¿Sabías que?, verdadero o falso, completa) llenan primero el final de la hoja 2 y las que no caben van a la hoja 3, encima del cierre.
+- Moli nunca numera las preguntas («1. 1.»): la ficha ya las numera.
+
 **Letra y diseño.** Letra de mínimo 11 puntos en toda la ficha (son niños); solo el Exit ticket puede ser más pequeño según el espacio. Márgenes pequeños para aprovechar la hoja, blanco y negro, sin dibujos de Moli ni iconos y con el logo de Innova en líneas delgadas. Todo lo que rellena espacio se relaciona con las actividades y la meta de la sesión, nunca es relleno genérico.
 
 **El cierre va siempre al final de la ficha**, en este orden (de arriba hacia abajo):

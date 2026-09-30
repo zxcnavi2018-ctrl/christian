@@ -61,6 +61,21 @@ Este archivo reúne **todo lo que Moli aprendió** con el profesor y con Claude.
   - vaso o plato hondo: su forma real;
   - agua: una línea dentro del recipiente.
 - El profesor revisa el dibujo antes de cargar la unidad.
+- **Biblioteca de piezas ya dibujadas:** Moli arma escenas combinando piezas en vez de dibujar todo desde cero, y así la calidad se mantiene en cualquier tema.
+  - Plantas: flor, hojas, hoja, tallo, raíz y suelo.
+  - Objetos: vaso, plato, maceta, termómetro, regla, lupa, pila, foco, semilla y gota.
+  - Naturaleza: sol, nube, mar y montaña.
+  - Flecha.
+  - Cada pieza se puede mover, agrandar, achicar y girar (por ejemplo, una flecha hacia arriba para la evaporación).
+- **Primero planea:** escribe dónde va cada objeto usando las zonas del lienzo (arriba, medio y abajo; izquierda, centro y derecha) para que nada se encime.
+- **Principios del buen dibujo** para lo que no está en la biblioteca:
+  - contorno limpio más 2 a 4 detalles internos que lo hagan reconocible;
+  - proporciones reales entre objetos;
+  - lo principal grande y al centro;
+  - los procesos con flechas;
+  - los cables son líneas, no flechas.
+- Las formas redondas usan círculos y óvalos perfectos.
+- Para animales, personas u órganos: diagrama de cajas con flechas, con el espacio para escribir dentro de cada caja.
 
 **Letra y diseño.** Letra de mínimo 11 puntos en toda la ficha (son niños); solo el Exit ticket puede ser más pequeño según el espacio. Márgenes pequeños para aprovechar la hoja, blanco y negro, sin dibujos de Moli ni iconos y con el logo de Innova en líneas delgadas. Todo lo que rellena espacio se relaciona con las actividades y la meta de la sesión, nunca es relleno genérico.
 

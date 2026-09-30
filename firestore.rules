@@ -548,31 +548,6 @@ service cloud.firestore {
       allow delete: if isTeacher();
     }
 
-    // Quién está conectado (pantalla de inicio) e invitaciones a duelo 1 vs 1.
-    match /online/{rid} {
-      allow get: if true;
-      allow list: if request.query.limit <= 60;
-      allow create, update: if rid.matches('r[0-9a-f]{20}')
-        && request.resource.data.keys().hasOnly(['n', 's', 'o', 'at', 'updatedAt'])
-        && request.resource.data.n is string && request.resource.data.n.size() <= 40
-        && request.resource.data.s is string && request.resource.data.s.size() <= 10
-        && request.resource.data.o is string && request.resource.data.o.size() <= 800
-        && request.resource.data.at is timestamp && request.resource.data.updatedAt is timestamp;
-      allow delete: if isTeacher();
-    }
-    match /invites/{rid} {
-      allow get: if true;
-      allow create, update: if rid.matches('r[0-9a-f]{20}')
-        && request.resource.data.keys().hasOnly(['from', 'fn', 'fo', 'd', 'st', 'at', 'updatedAt'])
-        && request.resource.data.from is string && request.resource.data.from.matches('r[0-9a-f]{20}')
-        && request.resource.data.fn is string && request.resource.data.fn.size() <= 40
-        && request.resource.data.fo is string && request.resource.data.fo.size() <= 800
-        && request.resource.data.d is string && request.resource.data.d.matches('di[0-9a-z]{6,30}')
-        && request.resource.data.st in ['sent', 'ok', 'no', 'busy', 'limit', 'late']
-        && request.resource.data.at is timestamp && request.resource.data.updatedAt is timestamp;
-      allow delete: if isTeacher();
-    }
-
     // Marcas de la versión anterior (solo para que la docente pueda limpiarlas).
     match /exitTicketsDone/{id} {
       allow get: if true;

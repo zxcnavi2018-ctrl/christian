@@ -701,20 +701,20 @@ async function uImport(n){
 function uUndo(n){const b=Ft(UB(n),null),i=APP.units.findIndex(x=>"unit"+n===x.key);if(!b||i<0)return;if(!confirm(`¿Volver a la Unidad ${n} como estaba antes de cargar la versión renovada?`))return;APP.units[i]=b;const re=new RegExp(`^u${n}s\\d+$`);Object.keys(APP.files).forEach(k=>re.test(k)&&delete APP.files[k]);try{localStorage.removeItem(UB(n))}catch(e){}wt(),Ct(),Ts(),Es(`↩️ Unidad ${n} restaurada.`)}
 const MSTY=`ESTILO DE LA PROFE (síguelo siempre):
 - Nunca uses la palabra "Anexo": el título es el nombre de la actividad o "Ficha · Sesión N".
-- Cada sesión tiene 3 actividades: Actividad 1 individual, Actividad 2 colaborativa en grupo y Actividad 3 individual que deja escrita una parte del producto de la unidad (informe, póster, etc.). Las sesiones están conectadas entre sí y avanzan hacia ese producto.
+- Cuando la sesión tiene 3 actividades: Actividad 1 individual, Actividad 2 colaborativa en grupo y Actividad 3 individual que deja escrita una parte del producto de la unidad (informe, póster, etc.). Las sesiones están conectadas entre sí y avanzan hacia ese producto.
 - El título de cada actividad y su descripción deben decir EXACTAMENTE lo que el estudiante hará en la ficha: nada que la ficha no tenga y nada de la ficha que la descripción omita.
-- La descripción va dirigida al estudiante (tú o ustedes), breve y fácil de leer para un niño de 11 años.
+- La descripción es breve y fácil de leer para que el estudiante la comprenda (niños de 11 años).
 - La ficha debe ser autosuficiente: si la actividad menciona un texto, casos, datos, tarjetas, una imagen o una tira para recortar, eso debe estar impreso en la ficha. Solo los videos pueden venir de fuera (la profe los proyecta).
 - Da espacio amplio para escribir: son niños. Usa tablas con casillas grandes y renglones.
 - Incluye andamios donde ayudan: "Si… entonces… porque…", "¿Cómo influye ___ en ___?", frases para completar y repreguntas. No pongas andamios en los retos ni en la evaluación final.
 - Usa tablas para completar (Componente | Respuesta), notas "Recuerda:" con definiciones clave y listas de cotejo "Sí / Debo mejorar".
 - En lo colaborativo usa retroalimentación entre pares: "Una estrella / Una escalera", "Tres estrellas y un deseo", "Veo / Pregunto / Sugiero" o el semáforo.
-- DUA: en la actividad grupal cada grupo elige cómo presentar (afiche, cómic, organizador, maqueta, dramatización, audio o video); no impongas un solo formato.
+- DUA: cuando el grupo presenta o comparte lo trabajado, cada grupo elige cómo hacerlo (afiche, cómic, organizador, maqueta, dramatización, audio o video); no impongas un solo formato.
 - Flipped: puede haber dos. "Para hoy": información que el estudiante debía traer para esta sesión. "Para la siguiente sesión": materiales o tareas que debe traer la próxima clase (por ejemplo, materiales del experimento).
 - Diseño de las fichas: blanco y negro, sin colores ni íconos, sin nombre ni meta, negrita solo en los títulos, un recuadro por actividad y el logo de Innova Schools en líneas.
 - Seguridad: agua a 35 °C como máximo, no consumir las mezclas, lavarse las manos; no cultivar ni manipular bacterias ni mohos.
 - Relaciona cada sesión con un criterio de la rúbrica de la unidad (INDAGA o EXPLICA, según corresponda).
-- Exit ticket: 5 preguntas con 3 opciones, sobre lo trabajado en la sesión, variando la posición de la respuesta correcta, con una explicación breve.
+- Exit ticket: preguntas sobre lo trabajado en la sesión y en sus fichas, variando la posición de la respuesta correcta, con una explicación breve.
 `;
 const ufFiles=z=>[...new Set([z.flipped2&&z.flipped2.enabled&&z.flipped2.file,z.flipped&&z.flipped.enabled&&z.flipped.file,...(z.activities||[]).map(x=>x.file)].filter(k=>k&&APP.files[k]))];
 const ufHas=u=>(u.sessions||[]).some(z=>ufFiles(z).length);

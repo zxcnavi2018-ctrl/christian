@@ -292,8 +292,8 @@
    "activities": [
     {
      "mode": "individual",
-     "title": "📖 La levadura está viva",
-     "desc": "Lee un texto corto sobre cómo reacciona la levadura al frío, a lo tibio y al calor. Subraya las ideas importantes. Pregúntate: ¿qué le pasa con el frío? ¿Y con lo tibio?",
+     "title": "📖 La levadura y la temperatura",
+     "desc": "Copia la pregunta de tu equipo y lee cómo reacciona la levadura al frío, a lo tibio y al calor. Elige 2 ideas científicas que te ayuden a predecir y explica por qué las elegiste.",
      "ficha": "",
      "file": ""
     },
@@ -492,7 +492,7 @@
     },
     {
      "mode": "individual",
-     "title": "📊 Mi tabla para anotar",
+     "title": "📊 Mi tabla de registro",
      "desc": "Dibuja tu tabla de registro: temperatura (15, 25 y 35 °C), repeticiones 1, 2 y 3, y la altura de la espuma en cm.",
      "ficha": "",
      "file": ""
@@ -578,7 +578,7 @@
     },
     {
      "mode": "group",
-     "title": "⏱️ ¡Manos a la ciencia!",
+     "title": "⏱️ Realizamos el experimento",
      "desc": "En grupo, realicen el experimento con las 3 temperaturas, 3 veces cada una. Midan la espuma a los 20 minutos, anoten las incidencias y tomen fotos como evidencia.",
      "ficha": "",
      "file": ""
@@ -664,8 +664,8 @@
    "activities": [
     {
      "mode": "individual",
-     "title": "🧮 Saco el promedio",
-     "desc": "Revisa que tu tabla esté completa. Calcula el promedio de cada temperatura: 1) suma las 3 medidas, 2) divide entre 3, 3) escribe la unidad (cm).",
+     "title": "🧮 Verifico y saco el promedio",
+     "desc": "Revisa con la lista de cotejo que tus registros estén completos. Calcula el promedio de cada temperatura: 1) suma las 3 medidas, 2) divide entre 3, 3) escribe la unidad (cm).",
      "ficha": "",
      "file": ""
     },
@@ -757,8 +757,8 @@
    "activities": [
     {
      "mode": "individual",
-     "title": "🔍 Leo mi gráfico",
-     "desc": "Mira tu gráfico y responde: ¿cuál es la barra más alta? ¿Cuál la más baja? ¿Hay algún dato muy diferente a los demás?",
+     "title": "🔍 Leo mis resultados",
+     "desc": "Anota la altura promedio de cada temperatura y responde: ¿con cuál hubo más espuma? ¿Con cuál menos? ¿Cuánta diferencia hay entre ellas?",
      "ficha": "",
      "file": ""
     },

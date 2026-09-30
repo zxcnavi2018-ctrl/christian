@@ -57,6 +57,7 @@ table.chk td:not(:first-child),table.chk th:not(:first-child){{width:62px;text-a
 .fill{{display:inline-block;min-width:120px;border-bottom:.8px solid #000}}
 .grid{{height:230px;border:1px solid #000;background-image:linear-gradient(#bbb 1px,transparent 1px),linear-gradient(90deg,#bbb 1px,transparent 1px);background-size:14px 14px;margin:6px 0}}
 .lg{{margin-left:auto;display:flex;align-items:center;gap:5px;font-size:10pt}}.lg b.i{{font-weight:700}}.lg span{{letter-spacing:.02em}}
+.bank{{border:1px solid #000;border-radius:8px;padding:6px 10px;text-align:center}}.cards{{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:6px 0;break-inside:avoid}}.cards b{{grid-column:1/-1;font-weight:700}}.card{{border:1.2px dashed #000;border-radius:6px;padding:8px 6px;min-height:52px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:9pt}}.fig{{text-align:center;margin:4px 0}}.strip{{width:7cm;height:1.2cm;border:1.2px dashed #000;display:flex;align-items:center;justify-content:center;margin:6px 0}}
 .foot{{margin-top:8px;font-size:8pt;text-align:center}}
 </style></head><body>
 <div class="hd"><div class="n"><small>SESIÓN</small>{num}</div><div><h1>{e(title)}</h1><p>Ciencia y Tecnología · 6.° grado · Unidad 8: El sistema reproductor humano</p></div><div class="lg"><svg viewBox="22 14 68 92" width="22" height="30" fill="none" stroke="#000" stroke-width="3"><path d="M27 20 Q36 19 44 21 Q49 29 53 38 Q42 34 30 34 Q28 27 27 20 Z"/><path d="M28 40 Q42 38 54 44 Q57 70 56 98 Q38 86 32 66 Q28 54 28 40 Z"/><path d="M58 26 Q74 32 84 46 Q82 76 58 100 Q62 64 58 26 Z"/></svg><span><b class="i">innova</b> schools</span></div></div>
@@ -67,12 +68,13 @@ table.chk td:not(:first-child),table.chk th:not(:first-child){{width:62px;text-a
 ORG=["Características","Funciones","Dato interesante"]
 def organ(orgs):return table(["Órgano"]+orgs,[[x] for x in ORG])
 P=[]
+CARD=lambda t:f'<div class="card">{t}</div>'
 P.append(dict(t="Conocemos el sistema reproductor",acts=[
-act(1,"i","¿Qué sé del sistema reproductor?",'<p>Observa las piezas del rompecabezas y responde.</p>'+table(["Órgano que reconozco","¿Qué crees que hace?"],[],4)+
- '<p>¿Todos los órganos del sistema reproductor se ven a simple vista?</p>'+lines(1)+scaf("«Creo que el/la ________ sirve para ________ porque ________.»")),
-act(2,"g","Armamos el rompecabezas",'<p>En grupo, armen el rompecabezas y ubiquen cada órgano. Luego comparen con el video.</p>'+
- table(["Sistema reproductor masculino","Sistema reproductor femenino"],[],4)+
- '<p>¿Qué órgano no mencionó el video? ¿Qué órganos tienen en común varones y mujeres?</p>'+lines(2)+dua()),
+act(1,"i","¿Qué sé del sistema reproductor?",'<p>Lee el banco de palabras y escribe cada órgano en la columna que crees que corresponde.</p><p class="bank">testículos · ovarios · útero · pene · trompas de Falopio · vagina · escroto · conductos deferentes</p>'+
+ table(["Sistema reproductor masculino","Sistema reproductor femenino"],[],3)+'<p>Elige dos órganos y escribe qué crees que hace cada uno.</p>'+
+ scaf("«Creo que el/la ________ sirve para ________ porque ________.»")+lines(2)),
+act(2,"g","Parejas de tarjetas",'<p>Recorten las tarjetas y formen parejas: cada órgano con su función. Luego comparen sus parejas con el video.</p><div class="cards"><b>Órganos</b>'+''.join(CARD(x) for x in ["Testículos","Ovarios","Útero","Escroto","Trompas de Falopio","Conductos deferentes","Vagina","Pene"])+'</div><div class="cards"><b>Funciones</b>'+''.join(CARD(x) for x in ["Es el lugar donde se desarrolla el bebé durante el embarazo","Producen los espermatozoides","Llevan los espermatozoides desde los testículos","Producen los óvulos","Protege a los testículos y regula su temperatura","Conducto que comunica el útero con el exterior; es el canal del parto","Conducen el óvulo hacia el útero; allí ocurre la fecundación","Órgano externo por donde salen la orina y el semen"])+'</div>'+
+ '<p>¿Qué pareja les costó más? ¿Qué órganos no mencionó el video?</p>'+lines(2)+dua()),
 act(3,"i","Mi glosario científico",informe("Glosario",table(["Palabra nueva","¿Qué significa?"],[],5))+
  scaf("«El sistema reproductor sirve para ________. Está formado por ________.»")+lines(2))]))
 P.append(dict(t="El sistema reproductor masculino",acts=[
@@ -92,14 +94,14 @@ act(2,"g","El ciclo en pareja",'<p>En pareja, organicen las fases del ciclo ová
  organ(["Ovarios","Trompas de Falopio","Útero","Vagina"])+dua()),
 act(3,"i","Para mi póster: sistema femenino",informe("Póster 1",scaf("«Primero ________. Luego ________. Finalmente ________.»")+lines(4)))]))
 P.append(dict(t="La fecundación y el primer trimestre",acts=[
-act(1,"i","Veo, pienso, me pregunto",'<p>Observa la imagen que muestra tu profe.</p>'+table(["Veo","Pienso","Me pregunto"],[],1)+
+act(1,"i","Veo, pienso, me pregunto",'<p>Observa la imagen.</p><div class="fig"><svg viewBox="0 0 300 150" width="300" height="150" fill="none" stroke="#000" stroke-width="1.4"><circle cx="210" cy="75" r="52"/><circle cx="210" cy="75" r="58" stroke-dasharray="3 3"/><circle cx="222" cy="66" r="10"/><ellipse cx="140" cy="40" rx="6" ry="4"/><path d="M134 40 q-10 -6 -20 0 t-20 0"/><ellipse cx="125" cy="75" rx="6" ry="4"/><path d="M119 75 q-10 -6 -20 0 t-20 0"/><ellipse cx="145" cy="110" rx="6" ry="4"/><path d="M139 110 q-10 -6 -20 0 t-20 0"/><ellipse cx="100" cy="55" rx="6" ry="4"/><path d="M94 55 q-10 -6 -20 0 t-20 0"/><ellipse cx="95" cy="100" rx="6" ry="4"/><path d="M89 100 q-10 -6 -20 0 t-20 0"/></svg></div>'+table(["Veo","Pienso","Me pregunto"],[],1)+
  '<p>Palabras nuevas del video:</p>'+lines(1)),
 act(2,"g","La fecundación paso a paso",table(["","La fecundación"],[["¿Qué células sexuales están involucradas?"],["¿Por qué las células sexuales se tienen que unir?"],["¿Qué sucede luego de que se unen?"]])+
  '<p>Ordenen los pasos del 1 al 4:</p>'+table(["N.°","Paso"],[["___","El cigoto se divide muchas veces"],["___","El espermatozoide se une al óvulo"],["___","El embrión se implanta en el útero"],["___","Se forma el cigoto"]])+dua()),
 act(3,"i","Para mi póster: fecundación y primer trimestre",informe("Línea de tiempo",table(["Semanas","Cambio importante"],[["1 a 4"],["5 a 8"],["9 a 12"]]))+
  scaf("«En la semana ___ el embrión ________.»"))]))
 P.append(dict(t="El desarrollo del bebé: segundo y tercer trimestre",acts=[
-act(1,"i","La tirita de 7 cm",'<p>¿Qué crees que representa tu tirita de papel de 7 cm?</p>'+lines(1)+'<p>Mira el video del segundo trimestre y completa.</p>'+
+act(1,"i","La tirita de 7 cm",'<p>Recorta la tirita. Mide 7 cm.</p><div class="strip">7 cm</div><p>¿Qué crees que representa?</p>'+lines(1)+'<p>Mira el video del segundo trimestre y completa.</p>'+
  table(["Semana 14","Semana 16","Semana 20","Semana 24","Semana 28"],[],2)+'<p>¿Qué síntomas podría experimentar la mamá?</p>'+lines(1)),
 act(2,"g","El viaje de 9 meses",'<p>Completen la información del tercer trimestre.</p>'+table(["Semana 28 (7.° mes)","Semana 32 (8.° mes)","Semana 36 (9.° mes)"],[],2)+
  '<p>¿Qué cambios presenta la mamá?</p>'+lines(1)+dua()),

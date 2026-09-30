@@ -5,8 +5,8 @@ def A(m,t,d):return{"mode":m,"title":t,"desc":d,"ficha":"","file":""}
 S=[]
 S.append(dict(meta="Describe las principales características del sistema reproductor humano.",
  criteria=["Identifica las funciones generales del sistema reproductor","Diferencia órganos del sistema masculino y femenino","Usa vocabulario científico"],
- activities=[A("individual","🧩 ¿Qué sé del sistema reproductor?","Observa las piezas del rompecabezas y escribe qué órganos reconoces y qué crees que hace cada uno. Pregúntate: ¿todos se ven a simple vista?"),
-  A("group","👥 Armamos el rompecabezas","En grupo, armen el rompecabezas, ubiquen los órganos del sistema masculino y del femenino, y compárenlos con el video: ¿qué órgano no mencionó el video? ¿Qué órganos tienen en común varones y mujeres?"+DUA),
+ activities=[A("individual","🧩 ¿Qué sé del sistema reproductor?","Lee el banco de palabras (testículos, ovarios, útero, pene, trompas de Falopio, vagina, escroto, conductos deferentes) y escribe cada órgano en el sistema que crees que corresponde. Luego elige dos y escribe qué crees que hace cada uno."),
+  A("group","👥 Parejas de tarjetas","En grupo, recorten las tarjetas de la ficha y formen parejas de cada órgano con su función. Luego compárenlas con el video: ¿qué pareja les costó más? ¿Qué órganos no mencionó el video?"+DUA),
   A("individual","📘 Mi glosario científico","Empieza tu glosario: escribe 5 palabras nuevas con su significado. Completa: «El sistema reproductor sirve para ___». Será la base de tu póster.")],
  qs=[Q("¿Cuál es la función principal del sistema reproductor?",["Permitir la reproducción, es decir, originar nuevos seres humanos","Digerir los alimentos","Bombear la sangre"],0,"El sistema reproductor permite la formación de nuevos seres humanos."),
   Q("¿Qué órgano pertenece al sistema reproductor femenino?",["Los testículos","El útero","La próstata"],1,"El útero es parte del sistema reproductor femenino."),
@@ -35,7 +35,7 @@ S.append(dict(meta="Explica las partes del sistema reproductor femenino y el cic
   Q("¿Qué ocurre si el óvulo no es fecundado?",["Se forma un bebé","El recubrimiento del útero se desprende: es la menstruación","El ovario deja de funcionar"],1,"Sin fecundación, el recubrimiento se expulsa como menstruación.")]))
 S.append(dict(meta="Explica el proceso de fecundación y los cambios en el primer trimestre del embarazo.",
  criteria=["Describe paso a paso la fecundación","Describe los eventos del primer trimestre","Presenta información sintetizada con lenguaje científico"],
- activities=[A("individual","👀 Veo, pienso, me pregunto","Observa la imagen del inicio del embarazo y escribe: ¿qué veo?, ¿qué pienso?, ¿qué me pregunto? Luego mira el video y anota las palabras nuevas."),
+ activities=[A("individual","👀 Veo, pienso, me pregunto","Observa el dibujo de la ficha y escribe: ¿qué veo?, ¿qué pienso?, ¿qué me pregunto? Luego mira el video y anota las palabras nuevas."),
   A("group","🧬 La fecundación paso a paso","En grupo, respondan qué células se unen, por qué se unen y qué pasa después, y ordenen del 1 al 4 los pasos de la fecundación."+DUA),
   A("individual","📝 Para mi póster: fecundación y primer trimestre","Completa una línea de tiempo del primer trimestre (semanas 1 a 12) con 3 cambios importantes del bebé en formación.")],
  qs=[Q("¿Qué células se unen en la fecundación?",["El espermatozoide y el óvulo","Dos óvulos","Dos neuronas"],0,"La fecundación es la unión de un espermatozoide con un óvulo."),
@@ -45,7 +45,7 @@ S.append(dict(meta="Explica el proceso de fecundación y los cambios en el prime
   Q("¿Cuánto dura aproximadamente el primer trimestre?",["1 mes","Las primeras 12 semanas","9 meses"],1,"El primer trimestre abarca aproximadamente las semanas 1 a 12.")]))
 S.append(dict(meta="Explica el desarrollo fetal en el segundo y tercer trimestre del embarazo.",
  criteria=["Reconoce las características del segundo trimestre","Describe las características del tercer trimestre","Presenta información sintetizada con lenguaje científico"],
- activities=[A("individual","📏 La tirita de 7 cm","Observa tu tirita de papel de 7 cm: ¿qué crees que representa? Mira el video y completa la tabla del segundo trimestre (semanas 14, 16, 20, 24 y 28) y los síntomas que podría tener la mamá."),
+ activities=[A("individual","📏 La tirita de 7 cm","Recorta la tirita de 7 cm de tu ficha: ¿qué crees que representa? Mira el video y completa la tabla del segundo trimestre (semanas 14, 16, 20, 24 y 28) y los síntomas que podría tener la mamá."),
   A("group","🤰 El viaje de 9 meses","En grupo, completen los cambios del bebé en las semanas 28, 32 y 36, y los cambios que presenta la mamá en el tercer trimestre."+DUA),
   A("individual","📝 Para mi póster: segundo y tercer trimestre","Escribe 3 datos que te sorprendieron del desarrollo del bebé, usando números: «En la semana ___ el bebé ___».")],
  qs=[Q("¿Qué representa la tirita de 7 cm?",["El tamaño del feto al inicio del segundo trimestre","El tamaño del óvulo","La duración del embarazo"],0,"Al inicio del segundo trimestre el feto mide unos 7 cm."),

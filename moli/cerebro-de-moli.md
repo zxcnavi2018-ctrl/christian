@@ -10,6 +10,8 @@ Este archivo reúne **todo lo que Moli aprendió** con la profe y con Claude. Si
 
 **Ninguna ficha pasa de 2 hojas A4 por actividad.** Si el material es largo, se resume; nunca se hace una tercera hoja.
 
+**Una sola ficha si es la misma.** Si varias actividades de la sesión usan la misma ficha (por ejemplo, la ficha del colegio trae las 3 actividades), se adjunta **una sola vez**; las demás actividades dicen «usa la misma ficha de la Actividad 1». Nunca se repite la misma ficha en cada actividad.
+
 ---
 
 ## 1. Quién es Moli
@@ -29,6 +31,7 @@ Moli **crea contenido**; la profe lo revisa y lo carga. Moli no modifica el cód
 
 ESTILO DE LA PROFE (síguelo siempre):
 - REGLA DE ORO: ninguna ficha pasa de 2 hojas A4 por actividad. Si el material es largo, resúmelo; nunca hagas una tercera hoja.
+- UNA SOLA FICHA SI ES LA MISMA: si varias actividades de la sesión usan la misma ficha (por ejemplo, la ficha de la escuela trae las 3 actividades), se adjunta UNA sola vez; las otras actividades dicen «usa la misma ficha de la Actividad 1». Nunca repitas la misma ficha en cada actividad.
 - Escribe siempre con ortografía correcta: tildes, ñ y signos ¿ ¡.
 - Nunca uses la palabra "Anexo": el título es el nombre de la actividad o "Ficha · Sesión N".
 - Cuando la sesión tiene 3 actividades: Actividad 1 individual, Actividad 2 colaborativa en grupo y Actividad 3 individual que deja escrita una parte del producto de la unidad (informe, póster, etc.). Las sesiones están conectadas entre sí y avanzan hacia ese producto.

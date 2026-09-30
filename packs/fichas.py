@@ -14,8 +14,8 @@ def table(head,rows,n=None,cls=""):
     return f'<table class="{cls}"><tr>{h}</tr>{body}</table>'
 def check(title,items,cols=("Sí","Debo mejorar")):
     return table([title]+list(cols),[[e(i)]+['☐']*len(cols) for i in items],cls="chk")
-def scaf(t):return f'<div class="scaf"><b>🪜 Andamio</b> {t}</div>'
-def tip(t):return f'<div class="tip"><b>💡 Recuerda</b> {t}</div>'
+def scaf(t):return f'<div class="scaf"><b>Andamio:</b> {t}</div>'
+def tip(t):return f'<div class="tip"><b>Recuerda:</b> {t}</div>'
 def dua():return '<div class="dua"><b>🎨 ¿Cómo lo presentamos?</b> Elijan el formato que más les guste: afiche · cómic · organizador visual · maqueta · dramatización · audio o video corto · canción o rima · exposición con objetos · ¡otra idea!</div>'
 def informe(part,body):return f'<div class="inf"><b>📘 Para mi informe · {e(part)}</b>{body}</div>'
 def act(n,mode,title,body):
@@ -30,28 +30,28 @@ def page(num,title,meta,crit,acts,extra=""):
     return f'''<!doctype html><html><head><meta charset="utf-8"><style>
 @page{{size:A4;margin:12mm 12mm 14mm}}
 *{{box-sizing:border-box}}body{{font-family:"DejaVu Sans",Arial,sans-serif;font-size:10.5pt;color:#000;margin:0;background:#fff}}
-.hd{{display:flex;align-items:center;gap:12px;border:2px solid #000;border-radius:14px;padding:8px 14px}}
-.hd .n{{border:2px solid #000;border-radius:12px;padding:6px 12px;font-weight:900;font-size:18pt;text-align:center;line-height:1}}
+.hd{{display:flex;align-items:center;gap:12px;border-bottom:1px solid #000;padding:0 0 8px}}
+.hd .n{{border:1px solid #000;border-radius:10px;padding:5px 11px;font-weight:600;font-size:18pt;text-align:center;line-height:1}}
 .hd .n small{{display:block;font-size:7pt;letter-spacing:.08em}}
-.hd h1{{margin:0;font-size:15pt}}.hd p{{margin:2px 0 0;font-size:8.5pt}}
-.name{{display:flex;gap:10px;margin:8px 0;font-size:9pt}}.name span{{flex:1;border-bottom:1.3px solid #000;padding-bottom:2px}}
-.meta{{border:1.5px solid #000;border-radius:12px;padding:7px 12px;margin:6px 0}}
+.hd h1{{margin:0;font-size:15pt;font-weight:700}}.hd p{{margin:2px 0 0;font-size:8.5pt}}
+.xname{{display:flex;gap:10px;margin:8px 0;font-size:9pt}}.name span{{flex:1;border-bottom:1.3px solid #000;padding-bottom:2px}}
+.xmeta{{border:1.5px solid #000;border-radius:12px;padding:7px 12px;margin:6px 0}}
 .meta ul{{list-style:none;padding:0;margin:4px 0 0;display:flex;flex-wrap:wrap;gap:4px 16px;font-size:9pt}}
-.act{{border:1.5px solid #000;border-radius:14px;padding:8px 12px 10px;margin:10px 0;break-inside:auto}}
-.act.g{{border-style:double;border-width:4px}}
-.ah{{display:flex;gap:8px;align-items:center}}.an{{font-weight:900;font-size:8pt;letter-spacing:.08em;text-transform:uppercase}}
-.am{{font-size:8pt;font-weight:800;border-radius:999px;padding:1px 9px;border:1.3px solid #000}}
-h2{{margin:3px 0 6px;font-size:12.5pt}}h3{{font-size:10.5pt;margin:8px 0 4px}}
-p{{margin:4px 0}}.ln{{border-bottom:1.2px dotted #000;height:27px}}
-table{{width:100%;border-collapse:collapse;margin:5px 0;font-size:9.2pt;break-inside:avoid}}th{{text-align:left;padding:4px 6px;border:1px solid #000;font-weight:800}}td{{border:1px solid #000;padding:5px 6px;height:28px;vertical-align:top}}
+.act{{border:1px solid #000;border-radius:14px;padding:8px 12px 10px;margin:10px 0;break-inside:auto}}
+
+.ah{{display:flex;gap:8px;align-items:center}}.an{{font-weight:400;font-size:8pt;letter-spacing:.08em;text-transform:uppercase}}
+.am{{font-size:8pt;font-weight:400}}
+h2{{margin:3px 0 6px;font-size:12.5pt;font-weight:600}}h3{{font-size:10.5pt;margin:8px 0 4px;font-weight:600}}b{{font-weight:400}}
+p{{margin:4px 0}}.ln{{border-bottom:.8px dotted #000;height:27px}}
+table{{width:100%;border-collapse:collapse;margin:5px 0;font-size:9.2pt;break-inside:avoid}}th{{text-align:left;padding:4px 6px;border:.7px solid #000;font-weight:400;background:#fff}}td{{border:.7px solid #000;padding:5px 6px;height:28px;vertical-align:top}}
 table.kv td:first-child,table.kv th:first-child{{width:42%}}
 table.chk td:not(:first-child),table.chk th:not(:first-child){{width:62px;text-align:center}}
-.scaf{{border:1.3px dashed #000;border-radius:10px;padding:5px 9px;margin:5px 0;font-size:9.4pt}}
-.tip{{border-left:4px solid #000;padding:4px 9px;margin:5px 0;font-size:9.2pt}}
-.dua{{border:1.3px dotted #000;border-radius:10px;padding:5px 9px;margin:6px 0;font-size:9.2pt}}
-.inf{{border:2px solid #000;border-radius:12px;padding:6px 10px;margin:6px 0}}.inf>b{{display:block;margin-bottom:3px}}
-.read{{border:1.2px solid #000;border-radius:10px;padding:6px 10px;font-size:9.4pt;margin:5px 0}}
-.fill{{display:inline-block;min-width:120px;border-bottom:1.2px solid #000}}
+.scaf{{margin:5px 0;font-size:9.4pt}}
+.tip{{margin:5px 0;font-size:9.2pt}}
+.dua{{margin:6px 0;font-size:9.2pt}}
+.inf{{margin:8px 0 6px}}.inf>b{{display:block;margin-bottom:3px}}
+.read{{font-size:9.4pt;margin:5px 0;font-style:italic}}
+.fill{{display:inline-block;min-width:120px;border-bottom:.8px solid #000}}
 .grid{{height:230px;border:1px solid #000;background-image:linear-gradient(#bbb 1px,transparent 1px),linear-gradient(90deg,#bbb 1px,transparent 1px);background-size:14px 14px;margin:6px 0}}
 .foot{{margin-top:8px;font-size:8pt;text-align:center}}
 </style></head><body>

@@ -56,8 +56,6 @@ table.chk td:not(:first-child),table.chk th:not(:first-child){{width:62px;text-a
 .foot{{margin-top:8px;font-size:8pt;text-align:center}}
 </style></head><body>
 <div class="hd"><div class="n"><small>SESIÓN</small>{num}</div><div><h1>{e(title)}</h1><p>Ciencia y Tecnología · 6.° grado · Unidad 7: Microorganismos en acción</p></div></div>
-<div class="name"><span>Nombre:</span><span style="flex:.45">Sección:</span><span style="flex:.5">Fecha:</span></div>
-<div class="meta"><b>🎯 Meta:</b> {e(meta)}<ul>{cr}</ul></div>
 {''.join(acts)}{extra}
 <div class="foot">Producto de la unidad: Informe de indagación · ¿Cómo influye la temperatura del agua en la actividad de la levadura?</div>
 </body></html>'''

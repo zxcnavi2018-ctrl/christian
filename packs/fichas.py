@@ -13,7 +13,7 @@ def table(head,rows,n=None,cls=""):
     if len(head)==2 and not cls:cls="kv"
     if len(head)>=5 and cls!="chk":cls+=" wide"
     elif len(head) in (3,4) and not cls:cls="mid"
-    return f'<table class="{cls}"><tr>{h}</tr>{body}</table>'
+    return f'<table class="{cls}"><thead><tr>{h}</tr></thead><tbody>{body}</tbody></table>'
 def check(title,items,cols=("Sí","Debo mejorar")):
     return table([title]+list(cols),[[e(i)]+['☐']*len(cols) for i in items],cls="chk")
 def scaf(t):return f'<div class="scaf"><b>Andamio:</b> {t}</div>'
@@ -45,9 +45,9 @@ def page(num,title,meta,crit,acts,extra=""):
 .am{{font-size:8pt;font-weight:400}}
 h2{{margin:3px 0 6px;font-size:12.5pt;font-weight:600}}h3{{font-size:10.5pt;margin:8px 0 4px;font-weight:600}}b{{font-weight:400}}
 p{{margin:4px 0}}.ln{{border-bottom:.8px dotted #000;height:34px}}
-table{{width:100%;border-collapse:collapse;margin:5px 0;font-size:9.2pt;break-inside:avoid}}th{{text-align:left;padding:4px 6px;border:.7px solid #000;font-weight:400;background:#fff}}td{{border:.7px solid #000;padding:5px 6px;height:44px;vertical-align:top}}
+table{{width:100%;border-collapse:collapse;margin:5px 0;font-size:9.2pt;break-inside:auto}}tr{{break-inside:avoid;page-break-inside:avoid}}thead{{display:table-header-group}}h2,.ah{{break-after:avoid}}th{{text-align:left;padding:4px 6px;border:.7px solid #000;font-weight:400;background:#fff}}td{{border:.7px solid #000;padding:5px 6px;height:44px;vertical-align:top}}
 table.kv td:first-child,table.kv th:first-child{{width:42%}}
-table.chk td{{height:30px}}table.wide{{table-layout:fixed}}table tr.bk td{{height:84px}}table.mid{{table-layout:fixed}}table.mid td{{height:56px}}table.wide td{{height:70px}}table.wide td:first-child{{height:auto}}
+table.chk td{{height:30px}}table.wide{{table-layout:fixed}}table tr.bk td{{height:70px}}table.mid{{table-layout:fixed}}table.mid td{{height:56px}}table.wide td{{height:70px}}table.wide td:first-child{{height:auto}}
 table.chk td:not(:first-child),table.chk th:not(:first-child){{width:62px;text-align:center}}
 .scaf{{margin:5px 0;font-size:9.4pt}}
 .tip{{margin:5px 0;font-size:9.2pt}}
@@ -56,9 +56,10 @@ table.chk td:not(:first-child),table.chk th:not(:first-child){{width:62px;text-a
 .read{{font-size:9.4pt;margin:5px 0;font-style:italic}}
 .fill{{display:inline-block;min-width:120px;border-bottom:.8px solid #000}}
 .grid{{height:230px;border:1px solid #000;background-image:linear-gradient(#bbb 1px,transparent 1px),linear-gradient(90deg,#bbb 1px,transparent 1px);background-size:14px 14px;margin:6px 0}}
+.lg{{margin-left:auto;display:flex;align-items:center;gap:5px;font-size:10pt}}.lg b.i{{font-weight:700}}.lg span{{letter-spacing:.02em}}
 .foot{{margin-top:8px;font-size:8pt;text-align:center}}
 </style></head><body>
-<div class="hd"><div class="n"><small>SESIÓN</small>{num}</div><div><h1>{e(title)}</h1><p>Ciencia y Tecnología · 6.° grado · Unidad 7: Microorganismos en acción</p></div></div>
+<div class="hd"><div class="n"><small>SESIÓN</small>{num}</div><div><h1>{e(title)}</h1><p>Ciencia y Tecnología · 6.° grado · Unidad 7: Microorganismos en acción</p></div><div class="lg"><svg viewBox="22 14 68 92" width="22" height="30" fill="none" stroke="#000" stroke-width="3"><path d="M27 20 Q36 19 44 21 Q49 29 53 38 Q42 34 30 34 Q28 27 27 20 Z"/><path d="M28 40 Q42 38 54 44 Q57 70 56 98 Q38 86 32 66 Q28 54 28 40 Z"/><path d="M58 26 Q74 32 84 46 Q82 76 58 100 Q62 64 58 26 Z"/></svg><span><b class="i">innova</b> schools</span></div></div>
 {''.join(acts)}{extra}
 <div class="foot">Producto de la unidad: Informe de indagación · ¿Cómo influye la temperatura del agua en la actividad de la levadura?</div>
 </body></html>'''

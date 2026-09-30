@@ -10,11 +10,17 @@
     "Describe los tipos de enfermedades",
     "Diferencia infecciosas y no infecciosas"
    ],
+   "flipped2": {
+    "enabled": true,
+    "title": "Para hoy: Microorganismos",
+    "desc": "Trae investigada la información sobre la levadura, las bacterias del yogur, la Salmonella y el moho del pan, con la ficha completa.",
+    "file": "f1"
+   },
    "flipped": {
     "enabled": true,
-    "title": "Antes de la sesión: Microorganismos",
-    "desc": "Investiga en fuentes confiables sobre la levadura, las bacterias del yogur, la Salmonella y el moho del pan, y completa la ficha antes de la clase.",
-    "file": "f1"
+    "title": "Para la siguiente sesión: materiales",
+    "desc": "Por grupo traigan: un vaso o frasco transparente, una regla y una cucharita. La profe llevará la levadura y el azúcar.",
+    "file": ""
    },
    "activities": [
     {
@@ -27,14 +33,14 @@
     {
      "mode": "group",
      "title": "🦠 Microorganismos: ¿amigos o enemigos?",
-     "desc": "En grupo, investiguen bacterias, virus, hongos y protozoarios. Busquen uno que cause enfermedades y otro que nos ayude (como en el pan o el yogur). Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
+     "desc": "En grupo, usen lo que investigaron antes de clase: completen la tabla de la levadura, las bacterias del yogur, la Salmonella y el moho del pan (grupo, qué hace y si nos ayuda o nos daña). Luego respondan: ¿todos los microorganismos del mismo grupo producen el mismo efecto? Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
      "ficha": "Ficha · Actividad 02",
      "file": "f3"
     },
     {
      "mode": "individual",
      "title": "🍞 Mi microorganismo útil",
-     "desc": "Escribe 3 o 4 líneas sobre la levadura: qué es y cómo nos ayuda. Usa: «La levadura es un ___. Nos ayuda a ___ porque ___». ¡Es el inicio de tu informe!",
+     "desc": "Completa qué es una enfermedad, una enfermedad infecciosa y una no infecciosa. Luego escribe 3 o 4 líneas sobre la levadura: qué es y cómo nos ayuda. ¡Es el inicio de tu informe!",
      "ficha": "",
      "file": ""
     }
@@ -188,6 +194,12 @@
     "desc": "",
     "file": ""
    },
+   "flipped2": {
+    "enabled": false,
+    "title": "",
+    "desc": "",
+    "file": ""
+   },
    "title": "",
    "fichaTitle": "Ficha · Sesión 2 · La levadura despierta"
   },
@@ -209,7 +221,7 @@
     {
      "mode": "group",
      "title": "🃏 Fábrica de preguntas",
-     "desc": "En grupo, combinen tarjetas de causas (temperatura, azúcar, levadura) con tarjetas de efectos (altura de la espuma). Armen 3 preguntas con «¿Cómo influye ___ en ___?» y elijan la mejor. Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
+     "desc": "En grupo, comparen sus preguntas individuales y escriban la pregunta inicial del equipo. Otro equipo les da una estrella (algo logrado) y una escalera (algo por mejorar), y con eso escriben la pregunta mejorada. Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
      "ficha": "",
      "file": ""
     },
@@ -282,6 +294,12 @@
     "desc": "",
     "file": ""
    },
+   "flipped2": {
+    "enabled": false,
+    "title": "",
+    "desc": "",
+    "file": ""
+   },
    "title": "",
    "fichaTitle": "Ficha · Sesión 3 · Formulamos nuestra pregunta de indagación"
   },
@@ -303,7 +321,7 @@
     {
      "mode": "group",
      "title": "🎲 La apuesta científica",
-     "desc": "En grupo, decidan: ¿a 15 °C, 25 °C o 35 °C habrá más espuma? Ordénenlas de mayor a menor y defiendan su apuesta con lo que leyeron: «Creemos que ___ porque en el texto dice ___». Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
+     "desc": "En grupo, ordenen las temperaturas de mayor a menor espuma y defiendan su apuesta con lo que leyeron. Escriban la hipótesis inicial del equipo, reciban una estrella y una escalera de otro equipo y escriban la hipótesis mejorada. Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
      "ficha": "",
      "file": ""
     },
@@ -376,6 +394,12 @@
     "desc": "",
     "file": ""
    },
+   "flipped2": {
+    "enabled": false,
+    "title": "",
+    "desc": "",
+    "file": ""
+   },
    "title": "",
    "fichaTitle": "Ficha · Sesión 4 · Elaboramos nuestra hipótesis"
   },
@@ -397,14 +421,14 @@
     {
      "mode": "group",
      "title": "🔧 Las reglas de nuestro experimento",
-     "desc": "En grupo, decidan qué cambiarán (la temperatura), qué medirán (la espuma en cm) y qué dejarán igual (levadura, azúcar, agua, vaso y tiempo): «Vamos a cambiar ___, mediremos ___ con ___ y dejaremos igual ___». Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
+     "desc": "En grupo, completen qué variable modificarán y qué variable medirán (con instrumento y unidad), y la tabla de factores que mantendrán iguales: agua, azúcar, levadura, recipiente, forma de mezclar, tiempo y forma de medir. Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
      "ficha": "",
      "file": ""
     },
     {
      "mode": "individual",
      "title": "📋 Mis variables",
-     "desc": "Escribe las variables de tu experimento. Explica con tus palabras: si un vaso tuviera más azúcar que otro, ¿sabríamos si la espuma cambió por la temperatura?",
+     "desc": "Completa tus variables: qué cambiaremos, qué mediremos y qué mantendremos igual. Explica por qué algunas cosas deben quedar igual y revisa tu trabajo con el semáforo de criterios.",
      "ficha": "",
      "file": ""
     }
@@ -470,6 +494,12 @@
     "desc": "",
     "file": ""
    },
+   "flipped2": {
+    "enabled": false,
+    "title": "",
+    "desc": "",
+    "file": ""
+   },
    "title": "",
    "fichaTitle": "Ficha · Sesión 5 · Determinamos nuestras variables"
   },
@@ -491,18 +521,24 @@
     {
      "mode": "group",
      "title": "🗺️ Nuestro plan de experimento",
-     "desc": "En grupo, escriban los pasos, los materiales y para qué sirve cada uno, y las medidas de seguridad (agua a 35 °C como máximo, no probamos la mezcla, nos lavamos las manos). Cada temperatura se repite 3 veces. Revisen el plan de otro grupo. Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
+     "desc": "En grupo, completen la tabla de materiales (cantidad y para qué sirven), las medidas de seguridad y los pasos en orden. Luego revisen el diseño de otro grupo con «Veo, pregunto, sugiero». Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
      "ficha": "",
      "file": ""
     },
     {
      "mode": "individual",
      "title": "📊 Mi tabla de registro",
-     "desc": "Dibuja tu tabla de registro: temperatura (15, 25 y 35 °C), repeticiones 1, 2 y 3, y la altura de la espuma en cm.",
+     "desc": "Diseña tu tabla de registro con las temperaturas (15, 25 y 35 °C), las 3 repeticiones y los tiempos (0 a 20 minutos). Luego comprueba tu diseño con la lista de cotejo.",
      "ficha": "",
      "file": ""
     }
    ],
+   "flipped": {
+    "enabled": true,
+    "title": "Para la siguiente sesión: materiales del experimento",
+    "desc": "Por grupo traigan: 3 vasos o frascos transparentes iguales, una regla, una cucharita, etiquetas o cinta para rotular y papel toalla. La profe llevará la levadura, el azúcar, el termómetro y el agua a 15, 25 y 35 °C.",
+    "file": ""
+   },
    "rubric": "Verificación mediante el diseño",
    "ticket": {
     "questions": [
@@ -558,7 +594,7 @@
      }
     ]
    },
-   "flipped": {
+   "flipped2": {
     "enabled": false,
     "title": "",
     "desc": "",
@@ -578,7 +614,7 @@
     {
      "mode": "individual",
      "title": "🦺 Listos y seguros",
-     "desc": "Revisa la lista de seguridad y elige tu rol en el grupo: medidor, cronometrista, anotador o vigía de seguridad.",
+     "desc": "Elige tu rol en el grupo (medidor, cronometrista, anotador o vigía de seguridad), revisa la lista de seguridad y comprueba las cantidades de agua, azúcar y levadura de cada recipiente.",
      "ficha": "",
      "file": ""
     },
@@ -592,11 +628,17 @@
     {
      "mode": "individual",
      "title": "📓 Mi diario del experimento",
-     "desc": "Anota tus medidas, algo que observaste (burbujas, olor, color) y una dificultad que tuviste: «Observé que ___. Lo más difícil fue ___».",
+     "desc": "Anota algo que observaste (burbujas, olor, color) y una dificultad que tuviste: «Observé que ___. Lo más difícil fue ___». Luego escribe la observación que recibió tu grupo y el ajuste que hicieron.",
      "ficha": "",
      "file": ""
     }
    ],
+   "flipped2": {
+    "enabled": true,
+    "title": "Para hoy: repasa tu diseño",
+    "desc": "Trae tu ficha de la sesión anterior con el procedimiento, la tabla de registro y las medidas de seguridad.",
+    "file": ""
+   },
    "rubric": "Verificación mediante el diseño (puesta en práctica)",
    "ticket": {
     "questions": [
@@ -679,7 +721,7 @@
     {
      "mode": "group",
      "title": "📈 Nuestros datos hablan",
-     "desc": "En grupo, junten sus promedios en una tabla de doble entrada y un gráfico. Elijan el gráfico que mejor muestre los datos y expliquen por qué. Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
+     "desc": "En grupo, construyan un gráfico de barras con los promedios: escriban el título y el nombre de los ejes, y expliquen por qué eligieron ese gráfico. Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
      "ficha": "",
      "file": ""
     },
@@ -752,6 +794,12 @@
     "desc": "",
     "file": ""
    },
+   "flipped2": {
+    "enabled": false,
+    "title": "",
+    "desc": "",
+    "file": ""
+   },
    "title": "",
    "fichaTitle": "Ficha · Sesión 8 · Procesamos nuestros datos"
   },
@@ -780,7 +828,7 @@
     {
      "mode": "individual",
      "title": "🗣️ Lo que muestran mis datos",
-     "desc": "Escribe 2 o 3 oraciones con tus números: «Cuando la temperatura fue ___, la espuma llegó a ___ cm. Esto muestra que ___».",
+     "desc": "Completa la tabla: resultado principal, comparación entre temperaturas, dos evidencias, el patrón y el límite de tus resultados. Luego escribe tu interpretación: «Cuando la temperatura fue ___, la espuma llegó a ___ cm. Esto muestra que ___».",
      "ficha": "",
      "file": ""
     }
@@ -846,6 +894,12 @@
     "desc": "",
     "file": ""
    },
+   "flipped2": {
+    "enabled": false,
+    "title": "",
+    "desc": "",
+    "file": ""
+   },
    "title": "",
    "fichaTitle": "Ficha · Sesión 9 · Interpretamos nuestros resultados"
   },
@@ -860,21 +914,21 @@
     {
      "mode": "individual",
      "title": "📚 Lo que dice la ciencia",
-     "desc": "Lee una ficha sobre cómo la levadura produce gas al alimentarse del azúcar. Subraya lo que te ayude a explicar lo que pasó en TU experimento.",
+     "desc": "Lee sobre cómo la levadura produce gas al alimentarse del azúcar y completa la tabla: información científica, dato de tu experimento y cómo ayuda a explicar el resultado.",
      "ficha": "",
      "file": ""
     },
     {
      "mode": "group",
      "title": "⚖️ Juicio a la hipótesis",
-     "desc": "En grupo, decidan si su hipótesis fue respaldada, parcialmente respaldada o no respaldada, usando sus datos y la lectura como pruebas: «Nuestra hipótesis fue ___ porque los datos muestran ___». Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
+     "desc": "En grupo, escriban qué predijo su hipótesis y qué mostraron los resultados. Decidan si fue respaldada, parcialmente respaldada o no respaldada, y escriban los datos que lo sustentan. Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
      "ficha": "",
      "file": ""
     },
     {
      "mode": "individual",
      "title": "🏁 Mi conclusión",
-     "desc": "Escribe tu conclusión: 1) Descubrí que… 2) Esto coincide con… 3) Tuve dificultad con… 4) Lo mejoraría… ¡Tu informe queda completo!",
+     "desc": "Completa la tabla de tu conclusión (respuesta a la pregunta, decisión sobre la hipótesis, dos evidencias, explicación científica, dificultades y mejoras) y escríbela en tu informe.",
      "ficha": "",
      "file": ""
     }
@@ -940,6 +994,12 @@
     "desc": "",
     "file": ""
    },
+   "flipped2": {
+    "enabled": false,
+    "title": "",
+    "desc": "",
+    "file": ""
+   },
    "title": "",
    "fichaTitle": "Ficha · Sesión 10 · Argumentamos nuestra conclusión"
   },
@@ -961,7 +1021,7 @@
     {
      "mode": "group",
      "title": "🕵️ Científicos en acción",
-     "desc": "En grupo, analicen la tabla o el gráfico del nuevo misterio. Saquen una conclusión con pruebas y propongan 2 mejoras al procedimiento. Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
+     "desc": "En grupo, calculen los promedios de la tabla del nuevo misterio, busquen el dato inusual, escriban una conclusión y propongan 2 mejoras al procedimiento. Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
      "ficha": "",
      "file": ""
     },
@@ -1029,6 +1089,12 @@
     ]
    },
    "flipped": {
+    "enabled": false,
+    "title": "",
+    "desc": "",
+    "file": ""
+   },
+   "flipped2": {
     "enabled": false,
     "title": "",
     "desc": "",

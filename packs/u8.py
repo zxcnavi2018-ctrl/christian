@@ -6,7 +6,7 @@ S=[]
 S.append(dict(meta="Describe las principales características del sistema reproductor humano.",
  criteria=["Identifica las funciones generales del sistema reproductor","Diferencia órganos del sistema masculino y femenino","Usa vocabulario científico"],
  activities=[A("individual","🧩 ¿Qué sé del sistema reproductor?","Observa las piezas del rompecabezas y escribe qué órganos reconoces y qué crees que hace cada uno. Pregúntate: ¿todos se ven a simple vista?"),
-  A("group","👥 Armamos el rompecabezas","En grupo, armen el rompecabezas del sistema reproductor masculino y femenino, ubiquen cada órgano y comparen con el video: ¿qué órganos faltaban?"+DUA),
+  A("group","👥 Armamos el rompecabezas","En grupo, armen el rompecabezas, ubiquen los órganos del sistema masculino y del femenino, y compárenlos con el video: ¿qué órgano no mencionó el video? ¿Qué órganos tienen en común varones y mujeres?"+DUA),
   A("individual","📘 Mi glosario científico","Empieza tu glosario: escribe 5 palabras nuevas con su significado. Completa: «El sistema reproductor sirve para ___». Será la base de tu póster.")],
  qs=[Q("¿Cuál es la función principal del sistema reproductor?",["Permitir la reproducción, es decir, originar nuevos seres humanos","Digerir los alimentos","Bombear la sangre"],0,"El sistema reproductor permite la formación de nuevos seres humanos."),
   Q("¿Qué órgano pertenece al sistema reproductor femenino?",["Los testículos","El útero","La próstata"],1,"El útero es parte del sistema reproductor femenino."),
@@ -25,9 +25,9 @@ S.append(dict(meta="Describe las partes y funciones del sistema reproductor masc
   Q("¿Qué significa «sintetizar» información de un video?",["Copiar todo lo que dice","Escribir las ideas principales con tus palabras","No tomar apuntes"],1,"Sintetizar es resumir lo importante.")]))
 S.append(dict(meta="Explica las partes del sistema reproductor femenino y el ciclo ovárico.",
  criteria=["Identifica órganos y funciones del sistema femenino","Describe las fases del ciclo ovárico y sus hormonas","Usa vocabulario científico"],
- activities=[A("individual","📖 Leo sobre el ciclo ovárico","Lee sobre el ciclo ovárico y subraya las palabras nuevas. Responde: ¿es lo mismo menstruación que ciclo ovárico? ¿Qué hormonas participan?"),
-  A("group","🔄 El ciclo en pareja","En pareja, construyan un organizador del ciclo ovárico con sus tres fases (folicular, ovulación y lútea): qué ocurre en cada una y qué hormona participa."+DUA),
-  A("individual","📝 Para mi póster: sistema femenino","Explica la función de ovarios, trompas de Falopio, útero y vagina, y resume el ciclo ovárico en 3 oraciones: «Primero ___, luego ___, finalmente ___».")],
+ activities=[A("individual","📖 Leo sobre el ciclo ovárico","Antes de leer, escribe si crees que menstruación y ciclo ovárico son lo mismo. Lee sobre las tres fases del ciclo y marca con una X las hormonas que participan."),
+  A("group","🔄 El ciclo en pareja","En pareja, completen la tabla de las tres fases del ciclo ovárico (qué ocurre y qué hormona participa) y la tabla de ovarios, trompas de Falopio, útero y vagina."+DUA),
+  A("individual","📝 Para mi póster: sistema femenino","Resume el ciclo ovárico en 3 oraciones para tu póster: «Primero ___. Luego ___. Finalmente ___».")],
  qs=[Q("¿Qué órgano produce los óvulos?",["Los ovarios","El útero","La vagina"],0,"Los óvulos maduran dentro de los ovarios."),
   Q("¿Cuántas fases tiene el ciclo ovárico?",["Dos","Tres: folicular, ovulación y lútea","Cinco"],1,"Tiene tres fases: folicular, ovulatoria y lútea."),
   Q("¿Qué es la ovulación?",["El inicio de la menstruación","El crecimiento del útero","La liberación de un óvulo maduro desde el ovario"],2,"En la ovulación el ovario libera un óvulo maduro."),
@@ -36,7 +36,7 @@ S.append(dict(meta="Explica las partes del sistema reproductor femenino y el cic
 S.append(dict(meta="Explica el proceso de fecundación y los cambios en el primer trimestre del embarazo.",
  criteria=["Describe paso a paso la fecundación","Describe los eventos del primer trimestre","Presenta información sintetizada con lenguaje científico"],
  activities=[A("individual","👀 Veo, pienso, me pregunto","Observa la imagen del inicio del embarazo y escribe: ¿qué veo?, ¿qué pienso?, ¿qué me pregunto? Luego mira el video y anota las palabras nuevas."),
-  A("group","🧬 La fecundación paso a paso","En grupo, ordenen y expliquen los pasos de la fecundación: qué células se unen, por qué se unen y qué pasa después (el cigoto se divide y se implanta en el útero)."+DUA),
+  A("group","🧬 La fecundación paso a paso","En grupo, respondan qué células se unen, por qué se unen y qué pasa después, y ordenen del 1 al 4 los pasos de la fecundación."+DUA),
   A("individual","📝 Para mi póster: fecundación y primer trimestre","Completa una línea de tiempo del primer trimestre (semanas 1 a 12) con 3 cambios importantes del bebé en formación.")],
  qs=[Q("¿Qué células se unen en la fecundación?",["El espermatozoide y el óvulo","Dos óvulos","Dos neuronas"],0,"La fecundación es la unión de un espermatozoide con un óvulo."),
   Q("¿Cómo se llama la primera célula que se forma tras la fecundación?",["Feto","Cigoto","Óvulo"],1,"La célula resultante se llama cigoto."),
@@ -45,8 +45,8 @@ S.append(dict(meta="Explica el proceso de fecundación y los cambios en el prime
   Q("¿Cuánto dura aproximadamente el primer trimestre?",["1 mes","Las primeras 12 semanas","9 meses"],1,"El primer trimestre abarca aproximadamente las semanas 1 a 12.")]))
 S.append(dict(meta="Explica el desarrollo fetal en el segundo y tercer trimestre del embarazo.",
  criteria=["Reconoce las características del segundo trimestre","Describe las características del tercer trimestre","Presenta información sintetizada con lenguaje científico"],
- activities=[A("individual","📏 La tirita de 7 cm","Observa tu tirita de papel de 7 cm: ¿qué crees que representa? Mira el video y completa la tabla del segundo trimestre (semanas 14, 16, 20, 24 y 28)."),
-  A("group","🤰 El viaje de 9 meses","En grupo, completen los cambios del tercer trimestre (semanas 28, 32 y 36) y los cambios en la mamá. Construyan una línea de tiempo del embarazo con tamaño y logros del bebé."+DUA),
+ activities=[A("individual","📏 La tirita de 7 cm","Observa tu tirita de papel de 7 cm: ¿qué crees que representa? Mira el video y completa la tabla del segundo trimestre (semanas 14, 16, 20, 24 y 28) y los síntomas que podría tener la mamá."),
+  A("group","🤰 El viaje de 9 meses","En grupo, completen los cambios del bebé en las semanas 28, 32 y 36, y los cambios que presenta la mamá en el tercer trimestre."+DUA),
   A("individual","📝 Para mi póster: segundo y tercer trimestre","Escribe 3 datos que te sorprendieron del desarrollo del bebé, usando números: «En la semana ___ el bebé ___».")],
  qs=[Q("¿Qué representa la tirita de 7 cm?",["El tamaño del feto al inicio del segundo trimestre","El tamaño del óvulo","La duración del embarazo"],0,"Al inicio del segundo trimestre el feto mide unos 7 cm."),
   Q("¿En qué trimestre el bebé empieza a moverse y oír?",["Primer trimestre","Segundo trimestre","Después del parto"],1,"Durante el segundo trimestre el bebé se mueve y puede oír."),
@@ -66,7 +66,7 @@ S.append(dict(meta="Elabora conclusiones sobre el uso de la tecnología asociada
 S.append(dict(meta="Elabora un póster en equipo reflexionando sobre lo aprendido en la unidad.",
  criteria=["Explica el saber científico de los sistemas reproductores y la fecundación","Explica cómo la tecnología interviene en el embarazo y el parto","Comunica con claridad, recursos visuales y lenguaje científico"],
  activities=[A("individual","✏️ Mi boceto","Revisa tus apuntes y glosario. Haz un boceto de lo que aportarás al póster: un título, un dibujo o esquema y 3 ideas clave con palabras científicas."),
-  A("group","🖼️ Nuestros pósters científicos","En equipo, elaboren los dos pósters: 1) los sistemas reproductores y el ciclo ovárico; 2) tecnologías del embarazo y el parto. Preséntenlos en modo feria científica."+DUA),
+  A("group","🖼️ Nuestros pósters científicos","En equipo, organicen el contenido, las imágenes y los responsables de los dos pósters: 1) sistemas reproductores y ciclo ovárico; 2) tecnologías del embarazo y el parto. Revísenlos con la lista de cotejo y preséntenlos en modo feria."+DUA),
   A("individual","🪞 Me evalúo","Revisa tu trabajo con la rúbrica: marca tu nivel (C, B, A o AD) y responde: ¿qué conocimiento es nuevo para ti? ¿Qué te gustaría investigar?")],
  qs=[Q("¿Qué debe tener un póster científico?",["Título, imágenes y textos breves con lenguaje científico","Solo dibujos sin texto","Textos muy largos sin imágenes"],0,"Un póster combina títulos, imágenes y textos cortos y claros."),
   Q("¿Qué tema va en el primer póster?",["Recetas de cocina","Los sistemas reproductores y el ciclo ovárico","Los planetas"],1,"El primer póster describe los sistemas reproductores y el ciclo ovárico."),
@@ -76,7 +76,10 @@ S.append(dict(meta="Elabora un póster en equipo reflexionando sobre lo aprendid
 for s,rb in zip(S,["Explica el saber científico"]*5+["Explica las consecuencias y opina sobre la tecnología","Todos los criterios (póster final)"]):
   s["rubric"]=rb
   assert len(s["qs"])==5 and len(s["activities"])==3
-  s["ticket"]={"questions":s.pop("qs")};s["flipped"]={"enabled":False,"title":"","desc":"","file":""};s["title"]=""
-S[1]["flipped"]={"enabled":True,"title":"Flipped: sistema reproductor femenino","desc":"Antes de la siguiente sesión, mira el video del sistema reproductor femenino y completa en tu cuaderno el cuadro de ovario, trompas de Falopio, útero y vagina: características, funciones y un dato interesante.","file":""}
+  s["ticket"]={"questions":s.pop("qs")};s.setdefault("flipped",{"enabled":False,"title":"","desc":"","file":""});s.setdefault("flipped2",{"enabled":False,"title":"","desc":"","file":""});s["title"]=""
+S[1]["flipped"]={"enabled":True,"title":"Para la siguiente sesión: sistema reproductor femenino","desc":"Mira el video del sistema reproductor femenino y completa en tu cuaderno el cuadro de ovario, trompas de Falopio, útero y vagina: características, funciones y un dato interesante.","file":""}
+S[2]["flipped2"]={"enabled":True,"title":"Para hoy: sistema reproductor femenino","desc":"Trae tu cuadro del sistema reproductor femenino completado con el video (ovario, trompas de Falopio, útero y vagina).","file":""}
+S[5]["flipped"]={"enabled":True,"title":"Para la siguiente sesión: materiales del póster","desc":"Por equipo traigan imágenes del sistema reproductor masculino y femenino, de la fecundación y las etapas del embarazo, y de tecnologías como la ecografía o el monitor fetal. También papelógrafo, plumones, tijeras y goma.","file":""}
+S[6]["flipped2"]={"enabled":True,"title":"Para hoy: imágenes y materiales","desc":"Trae las imágenes y los materiales acordados con tu equipo para armar los pósters.","file":""}
 json.dump({"unit":"unit8","title":"El sistema reproductor humano","product":"Dos pósters científicos: 1) los sistemas reproductores y el ciclo ovárico; 2) tecnologías asociadas a la fecundación, el embarazo y el parto","sessions":S},open('/home/user/christian/packs/unidad8.json','w'),ensure_ascii=False,indent=1)
 print('ok',len(S))

@@ -21,7 +21,7 @@
     {
      "mode": "group",
      "title": "👥 Armamos el rompecabezas",
-     "desc": "En grupo, armen el rompecabezas del sistema reproductor masculino y femenino, ubiquen cada órgano y comparen con el video: ¿qué órganos faltaban? Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
+     "desc": "En grupo, armen el rompecabezas, ubiquen los órganos del sistema masculino y del femenino, y compárenlos con el video: ¿qué órgano no mencionó el video? ¿Qué órganos tienen en común varones y mujeres? Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
      "ficha": "",
      "file": ""
     },
@@ -89,6 +89,12 @@
     ]
    },
    "flipped": {
+    "enabled": false,
+    "title": "",
+    "desc": "",
+    "file": ""
+   },
+   "flipped2": {
     "enabled": false,
     "title": "",
     "desc": "",
@@ -183,8 +189,14 @@
    },
    "flipped": {
     "enabled": true,
-    "title": "Flipped: sistema reproductor femenino",
-    "desc": "Antes de la siguiente sesión, mira el video del sistema reproductor femenino y completa en tu cuaderno el cuadro de ovario, trompas de Falopio, útero y vagina: características, funciones y un dato interesante.",
+    "title": "Para la siguiente sesión: sistema reproductor femenino",
+    "desc": "Mira el video del sistema reproductor femenino y completa en tu cuaderno el cuadro de ovario, trompas de Falopio, útero y vagina: características, funciones y un dato interesante.",
+    "file": ""
+   },
+   "flipped2": {
+    "enabled": false,
+    "title": "",
+    "desc": "",
     "file": ""
    },
    "title": ""
@@ -200,21 +212,21 @@
     {
      "mode": "individual",
      "title": "📖 Leo sobre el ciclo ovárico",
-     "desc": "Lee sobre el ciclo ovárico y subraya las palabras nuevas. Responde: ¿es lo mismo menstruación que ciclo ovárico? ¿Qué hormonas participan?",
+     "desc": "Antes de leer, escribe si crees que menstruación y ciclo ovárico son lo mismo. Lee sobre las tres fases del ciclo y marca con una X las hormonas que participan.",
      "ficha": "",
      "file": ""
     },
     {
      "mode": "group",
      "title": "🔄 El ciclo en pareja",
-     "desc": "En pareja, construyan un organizador del ciclo ovárico con sus tres fases (folicular, ovulación y lútea): qué ocurre en cada una y qué hormona participa. Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
+     "desc": "En pareja, completen la tabla de las tres fases del ciclo ovárico (qué ocurre y qué hormona participa) y la tabla de ovarios, trompas de Falopio, útero y vagina. Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
      "ficha": "",
      "file": ""
     },
     {
      "mode": "individual",
      "title": "📝 Para mi póster: sistema femenino",
-     "desc": "Explica la función de ovarios, trompas de Falopio, útero y vagina, y resume el ciclo ovárico en 3 oraciones: «Primero ___, luego ___, finalmente ___».",
+     "desc": "Resume el ciclo ovárico en 3 oraciones para tu póster: «Primero ___. Luego ___. Finalmente ___».",
      "ficha": "",
      "file": ""
     }
@@ -280,6 +292,12 @@
     "desc": "",
     "file": ""
    },
+   "flipped2": {
+    "enabled": true,
+    "title": "Para hoy: sistema reproductor femenino",
+    "desc": "Trae tu cuadro del sistema reproductor femenino completado con el video (ovario, trompas de Falopio, útero y vagina).",
+    "file": ""
+   },
    "title": ""
   },
   {
@@ -300,7 +318,7 @@
     {
      "mode": "group",
      "title": "🧬 La fecundación paso a paso",
-     "desc": "En grupo, ordenen y expliquen los pasos de la fecundación: qué células se unen, por qué se unen y qué pasa después (el cigoto se divide y se implanta en el útero). Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
+     "desc": "En grupo, respondan qué células se unen, por qué se unen y qué pasa después, y ordenen del 1 al 4 los pasos de la fecundación. Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
      "ficha": "",
      "file": ""
     },
@@ -373,6 +391,12 @@
     "desc": "",
     "file": ""
    },
+   "flipped2": {
+    "enabled": false,
+    "title": "",
+    "desc": "",
+    "file": ""
+   },
    "title": ""
   },
   {
@@ -386,14 +410,14 @@
     {
      "mode": "individual",
      "title": "📏 La tirita de 7 cm",
-     "desc": "Observa tu tirita de papel de 7 cm: ¿qué crees que representa? Mira el video y completa la tabla del segundo trimestre (semanas 14, 16, 20, 24 y 28).",
+     "desc": "Observa tu tirita de papel de 7 cm: ¿qué crees que representa? Mira el video y completa la tabla del segundo trimestre (semanas 14, 16, 20, 24 y 28) y los síntomas que podría tener la mamá.",
      "ficha": "",
      "file": ""
     },
     {
      "mode": "group",
      "title": "🤰 El viaje de 9 meses",
-     "desc": "En grupo, completen los cambios del tercer trimestre (semanas 28, 32 y 36) y los cambios en la mamá. Construyan una línea de tiempo del embarazo con tamaño y logros del bebé. Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
+     "desc": "En grupo, completen los cambios del bebé en las semanas 28, 32 y 36, y los cambios que presenta la mamá en el tercer trimestre. Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
      "ficha": "",
      "file": ""
     },
@@ -461,6 +485,12 @@
     ]
    },
    "flipped": {
+    "enabled": false,
+    "title": "",
+    "desc": "",
+    "file": ""
+   },
+   "flipped2": {
     "enabled": false,
     "title": "",
     "desc": "",
@@ -554,6 +584,12 @@
     ]
    },
    "flipped": {
+    "enabled": true,
+    "title": "Para la siguiente sesión: materiales del póster",
+    "desc": "Por equipo traigan imágenes del sistema reproductor masculino y femenino, de la fecundación y las etapas del embarazo, y de tecnologías como la ecografía o el monitor fetal. También papelógrafo, plumones, tijeras y goma.",
+    "file": ""
+   },
+   "flipped2": {
     "enabled": false,
     "title": "",
     "desc": "",
@@ -579,7 +615,7 @@
     {
      "mode": "group",
      "title": "🖼️ Nuestros pósters científicos",
-     "desc": "En equipo, elaboren los dos pósters: 1) los sistemas reproductores y el ciclo ovárico; 2) tecnologías del embarazo y el parto. Preséntenlos en modo feria científica. Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
+     "desc": "En equipo, organicen el contenido, las imágenes y los responsables de los dos pósters: 1) sistemas reproductores y ciclo ovárico; 2) tecnologías del embarazo y el parto. Revísenlos con la lista de cotejo y preséntenlos en modo feria. Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
      "ficha": "",
      "file": ""
     },
@@ -650,6 +686,12 @@
     "enabled": false,
     "title": "",
     "desc": "",
+    "file": ""
+   },
+   "flipped2": {
+    "enabled": true,
+    "title": "Para hoy: imágenes y materiales",
+    "desc": "Trae las imágenes y los materiales acordados con tu equipo para armar los pósters.",
     "file": ""
    },
    "title": ""

@@ -28,7 +28,7 @@ def cover(n,pk,sess):
 def sess(n,i,s):
     cr=''.join(f'<li>{c(x)}</li>' for x in s["criteria"])
     ac=''.join(f'<tr><td>{k}</td><td>{"En grupo" if a["mode"]=="group" else "Individual"}</td><td><b>{c(a["title"])}</b><br>{c(a["desc"])}</td></tr>' for k,a in enumerate(s["activities"],1))
-    fl=f'<div class="box"><b>Flipped:</b> {c(s["flipped"]["title"])}. {c(s["flipped"]["desc"])}</div>' if s.get("flipped",{}).get("enabled") else ''
+    fl=(f'<div class="box"><b>Flipped para hoy:</b> {c(s["flipped2"]["title"])}. {c(s["flipped2"]["desc"])}</div>' if s.get("flipped2",{}).get("enabled") else '')+(f'<div class="box"><b>Flipped para la siguiente sesión:</b> {c(s["flipped"]["title"])}. {c(s["flipped"]["desc"])}</div>' if s.get("flipped",{}).get("enabled") else '')
     qs=''.join(f'<li>{c(q["q"])}<br>'+' · '.join((f'<span class="ok">{"abc"[j]}) {c(o)} ✔</span>' if j==q["answer"] else f'{"abc"[j]}) {c(o)}') for j,o in enumerate(q["options"]))+'</li>' for q in s["ticket"]["questions"])
     return f'<div class="k">Unidad {n} · Guía docente</div><h2>Sesión {i}</h2><div class="box"><b>Meta:</b> {c(s["meta"])}<br><b>Criterio de la rúbrica:</b> {E(RUB[n][2][i-1])}</div><h3>Criterios de éxito</h3><ol>{cr}</ol>{fl}<h3>Actividades</h3><table><tr><th style="width:8%">N.°</th><th style="width:14%">Modalidad</th><th>Actividad</th></tr>{ac}</table><h3>Exit ticket (respuesta correcta subrayada)</h3><ol>{qs}</ol><p style="margin-top:8px">A continuación: ficha del estudiante de la sesión {i}.</p>'
 pages=[]

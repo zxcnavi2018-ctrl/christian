@@ -30,7 +30,7 @@ def feedback(kind):
 def page(num,title,meta,crit,acts,extra=""):
     cr=''.join(f'<li>☐ {e(c)}</li>' for c in crit)
     return f'''<!doctype html><html><head><meta charset="utf-8"><style>
-@page{{size:A4;margin:12mm 12mm 14mm}}
+@page{{size:A4;margin:9mm 8mm 10mm}}
 *{{box-sizing:border-box}}body{{font-family:"DejaVu Sans",Arial,sans-serif;font-size:11.5pt;color:#000;margin:0;background:#fff}}
 .hd{{display:flex;align-items:center;gap:12px;border-bottom:1px solid #000;padding:0 0 8px}}
 .hd .n{{border:1px solid #000;border-radius:10px;padding:5px 11px;font-weight:600;font-size:18pt;text-align:center;line-height:1}}
@@ -60,7 +60,7 @@ table.chk td:not(:first-child),table.chk th:not(:first-child){{width:62px;text-a
 .sab{{margin:8px 2px 0}}.sab h3{{margin:0 0 3px}}.sab ul{{margin:0;padding-left:18px}}.sab li{{margin:2px 0;font-size:11pt}}.moli{{vertical-align:middle;margin-right:6px}}.sopa{{width:auto;border-collapse:collapse;margin:4px auto}}.sopa td{{width:22px;height:22px!important;text-align:center;vertical-align:middle;border:.6px solid #000;font-size:10pt;padding:0}}.wb{{font-weight:400;border:1px solid #000;padding:1px 6px;border-radius:6px}}.sop{{break-inside:avoid}}.sab p{{font-size:11pt;line-height:1.4}}.vf{{list-style:none;padding-left:4px!important}}.vf li{{margin:5px 0}}.draw{{border:1px solid #000;border-radius:12px;margin-top:8px;padding:6px 10px;font-size:11pt;break-inside:avoid}}
 .foot{{margin-top:8px;font-size:8pt;text-align:center}}
 </style></head><body>
-<div class="hd"><div class="n"><small>SESIÓN</small>{num}</div><div><h1>{e(title)}</h1><p>Ciencia y Tecnología · 6.° grado · Unidad 7: Microorganismos en acción</p></div><div class="lg"><svg viewBox="22 14 68 92" width="22" height="30" fill="none" stroke="#000" stroke-width="2"><path d="M27 20 Q36 19 44 21 Q49 29 53 38 Q42 34 30 34 Q28 27 27 20 Z"/><path d="M28 40 Q42 38 54 44 Q57 70 56 98 Q38 86 32 66 Q28 54 28 40 Z"/><path d="M58 26 Q74 32 84 46 Q82 76 58 100 Q62 64 58 26 Z"/></svg><span><b class="i">innova</b> schools</span></div></div>
+<div class="hd"><div class="n"><small>SESIÓN</small>{num}</div><div><h1>{e(title)}</h1><p>Ciencia y Tecnología · 6.° grado · Unidad 7: Microorganismos en acción</p></div><div class="lg"><svg viewBox="22 14 68 92" width="22" height="30" fill="none" stroke="#000" stroke-width="1.2"><path d="M27 20 Q36 19 44 21 Q49 29 53 38 Q42 34 30 34 Q28 27 27 20 Z"/><path d="M28 40 Q42 38 54 44 Q57 70 56 98 Q38 86 32 66 Q28 54 28 40 Z"/><path d="M58 26 Q74 32 84 46 Q82 76 58 100 Q62 64 58 26 Z"/></svg><span><b class="i">innova</b> schools</span></div></div>
 {''.join(acts)}{extra}
 <div class="foot">Producto de la unidad: Informe de indagación · ¿Cómo influye la temperatura del agua en la actividad de la levadura?</div>
 </body></html>'''
@@ -89,6 +89,7 @@ def cloze(text,words):
                 out.append(sent[:m.start()]+'__________'+sent[m.end():]);bank.append(w);sents[k]='';break
     return out,sorted(bank)
 MOLI='<svg class="moli" viewBox="0 0 100 100" width="46" height="46" fill="none" stroke="#000" stroke-width="3.6">'+''.join(f'<path d="{d}"/>' for d in ["M26 8 H74 Q90 8 90 24 V36 Q90 52 74 52 H26 Q10 52 10 36 V24 Q10 8 26 8 Z","M31 16 H69 Q80 16 80 27 V33 Q80 44 69 44 H31 Q20 44 20 33 V27 Q20 16 31 16 Z","M36 24 Q41 24 41 30 Q41 36 36 36 Q31 36 31 30 Q31 24 36 24 Z","M64 24 Q69 24 69 30 Q69 36 64 36 Q59 36 59 30 Q59 24 64 24 Z","M10 25 Q4 25 4 30.5 Q4 36 10 36","M90 25 Q96 25 96 30.5 Q96 36 90 36","M29 57 H71 Q78 57 76 67 L72 85 Q70 93 61 93 H39 Q30 93 28 85 L24 67 Q22 57 29 57 Z","M25 63 Q14 70 16 82","M75 63 Q86 70 84 82","M44 70 Q50 74 56 70"])+'</svg>'
+MOLI=''  # sin dibujo de Moli en las fichas
 P=[]
 # ---------- S1
 P.append(dict(t="¿Por qué nos enfermamos?",acts=[

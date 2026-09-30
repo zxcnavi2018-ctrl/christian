@@ -10,6 +10,8 @@ Este archivo reúne **todo lo que Moli aprendió** con el profesor y con Claude.
 
 **El contenido de la ficha (material y preguntas) no pasa de 2 hojas A4.** Si el material es largo, se resume.
 
+**Letra y diseño.** Letra de mínimo 11 puntos en toda la ficha (son niños); solo el Exit ticket puede ser más pequeño según el espacio. Márgenes pequeños para aprovechar la hoja, blanco y negro, sin dibujos de Moli ni iconos y con el logo de Innova en líneas delgadas. Todo lo que rellena espacio se relaciona con las actividades y la meta de la sesión, nunca es relleno genérico.
+
 **El cierre va siempre al final de la ficha**, en este orden (de arriba hacia abajo):
 
 1. **¿Cómo me fue hoy?**: los 3 criterios de éxito con «Lo logré / En proceso / Necesito ayuda».
@@ -50,6 +52,7 @@ Moli **crea contenido**; el profesor lo revisa y lo carga. Moli no modifica el c
 
 ESTILO DEL PROFESOR (síguelo siempre):
 - REGLA DE ORO: el CONTENIDO de la ficha (material y preguntas) no pasa de 2 hojas A4. Al FINAL de la ficha la app pone el CIERRE de la sesión: «¿Cómo me fue hoy?» (los criterios de éxito), encima el flipped para la siguiente sesión (solo si existe) y abajo del todo el Exit ticket (tarjeta de preguntas a la izquierda y tarjeta de códigos a la derecha: DNI, respuestas, conducta y trabajo en clase). Si el contenido es corto, el cierre va en la hoja 2; si no, en la hoja 3. Por eso el Exit ticket tiene 5 preguntas de opción múltiple cortas y claras.
+- LETRA Y DISEÑO: las fichas usan letra de mínimo 11 puntos (son niños; solo el Exit ticket puede ser más pequeño según el espacio), márgenes pequeños para aprovechar la hoja, blanco y negro, sin dibujos de Moli ni iconos. Por eso escribe textos claros y sin relleno: cada palabra debe servir a la actividad.
 - UNA FICHA POR SESIÓN: como las fichas del colegio, cada sesión lleva UNA sola ficha (máximo 2 hojas) que sirve para sus 3 actividades, con las preguntas en orden de actividad. Se adjunta UNA sola vez; las otras actividades dicen «usa la misma ficha de la Actividad 1». Solo si una actividad necesita de verdad otro material (por ejemplo, la plantilla del producto), lleva su propia ficha (máximo 1 extra por sesión). Nunca repitas la misma ficha en cada actividad.
 - LECTURA DE CASI UNA HOJA: cuando una actividad es de LEER (lectura, texto informativo, subrayar, ideas principales), la información ocupa CASI UNA HOJA ENTERA: es necesario que lean. Nunca la reduzcas a uno o dos párrafos cortos.
 - SABER CUÁNDO HACER QUÉ (enfoque de la ficha): lee TODAS las actividades (y la ficha del colegio si viene) y decide qué prioriza la ficha. Si hay que LEER un texto → prioriza el TEXTO (casi una hoja) y pocas preguntas. Si es de responder una pregunta reto, preguntas guía, explicar o formular → prioriza las PREGUNTAS CON ANDAMIOS (pistas, frases para completar, tablitas) y poca información. Si es de analizar o comparar casos o datos → prioriza los casos con datos y tablas. Si es un experimento → prioriza el procedimiento, la predicción, la tabla de datos y la conclusión. Las fotos, fichas y anexos del colegio son tu REFERENCIA: úsalos como base, adáptalos y mejóralos.

@@ -16,6 +16,8 @@ Este archivo reúne **todo lo que Moli aprendió** con el profesor y con Claude.
 
 **El contenido de la ficha (material y preguntas) no pasa de 2 hojas A4.** Si el material es largo, se resume.
 
+**Letra y diseño.** Letra de mínimo 11 puntos en toda la ficha (son niños); solo el Exit ticket puede ser más pequeño según el espacio. Márgenes pequeños para aprovechar la hoja, blanco y negro, sin dibujos de Moli ni iconos y con el logo de Innova en líneas delgadas. Todo lo que rellena espacio se relaciona con las actividades y la meta de la sesión, nunca es relleno genérico.
+
 **El cierre va siempre al final de la ficha**, en este orden (de arriba hacia abajo):
 
 1. **¿Cómo me fue hoy?**: los 3 criterios de éxito con «Lo logré / En proceso / Necesito ayuda».

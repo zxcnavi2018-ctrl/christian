@@ -58,7 +58,7 @@ S.append(dict(meta="Determina las variables necesarias para comprobar la hipóte
 S.append(dict(meta="Diseña una estrategia experimental válida y segura para comprobar la hipótesis.",
  criteria=["Describe materiales y seguridad","Organiza acciones en secuencia","Diseña su tabla de registro"],
  activities=[A("individual","🧩 Pasos en orden","Ordena los pasos para preparar un refresco usando «primero, luego, después, finalmente». Así practicas cómo escribir un procedimiento."),
-  A("group","🗺️ Nuestro plan de experimento","En grupo, completen la tabla de materiales (cantidad y para qué sirven), las medidas de seguridad y los pasos en orden. Luego revisen el diseño de otro grupo con «Veo, pregunto, sugiero»."+DUA),
+  A("group","🗺️ Nuestro plan de experimento","En grupo, completen la tabla de materiales (cantidad y para qué sirven), las medidas de seguridad y los pasos en orden, y presenten su diseño de indagación en un papelote. Luego revisen el diseño de otro grupo con «Veo, pregunto, sugiero»."+DUA),
   A("individual","📊 Mi tabla de registro","Diseña tu tabla de registro con las temperaturas (15, 25 y 35 °C), las 3 repeticiones y los tiempos (0 a 20 minutos). Luego comprueba tu diseño con la lista de cotejo.")],
  qs=[Q("¿Por qué repetimos 3 veces cada temperatura?",["Para que los resultados sean más confiables","Para gastar más levadura","Porque es divertido"],0,"Repetir ayuda a detectar errores y confiar en los datos."),
   Q("¿Cuál es una medida de seguridad de nuestro experimento?",["Probar la mezcla para ver su sabor","Usar agua a 35 °C como máximo y no consumir las mezclas","Usar agua hirviendo"],1,"Usamos agua hasta 35 °C y nunca probamos las mezclas."),

@@ -46,7 +46,7 @@ def page(num,title,meta,crit,acts,extra=""):
 h2{{margin:3px 0 6px;font-size:12.5pt;font-weight:600}}h3{{font-size:12pt;margin:8px 0 4px;font-weight:600}}b{{font-weight:400}}
 p{{margin:4px 0}}.ln{{border-bottom:.8px dotted #000;height:34px}}
 table{{width:100%;border-collapse:collapse;margin:5px 0;font-size:11pt;break-inside:auto}}tr{{break-inside:avoid;page-break-inside:avoid}}thead{{display:table-header-group}}h2,.ah{{break-after:avoid}}th{{text-align:left;padding:4px 6px;border:.7px solid #000;font-weight:400;background:#fff}}td{{border:.7px solid #000;padding:5px 6px;height:44px;vertical-align:top}}
-table.kv td:first-child,table.kv th:first-child{{width:42%}}
+table.kv td:first-child,table.kv th:first-child{{width:42%}}table.num td:first-child,table.num th:first-child{{width:56px;text-align:center}}table.num td{{height:30px!important}}.chk2{{display:grid;grid-template-columns:1fr 1fr;gap:3px 18px;margin:4px 0 8px}}
 table.chk td{{height:30px}}table.wide{{table-layout:fixed}}table tr.bk td{{height:70px}}table.mid{{table-layout:fixed}}table.mid td{{height:56px}}table.wide td{{height:70px}}table.wide td:first-child{{height:auto}}
 table.chk td:not(:first-child),table.chk th:not(:first-child){{width:62px;text-align:center}}
 .scaf{{margin:5px 0;font-size:11pt}}
@@ -123,7 +123,7 @@ P.append(dict(t="La fecundación y el primer trimestre",acts=[
 act(1,"i","Veo, pienso, me pregunto",'<p>Observa la imagen.</p><div class="fig"><svg viewBox="0 0 300 150" width="300" height="150" fill="none" stroke="#000" stroke-width="1.4"><circle cx="210" cy="75" r="52"/><circle cx="210" cy="75" r="58" stroke-dasharray="3 3"/><circle cx="222" cy="66" r="10"/><ellipse cx="140" cy="40" rx="6" ry="4"/><path d="M134 40 q-10 -6 -20 0 t-20 0"/><ellipse cx="125" cy="75" rx="6" ry="4"/><path d="M119 75 q-10 -6 -20 0 t-20 0"/><ellipse cx="145" cy="110" rx="6" ry="4"/><path d="M139 110 q-10 -6 -20 0 t-20 0"/><ellipse cx="100" cy="55" rx="6" ry="4"/><path d="M94 55 q-10 -6 -20 0 t-20 0"/><ellipse cx="95" cy="100" rx="6" ry="4"/><path d="M89 100 q-10 -6 -20 0 t-20 0"/></svg></div>'+table(["Veo","Pienso","Me pregunto"],[],1)+
  '<p>Palabras nuevas del video:</p>'+lines(1)),
 act(2,"g","La fecundación paso a paso",table(["","La fecundación"],[["¿Qué células sexuales están involucradas?"],["¿Por qué las células sexuales se tienen que unir?"],["¿Qué sucede luego de que se unen?"]])+
- '<p>Ordenen los pasos del 1 al 4:</p>'+table(["N.°","Paso"],[["___","El cigoto se divide muchas veces"],["___","El espermatozoide se une al óvulo"],["___","El embrión se implanta en el útero"],["___","Se forma el cigoto"]])+dua()),
+ '<p>Ordenen los pasos del 1 al 4:</p>'+table(["N.°","Paso"],[["___","El cigoto se divide muchas veces"],["___","El espermatozoide se une al óvulo"],["___","El embrión se implanta en el útero"],["___","Se forma el cigoto"]],cls="num")+dua()),
 act(3,"i","Para mi póster: fecundación y primer trimestre",informe("Línea de tiempo",table(["Semanas","Cambio importante"],[["1 a 4"],["5 a 8"],["9 a 12"]]))+
  scaf("«En la semana ___ el embrión ________.»"))]))
 P.append(dict(t="El desarrollo del bebé: segundo y tercer trimestre",acts=[

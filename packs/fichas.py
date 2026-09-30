@@ -46,7 +46,7 @@ def page(num,title,meta,crit,acts,extra=""):
 h2{{margin:3px 0 6px;font-size:12.5pt;font-weight:600}}h3{{font-size:12pt;margin:8px 0 4px;font-weight:600}}b{{font-weight:400}}
 p{{margin:4px 0}}.ln{{border-bottom:.8px dotted #000;height:34px}}
 table{{width:100%;border-collapse:collapse;margin:5px 0;font-size:11pt;break-inside:auto}}tr{{break-inside:avoid;page-break-inside:avoid}}thead{{display:table-header-group}}h2,.ah{{break-after:avoid}}th{{text-align:left;padding:4px 6px;border:.7px solid #000;font-weight:400;background:#fff}}td{{border:.7px solid #000;padding:5px 6px;height:44px;vertical-align:top}}
-table.kv td:first-child,table.kv th:first-child{{width:42%}}
+table.kv td:first-child,table.kv th:first-child{{width:42%}}table.num td:first-child,table.num th:first-child{{width:56px;text-align:center}}table.num td{{height:30px!important}}.chk2{{display:grid;grid-template-columns:1fr 1fr;gap:3px 18px;margin:4px 0 8px}}
 table.chk td{{height:30px}}table.wide{{table-layout:fixed}}table tr.bk td{{height:70px}}table.mid{{table-layout:fixed}}table.mid td{{height:56px}}table.wide td{{height:70px}}table.wide td:first-child{{height:auto}}
 table.chk td:not(:first-child),table.chk th:not(:first-child){{width:62px;text-align:center}}
 .scaf{{margin:5px 0;font-size:11pt}}
@@ -154,11 +154,12 @@ act(3,"i","📋 Mis variables",informe("Variables",table(["Cambiaremos","Medirem
 # ---------- S6
 P.append(dict(t="Diseñamos nuestro experimento",acts=[
 act(1,"i","🧩 Pasos en orden",'<p>Ordena los pasos para preparar un vaso de refresco con los números 1 a 5.</p>'+
- table(["N.°","Paso"],[["___","Mezclar hasta disolver el azúcar"],["___","Lavar el vaso y la cuchara"],["___","Echar 200 mL de agua al vaso"],["___","Servir y beber"],["___","Agregar dos cucharadas de azúcar y el jugo"]],cls="chk")+
+ table(["N.°","Paso"],[["___","Mezclar hasta disolver el azúcar"],["___","Lavar el vaso y la cuchara"],["___","Echar 200 mL de agua al vaso"],["___","Servir y beber"],["___","Agregar dos cucharadas de azúcar y el jugo"]],cls="num")+
  scaf("Usa conectores: <b>primero</b>, <b>luego</b>, <b>después</b>, <b>finalmente</b>.")),
 act(2,"g","🗺️ Nuestro plan de experimento",table(["Material o instrumento","Cantidad","¿Para qué lo usaremos?"],[],3)+
  '<p><b>Medidas de seguridad:</b> agua a una temperatura máxima de 35 °C · no consumir ni acercar el rostro a las mezclas · ____________________________</p>'+
  table(["Paso","Acción (en orden)"],[["1"],["2"],["3"],["4"],["5"],["6"]])+
+ '<p><b>En equipo, en un papelote,</b> presenten su diseño de indagación. Su papelote debe tener (marquen cada parte al terminar):</p><div class="chk2"><span>☐ Pregunta de indagación</span><span>☐ Hipótesis</span><span>☐ Variable independiente</span><span>☐ Variable dependiente</span><span>☐ Variables que no cambian</span><span>☐ Materiales</span><span>☐ Procedimiento</span><span>☐ Medidas de seguridad</span></div>'+
  '<p>Revisen el diseño de otro grupo:</p>'+feedback("vps")+dua()),
 act(3,"i","📊 Mi tabla de registro",informe("Diseño",'<p>Completa tu tabla de registro: escribe las repeticiones y los tiempos que medirás.</p>'+
  table(["Temperatura","Repetición 1","Repetición 2","Repetición 3"],[["15 °C"],["25 °C"],["35 °C"]])+'<p>Unidad para la altura de la espuma: <span class="fill"></span></p>')+

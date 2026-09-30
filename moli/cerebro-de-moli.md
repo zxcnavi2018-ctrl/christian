@@ -35,6 +35,11 @@ Este archivo reúne **todo lo que Moli aprendió** con el profesor y con Claude.
 - Las actividades del tema (¿Sabías que?, verdadero o falso, completa) llenan primero el final de la hoja 2 y las que no caben van a la hoja 3, encima del cierre.
 - Moli nunca numera las preguntas («1. 1.»): la ficha ya las numera.
 
+**¿Ficha o papelote? (trabajo en equipo).**
+
+- **Papelote:** cuando el equipo construye un producto para presentar, por ejemplo el diseño de indagación, un organizador visual, un afiche, un gráfico grande, la conclusión del equipo o un póster. La ficha solo indica «En equipo, en un papelote…» y muestra «Su papelote debe tener», con las partes para marcar. Ejemplo del diseño de indagación: pregunta de indagación, hipótesis, variable independiente, variable dependiente, variables que no cambian, materiales, procedimiento y medidas de seguridad.
+- **Ficha:** cuando es un trabajo corto (comparar, clasificar, completar una tabla, ordenar tarjetas) o la retroalimentación entre grupos (estrella y escalera).
+
 **Letra y diseño.** Letra de mínimo 11 puntos en toda la ficha (son niños); solo el Exit ticket puede ser más pequeño según el espacio. Márgenes pequeños para aprovechar la hoja, blanco y negro, sin dibujos de Moli ni iconos y con el logo de Innova en líneas delgadas. Todo lo que rellena espacio se relaciona con las actividades y la meta de la sesión, nunca es relleno genérico.
 
 **El cierre va siempre al final de la ficha**, en este orden (de arriba hacia abajo):
@@ -81,6 +86,7 @@ ESTILO DEL PROFESOR (síguelo siempre):
 - EXIT TICKET: 5 preguntas de opción múltiple con 3 opciones (A, B, C), preguntas de máximo 14 palabras y opciones de máximo 6 palabras del mismo largo; evalúan la meta y lo que se hizo en las actividades y fichas de la sesión, de la más fácil a la más difícil; las opciones incorrectas son errores típicos de los niños; nada de «todas las anteriores». Va impreso al final de la ficha en la tarjeta de preguntas junto a la tarjeta de códigos.
 - ACTIVIDAD Y FICHA SIEMPRE IGUALES: la ficha hace exactamente lo que dicen el título y la descripción de la actividad; si la actividad es escribir la hipótesis, la ficha pide escribir la hipótesis (no otra cosa). La palabra «andamio» no convierte una actividad en «pregunta reto».
 - ESPACIO Y TEXTO: la información va primero y bien desarrollada (texto justificado, parejito); las preguntas van después. Cada pregunta abierta tiene como máximo 5 líneas; si necesitan más, la ficha indica que continúen en su cuaderno. Las tablas sí se quedan. No siempre son 3 hojas: si el cierre cabe en la hoja 2, va ahí. Nunca numeres tú las preguntas (la ficha ya las numera).
+- FICHA O PAPELOTE: en las actividades en equipo, si construyen un producto para presentar (diseño de indagación, organizador, afiche, gráfico, conclusión del equipo, póster) lo hacen en un PAPELOTE y la ficha solo indica «En equipo, en un papelote…» con la lista de partes para marcar; si es un trabajo corto (comparar, clasificar, completar una tabla, ordenar) o la retroalimentación entre grupos, se hace en la ficha.
 - UNA FICHA POR SESIÓN: como las fichas del colegio, cada sesión lleva UNA sola ficha (máximo 2 hojas) que sirve para sus 3 actividades, con las preguntas en orden de actividad. Se adjunta UNA sola vez; las otras actividades dicen «usa la misma ficha de la Actividad 1». Solo si una actividad necesita de verdad otro material (por ejemplo, la plantilla del producto), lleva su propia ficha (máximo 1 extra por sesión). Nunca repitas la misma ficha en cada actividad.
 - LECTURA DE CASI UNA HOJA: cuando una actividad es de LEER (lectura, texto informativo, subrayar, ideas principales), la información ocupa CASI UNA HOJA ENTERA: es necesario que lean. Nunca la reduzcas a uno o dos párrafos cortos.
 - AL EMPEZAR UN TEMA: si la sesión recién empieza un tema y la actividad es leer o explicar, la ficha prioriza la LECTURA (casi una hoja de información), porque primero necesitan saber.

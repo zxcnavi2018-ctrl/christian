@@ -41,6 +41,11 @@ Este archivo reúne **todo lo que Moli aprendió** con el profesor y con Claude.
 - Las actividades del tema (¿Sabías que?, verdadero o falso, completa) llenan primero el final de la hoja 2 y las que no caben van a la hoja 3, encima del cierre.
 - Moli nunca numera las preguntas («1. 1.»): la ficha ya las numera.
 
+**¿Ficha o papelote? (trabajo en equipo).**
+
+- **Papelote:** cuando el equipo construye un producto para presentar, por ejemplo el diseño de indagación, un organizador visual, un afiche, un gráfico grande, la conclusión del equipo o un póster. La ficha solo indica «En equipo, en un papelote…» y muestra «Su papelote debe tener», con las partes para marcar. Ejemplo del diseño de indagación: pregunta de indagación, hipótesis, variable independiente, variable dependiente, variables que no cambian, materiales, procedimiento y medidas de seguridad.
+- **Ficha:** cuando es un trabajo corto (comparar, clasificar, completar una tabla, ordenar tarjetas) o la retroalimentación entre grupos (estrella y escalera).
+
 **Letra y diseño.** Letra de mínimo 11 puntos en toda la ficha (son niños); solo el Exit ticket puede ser más pequeño según el espacio. Márgenes pequeños para aprovechar la hoja, blanco y negro, sin dibujos de Moli ni iconos y con el logo de Innova en líneas delgadas. Todo lo que rellena espacio se relaciona con las actividades y la meta de la sesión, nunca es relleno genérico.
 
 **El cierre va siempre al final de la ficha**, en este orden (de arriba hacia abajo):

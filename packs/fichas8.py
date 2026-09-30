@@ -91,7 +91,7 @@ def cloze(text,words):
             if m:
                 out.append(sent[:m.start()]+'__________'+sent[m.end():]);bank.append(w);sents[k]='';break
     return out,sorted(bank)
-MOLI='<svg class="moli" viewBox="0 0 100 100" width="46" height="46" fill="none" stroke="#000" stroke-width="2.2">'+''.join(f'<path d="{d}"/>' for d in ["M26 8 H74 Q90 8 90 24 V36 Q90 52 74 52 H26 Q10 52 10 36 V24 Q10 8 26 8 Z","M31 16 H69 Q80 16 80 27 V33 Q80 44 69 44 H31 Q20 44 20 33 V27 Q20 16 31 16 Z","M36 24 Q41 24 41 30 Q41 36 36 36 Q31 36 31 30 Q31 24 36 24 Z","M64 24 Q69 24 69 30 Q69 36 64 36 Q59 36 59 30 Q59 24 64 24 Z","M10 25 Q4 25 4 30.5 Q4 36 10 36","M90 25 Q96 25 96 30.5 Q96 36 90 36","M29 57 H71 Q78 57 76 67 L72 85 Q70 93 61 93 H39 Q30 93 28 85 L24 67 Q22 57 29 57 Z","M25 63 Q14 70 16 82","M75 63 Q86 70 84 82","M44 70 Q50 74 56 70"])+'</svg>'
+MOLI='<svg class="moli" viewBox="0 0 100 100" width="46" height="46" fill="none" stroke="#000" stroke-width="3.6">'+''.join(f'<path d="{d}"/>' for d in ["M26 8 H74 Q90 8 90 24 V36 Q90 52 74 52 H26 Q10 52 10 36 V24 Q10 8 26 8 Z","M31 16 H69 Q80 16 80 27 V33 Q80 44 69 44 H31 Q20 44 20 33 V27 Q20 16 31 16 Z","M36 24 Q41 24 41 30 Q41 36 36 36 Q31 36 31 30 Q31 24 36 24 Z","M64 24 Q69 24 69 30 Q69 36 64 36 Q59 36 59 30 Q59 24 64 24 Z","M10 25 Q4 25 4 30.5 Q4 36 10 36","M90 25 Q96 25 96 30.5 Q96 36 90 36","M29 57 H71 Q78 57 76 67 L72 85 Q70 93 61 93 H39 Q30 93 28 85 L24 67 Q22 57 29 57 Z","M25 63 Q14 70 16 82","M75 63 Q86 70 84 82","M44 70 Q50 74 56 70"])+'</svg>'
 P=[]
 CARD=lambda t:f'<div class="card">{t}</div>'
 P.append(dict(t="Conocemos el sistema reproductor",acts=[

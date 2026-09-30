@@ -724,20 +724,22 @@ function scanUse(){const u=ga();if(!u)return;const o=Ft(scKey,{})||{};o[u.key]=d
 function twoT(u){return"extra"===u||"mis"===u}
 function baseU(u){return"extra2"===u||"mis2"===u?u.slice(0,-1):u}
 function bestRec(a,b){const w=b&&+b.score>+a.score?b:a;return{score:+w.score,total:+w.total,at:w.createdAt||w.at||0,tries:b?2:1}}
-const TCK="ciencia4b:tcache:"+APP.docId;
+const TCK="ciencia4b:tcache:"+APP.docId,TCF={exitTickets:"createdAt",students:"createdAt",tasks:"at",notes:"at",xbonus:"at",redemptions:"at",mrev:"rv"};
 const tcAll=()=>Ft(TCK,{})||{};
 function tcPut(col,v){const o=tcAll();o[col]=v;Vt(TCK,o)||(delete o[col],Vt(TCK,o))}
+function tcPatch(col,d,mask){const o=tcAll(),c=o[col];if(!c||!Array.isArray(c.docs))return;const i=c.docs.findIndex(x=>x.id===d.id);if(mask){if(i<0)return;const n={...c.docs[i]};mask.forEach(k=>{k in d?n[k]=d[k]:delete n[k]}),c.docs[i]=n}else i<0?c.docs.push(d):c.docs[i]=d;Vt(TCK,o)||(delete o[col],Vt(TCK,o))}
 function tcDrop(col,id){const o=tcAll(),c=o[col];if(!c)return;const k=c.docs.length;c.docs=c.docs.filter(d=>d.id!==id);k!==c.docs.length&&Vt(TCK,o)}
-(()=>{const f0=window.fetch.bind(window),re=/\/documents\/(exitTickets|students)\/([^?/]+)/;window.fetch=function(u,o){try{const m=o&&o.method,s=String(u&&u.url||u);if("DELETE"===m){const x=s.match(re);x&&tcDrop(x[1],decodeURIComponent(x[2]))}else if("POST"===m&&s.includes(":commit")&&"string"==typeof o.body&&o.body.includes('"delete"'))JSON.parse(o.body).writes.forEach(w=>{const x=w.delete&&w.delete.match(re);x&&tcDrop(x[1],decodeURIComponent(x[2]))})}catch(e){}return f0(u,o)}})();
-async function tcQuery(e,col,since){const a=await ca(e);if(!a)throw new Error("AUTH");const r=await fetch(`${Jt(e)}:runQuery?key=${e.apiKey}`,{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+a},body:JSON.stringify({structuredQuery:{from:[{collectionId:col}],where:{fieldFilter:{field:{fieldPath:"createdAt"},op:"GREATER_THAN",value:{timestampValue:new Date(since).toISOString()}}}}})});if(401===r.status||403===r.status)throw new Error("DENIED");if(429===r.status)throw Es("⏳ Firebase llegó a su límite gratis de lecturas por hoy. Vuelve a funcionar desde las 2 a. m."),new Error("QUOTA");if(!r.ok)throw new Error("HTTP "+r.status);return(await r.json()).filter(x=>x.document).map(x=>ta(x.document))}
+(()=>{const f0=window.fetch.bind(window),re=/\/documents\/(exitTickets|students|tasks|notes|xbonus|redemptions|mrev)\/([^?/]+)/,rp=/\/documents\/(tasks|notes|xbonus|redemptions|mrev)\/([^?/]+)$/;window.fetch=function(u,o){let P=null;try{const m=o&&o.method,s=String(u&&u.url||u);if("DELETE"===m){const x=s.match(re);x&&tcDrop(x[1],decodeURIComponent(x[2]))}else if("POST"===m&&s.includes(":commit")&&"string"==typeof o.body&&o.body.includes('"delete"'))JSON.parse(o.body).writes.forEach(w=>{const x=w.delete&&w.delete.match(re);x&&tcDrop(x[1],decodeURIComponent(x[2]))});if("POST"===m&&s.includes(":commit")&&"string"==typeof o.body)P=JSON.parse(o.body).writes.filter(w=>w.update&&rp.test(w.update.name))}catch(e){}const r=f0(u,o);return P&&P.length&&r.then(x=>{x.ok&&P.forEach(w=>{try{const x=w.update.name.match(rp),d=ta(w.update);d.id=decodeURIComponent(x[2]),tcPatch(x[1],d,w.updateMask&&w.updateMask.fieldPaths)}catch(e){}})}).catch(()=>{}),r}})();
+async function tcQuery(e,col,since,fld){const a=await ca(e);if(!a)throw new Error("AUTH");const r=await fetch(`${Jt(e)}:runQuery?key=${e.apiKey}`,{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+a},body:JSON.stringify({structuredQuery:{from:[{collectionId:col}],where:{fieldFilter:{field:{fieldPath:fld||"createdAt"},op:"GREATER_THAN",value:{timestampValue:new Date(since).toISOString()}}}}})});if(401===r.status||403===r.status)throw new Error("DENIED");if(429===r.status)throw Es("⏳ Firebase llegó a su límite gratis de lecturas por hoy. Vuelve a funcionar desde las 2 a. m."),new Error("QUOTA");if(!r.ok)throw new Error("HTTP "+r.status);return(await r.json()).filter(x=>x.document).map(x=>ta(x.document))}
 const tcBusy={};
 async function tcSync(e,col){const c=tcAll()[col],now=Date.now();
- if(!c||!Array.isArray(c.docs)||now-(c.full||0)>3*864e5){const n=await uaRaw(e,col);tcPut(col,{full:now,at:now,docs:n});return n}
+ const F=TCF[col]||"createdAt",old="exitTickets"===col||"students"===col;
+ if(!c||!Array.isArray(c.docs)||now-(c.full||0)>(old?3:1)*864e5){const n=await uaRaw(e,col);tcPut(col,{full:now,at:now,docs:n});return n}
  if(now-(c.at||0)<6e4)return c.docs;
- const mx=c.docs.reduce((m,d)=>Math.max(m,+d.createdAt||0),0),add=await tcQuery(e,col,Math.max(0,mx-864e5));
+ const mx=c.docs.reduce((m,d)=>Math.max(m,+d[F]||0),0),add=await tcQuery(e,col,Math.max(0,mx-864e5),F);
  if(add.length){const byId=new Map(c.docs.map(d=>[d.id,d]));add.forEach(d=>byId.set(d.id,d));c.docs=[...byId.values()]}
  c.at=now;tcPut(col,c);return c.docs}
-async function ua(e,t="exitTickets"){if("exitTickets"!==t&&"students"!==t)return uaRaw(e,t);const k=t;tcBusy[k]=tcBusy[k]||tcSync(e,t).finally(()=>{delete tcBusy[k]});const d=await tcBusy[k];return"exitTickets"===t?uaMerge(d):d.slice()}
+async function ua(e,t="exitTickets"){if(!TCF[t])return uaRaw(e,t);const k=t;tcBusy[k]=tcBusy[k]||tcSync(e,t).finally(()=>{delete tcBusy[k]});const d=await tcBusy[k];return"exitTickets"===t?uaMerge(d):d.slice()}
 const UB=n=>"ciencia4b:u"+n+"bak:"+APP.docId,U7B=UB(7);
 async function uImport(n){
  const u=APP.units.find(x=>"unit"+n===x.key);if(!u)return Es(`No encontré la Unidad ${n}.`);

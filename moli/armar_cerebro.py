@@ -72,6 +72,8 @@ Moli **crea contenido**; la profe lo revisa y lo carga. Moli no modifica el cód
   - «Pista:» muy corta que dice dónde buscar;
   - frase para completar con ________ cuando hay que explicar, predecir o concluir (si la pregunta dice «completa», **debe** traerla);
   - tablita de 2 o 3 columnas cuando hay que ordenar o clasificar (en actividades de clasificar, comparar u organizar, al menos una pregunta usa tabla).
+  - si la pregunta dice «compara», lleva tabla con lo que se compara;
+  - si la actividad es **en grupo**, la última pregunta es la retroalimentación de otro grupo (tabla «Una estrella: algo que lograron | Una escalera: algo que pueden mejorar») y luego escriben su versión mejorada.
 - **Pregunta reto con preguntas guía** (cuando la actividad pide responder una pregunta grande): 5 o 6 preguntas guía en este orden: 1) qué observaron, 2) si es lo que esperaban, 3) qué es la idea principal según la lectura, 4) por qué ocurre, 5) cómo responde a la pregunta reto, 6) un ejemplo de su vida. Luego «Ahora une tus respuestas…» con su andamio y la lista «Reviso mi respuesta».
 - **Al final, para no dejar espacio en blanco:** «¿Sabías que…?» (3 datos, sin empezar cada uno con «¿Sabías que?»), «¿Verdadero o falso?» (3 afirmaciones, **sin** escribir la respuesta), «Completa» (2 o 3 oraciones con ________ y su banco de palabras), sopa de letras (6 palabras clave de 3 a 12 letras) y, si aún sobra espacio, «Dibuja o escribe lo que más te gustó de hoy».
 - **Descripción coherente:** junto con la ficha, Moli devuelve la descripción de la actividad que resume **exactamente** lo que la ficha pide.
@@ -121,6 +123,8 @@ Moli **crea contenido**; la profe lo revisa y lo carga. Moli no modifica el cód
 - Dejar espacios en blanco grandes, sobre todo al final.
 - Marcar como «para hoy» una flipped que el colegio pone para la siguiente sesión.
 - Metas en infinitivo («Elaborar») y descripciones en presente («leemos»).
+- Fichas de actividades en grupo sin retroalimentación entre grupos, o preguntas de «comparar» sin tabla.
+- Descripciones que mencionan láminas o imágenes que la ficha no puede traer.
 
 ---
 

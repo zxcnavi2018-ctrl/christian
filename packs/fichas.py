@@ -153,15 +153,15 @@ act(3,"i","📋 Mis variables",informe("Variables",table(["Cambiaremos","Medirem
 # ---------- S6
 P.append(dict(t="Diseñamos nuestro experimento",acts=[
 act(1,"i","🧩 Pasos en orden",'<p>Ordena los pasos para preparar un vaso de refresco con los números 1 a 5.</p>'+
- table(["N.°","Paso"],[["___","Mezclar hasta disolver el azúcar"],["___","Lavar el vaso y la cuchara"],["___","Echar 200 mL de agua al vaso"],["___","Servir y beber"],["___","Agregar dos cucharadas de azúcar y el jugo"]])+
+ table(["N.°","Paso"],[["___","Mezclar hasta disolver el azúcar"],["___","Lavar el vaso y la cuchara"],["___","Echar 200 mL de agua al vaso"],["___","Servir y beber"],["___","Agregar dos cucharadas de azúcar y el jugo"]],cls="chk")+
  scaf("Usa conectores: <b>primero</b>, <b>luego</b>, <b>después</b>, <b>finalmente</b>.")),
-act(2,"g","🗺️ Nuestro plan de experimento",table(["Material o instrumento","Cantidad","¿Para qué lo usaremos?"],[],4)+
- table(["Medidas de seguridad"],[["💧 Agua a una temperatura máxima de 35 °C"],["🚫 No consumir ni acercar el rostro a las mezclas"],[""]])+
- table(["Paso","Acción (en orden)"],[["1"],["2"],["3"],["4"],["5"],["6"],["7"],["8"]])+
+act(2,"g","🗺️ Nuestro plan de experimento",table(["Material o instrumento","Cantidad","¿Para qué lo usaremos?"],[],3)+
+ '<p><b>Medidas de seguridad:</b> agua a una temperatura máxima de 35 °C · no consumir ni acercar el rostro a las mezclas · ____________________________</p>'+
+ table(["Paso","Acción (en orden)"],[["1"],["2"],["3"],["4"],["5"],["6"]])+
  '<p>Revisen el diseño de otro grupo:</p>'+feedback("vps")+dua()),
-act(3,"i","📊 Mi tabla de registro",informe("Diseño",'<p>Diseña tu tabla con temperaturas, repeticiones y tiempos.</p>'+
- table(["Temperatura","Repetición","0 min","5 min","10 min","15 min","20 min"],[["15 °C","1"],["15 °C","2"],["15 °C","3"],["25 °C","1"],["…",""]])+'<p>Unidad para la altura de la espuma: <span class="fill"></span></p>')+
- check("Comprobamos el diseño",["Indicamos materiales, instrumentos y su función","Incluimos medidas de seguridad","Organizamos las acciones en secuencia lógica","La tabla incluye temperaturas, tiempos y repeticiones"],("Sí","Debemos mejorar")))]))
+act(3,"i","📊 Mi tabla de registro",informe("Diseño",'<p>Completa tu tabla de registro: escribe las repeticiones y los tiempos que medirás.</p>'+
+ table(["Temperatura","Repetición 1","Repetición 2","Repetición 3"],[["15 °C"],["25 °C"],["35 °C"]])+'<p>Unidad para la altura de la espuma: <span class="fill"></span></p>')+
+ check("Comprobamos el diseño",["Indicamos materiales, instrumentos y su función","Incluimos medidas de seguridad","Organizamos las acciones en secuencia lógica","La tabla incluye temperaturas y repeticiones"],("Sí","Debemos mejorar")))]))
 # ---------- S7
 P.append(dict(t="¡Manos a la ciencia!",acts=[
 act(1,"i","🦺 Listos y seguros",'<p>Mi rol en el grupo: ☐ Medidor ☐ Cronometrista ☐ Anotador ☐ Vigía de seguridad</p>'+

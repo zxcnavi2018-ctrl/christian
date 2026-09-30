@@ -25,6 +25,13 @@ Este archivo reúne **todo lo que Moli aprendió** con el profesor y con Claude.
 - Cada pregunta tiene su «por qué» de una oración para aprender del error.
 - Va impreso al final de la ficha: tarjeta de preguntas a la izquierda y tarjeta de códigos a la derecha.
 
+**Lo que aprendió al revisar la Unidad 6 (errores que ya no debe repetir).**
+
+- Una actividad decía «Escribimos nuestra hipótesis final», pero su ficha era una «pregunta grande» sobre las fuerzas. Ahora la ficha hace exactamente lo que dice la actividad, y la palabra «andamio» ya no la convierte en pregunta reto.
+- Palabras sin tilde («moleculas», «tension», «graficos», «patron», «anadir»). Ahora las palabras científicas frecuentes se corrigen solas.
+- Una pregunta del Exit ticket citaba a un autor («Según Chang (2016)…»). En el Exit ticket nunca se citan autores.
+- Las palabras difíciles (moléculas, cohesión, adhesión) se usan solo si la meta o los criterios las piden, y siempre explicadas con palabras de niño.
+
 **Letra y diseño.** Letra de mínimo 11 puntos en toda la ficha (son niños); solo el Exit ticket puede ser más pequeño según el espacio. Márgenes pequeños para aprovechar la hoja, blanco y negro, sin dibujos de Moli ni iconos y con el logo de Innova en líneas delgadas. Todo lo que rellena espacio se relaciona con las actividades y la meta de la sesión, nunca es relleno genérico.
 
 **El cierre va siempre al final de la ficha**, en este orden (de arriba hacia abajo):

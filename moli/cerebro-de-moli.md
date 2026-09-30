@@ -19,6 +19,13 @@ Este archivo reúne **todo lo que Moli aprendió** con el profesor y con Claude.
 - Cada pregunta tiene su «por qué» de una oración para aprender del error.
 - Va impreso al final de la ficha: tarjeta de preguntas a la izquierda y tarjeta de códigos a la derecha.
 
+**Lo que aprendió al revisar la Unidad 6 (errores que ya no debe repetir).**
+
+- Una actividad decía «Escribimos nuestra hipótesis final», pero su ficha era una «pregunta grande» sobre las fuerzas. Ahora la ficha hace exactamente lo que dice la actividad, y la palabra «andamio» ya no la convierte en pregunta reto.
+- Palabras sin tilde («moleculas», «tension», «graficos», «patron», «anadir»). Ahora las palabras científicas frecuentes se corrigen solas.
+- Una pregunta del Exit ticket citaba a un autor («Según Chang (2016)…»). En el Exit ticket nunca se citan autores.
+- Las palabras difíciles (moléculas, cohesión, adhesión) se usan solo si la meta o los criterios las piden, y siempre explicadas con palabras de niño.
+
 **Letra y diseño.** Letra de mínimo 11 puntos en toda la ficha (son niños); solo el Exit ticket puede ser más pequeño según el espacio. Márgenes pequeños para aprovechar la hoja, blanco y negro, sin dibujos de Moli ni iconos y con el logo de Innova en líneas delgadas. Todo lo que rellena espacio se relaciona con las actividades y la meta de la sesión, nunca es relleno genérico.
 
 **El cierre va siempre al final de la ficha**, en este orden (de arriba hacia abajo):
@@ -63,6 +70,7 @@ ESTILO DEL PROFESOR (síguelo siempre):
 - REGLA DE ORO: el CONTENIDO de la ficha (material y preguntas) no pasa de 2 hojas A4. Al FINAL de la ficha la app pone el CIERRE de la sesión: «¿Cómo me fue hoy?» (los criterios de éxito), encima el flipped para la siguiente sesión (solo si existe) y abajo del todo el Exit ticket (tarjeta de preguntas a la izquierda y tarjeta de códigos a la derecha: DNI, respuestas, conducta y trabajo en clase). Si el contenido es corto, el cierre va en la hoja 2; si no, en la hoja 3. Por eso el Exit ticket tiene 5 preguntas de opción múltiple cortas y claras.
 - LETRA Y DISEÑO: las fichas usan letra de mínimo 11 puntos (son niños; solo el Exit ticket puede ser más pequeño según el espacio), márgenes pequeños para aprovechar la hoja, blanco y negro, sin dibujos de Moli ni iconos. Por eso escribe textos claros y sin relleno: cada palabra debe servir a la actividad.
 - EXIT TICKET: 5 preguntas de opción múltiple con 3 opciones (A, B, C), preguntas de máximo 14 palabras y opciones de máximo 6 palabras del mismo largo; evalúan la meta y lo que se hizo en las actividades y fichas de la sesión, de la más fácil a la más difícil; las opciones incorrectas son errores típicos de los niños; nada de «todas las anteriores». Va impreso al final de la ficha en la tarjeta de preguntas junto a la tarjeta de códigos.
+- ACTIVIDAD Y FICHA SIEMPRE IGUALES: la ficha hace exactamente lo que dicen el título y la descripción de la actividad; si la actividad es escribir la hipótesis, la ficha pide escribir la hipótesis (no otra cosa). La palabra «andamio» no convierte una actividad en «pregunta reto».
 - UNA FICHA POR SESIÓN: como las fichas del colegio, cada sesión lleva UNA sola ficha (máximo 2 hojas) que sirve para sus 3 actividades, con las preguntas en orden de actividad. Se adjunta UNA sola vez; las otras actividades dicen «usa la misma ficha de la Actividad 1». Solo si una actividad necesita de verdad otro material (por ejemplo, la plantilla del producto), lleva su propia ficha (máximo 1 extra por sesión). Nunca repitas la misma ficha en cada actividad.
 - LECTURA DE CASI UNA HOJA: cuando una actividad es de LEER (lectura, texto informativo, subrayar, ideas principales), la información ocupa CASI UNA HOJA ENTERA: es necesario que lean. Nunca la reduzcas a uno o dos párrafos cortos.
 - AL EMPEZAR UN TEMA: si la sesión recién empieza un tema y la actividad es leer o explicar, la ficha prioriza la LECTURA (casi una hoja de información), porque primero necesitan saber.

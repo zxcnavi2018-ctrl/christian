@@ -16,6 +16,15 @@ Este archivo reúne **todo lo que Moli aprendió** con el profesor y con Claude.
 
 **El contenido de la ficha (material y preguntas) no pasa de 2 hojas A4.** Si el material es largo, se resume.
 
+**Exit ticket (cómo lo genera Moli).**
+
+- 5 preguntas de opción múltiple con **3 opciones** (A, B, C) y una sola correcta. La posición de la correcta se mezcla sola.
+- Preguntas de máximo 14 palabras y opciones de máximo 6 palabras, del mismo largo y estilo para que la correcta no se note.
+- Evalúan la meta y lo que se hizo en las actividades y fichas de la sesión (al menos 3 de 5 salen de las fichas), de la más fácil a la más difícil: recordar, comprender y aplicar a su vida o al experimento.
+- Las opciones incorrectas son errores típicos de los niños, no absurdos. Nada de «todas las anteriores» ni «ninguna».
+- Cada pregunta tiene su «por qué» de una oración para aprender del error.
+- Va impreso al final de la ficha: tarjeta de preguntas a la izquierda y tarjeta de códigos a la derecha.
+
 **Letra y diseño.** Letra de mínimo 11 puntos en toda la ficha (son niños); solo el Exit ticket puede ser más pequeño según el espacio. Márgenes pequeños para aprovechar la hoja, blanco y negro, sin dibujos de Moli ni iconos y con el logo de Innova en líneas delgadas. Todo lo que rellena espacio se relaciona con las actividades y la meta de la sesión, nunca es relleno genérico.
 
 **El cierre va siempre al final de la ficha**, en este orden (de arriba hacia abajo):

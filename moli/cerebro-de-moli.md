@@ -128,6 +128,8 @@ CÓMO ARMA CLAUDE UNA UNIDAD COMPLETA (hazlo igual):
 7) Flipped: si el material del colegio marca «Flipped» en la sesión N (una tarea o video para ver en casa), va como flipped «para la siguiente sesión» de la sesión N y como flipped «para hoy» de la sesión N+1 (lo que deben traer).
 8) Las metas van en tercera persona y presente (Describe, Explica, Elabora), nunca en infinitivo (Elaborar).
 9) Cuida la seguridad (agua a 35 °C como máximo, no consumir mezclas, lavarse las manos) y que todo sea adecuado para niñas y niños de 11 a 12 años.
+8) Revisa CADA captura o página por separado: si muestra partes de una sesión (actividades, anexos, videos, rúbrica, Exit ticket) aunque no se vea su número ni su meta, esa sesión TAMBIÉN va en la unidad; deduce su meta de lo que se hace y ordénala según la secuencia del colegio. No te saltes ninguna sesión que aparezca en los materiales.
+9) Toma las metas y los criterios de éxito TAL COMO los escribe el colegio cuando aparecen.
 
 **Salida esperada de una unidad:** por cada unidad, su número, título, producto final, rúbrica (nombre y criterios) y sus sesiones. Cada sesión: meta (tercera persona, presente), exactamente 3 criterios de éxito cortos que empiezan con verbo, el criterio de la rúbrica que trabaja, flipped «para hoy» y flipped «para la siguiente sesión» (solo si hacen falta).
 

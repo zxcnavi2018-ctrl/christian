@@ -507,6 +507,40 @@ service cloud.firestore {
       allow delete: if isTeacher();
     }
 
+    // Duelos 2 vs 2: equipo A = jugadores 1 y 2, equipo B = jugadores 3 y 4.
+    // "bot" ocupa un lugar vacío (Moli Bot) cuando faltan compañeros.
+    function p2v2(x) { return x is string && (x == '' || x == 'bot' || x.matches('r[0-9a-f]{20}')); }
+    function sc2v2(s, a) { return s is int && s >= 0 && s <= 1000 && a is int && a >= 0 && a <= 5; }
+    function validDuel2(d) {
+      return d.keys().hasOnly(['status', 'p1', 'n1', 'o1', 'p2', 'n2', 'o2', 'p3', 'n3', 'o3', 'p4', 'n4', 'o4', 'qs',
+          's1', 'a1', 's2', 'a2', 's3', 'a3', 's4', 'a4', 'hb', 'createdAt', 'updatedAt'])
+        && d.status in ['waiting', 'ready', 'cancel']
+        && d.p1 is string && d.p1.matches('r[0-9a-f]{20}') && p2v2(d.p2) && p2v2(d.p3) && p2v2(d.p4)
+        && d.n1 is string && d.n1.size() <= 40 && d.n2 is string && d.n2.size() <= 40
+        && d.n3 is string && d.n3.size() <= 40 && d.n4 is string && d.n4.size() <= 40
+        && d.o1 is string && d.o1.size() <= 800 && d.o2 is string && d.o2.size() <= 800
+        && d.o3 is string && d.o3.size() <= 800 && d.o4 is string && d.o4.size() <= 800
+        && d.qs is string && d.qs.size() <= 20000
+        && sc2v2(d.s1, d.a1) && sc2v2(d.s2, d.a2) && sc2v2(d.s3, d.a3) && sc2v2(d.s4, d.a4)
+        && d.hb is timestamp && d.createdAt is timestamp && d.updatedAt is timestamp;
+    }
+    match /duels2/{id} {
+      allow get: if true;
+      allow list: if request.query.limit <= 10;
+      allow create: if id.matches('q[0-9a-z]{6,30}') && validDuel2(request.resource.data)
+        && request.resource.data.status == 'waiting' && request.resource.data.p2 == '' && request.resource.data.p3 == '' && request.resource.data.p4 == ''
+        && request.resource.data.s1 == 0 && request.resource.data.s2 == 0 && request.resource.data.s3 == 0 && request.resource.data.s4 == 0;
+      allow update: if validDuel2(request.resource.data)
+        && request.resource.data.p1 == resource.data.p1 && request.resource.data.qs == resource.data.qs
+        && ((resource.data.status == 'waiting'
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'p2', 'n2', 'o2', 'p3', 'n3', 'o3', 'p4', 'n4', 'o4', 'hb', 'updatedAt']))
+          || (resource.data.status == 'ready' && request.resource.data.status == 'ready'
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['s1', 'a1', 's2', 'a2', 's3', 'a3', 's4', 'a4', 'updatedAt'])
+              && request.resource.data.a1 >= resource.data.a1 && request.resource.data.a2 >= resource.data.a2
+              && request.resource.data.a3 >= resource.data.a3 && request.resource.data.a4 >= resource.data.a4));
+      allow delete: if isTeacher();
+    }
+
     // Marcas de la versión anterior (solo para que la docente pueda limpiarlas).
     match /exitTicketsDone/{id} {
       allow get: if true;

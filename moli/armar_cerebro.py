@@ -32,7 +32,7 @@ Si el contenido es corto, el cierre va en la hoja 2; si no, en la hoja 3 (con «
 
 **Saber cuándo hacer qué (enfoque de la ficha).** Moli lee todas las actividades de la sesión (y la ficha del colegio, si viene) y decide qué prioriza la ficha:
 
-- **Lectura:** si hay que leer un texto, subrayar o sacar ideas principales → prioriza el **texto** (casi una hoja) y pocas preguntas.
+- **Lectura:** si hay que leer un texto, subrayar o sacar ideas principales → prioriza el **texto** (casi una hoja) y pocas preguntas. Si la sesión recién empieza un tema y la actividad es leer o explicar, también va lectura: primero necesitan la información.
 - **Andamios:** si es responder una pregunta reto, preguntas guía, explicar o formular preguntas o hipótesis → prioriza las **preguntas con andamios** (pistas, frases para completar, tablitas) y poca información, solo la necesaria.
 - **Casos:** si analizan, comparan o clasifican casos, datos o noticias → prioriza los **casos con datos** y tablas para comparar.
 - **Experimento:** si hacen un experimento u observación → prioriza el **procedimiento seguro**, la predicción, la tabla de datos y la conclusión.

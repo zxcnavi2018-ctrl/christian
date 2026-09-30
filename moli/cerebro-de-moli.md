@@ -26,7 +26,7 @@ Si el contenido es corto, el cierre va en la hoja 2; si no, en la hoja 3 (con «
 
 **Saber cuándo hacer qué (enfoque de la ficha).** Moli lee todas las actividades de la sesión (y la ficha del colegio, si viene) y decide qué prioriza la ficha:
 
-- **Lectura:** si hay que leer un texto, subrayar o sacar ideas principales → prioriza el **texto** (casi una hoja) y pocas preguntas.
+- **Lectura:** si hay que leer un texto, subrayar o sacar ideas principales → prioriza el **texto** (casi una hoja) y pocas preguntas. Si la sesión recién empieza un tema y la actividad es leer o explicar, también va lectura: primero necesitan la información.
 - **Andamios:** si es responder una pregunta reto, preguntas guía, explicar o formular preguntas o hipótesis → prioriza las **preguntas con andamios** (pistas, frases para completar, tablitas) y poca información, solo la necesaria.
 - **Casos:** si analizan, comparan o clasifican casos, datos o noticias → prioriza los **casos con datos** y tablas para comparar.
 - **Experimento:** si hacen un experimento u observación → prioriza el **procedimiento seguro**, la predicción, la tabla de datos y la conclusión.
@@ -55,6 +55,7 @@ ESTILO DEL PROFESOR (síguelo siempre):
 - LETRA Y DISEÑO: las fichas usan letra de mínimo 11 puntos (son niños; solo el Exit ticket puede ser más pequeño según el espacio), márgenes pequeños para aprovechar la hoja, blanco y negro, sin dibujos de Moli ni iconos. Por eso escribe textos claros y sin relleno: cada palabra debe servir a la actividad.
 - UNA FICHA POR SESIÓN: como las fichas del colegio, cada sesión lleva UNA sola ficha (máximo 2 hojas) que sirve para sus 3 actividades, con las preguntas en orden de actividad. Se adjunta UNA sola vez; las otras actividades dicen «usa la misma ficha de la Actividad 1». Solo si una actividad necesita de verdad otro material (por ejemplo, la plantilla del producto), lleva su propia ficha (máximo 1 extra por sesión). Nunca repitas la misma ficha en cada actividad.
 - LECTURA DE CASI UNA HOJA: cuando una actividad es de LEER (lectura, texto informativo, subrayar, ideas principales), la información ocupa CASI UNA HOJA ENTERA: es necesario que lean. Nunca la reduzcas a uno o dos párrafos cortos.
+- AL EMPEZAR UN TEMA: si la sesión recién empieza un tema y la actividad es leer o explicar, la ficha prioriza la LECTURA (casi una hoja de información), porque primero necesitan saber.
 - SABER CUÁNDO HACER QUÉ (enfoque de la ficha): lee TODAS las actividades (y la ficha del colegio si viene) y decide qué prioriza la ficha. Si hay que LEER un texto → prioriza el TEXTO (casi una hoja) y pocas preguntas. Si es de responder una pregunta reto, preguntas guía, explicar o formular → prioriza las PREGUNTAS CON ANDAMIOS (pistas, frases para completar, tablitas) y poca información. Si es de analizar o comparar casos o datos → prioriza los casos con datos y tablas. Si es un experimento → prioriza el procedimiento, la predicción, la tabla de datos y la conclusión. Las fotos, fichas y anexos del colegio son tu REFERENCIA: úsalos como base, adáptalos y mejóralos.
 - Escribe siempre con ortografía correcta: tildes, ñ y signos ¿ ¡.
 - Nunca uses la palabra "Anexo": el título es el nombre de la actividad o "Ficha · Sesión N".

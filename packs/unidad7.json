@@ -1,0 +1,1030 @@
+{
+ "unit": "unit7",
+ "title": "Microorganismos en acción",
+ "product": "Informe de indagación: ¿Cómo influye la temperatura del agua en la actividad de la levadura?",
+ "sessions": [
+  {
+   "meta": "Explicar qué es una enfermedad y diferenciar sus tipos a partir de una situación.",
+   "criteria": [
+    "Reconoce el concepto de enfermedad",
+    "Describe los tipos de enfermedades",
+    "Diferencia infecciosas y no infecciosas"
+   ],
+   "flipped": {
+    "enabled": true,
+    "title": "Antes de la sesión: Microorganismos",
+    "desc": "Investiga en fuentes confiables sobre la levadura, las bacterias del yogur, la Salmonella y el moho del pan, y completa la ficha antes de la clase.",
+    "file": "f1"
+   },
+   "activities": [
+    {
+     "mode": "individual",
+     "title": "🤒 ¿Por qué me enfermé?",
+     "desc": "Lee los casos de niños que se enfermaron. Decide si cada enfermedad es infecciosa (se contagia) o no infecciosa y explica por qué. Pista: ¿se pasa de una persona a otra? ¿La causa un microorganismo?",
+     "ficha": "Ficha · Actividad 01",
+     "file": "f2"
+    },
+    {
+     "mode": "group",
+     "title": "🦠 Microorganismos: ¿amigos o enemigos?",
+     "desc": "En grupo, investiguen bacterias, virus, hongos y protozoarios. Busquen uno que cause enfermedades y otro que nos ayude (como en el pan o el yogur). Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
+     "ficha": "Ficha · Actividad 02",
+     "file": "f3"
+    },
+    {
+     "mode": "individual",
+     "title": "🍞 Mi microorganismo útil",
+     "desc": "Escribe 3 o 4 líneas sobre la levadura: qué es y cómo nos ayuda. Usa: «La levadura es un ___. Nos ayuda a ___ porque ___». ¡Es el inicio de tu informe!",
+     "ficha": "",
+     "file": ""
+    }
+   ],
+   "ticket": {
+    "questions": [
+     {
+      "q": "¿Qué es una enfermedad infecciosa?",
+      "options": [
+       "Una enfermedad causada por un microorganismo que puede contagiarse",
+       "Una enfermedad causada solo por dormir poco",
+       "Una enfermedad que solo tienen los adultos"
+      ],
+      "answer": 0,
+      "why": "Las enfermedades infecciosas las causan virus, bacterias, hongos o parásitos y pueden contagiarse."
+     },
+     {
+      "q": "¿Cuál de estas enfermedades NO es infecciosa?",
+      "options": [
+       "La gripe",
+       "La diabetes",
+       "La varicela"
+      ],
+      "answer": 1,
+      "why": "La diabetes no se contagia: se relaciona con cómo el cuerpo usa el azúcar."
+     },
+     {
+      "q": "El dengue se transmite por la picadura de un mosquito. ¿Qué tipo de enfermedad es?",
+      "options": [
+       "No infecciosa",
+       "Hereditaria",
+       "Infecciosa"
+      ],
+      "answer": 2,
+      "why": "El dengue lo causa un virus que el mosquito transmite, por eso es infecciosa."
+     },
+     {
+      "q": "¿Qué microorganismo nos ayuda a preparar el pan?",
+      "options": [
+       "La levadura",
+       "La Salmonella",
+       "El virus de la gripe"
+      ],
+      "answer": 0,
+      "why": "La levadura es un hongo útil que hace crecer la masa del pan."
+     },
+     {
+      "q": "¿Todos los microorganismos causan enfermedades?",
+      "options": [
+       "Sí, todos son dañinos",
+       "No, algunos son útiles, como los del yogur",
+       "Solo los que viven en el agua"
+      ],
+      "answer": 1,
+      "why": "Muchos microorganismos son útiles: nos ayudan a hacer yogur, pan y queso."
+     }
+    ]
+   },
+   "title": "",
+   "fichaTitle": "Ficha · Sesión 1 · ¿Por qué nos enfermamos?"
+  },
+  {
+   "meta": "Explica el fenómeno de la actividad de la levadura para delimitar una relación investigable.",
+   "criteria": [
+    "Observa los cambios",
+    "Registra medidas y descripciones",
+    "Describe factores que lo modifican"
+   ],
+   "activities": [
+    {
+     "mode": "individual",
+     "title": "👀 Predigo y observo",
+     "desc": "Antes de empezar, predice qué cambio verás en la mezcla de agua, azúcar y levadura, y qué podrías medir con una regla. Usa tus sentidos: ¿qué ves, qué hueles, qué escuchas?",
+     "ficha": "",
+     "file": ""
+    },
+    {
+     "mode": "group",
+     "title": "🧪 Registramos los cambios",
+     "desc": "En grupo, observen la mezcla de levadura cada 5 minutos, desde 0 hasta 20 minutos. Midan la espuma con la regla, describan las burbujas y calculen cuánto cambió. Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
+     "ficha": "",
+     "file": ""
+    },
+    {
+     "mode": "individual",
+     "title": "📝 Explico el fenómeno",
+     "desc": "Lee sobre la fermentación y explica con tus datos: «La espuma cambió de ___ cm a ___ cm porque la levadura liberó ___». Luego escribe qué factor podrías cambiar y qué medirías.",
+     "ficha": "",
+     "file": ""
+    }
+   ],
+   "ticket": {
+    "questions": [
+     {
+      "q": "¿Qué es la levadura?",
+      "options": [
+       "Un microorganismo formado por una sola célula",
+       "Una planta con hojas y raíces",
+       "Un tipo de azúcar"
+      ],
+      "answer": 0,
+      "why": "La levadura es un ser vivo microscópico: un hongo de una sola célula."
+     },
+     {
+      "q": "¿Qué gas libera la levadura cuando se alimenta del azúcar?",
+      "options": [
+       "Oxígeno",
+       "Dióxido de carbono",
+       "Vapor de agua"
+      ],
+      "answer": 1,
+      "why": "Durante la fermentación la levadura produce dióxido de carbono."
+     },
+     {
+      "q": "¿Por qué se formó espuma en la mezcla?",
+      "options": [
+       "Porque el agua se congeló",
+       "Porque el azúcar desapareció",
+       "Por las burbujas del gas que liberó la levadura"
+      ],
+      "answer": 2,
+      "why": "Las burbujas de dióxido de carbono forman la espuma."
+     },
+     {
+      "q": "¿Con qué instrumento medimos la altura de la espuma?",
+      "options": [
+       "Con una regla",
+       "Con un termómetro",
+       "Con una balanza"
+      ],
+      "answer": 0,
+      "why": "La altura se mide con una regla, en centímetros."
+     },
+     {
+      "q": "¿Qué factor podría cambiar la cantidad de espuma?",
+      "options": [
+       "El color del vaso",
+       "La temperatura del agua",
+       "El nombre del grupo"
+      ],
+      "answer": 1,
+      "why": "La temperatura del agua puede hacer que la levadura trabaje más o menos."
+     }
+    ]
+   },
+   "flipped": {
+    "enabled": false,
+    "title": "",
+    "desc": "",
+    "file": ""
+   },
+   "title": "",
+   "fichaTitle": "Ficha · Sesión 2 · La levadura despierta"
+  },
+  {
+   "meta": "Formula una pregunta que pueda responderse mediante una indagación experimental.",
+   "criteria": [
+    "Selecciona un factor",
+    "Selecciona un efecto",
+    "Relaciona causa y efecto"
+   ],
+   "activities": [
+    {
+     "mode": "individual",
+     "title": "❓ ¿Se puede investigar?",
+     "desc": "Lee varias preguntas y marca cuáles se pueden responder con un experimento. Pista: ¿hay algo que puedo cambiar? ¿Hay algo que puedo medir? Si las dos respuestas son «sí», ¡se puede investigar!",
+     "ficha": "",
+     "file": ""
+    },
+    {
+     "mode": "group",
+     "title": "🃏 Fábrica de preguntas",
+     "desc": "En grupo, combinen tarjetas de causas (temperatura, azúcar, levadura) con tarjetas de efectos (altura de la espuma). Armen 3 preguntas con «¿Cómo influye ___ en ___?» y elijan la mejor. Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
+     "ficha": "",
+     "file": ""
+    },
+    {
+     "mode": "individual",
+     "title": "✏️ Mi pregunta científica",
+     "desc": "Escribe tu pregunta de indagación. Subraya en azul lo que vas a cambiar (causa) y en rojo lo que vas a medir (efecto). ⭐ Reto: inventa otra pregunta sobre algo más que se pueda probar.",
+     "ficha": "",
+     "file": ""
+    }
+   ],
+   "ticket": {
+    "questions": [
+     {
+      "q": "En nuestra indagación, ¿qué vamos a cambiar a propósito?",
+      "options": [
+       "La temperatura del agua",
+       "El color del recipiente",
+       "La marca del azúcar"
+      ],
+      "answer": 0,
+      "why": "Probaremos agua a 15 °C, 25 °C y 35 °C."
+     },
+     {
+      "q": "¿Qué efecto vamos a medir?",
+      "options": [
+       "El sabor de la mezcla",
+       "La altura de la espuma",
+       "El olor de la levadura"
+      ],
+      "answer": 1,
+      "why": "El efecto es lo que observamos y medimos con un instrumento."
+     },
+     {
+      "q": "¿Cuál es una pregunta que SÍ se puede investigar con un experimento?",
+      "options": [
+       "¿Te gusta el pan?",
+       "¿La levadura es bonita?",
+       "¿Cómo influye la temperatura del agua en la altura de la espuma?"
+      ],
+      "answer": 2,
+      "why": "Tiene una causa que podemos cambiar y un efecto que podemos medir."
+     },
+     {
+      "q": "En «¿Cómo influye la temperatura en la espuma?», ¿cuál es la causa?",
+      "options": [
+       "La temperatura",
+       "La espuma",
+       "El vaso"
+      ],
+      "answer": 0,
+      "why": "La causa es lo que cambiamos: la temperatura."
+     },
+     {
+      "q": "¿Qué palabras ayudan a escribir una pregunta de causa y efecto?",
+      "options": [
+       "«¿Te gusta…?»",
+       "«¿Cómo influye… en…?»",
+       "«¿Qué color…?»"
+      ],
+      "answer": 1,
+      "why": "«¿Cómo influye ___ en ___?» une la causa con el efecto."
+     }
+    ]
+   },
+   "flipped": {
+    "enabled": false,
+    "title": "",
+    "desc": "",
+    "file": ""
+   },
+   "title": "",
+   "fichaTitle": "Ficha · Sesión 3 · Formulamos nuestra pregunta de indagación"
+  },
+  {
+   "meta": "Elabora una hipótesis causal y fundamentada para la indagación.",
+   "criteria": [
+    "Selecciona información científica",
+    "Relaciona causa y efecto",
+    "Predice el resultado"
+   ],
+   "activities": [
+    {
+     "mode": "individual",
+     "title": "📖 La levadura está viva",
+     "desc": "Lee un texto corto sobre cómo reacciona la levadura al frío, a lo tibio y al calor. Subraya las ideas importantes. Pregúntate: ¿qué le pasa con el frío? ¿Y con lo tibio?",
+     "ficha": "",
+     "file": ""
+    },
+    {
+     "mode": "group",
+     "title": "🎲 La apuesta científica",
+     "desc": "En grupo, decidan: ¿a 15 °C, 25 °C o 35 °C habrá más espuma? Ordénenlas de mayor a menor y defiendan su apuesta con lo que leyeron: «Creemos que ___ porque en el texto dice ___». Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
+     "ficha": "",
+     "file": ""
+    },
+    {
+     "mode": "individual",
+     "title": "💡 Mi hipótesis",
+     "desc": "Escribe tu hipótesis: «Si el agua está a ___ (causa), entonces la espuma ___ (efecto), porque la levadura ___ (razón científica)». Usa palabras como fermentación y dióxido de carbono.",
+     "ficha": "",
+     "file": ""
+    }
+   ],
+   "ticket": {
+    "questions": [
+     {
+      "q": "¿Qué es una hipótesis?",
+      "options": [
+       "Una respuesta posible a la pregunta, que luego comprobamos",
+       "Un dibujo del experimento",
+       "La lista de materiales"
+      ],
+      "answer": 0,
+      "why": "La hipótesis es nuestra predicción fundamentada, que el experimento confirma o no."
+     },
+     {
+      "q": "¿Cuál está escrita como hipótesis?",
+      "options": [
+       "Me gusta la levadura",
+       "Si el agua está tibia, entonces habrá más espuma, porque la levadura se activa",
+       "La espuma es blanca"
+      ],
+      "answer": 1,
+      "why": "Tiene la estructura «Si… entonces… porque…»."
+     },
+     {
+      "q": "¿Qué le pasa a la levadura con el agua muy fría?",
+      "options": [
+       "Trabaja más rápido",
+       "Se muere al instante",
+       "Trabaja más lento"
+      ],
+      "answer": 2,
+      "why": "Con el frío la levadura se vuelve lenta y produce menos gas."
+     },
+     {
+      "q": "En una hipótesis, la parte «porque…» sirve para…",
+      "options": [
+       "Dar la razón científica",
+       "Decir el color de la espuma",
+       "Nombrar a los integrantes"
+      ],
+      "answer": 0,
+      "why": "El «porque» fundamenta la predicción con información científica."
+     },
+     {
+      "q": "¿Qué produce la levadura que hace subir la espuma?",
+      "options": [
+       "Agua",
+       "Dióxido de carbono",
+       "Sal"
+      ],
+      "answer": 1,
+      "why": "El dióxido de carbono forma burbujas y la espuma sube."
+     }
+    ]
+   },
+   "flipped": {
+    "enabled": false,
+    "title": "",
+    "desc": "",
+    "file": ""
+   },
+   "title": "",
+   "fichaTitle": "Ficha · Sesión 4 · Elaboramos nuestra hipótesis"
+  },
+  {
+   "meta": "Determina las variables necesarias para comprobar la hipótesis.",
+   "criteria": [
+    "Identifica qué cambia y qué mide",
+    "Define cómo medirá y en qué unidades",
+    "Establece lo que queda igual"
+   ],
+   "activities": [
+    {
+     "mode": "individual",
+     "title": "🔎 ¿Es una prueba justa?",
+     "desc": "Un equipo preparó dos mezclas cambiando la temperatura, el agua, el azúcar y la levadura a la vez. ¿Podrían saber si la espuma cambió solo por la temperatura? Explica por qué.",
+     "ficha": "",
+     "file": ""
+    },
+    {
+     "mode": "group",
+     "title": "🔧 Las reglas de nuestro experimento",
+     "desc": "En grupo, decidan qué cambiarán (la temperatura), qué medirán (la espuma en cm) y qué dejarán igual (levadura, azúcar, agua, vaso y tiempo): «Vamos a cambiar ___, mediremos ___ con ___ y dejaremos igual ___». Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
+     "ficha": "",
+     "file": ""
+    },
+    {
+     "mode": "individual",
+     "title": "📋 Mis variables",
+     "desc": "Escribe las variables de tu experimento. Explica con tus palabras: si un vaso tuviera más azúcar que otro, ¿sabríamos si la espuma cambió por la temperatura?",
+     "ficha": "",
+     "file": ""
+    }
+   ],
+   "ticket": {
+    "questions": [
+     {
+      "q": "¿Cuál es la variable que cambiamos a propósito?",
+      "options": [
+       "La temperatura del agua",
+       "La altura de la espuma",
+       "La cantidad de levadura"
+      ],
+      "answer": 0,
+      "why": "Es la variable independiente: 15 °C, 25 °C y 35 °C."
+     },
+     {
+      "q": "¿Cuál es la variable que medimos?",
+      "options": [
+       "El tipo de vaso",
+       "La altura de la espuma",
+       "La hora del día"
+      ],
+      "answer": 1,
+      "why": "Es la variable dependiente: la medimos en centímetros."
+     },
+     {
+      "q": "¿Por qué usamos la misma cantidad de azúcar en todos los vasos?",
+      "options": [
+       "Porque sobra azúcar",
+       "Para que el vaso pese igual",
+       "Para que solo la temperatura sea la diferencia"
+      ],
+      "answer": 2,
+      "why": "Si todo lo demás queda igual, la prueba es justa."
+     },
+     {
+      "q": "¿En qué unidad medimos la temperatura?",
+      "options": [
+       "Grados Celsius (°C)",
+       "Centímetros (cm)",
+       "Gramos (g)"
+      ],
+      "answer": 0,
+      "why": "La temperatura se mide en °C con un termómetro."
+     },
+     {
+      "q": "¿Cuál de estas es una variable que debe quedar igual?",
+      "options": [
+       "La temperatura",
+       "La cantidad de agua",
+       "La altura de la espuma"
+      ],
+      "answer": 1,
+      "why": "La cantidad de agua se controla: es igual en todos los vasos."
+     }
+    ]
+   },
+   "flipped": {
+    "enabled": false,
+    "title": "",
+    "desc": "",
+    "file": ""
+   },
+   "title": "",
+   "fichaTitle": "Ficha · Sesión 5 · Determinamos nuestras variables"
+  },
+  {
+   "meta": "Diseña una estrategia experimental válida y segura para comprobar la hipótesis.",
+   "criteria": [
+    "Describe materiales y seguridad",
+    "Organiza acciones en secuencia",
+    "Diseña su tabla de registro"
+   ],
+   "activities": [
+    {
+     "mode": "individual",
+     "title": "🧩 Pasos en orden",
+     "desc": "Ordena los pasos para preparar un refresco usando «primero, luego, después, finalmente». Así practicas cómo escribir un procedimiento.",
+     "ficha": "",
+     "file": ""
+    },
+    {
+     "mode": "group",
+     "title": "🗺️ Nuestro plan de experimento",
+     "desc": "En grupo, escriban los pasos, los materiales y para qué sirve cada uno, y las medidas de seguridad (agua a 35 °C como máximo, no probamos la mezcla, nos lavamos las manos). Cada temperatura se repite 3 veces. Revisen el plan de otro grupo. Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
+     "ficha": "",
+     "file": ""
+    },
+    {
+     "mode": "individual",
+     "title": "📊 Mi tabla para anotar",
+     "desc": "Dibuja tu tabla de registro: temperatura (15, 25 y 35 °C), repeticiones 1, 2 y 3, y la altura de la espuma en cm.",
+     "ficha": "",
+     "file": ""
+    }
+   ],
+   "ticket": {
+    "questions": [
+     {
+      "q": "¿Por qué repetimos 3 veces cada temperatura?",
+      "options": [
+       "Para que los resultados sean más confiables",
+       "Para gastar más levadura",
+       "Porque es divertido"
+      ],
+      "answer": 0,
+      "why": "Repetir ayuda a detectar errores y confiar en los datos."
+     },
+     {
+      "q": "¿Cuál es una medida de seguridad de nuestro experimento?",
+      "options": [
+       "Probar la mezcla para ver su sabor",
+       "Usar agua a 35 °C como máximo y no consumir las mezclas",
+       "Usar agua hirviendo"
+      ],
+      "answer": 1,
+      "why": "Usamos agua hasta 35 °C y nunca probamos las mezclas."
+     },
+     {
+      "q": "¿Para qué sirve el termómetro en nuestro experimento?",
+      "options": [
+       "Para medir la espuma",
+       "Para contar el tiempo",
+       "Para medir la temperatura del agua"
+      ],
+      "answer": 2,
+      "why": "El termómetro nos dice si el agua está a 15, 25 o 35 °C."
+     },
+     {
+      "q": "¿Qué palabra usamos para el primer paso de un procedimiento?",
+      "options": [
+       "Primero",
+       "Finalmente",
+       "Además"
+      ],
+      "answer": 0,
+      "why": "Los conectores ayudan a ordenar los pasos."
+     },
+     {
+      "q": "¿Qué debe tener nuestra tabla de registro?",
+      "options": [
+       "Solo dibujos",
+       "Temperaturas, repeticiones y altura de la espuma",
+       "Los nombres de las mascotas"
+      ],
+      "answer": 1,
+      "why": "La tabla organiza todos los datos que vamos a medir."
+     }
+    ]
+   },
+   "flipped": {
+    "enabled": false,
+    "title": "",
+    "desc": "",
+    "file": ""
+   },
+   "title": "",
+   "fichaTitle": "Ficha · Sesión 6 · Diseñamos nuestro experimento"
+  },
+  {
+   "meta": "Ejecuta el procedimiento experimental controlando las condiciones establecidas.",
+   "criteria": [
+    "Sigue el procedimiento con seguridad",
+    "Controla las condiciones",
+    "Registra los datos de todas las repeticiones"
+   ],
+   "activities": [
+    {
+     "mode": "individual",
+     "title": "🦺 Listos y seguros",
+     "desc": "Revisa la lista de seguridad y elige tu rol en el grupo: medidor, cronometrista, anotador o vigía de seguridad.",
+     "ficha": "",
+     "file": ""
+    },
+    {
+     "mode": "group",
+     "title": "⏱️ ¡Manos a la ciencia!",
+     "desc": "En grupo, realicen el experimento con las 3 temperaturas, 3 veces cada una. Midan la espuma a los 20 minutos, anoten las incidencias y tomen fotos como evidencia.",
+     "ficha": "",
+     "file": ""
+    },
+    {
+     "mode": "individual",
+     "title": "📓 Mi diario del experimento",
+     "desc": "Anota tus medidas, algo que observaste (burbujas, olor, color) y una dificultad que tuviste: «Observé que ___. Lo más difícil fue ___».",
+     "ficha": "",
+     "file": ""
+    }
+   ],
+   "ticket": {
+    "questions": [
+     {
+      "q": "¿Qué hace el cronometrista del grupo?",
+      "options": [
+       "Controla el tiempo",
+       "Mide la temperatura",
+       "Lava los vasos"
+      ],
+      "answer": 0,
+      "why": "El cronometrista avisa cuándo medir, por ejemplo a los 20 minutos."
+     },
+     {
+      "q": "Si a un vaso le echamos más levadura por error, ¿qué pasa?",
+      "options": [
+       "No importa",
+       "La prueba ya no es justa",
+       "La espuma será azul"
+      ],
+      "answer": 1,
+      "why": "Cambió una variable que debía quedar igual."
+     },
+     {
+      "q": "¿Por qué anotamos los datos apenas medimos?",
+      "options": [
+       "Para terminar rápido",
+       "Para decorar la tabla",
+       "Para no olvidar ni confundir las medidas"
+      ],
+      "answer": 2,
+      "why": "Registrar al momento evita errores."
+     },
+     {
+      "q": "¿Qué es una observación cualitativa?",
+      "options": [
+       "Describir burbujas, olor o color",
+       "Medir en centímetros",
+       "Contar los minutos"
+      ],
+      "answer": 0,
+      "why": "Lo cualitativo se describe con palabras; lo cuantitativo, con números."
+     },
+     {
+      "q": "¿Para qué anotamos las dificultades?",
+      "options": [
+       "Para quejarnos",
+       "Para proponer mejoras en la conclusión",
+       "Para no hacer el informe"
+      ],
+      "answer": 1,
+      "why": "Las dificultades nos ayudan a mejorar el experimento."
+     }
+    ]
+   },
+   "flipped": {
+    "enabled": false,
+    "title": "",
+    "desc": "",
+    "file": ""
+   },
+   "title": "",
+   "fichaTitle": "Ficha · Sesión 7 · ¡Manos a la ciencia!"
+  },
+  {
+   "meta": "Procesa los datos experimentales para facilitar su comparación.",
+   "criteria": [
+    "Verifica registros completos",
+    "Calcula el promedio",
+    "Organiza en tabla y gráfico"
+   ],
+   "activities": [
+    {
+     "mode": "individual",
+     "title": "🧮 Saco el promedio",
+     "desc": "Revisa que tu tabla esté completa. Calcula el promedio de cada temperatura: 1) suma las 3 medidas, 2) divide entre 3, 3) escribe la unidad (cm).",
+     "ficha": "",
+     "file": ""
+    },
+    {
+     "mode": "group",
+     "title": "📈 Nuestros datos hablan",
+     "desc": "En grupo, junten sus promedios en una tabla de doble entrada y un gráfico. Elijan el gráfico que mejor muestre los datos y expliquen por qué. Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
+     "ficha": "",
+     "file": ""
+    },
+    {
+     "mode": "individual",
+     "title": "📊 Mi tabla y mi gráfico",
+     "desc": "Pasa tu tabla y tu gráfico al informe, con título, nombre de los ejes y unidades (cm, °C). ⭐ Reto: explica por qué elegiste ese tipo de gráfico.",
+     "ficha": "",
+     "file": ""
+    }
+   ],
+   "ticket": {
+    "questions": [
+     {
+      "q": "Las medidas fueron 4 cm, 5 cm y 6 cm. ¿Cuál es el promedio?",
+      "options": [
+       "5 cm",
+       "15 cm",
+       "6 cm"
+      ],
+      "answer": 0,
+      "why": "4 + 5 + 6 = 15, y 15 ÷ 3 = 5 cm."
+     },
+     {
+      "q": "¿Qué gráfico sirve mejor para comparar la espuma en 3 temperaturas?",
+      "options": [
+       "Un gráfico de líneas del clima",
+       "Un gráfico de barras",
+       "Un dibujo libre"
+      ],
+      "answer": 1,
+      "why": "Las barras permiten comparar cantidades entre grupos."
+     },
+     {
+      "q": "¿Qué debe tener siempre un gráfico?",
+      "options": [
+       "Muchos colores",
+       "Stickers",
+       "Título, ejes y unidades"
+      ],
+      "answer": 2,
+      "why": "Sin título ni unidades no se entiende qué muestra."
+     },
+     {
+      "q": "¿Para qué calculamos el promedio?",
+      "options": [
+       "Para tener un solo valor representativo de las repeticiones",
+       "Para borrar datos",
+       "Para que la tabla sea más larga"
+      ],
+      "answer": 0,
+      "why": "El promedio resume las 3 repeticiones en un valor."
+     },
+     {
+      "q": "¿Qué es una tabla de doble entrada?",
+      "options": [
+       "Una tabla con una sola columna",
+       "Una tabla que cruza filas y columnas, como temperatura y repetición",
+       "Una lista de materiales"
+      ],
+      "answer": 1,
+      "why": "Cruza dos datos a la vez: filas y columnas."
+     }
+    ]
+   },
+   "flipped": {
+    "enabled": false,
+    "title": "",
+    "desc": "",
+    "file": ""
+   },
+   "title": "",
+   "fichaTitle": "Ficha · Sesión 8 · Procesamos nuestros datos"
+  },
+  {
+   "meta": "Interpreta los datos para establecer la relación entre la temperatura y la actividad de la levadura.",
+   "criteria": [
+    "Compara los resultados",
+    "Identifica patrones y datos inusuales",
+    "Explica qué muestran tabla y gráfico"
+   ],
+   "activities": [
+    {
+     "mode": "individual",
+     "title": "🔍 Leo mi gráfico",
+     "desc": "Mira tu gráfico y responde: ¿cuál es la barra más alta? ¿Cuál la más baja? ¿Hay algún dato muy diferente a los demás?",
+     "ficha": "",
+     "file": ""
+    },
+    {
+     "mode": "group",
+     "title": "🖼️ Galería científica",
+     "desc": "En grupo, visiten los gráficos de los demás. Busquen qué se repite en todos y qué fue diferente: «En todos se repite ___. Lo diferente fue ___». Comenten por qué pudo pasar. Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
+     "ficha": "",
+     "file": ""
+    },
+    {
+     "mode": "individual",
+     "title": "🗣️ Lo que muestran mis datos",
+     "desc": "Escribe 2 o 3 oraciones con tus números: «Cuando la temperatura fue ___, la espuma llegó a ___ cm. Esto muestra que ___».",
+     "ficha": "",
+     "file": ""
+    }
+   ],
+   "ticket": {
+    "questions": [
+     {
+      "q": "Si la barra de 35 °C es la más alta, ¿qué significa?",
+      "options": [
+       "A 35 °C hubo más espuma",
+       "A 35 °C hubo menos espuma",
+       "La temperatura no importa"
+      ],
+      "answer": 0,
+      "why": "La barra más alta representa la mayor altura de espuma."
+     },
+     {
+      "q": "¿Qué es un patrón en los datos?",
+      "options": [
+       "Un error",
+       "Algo que se repite en los resultados",
+       "Un dibujo bonito"
+      ],
+      "answer": 1,
+      "why": "Un patrón es una tendencia que se repite."
+     },
+     {
+      "q": "Un grupo obtuvo un dato muy distinto a los demás. ¿Qué hacemos?",
+      "options": [
+       "Lo borramos sin decir nada",
+       "Lo copiamos de otro grupo",
+       "Lo revisamos y pensamos por qué pasó"
+      ],
+      "answer": 2,
+      "why": "Los datos inusuales se analizan; pueden indicar un error en el procedimiento."
+     },
+     {
+      "q": "Si a más temperatura hay más espuma, ¿cuál es la relación?",
+      "options": [
+       "De causa y efecto",
+       "De colores",
+       "De tamaño del vaso"
+      ],
+      "answer": 0,
+      "why": "La temperatura (causa) influye en la espuma (efecto)."
+     },
+     {
+      "q": "¿Qué debemos usar para explicar lo que muestra el gráfico?",
+      "options": [
+       "Solo opiniones",
+       "Los números y datos obtenidos",
+       "Lo que dijo un amigo"
+      ],
+      "answer": 1,
+      "why": "Las explicaciones científicas se apoyan en datos."
+     }
+    ]
+   },
+   "flipped": {
+    "enabled": false,
+    "title": "",
+    "desc": "",
+    "file": ""
+   },
+   "title": "",
+   "fichaTitle": "Ficha · Sesión 9 · Interpretamos nuestros resultados"
+  },
+  {
+   "meta": "Argumenta una conclusión mediante evidencias experimentales y conocimientos científicos.",
+   "criteria": [
+    "Selecciona información científica",
+    "Relaciona levadura, gas y espuma",
+    "Contrasta resultados con la hipótesis"
+   ],
+   "activities": [
+    {
+     "mode": "individual",
+     "title": "📚 Lo que dice la ciencia",
+     "desc": "Lee una ficha sobre cómo la levadura produce gas al alimentarse del azúcar. Subraya lo que te ayude a explicar lo que pasó en TU experimento.",
+     "ficha": "",
+     "file": ""
+    },
+    {
+     "mode": "group",
+     "title": "⚖️ Juicio a la hipótesis",
+     "desc": "En grupo, decidan si su hipótesis fue respaldada, parcialmente respaldada o no respaldada, usando sus datos y la lectura como pruebas: «Nuestra hipótesis fue ___ porque los datos muestran ___». Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
+     "ficha": "",
+     "file": ""
+    },
+    {
+     "mode": "individual",
+     "title": "🏁 Mi conclusión",
+     "desc": "Escribe tu conclusión: 1) Descubrí que… 2) Esto coincide con… 3) Tuve dificultad con… 4) Lo mejoraría… ¡Tu informe queda completo!",
+     "ficha": "",
+     "file": ""
+    }
+   ],
+   "ticket": {
+    "questions": [
+     {
+      "q": "¿Qué es una conclusión?",
+      "options": [
+       "La respuesta a la pregunta, apoyada en los datos",
+       "El título del informe",
+       "La lista de materiales"
+      ],
+      "answer": 0,
+      "why": "La conclusión responde la pregunta de indagación con evidencias."
+     },
+     {
+      "q": "Si los datos NO coinciden con la hipótesis, entonces la hipótesis…",
+      "options": [
+       "Se cambia a escondidas",
+       "No es respaldada, y lo explicamos con los datos",
+       "Se borra del informe"
+      ],
+      "answer": 1,
+      "why": "Una hipótesis no respaldada también es un resultado científico valioso."
+     },
+     {
+      "q": "¿Por qué la levadura produce más espuma con temperatura adecuada?",
+      "options": [
+       "Porque el agua se evapora",
+       "Porque el azúcar se vuelve sal",
+       "Porque se activa y libera más dióxido de carbono"
+      ],
+      "answer": 2,
+      "why": "Con una temperatura adecuada la fermentación es más rápida."
+     },
+     {
+      "q": "¿Qué es una evidencia?",
+      "options": [
+       "Un dato u observación que apoya lo que decimos",
+       "Una opinión personal",
+       "Un adorno del informe"
+      ],
+      "answer": 0,
+      "why": "Las evidencias son datos medidos u observados."
+     },
+     {
+      "q": "En la conclusión también escribimos…",
+      "options": [
+       "Nuestro juego favorito",
+       "Las dificultades y cómo mejorar el experimento",
+       "El precio de la levadura"
+      ],
+      "answer": 1,
+      "why": "Mencionar dificultades y mejoras es parte de una buena conclusión."
+     }
+    ]
+   },
+   "flipped": {
+    "enabled": false,
+    "title": "",
+    "desc": "",
+    "file": ""
+   },
+   "title": "",
+   "fichaTitle": "Ficha · Sesión 10 · Argumentamos nuestra conclusión"
+  },
+  {
+   "meta": "Sustenta decisiones de indagación y conclusiones ante una nueva situación experimental.",
+   "criteria": [
+    "Organiza pregunta, hipótesis y variables",
+    "Analiza datos en tabla o gráfico",
+    "Sustenta conclusiones y propone mejoras"
+   ],
+   "activities": [
+    {
+     "mode": "individual",
+     "title": "🆕 Un nuevo misterio",
+     "desc": "Lee una situación nueva: la levadura con distintas cantidades de azúcar. Identifica la pregunta, la hipótesis, qué se cambia, qué se mide y qué queda igual.",
+     "ficha": "",
+     "file": ""
+    },
+    {
+     "mode": "group",
+     "title": "🕵️ Científicos en acción",
+     "desc": "En grupo, analicen la tabla o el gráfico del nuevo misterio. Saquen una conclusión con pruebas y propongan 2 mejoras al procedimiento. Preséntenlo como más les guste: afiche, cómic, organizador, maqueta, dramatización, audio o video corto.",
+     "ficha": "",
+     "file": ""
+    },
+    {
+     "mode": "individual",
+     "title": "🪞 Me evalúo",
+     "desc": "Revisa tu informe con la rúbrica. Marca tu nivel en cada criterio (C, B, A o AD) y escribe una meta para mejorar.",
+     "ficha": "",
+     "file": ""
+    }
+   ],
+   "ticket": {
+    "questions": [
+     {
+      "q": "Si ahora cambiamos la cantidad de azúcar, ¿cuál es la causa?",
+      "options": [
+       "La cantidad de azúcar",
+       "La altura de la espuma",
+       "El termómetro"
+      ],
+      "answer": 0,
+      "why": "Lo que cambiamos a propósito es la causa."
+     },
+     {
+      "q": "En ese nuevo experimento, ¿qué debe quedar igual?",
+      "options": [
+       "La cantidad de azúcar",
+       "La temperatura del agua",
+       "La altura de la espuma"
+      ],
+      "answer": 1,
+      "why": "Si probamos el azúcar, la temperatura debe ser igual en todos los vasos."
+     },
+     {
+      "q": "¿Cuál es una buena mejora para un experimento?",
+      "options": [
+       "Hacer una sola medición",
+       "No anotar los datos",
+       "Aumentar las repeticiones y medir con cuidado"
+      ],
+      "answer": 2,
+      "why": "Más repeticiones y mediciones cuidadosas dan datos más confiables."
+     },
+     {
+      "q": "¿Qué parte del informe responde la pregunta de indagación?",
+      "options": [
+       "La conclusión",
+       "La lista de materiales",
+       "El título"
+      ],
+      "answer": 0,
+      "why": "La conclusión responde la pregunta usando los datos."
+     },
+     {
+      "q": "¿Para qué sirve la rúbrica?",
+      "options": [
+       "Para copiar respuestas",
+       "Para saber qué logré y qué puedo mejorar",
+       "Para decorar el informe"
+      ],
+      "answer": 1,
+      "why": "La rúbrica muestra los niveles de logro de cada criterio."
+     }
+    ]
+   },
+   "flipped": {
+    "enabled": false,
+    "title": "",
+    "desc": "",
+    "file": ""
+   },
+   "title": "",
+   "fichaTitle": "Ficha · Sesión 11 · Científicos ante un nuevo reto"
+  }
+ ]
+}

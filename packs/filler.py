@@ -27,7 +27,7 @@ json.dump(fill,open(P+'fill.json','w'));gen();render(S)
 free={s:meas(*s)[1] for s in S}
 for n,i in S:
     fr=free[(n,i)]
-    fill[f'{n}-{i}']["h"]=int((fr-30)*96/72) if fr>80 else 0
+    fill[f'{n}-{i}']["h"]=int((fr-30)*96/72) if 80<fr<170 else 0
 json.dump(fill,open(P+'fill.json','w'));gen();render(S)
 for s in S:
     pg,fr=meas(*s)

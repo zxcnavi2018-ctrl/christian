@@ -9,8 +9,10 @@ def table(head,rows,n=None,cls=""):
     for r in rows:
         body+='<tr>'+''.join(f'<td>{c}</td>' for c in (r+['']*(len(head)-len(r))))+'</tr>'
     if n:
-        for _ in range(n):body+='<tr>'+'<td>&nbsp;</td>'*len(head)+'</tr>'
+        for _ in range(n):body+='<tr class="bk">'+'<td>&nbsp;</td>'*len(head)+'</tr>'
     if len(head)==2 and not cls:cls="kv"
+    if len(head)>=5 and cls!="chk":cls+=" wide"
+    elif len(head) in (3,4) and not cls:cls="mid"
     return f'<table class="{cls}"><tr>{h}</tr>{body}</table>'
 def check(title,items,cols=("Sí","Debo mejorar")):
     return table([title]+list(cols),[[e(i)]+['☐']*len(cols) for i in items],cls="chk")
@@ -42,9 +44,10 @@ def page(num,title,meta,crit,acts,extra=""):
 .ah{{display:flex;gap:8px;align-items:center}}.an{{font-weight:400;font-size:8pt;letter-spacing:.08em;text-transform:uppercase}}
 .am{{font-size:8pt;font-weight:400}}
 h2{{margin:3px 0 6px;font-size:12.5pt;font-weight:600}}h3{{font-size:10.5pt;margin:8px 0 4px;font-weight:600}}b{{font-weight:400}}
-p{{margin:4px 0}}.ln{{border-bottom:.8px dotted #000;height:27px}}
-table{{width:100%;border-collapse:collapse;margin:5px 0;font-size:9.2pt;break-inside:avoid}}th{{text-align:left;padding:4px 6px;border:.7px solid #000;font-weight:400;background:#fff}}td{{border:.7px solid #000;padding:5px 6px;height:28px;vertical-align:top}}
+p{{margin:4px 0}}.ln{{border-bottom:.8px dotted #000;height:34px}}
+table{{width:100%;border-collapse:collapse;margin:5px 0;font-size:9.2pt;break-inside:avoid}}th{{text-align:left;padding:4px 6px;border:.7px solid #000;font-weight:400;background:#fff}}td{{border:.7px solid #000;padding:5px 6px;height:44px;vertical-align:top}}
 table.kv td:first-child,table.kv th:first-child{{width:42%}}
+table.chk td{{height:30px}}table.wide{{table-layout:fixed}}table tr.bk td{{height:84px}}table.mid{{table-layout:fixed}}table.mid td{{height:56px}}table.wide td{{height:70px}}table.wide td:first-child{{height:auto}}
 table.chk td:not(:first-child),table.chk th:not(:first-child){{width:62px;text-align:center}}
 .scaf{{margin:5px 0;font-size:9.4pt}}
 .tip{{margin:5px 0;font-size:9.2pt}}

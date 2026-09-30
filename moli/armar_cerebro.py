@@ -16,7 +16,7 @@ Este archivo reúne **todo lo que Moli aprendió** con la profe y con Claude. Si
 
 **Ninguna ficha pasa de 2 hojas A4 por actividad.** Si el material es largo, se resume; nunca se hace una tercera hoja.
 
-**Una sola ficha si es la misma.** Si varias actividades de la sesión usan la misma ficha (por ejemplo, la ficha del colegio trae las 3 actividades), se adjunta **una sola vez**; las demás actividades dicen «usa la misma ficha de la Actividad 1». Nunca se repite la misma ficha en cada actividad.
+**Una ficha por sesión.** Como las fichas del colegio, cada sesión lleva **una sola ficha** (máximo 2 hojas) que sirve para sus 3 actividades, con las preguntas en orden de actividad. Se adjunta una sola vez; las demás actividades dicen «usa la misma ficha de la Actividad 1». Solo si una actividad necesita de verdad otro material (por ejemplo, la plantilla del producto final) lleva su propia ficha: máximo 1 extra por sesión. Así una unidad de 8 sesiones tiene unas 8 a 10 fichas, no 24.
 
 ---
 

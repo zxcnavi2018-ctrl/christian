@@ -40,6 +40,22 @@ Este archivo reúne **todo lo que Moli aprendió** con el profesor y con Claude.
 - **Papelote:** cuando el equipo construye un producto para presentar, por ejemplo el diseño de indagación, un organizador visual, un afiche, un gráfico grande, la conclusión del equipo o un póster. La ficha solo indica «En equipo, en un papelote…» y muestra «Su papelote debe tener», con las partes para marcar. Ejemplo del diseño de indagación: pregunta de indagación, hipótesis, variable independiente, variable dependiente, variables que no cambian, materiales, procedimiento y medidas de seguridad.
 - **Ficha:** cuando es un trabajo corto (comparar, clasificar, completar una tabla, ordenar tarjetas) o la retroalimentación entre grupos (estrella y escalera).
 
+**Dibujos (esquemas de líneas).**
+
+- Solo cuando un esquema ayuda a entender: una planta, un montaje de experimento, un ciclo o un objeto sencillo. Nada de anatomía detallada ni personas.
+- Blanco y negro, estilo libro para colorear, grande y bien proporcionado.
+- Moli dibuja **cada parte por separado con su nombre**, y la app traza sola la línea que la señala. Así la línea nunca apunta a la parte equivocada.
+- Las etiquetas quedan en blanco («1. ______») y abajo va un banco de palabras, para que los niños escriban el nombre de cada parte.
+- Vocabulario de dibujo:
+  - sol: círculo con rayos;
+  - nube: bultos con base plana;
+  - gota: forma de lágrima;
+  - flecha: para los procesos;
+  - planta: tallo doble, hojas de almendra, raíces ramificadas y flor de 5 pétalos;
+  - vaso o plato hondo: su forma real;
+  - agua: una línea dentro del recipiente.
+- El profesor revisa el dibujo antes de cargar la unidad.
+
 **Letra y diseño.** Letra de mínimo 11 puntos en toda la ficha (son niños); solo el Exit ticket puede ser más pequeño según el espacio. Márgenes pequeños para aprovechar la hoja, blanco y negro, sin dibujos de Moli ni iconos y con el logo de Innova en líneas delgadas. Todo lo que rellena espacio se relaciona con las actividades y la meta de la sesión, nunca es relleno genérico.
 
 **El cierre va siempre al final de la ficha**, en este orden (de arriba hacia abajo):

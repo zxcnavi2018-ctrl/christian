@@ -19,7 +19,7 @@
    "flipped": {
     "enabled": true,
     "title": "Para la siguiente sesión: materiales",
-    "desc": "Por grupo traigan: un vaso o frasco transparente, una regla y una cucharita. La profe llevará la levadura y el azúcar.",
+    "desc": "Por grupo traigan: un vaso o frasco transparente, una regla y una cucharita. El profesor llevará la levadura y el azúcar.",
     "file": ""
    },
    "activities": [
@@ -536,7 +536,7 @@
    "flipped": {
     "enabled": true,
     "title": "Para la siguiente sesión: materiales del experimento",
-    "desc": "Por grupo traigan: 3 vasos o frascos transparentes iguales, una regla, una cucharita, etiquetas o cinta para rotular y papel toalla. La profe llevará la levadura, el azúcar, el termómetro y el agua a 15, 25 y 35 °C.",
+    "desc": "Por grupo traigan: 3 vasos o frascos transparentes iguales, una regla, una cucharita, etiquetas o cinta para rotular y papel toalla. El profesor llevará la levadura, el azúcar, el termómetro y el agua a 15, 25 y 35 °C.",
     "file": ""
    },
    "rubric": "Verificación mediante el diseño",

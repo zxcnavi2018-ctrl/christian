@@ -114,7 +114,8 @@ S.append(dict(meta="Sustenta decisiones de indagación y conclusiones ante una n
   Q("¿Cuál es una buena mejora para un experimento?",["Hacer una sola medición","No anotar los datos","Aumentar las repeticiones y medir con cuidado"],2,"Más repeticiones y mediciones cuidadosas dan datos más confiables."),
   Q("¿Qué parte del informe responde la pregunta de indagación?",["La conclusión","La lista de materiales","El título"],0,"La conclusión responde la pregunta usando los datos."),
   Q("¿Para qué sirve la rúbrica?",["Para copiar respuestas","Para saber qué logré y qué puedo mejorar","Para decorar el informe"],1,"La rúbrica muestra los niveles de logro de cada criterio.")]))
-for s in S:
+for s,rb in zip(S,["Describe hechos y fenómenos","Describe hechos y fenómenos","Formula pregunta de indagación","Elabora hipótesis","Verificación mediante el diseño","Verificación mediante el diseño","Verificación mediante el diseño (puesta en práctica)","Organiza y procesa datos","Organiza y procesa datos","Elabora y comunica conclusiones","Todos los criterios (evaluación final)"]):
+  s["rubric"]=rb
   assert len(s["qs"])==5 and len(s["activities"])==3
   s["ticket"]={"questions":s.pop("qs")}
   s.setdefault("flipped",{"enabled":False,"title":"","desc":"","file":""})

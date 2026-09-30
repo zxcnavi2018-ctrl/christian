@@ -73,8 +73,10 @@ S.append(dict(meta="Elabora un póster en equipo reflexionando sobre lo aprendid
   Q("¿Qué tema va en el segundo póster?",["Deportes","Animales marinos","Tecnologías asociadas a la fecundación, el embarazo o el parto"],2,"El segundo póster trata sobre las tecnologías, como la ecografía."),
   Q("¿Para qué sirve hacer un boceto antes del póster?",["Para planificar el contenido y la distribución","Para gastar papel","Para no trabajar en equipo"],0,"El boceto ayuda a organizar las ideas antes de hacer la versión final."),
   Q("¿Qué significa «explicar» en la rúbrica?",["Nombrar sin dar razones","Dar razones y detallar cómo ocurre un proceso","Copiar un texto"],1,"Explicar es dar razones y detallar pasos o procesos.")]))
-for s in S:
+for s,rb in zip(S,["Explica el saber científico"]*5+["Explica las consecuencias y opina sobre la tecnología","Todos los criterios (póster final)"]):
+  s["rubric"]=rb
   assert len(s["qs"])==5 and len(s["activities"])==3
   s["ticket"]={"questions":s.pop("qs")};s["flipped"]={"enabled":False,"title":"","desc":"","file":""};s["title"]=""
+S[1]["flipped"]={"enabled":True,"title":"Flipped: sistema reproductor femenino","desc":"Antes de la siguiente sesión, mira el video del sistema reproductor femenino y completa en tu cuaderno el cuadro de ovario, trompas de Falopio, útero y vagina: características, funciones y un dato interesante.","file":""}
 json.dump({"unit":"unit8","title":"El sistema reproductor humano","product":"Dos pósters científicos: 1) los sistemas reproductores y el ciclo ovárico; 2) tecnologías asociadas a la fecundación, el embarazo y el parto","sessions":S},open('/home/user/christian/packs/unidad8.json','w'),ensure_ascii=False,indent=1)
 print('ok',len(S))

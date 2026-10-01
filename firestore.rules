@@ -551,6 +551,19 @@ service cloud.firestore {
       allow delete: if isTeacher();
     }
 
+    // Misión 01: avance de cada estudiante (errores e intentos por actividad). Solo la docente ve la lista.
+    match /mision/{id} {
+      allow get: if true;
+      allow list, delete: if isTeacher();
+      allow create, update: if id.matches('m1-k[0-9a-f]{20}')
+        && exists(/databases/$(database)/documents/students/$(id.split('-')[1]))
+        && request.resource.data.keys().hasOnly(['p', 'n', 'sec', 'at'])
+        && request.resource.data.p is string && request.resource.data.p.size() <= 4000
+        && request.resource.data.n is string && request.resource.data.n.size() <= 60
+        && request.resource.data.sec in ['A', 'B', 'C', 'D']
+        && request.resource.data.at is timestamp;
+    }
+
     // Marcas de la versión anterior (solo para que la docente pueda limpiarlas).
     match /exitTicketsDone/{id} {
       allow get: if true;

@@ -13,8 +13,8 @@ service cloud.firestore {
         && d.keys().hasAll(['dni', 'name', 'section', 'grade', 'createdAt'])
         && d.dni is string && d.dni.matches('[0-9]{8}')
         && d.name is string && d.name.size() >= 3 && d.name.size() <= 60
-        && d.section in ['A', 'B', 'C', 'D']
-        && d.grade == '6to'
+        && d.section in ['A', 'B', 'C', 'D', 'E', 'F']
+        && d.grade in ['5to', '6to']
         && d.createdAt is timestamp;
     }
 
@@ -24,8 +24,8 @@ service cloud.firestore {
         && d.unit is string && d.unit.size() <= 20
         && d.unitNum is string && d.unitNum.size() <= 10
         && d.session is int && d.session >= 1 && d.session <= 99
-        && d.grade == '6to'
-        && d.section in ['A', 'B', 'C', 'D']
+        && d.grade in ['5to', '6to']
+        && d.section in ['A', 'B', 'C', 'D', 'E', 'F']
         && d.name is string && d.name.size() > 0 && d.name.size() <= 60
         && d.student is string && d.student.matches('k[0-9a-f]{20}')
         && d.dni is string && d.dni.matches('[0-9]{8}')
@@ -39,7 +39,8 @@ service cloud.firestore {
     // conoce el DNI puede abrir su cuenta. Solo la docente ve la lista completa.
     match /students/{id} {
       allow get: if true;
-      allow create: if id.matches('k[0-9a-f]{20}') && validStudent(request.resource.data);
+      // Solo el docente crea cuentas (desde su lista de Excel).
+      allow create: if isTeacher() && id.matches('k[0-9a-f]{20}') && validStudent(request.resource.data);
       allow list, update, delete: if isTeacher();
     }
 
@@ -196,7 +197,7 @@ service cloud.firestore {
         && d.updatedAt is timestamp
         && (id == 'r3c9113e81963df4dffaa'
           ? (d.section == 'DOC' && d.name == 'Docente' && d.stars == 0)
-          : d.section in ['A', 'B', 'C', 'D']);
+          : d.section in ['A', 'B', 'C', 'D', 'E', 'F']);
     }
     match /ranking/{id} {
       allow get: if true;
@@ -229,8 +230,10 @@ service cloud.firestore {
         && request.resource.data.data is string && request.resource.data.data.size() <= 20000
         && request.resource.data.updatedAt is timestamp;
       allow create, update: if isTeacher() && id == 'site'
-        && request.resource.data.keys().hasOnly(['title', 'bimestre', 'hidden', 'lbl', 'tch', 'updatedAt'])
-        && (!('tch' in request.resource.data) || (request.resource.data.tch is list && request.resource.data.tch.size() <= 20))
+        && request.resource.data.keys().hasOnly(['title', 'bimestre', 'hidden', 'lbl', 'tch', 'tchN', 'areas', 'updatedAt'])
+        && (!('tch' in request.resource.data) || (request.resource.data.tch is list && request.resource.data.tch.size() <= 40))
+        && (!('tchN' in request.resource.data) || (request.resource.data.tchN is map && request.resource.data.tchN.size() <= 40))
+        && (!('areas' in request.resource.data) || (request.resource.data.areas is string && request.resource.data.areas.size() <= 3000))
         && (!('lbl' in request.resource.data) || (request.resource.data.lbl is string && request.resource.data.lbl.size() <= 30))
         && request.resource.data.title is string && request.resource.data.title.size() > 0 && request.resource.data.title.size() <= 40
         && request.resource.data.bimestre is int && request.resource.data.bimestre >= 1 && request.resource.data.bimestre <= 4
@@ -565,7 +568,7 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['p', 'n', 'sec', 'at'])
         && request.resource.data.p is string && request.resource.data.p.size() <= 4000
         && request.resource.data.n is string && request.resource.data.n.size() <= 60
-        && request.resource.data.sec in ['A', 'B', 'C', 'D']
+        && request.resource.data.sec in ['A', 'B', 'C', 'D', 'E', 'F']
         && request.resource.data.at is timestamp;
     }
 

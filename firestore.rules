@@ -560,6 +560,22 @@ service cloud.firestore {
     }
 
     // Misión 01: avance de cada estudiante (errores e intentos por actividad). Solo la docente ve la lista.
+    // Control remoto: "p-<cuenta>" guarda el canal de cada docente (solo docente);
+    // "c-<32 hex>" es el canal secreto que leen y escriben la laptop y el celular.
+    match /remote/{id} {
+      allow get: if (isTeacher() && id.matches('p-k[0-9a-f]{20}')) || id.matches('c-[0-9a-f]{32}');
+      allow create, update: if isTeacher() && id.matches('p-k[0-9a-f]{20}')
+        && request.resource.data.keys().hasOnly(['c', 'at'])
+        && request.resource.data.c is string && request.resource.data.c.matches('[0-9a-f]{32}');
+      allow create, update: if id.matches('c-[0-9a-f]{32}')
+        && request.resource.data.keys().hasOnly(['cmd', 'arg', 'seq', 'st', 'cfg', 'at'])
+        && (!('cmd' in request.resource.data) || (request.resource.data.cmd is string && request.resource.data.cmd.size() <= 10))
+        && (!('arg' in request.resource.data) || (request.resource.data.arg is string && request.resource.data.arg.size() <= 60))
+        && (!('seq' in request.resource.data) || request.resource.data.seq is int)
+        && (!('st' in request.resource.data) || (request.resource.data.st is string && request.resource.data.st.size() <= 2000))
+        && (!('cfg' in request.resource.data) || (request.resource.data.cfg is string && request.resource.data.cfg.size() <= 200));
+    }
+
     match /mision/{id} {
       allow get: if true;
       allow list, delete: if isTeacher();

@@ -551,41 +551,6 @@ service cloud.firestore {
       allow delete: if isTeacher();
     }
 
-    // Jugadores conectados (inicio), amigos e invitaciones a duelo (retos 1 vs 1 y equipos 2 vs 2).
-    match /online/{rid} {
-      allow get: if true;
-      allow list: if request.query.limit <= 60;
-      allow create, update: if rid.matches('r[0-9a-f]{20}')
-        && request.resource.data.keys().hasOnly(['n', 's', 'o', 'at', 'updatedAt'])
-        && request.resource.data.n is string && request.resource.data.n.size() <= 40
-        && request.resource.data.s is string && request.resource.data.s.size() <= 10
-        && request.resource.data.o is string && request.resource.data.o.size() <= 800
-        && request.resource.data.at is timestamp && request.resource.data.updatedAt is timestamp;
-      allow delete: if isTeacher();
-    }
-    match /friends/{rid} {
-      allow get: if true;
-      allow create, update: if rid.matches('r[0-9a-f]{20}')
-        && request.resource.data.keys().hasOnly(['l', 'updatedAt'])
-        && request.resource.data.l is string && request.resource.data.l.size() <= 20000
-        && request.resource.data.updatedAt is timestamp;
-      allow delete: if isTeacher();
-    }
-    match /invites/{rid} {
-      allow get: if true;
-      allow create, update: if rid.matches('r[0-9a-f]{20}')
-        && request.resource.data.keys().hasOnly(['from', 'fn', 'fo', 'd', 'k', 'sl', 'st', 'at', 'updatedAt'])
-        && request.resource.data.from is string && request.resource.data.from.matches('r[0-9a-f]{20}')
-        && request.resource.data.fn is string && request.resource.data.fn.size() <= 40
-        && request.resource.data.fo is string && request.resource.data.fo.size() <= 800
-        && request.resource.data.d is string && request.resource.data.d.matches('(di|q)[0-9a-z]{6,30}')
-        && request.resource.data.k in ['duel', 'team']
-        && request.resource.data.sl is int && request.resource.data.sl >= 1 && request.resource.data.sl <= 6
-        && request.resource.data.st in ['sent', 'ok', 'no', 'busy', 'limit', 'late', 'move']
-        && request.resource.data.at is timestamp && request.resource.data.updatedAt is timestamp;
-      allow delete: if isTeacher();
-    }
-
     // Marcas de la versión anterior (solo para que la docente pueda limpiarlas).
     match /exitTicketsDone/{id} {
       allow get: if true;

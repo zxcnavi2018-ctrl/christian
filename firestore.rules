@@ -68,142 +68,14 @@ service cloud.firestore {
       allow list, delete: if isTeacher();
     }
 
-    // Códigos de estrellas que entrega la docente en clase. Aquí solo está la
-    // versión cifrada de cada código; cada código se puede canjear una sola vez.
-    function validCode(code) {
-      return hashing.sha256('moli|' + code).toHexString().lower() in [
-          '0874f33794967edcedcfcef8b63b201d82b9d02203e1c971bc5434e02539d9a3',
-          '7d5d539f8536bfe682cdecd7b39eade8753bea18febdc0774d0e26da2602660f',
-          'f8df50b41e3d7463d39da2152c278c2962e702ee1be905afd7a7dc2e00c10985',
-          '33ff86b84ef42ce2c18dfce9e9f8b823f2225c63a4f24742e2287702f1924a0f',
-          '92ba62e02eddc6c77ecd3f190db770e401399c7cf766862b7fa17c2a4d597132',
-          '0e088e3c31b81be8b4b145d9e76c4f9d9c025275a982a73daf8fb166f44909e2',
-          '78d6b4d10aee59c6ccf052806e98bbfa3f0c2b8cf10b359ad6f6548bdb8e8288',
-          '007bf28ba449f5f0e53bfc274228c1fa363db3d2cd9c9490e4d2660ceced1758',
-          '68b7a77dd59f593c714341f47f1e5ac7150c57db8cf29954ff763eb154f4e562',
-          '261faa259c2fff8d22f4d4bed04b582b4dfa269fa1bec306147a5ef2d939daa0',
-          '5983997e58601bad2166af2df465f1bb70fa373328a845aacc97ee2b4fb2a62d',
-          'cbcab31e4bb3606637a0f8ed00921a0744087bb8b4632285d7ee9cd177f28619',
-          '82205c36f32d8258c6ccaa9d908f030cd53f86827fe64e0a48bcefad25358011',
-          '1ec46f23e5cfad71117818f5262f8c0f01806c56d57225001c2f4a830c47fa69',
-          '38c628dde6f3d9d6416fb68bda5087413a55c39c9257a3d9daba76b66b3d30eb',
-          '8a814f5cad1daf0d8258c7b36afe10bf59d6e7ff5663d3ed32e9784b30b98285',
-          '344e83bf951c84cae346d35166769ae43368573e1369998e24883cee755b9c8c',
-          'dce6eb1e260c50130ece708373f150d002fc8df10e0b48b240e78540b97e80e4',
-          'af93999842d7b6e2c85bb24a8cfc8e4ba947733229a750ced128273bbee11226',
-          'ffef7cb6e4b6a0f80d1266fb41202cf6fdcdb129630b2287503d7a76854a3124',
-          '16d6bb16524ce6075097d53bedf018c4338ce040fd16b77057261a7d7fa9ca3f',
-          '5a1a066f41dc5e7d41ead36c69289131bbb1f5ffd02e470eb02a72cec3b422ff',
-          '99379b68ec0b58afdc74fd860d91df8202dd0d5a14656c1452e3010fca82ae0b',
-          'a3b2e2a7ba7d48195d0b2180d60b9b1ea0de84d148479f5e6018f945111e8611',
-          '12ec2938ed060bda98eacabac7654ff6d91a6c46692387ffe9507036f10a8b32',
-          'f18091c003ad9e774a6510a42d0808135d0eff6b0323f6242c77e5368874514d',
-          'a44bf65045f51be4be94408b1cba1cfd006b3c568c08d5dd6edbbd01de7f82a1',
-          '6f5bd3afb651dbe88d8be05599c897b0f7e083923b8616633ccc0c5b480a562b',
-          '39f3d7d3de6a3b0ab041eddad8761b392e9f3f7f521bba2e00f641e9bcdd5749',
-          '5aa5dbbcded10ba7bda081cb2d141ec3a2f5f605ae80cdecb81323bdc680b2f4',
-          '2484537023fd48131a50433e171c6ff5fa65d8fcfcd8e45299ffa31c873e95e4',
-          'e82c19bfac2a7837b1290218c9ad659e903019f65e4107e415a1a7b09e586d20',
-          'bc76a1ea51ee42910898d7045cfa6c1ddd86b90b8a18ee75f1de537aba69ec20',
-          '1a07e2db6bf093cedcb0edc28d10c2bd7267f0247045faa7abca8897ecd8ad5e',
-          'd67d2f2ad43fb6979b145e8a7f76c6407c7e3d475a2a01ee816d9a12239917fb',
-          'ca6bfea6d0a44793de9fa321a9cc1319150117b36bf657a326a75b35543386ec',
-          '7468a658cfa30c9f90d765c6844b3835f41cfcd83873294008a250e9d41a7d6a',
-          'bde082d322c8b30d41451df1604ea7c54bef14d1c33b5c4df2fea69bdba2ae8a',
-          '6e3f4a7079886c47baaf93d47a6955ac8db13b93774597438f60b7f75ad37104',
-          '24f453dec57d3e8066125b2aa9bca1a63e2c8ce6796eec30e411901c7a83e935',
-          'f4354b439d641a6dd70900904d58affff04aa239e08593a0781986bca6a08588',
-          'ebda531464090296ed65932c51df8fb9987c765e37cd23b58e6e9dc699839162',
-          '56838c29be225b200753811201c3dba3437898b36c6a993224964037aa03dada',
-          '550a35500f4516eaf846c616f8c276d0bd51be7d747ceda45a884669105ad18b',
-          'f6f0fc71e30741369abaa75c21e4dfc6cc721b5e2b6e3d1ec2315fd6d77b248e',
-          '920e221be07b8887e3c3ed31e5db8c3a00ebe9a835a64e388dc954c2ba7f23b8',
-          '2e10da300240ca3b54979b9a48fb77ec6ea7a19153155be07dee771dc5f86174',
-          'a7c3f6dfaf0d5bb1d05db331274adc74a2a7d69c8ce0383d348e7f1eeb57d6c6',
-          '07f2715cb4baee91ce0f8fc2fb68b7c676235459ec9176b616665395f2f415a6',
-          '1d2c3f0da99a6f36743c9000ba98ecbfa06d55a18215d2661d6d71bfd037582f',
-          '63c1744aa22a7a9e311dbfddd5d682c9c5f6d6bd2f372a671294a55e831ee99e',
-          '3d418d9c6833e453428f12a43f3a34c55ab0cacc050ee7447deabf45d7c965e9',
-          '18f8abb60ad4d60c83546a05e5a00367133f99f5b793e80292fc2f12ca0ab1f9',
-          '5a255f2b3223dc7a1d132c9a321edb149fcd644cacf46f30292ca5aedf8e7517',
-          '3bee1362c682f6577c3f51101d0b9daaf185f6c8bc8532cacaee7faee3345fb9',
-          '7bb3501438f952908a050d918b51ef14d5f083e88d63b364ea99a17d8895830a',
-          'ef6c905529be59db621ad30a3d63fc014303f63d5051f730333e3d9e8e348ff2',
-          '5c8e26993e23901edff814a2d16e609029a4236e332507886d446b251182fab0',
-          '09ade76a779d7ca37a948dc2219b5bd95e697a97e81ce119be62ee5a84f44833',
-          '665eed8a2c0f5917af204318ebb830309a6f5a03a224626aadb6b922f4cd928d',
-          'b0ab79fe5d208ee25dfb2981e13355e567b4025e9c975597862610287ef859c3',
-          '0141812558601d9908b4b8c7ae12d2eb68451296582680f480399cb32bb82951',
-          'edb099d4ffa7ed78e71ed22b10df859e5f57d71bcb0b546b2d1688d5d859ca7d',
-          '345c42f296323647bfd7ee720d1ca2aa38d48343a4e65fb4400988bc9fbbbd56',
-          '03ed5714237f8937bc3160c85fee2b18311ddec5d60e5b7f6ca56876faf8bdf3',
-          'c141be842ee7d8f80f99da83a6da20471c49ab64ca418d153ee85df7754abc4e',
-          '5f3a6b89c9c36efcbb471d31d9c24dc45ea28fcf6c59c24b94c38a4808af4c0c',
-          'eaa3ecb2683744c230d07e268fa51bc6405cbdbfcfad5e66fc8f7cbc70cb17ab',
-          '7fc8464da6855c80601689ef45157e1e303dd1482915e2dc3528a04a43882a08',
-          '941dc14393b52742ccb0aaf22f5f83051c8462f80ac749564385720879732188',
-          '5e00eca188771ce2e83172a6dd703116ad9294294e9996485afebad9406e4783',
-          '3c13dc1c9f242dc22a91b0bd3c57e65a41cf484c126d2f55bab585eb3c50ea74',
-          'f2bd94cfb10f5314568480d8a85a7303d322c84f8464d45deb426c3455b5dc3f',
-          '8e4f8a5e1753c5d02ad390167600326cdabd4d3f84382e104355c5a502281a76',
-          'a3f149ab99efc25dd44b3232da97d2b0b0982123ff90d33d696ccd260f973aef',
-          '5096580870a1877dbcceba94e6d14ba2082b32318b883ceda902af5e343f5e32',
-          'eaeb99e678f3fb16f6bd3d2675362b4bada462a8855eb03532dbebbb1a2100a0',
-          '21a7b7b21ec2347ab4e793e19fc314c62b535ca481c5bea6d5c2334daba54203',
-          '3e13172bfba153ceab408891767f9ef8a888def92d608e9d5eb98d323f9d4e29',
-          '7b26d6f3402c03eb7d55c63c397cfd429f76d2e65f06f7ca8f302cc9e916f127',
-          '000acabc08dde97bb3e13f84f69c449a0c5c3a6eb82e2b0c8566d4fc6d434f96',
-          '6c333adbf739ff7e4140d7e40d18ad09931aed93ff3606c389cfa0490e848973',
-          'f44d8856fe3e97e91d4b94362ab60d0fbd1f33d0f0242f7cc5c0aa8a18ad12bb',
-          'd04bf087757963378a74a45c10711ec77be4ef06d7efa44e9674634a642f366b',
-          '66de53fb56bdb137e8cda9e7f4ad5f43820551400cdcb4c98892a35027b8a396',
-          '8dfd1cdf5ed2068443dac17491c55d16fc869a685af438e482d1f6171258b10f',
-          '708390c177a8c774285b4ddfa48fd7bb9c41054b77be18b2e601caf9eaf6f6dd',
-          '13e2d0b65f83e1ed5d01e53fa6fb3c8c3345bc90b4319ce872854f007c0892c8',
-          'ab14562deb560349c94b2ed52e96d6b70de34151cdfc1940c50723cbdeb37057',
-          '0eda659c4fa531e913f52fbebbfe99908c07289135c614d4593d58071abe064a',
-          'af8b7f921ee3e37119d879f9c0e4d3578484e1e2c2f390b07a43fa24a5e49a2b',
-          '39bd8d9a5148d1c7277386aa6e71bb0871fcc05593e7cdf9f037da37ab50dbaf',
-          'c9699def5104db8837bcfa4b8d28d54b01b4034510cd5bfc5ae3619ac7e2e745',
-          'c563dce30969c8d469efc6ddd0bd7f7975cf8b90728cf3b8fbea24aaf5afcf99',
-          'b39f2c43a1e692c1339385e374806adb0b05911569b5bdc4da7d7a012aa2633c',
-          '91f5fc7fd07b1c6460618518e627896e6de3be9bdcb4ecdae3585ff343bece8a',
-          'a97e6bc3738b26de888f9e126933d51666833e41a76f6a779957fb28875c15aa',
-          '9f8b189de30ad8f5e78c6aec468bc86b1b8c0e5484244b3e9e9340aae5b5a6ed',
-          '29d051714496ee87dea5c223486f6e5c449b29459cbc605e39876acbd60a5a55',
-          '660b15431449aca7f5f79a4068cc926477bae3adecc4a588510fd9cf541b7264'
-        ];
-    }
+    // Códigos de estrellas: ya no existen. Solo la docente puede borrar los que quedaron.
     match /redemptions/{code} {
-      allow get: if true;
-      allow create: if validCode(code)
-        && request.resource.data.keys().hasOnly(['student', 'at'])
-        && request.resource.data.student is string && request.resource.data.student.matches('k[0-9a-f]{20}')
-        && exists(/databases/$(database)/documents/students/$(request.resource.data.student))
-        && request.resource.data.at is timestamp;
       allow list, delete: if isTeacher();
-      allow update: if false;
     }
 
-    // Ranking (top 15): nombre corto, sección, estrellas ganadas en total y la ropa de Moli.
-    // El id sale de un cifrado lento del DNI, así el ranking no deja adivinar los DNI.
-    // La tarjeta "Docente" tiene su propio id y siempre va con 0 estrellas.
-    function validRank(id, d) {
-      return d.keys().hasOnly(['name', 'section', 'stars', 'outfit', 'duels', 'updatedAt'])
-        && (!('duels' in d) || (d.duels is int && d.duels >= 0 && d.duels <= 5000))
-        && d.name is string && d.name.size() > 0 && d.name.size() <= 40
-        && d.stars is int && d.stars >= 0 && d.stars <= 1000
-        && d.outfit is list && d.outfit.size() <= 12
-        && d.updatedAt is timestamp
-        && (id == 'r3c9113e81963df4dffaa'
-          ? (d.section == 'DOC' && d.name == 'Docente' && d.stars == 0)
-          : d.section in ['A', 'B', 'C', 'D', 'E', 'F']);
-    }
+    // Ranking de estrellas: ya no existe. Solo la docente puede borrar lo que quedó.
     match /ranking/{id} {
-      allow get: if true;
-      allow list: if request.query.limit <= 50 || isTeacher();
-      allow create, update: if id.matches('r[0-9a-f]{20}') && validRank(id, request.resource.data);
-      allow delete: if isTeacher();
+      allow list, delete: if isTeacher();
     }
 
     // Portada: título, bimestre y unidades visibles. Todos la leen; solo la docente la cambia.
@@ -241,11 +113,6 @@ service cloud.firestore {
         && request.resource.data.updatedAt is timestamp;
       // Misiones (Exit tickets y tareas que crea la docente). Todos las leen; solo ella las cambia.
       allow create, update: if isTeacher() && id == 'mis'
-        && request.resource.data.keys().hasOnly(['data', 'updatedAt'])
-        && request.resource.data.data is string && request.resource.data.data.size() <= 300000
-        && request.resource.data.updatedAt is timestamp;
-      // Foto del ranking (la guarda la docente cada hora): así los estudiantes leen 1 documento y no todos.
-      allow create, update: if isTeacher() && id == 'rank'
         && request.resource.data.keys().hasOnly(['data', 'updatedAt'])
         && request.resource.data.data is string && request.resource.data.data.size() <= 300000
         && request.resource.data.updatedAt is timestamp;

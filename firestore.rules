@@ -459,7 +459,12 @@ service cloud.firestore {
     }
 
     match /remote/{id} {
-      allow get: if (isTeacher() && id.matches('p-k[0-9a-f]{20}')) || id.matches('[cs]-[0-9a-f]{32}');
+      // p- de 32 caracteres: se calcula con el DNI y la contraseña de cada docente (nadie más puede adivinarlo).
+      allow get: if (isTeacher() && id.matches('p-k[0-9a-f]{20}')) || id.matches('[cs]-[0-9a-f]{32}') || id.matches('p-[0-9a-f]{32}');
+      allow create, update: if id.matches('p-[0-9a-f]{32}')
+        && request.resource.data.keys().hasOnly(['c', 'at'])
+        && request.resource.data.c is string && request.resource.data.c.matches('[0-9a-f]{32}')
+        && request.resource.data.at is timestamp;
       allow create, update: if isTeacher() && id.matches('p-k[0-9a-f]{20}')
         && request.resource.data.keys().hasOnly(['c', 'at'])
         && request.resource.data.c is string && request.resource.data.c.matches('[0-9a-f]{32}');

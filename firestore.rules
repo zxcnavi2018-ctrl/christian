@@ -201,7 +201,7 @@ service cloud.firestore {
     }
     match /ranking/{id} {
       allow get: if true;
-      allow list: if request.query.limit <= 50;
+      allow list: if request.query.limit <= 50 || isTeacher();
       allow create, update: if id.matches('r[0-9a-f]{20}') && validRank(id, request.resource.data);
       allow delete: if isTeacher();
     }
@@ -373,7 +373,9 @@ service cloud.firestore {
     }
     match /tourneys/{id} {
       allow get: if true;
-      allow create, update, delete: if isTeacher() && id == 'current';
+      allow list: if isTeacher();
+      allow create, update: if isTeacher() && id == 'current';
+      allow delete: if isTeacher();
     }
     // Cupos públicos (nombre corto, sección y Moli) para que los compañeros vean quién participa.
     match /tslots/{id} {
@@ -499,7 +501,7 @@ service cloud.firestore {
     }
     match /duels/{id} {
       allow get: if true;
-      allow list: if request.query.limit <= 10;
+      allow list: if request.query.limit <= 10 || isTeacher();
       allow create: if id.matches('d[0-9a-z]{6,30}') && validDuel(request.resource.data)
         && request.resource.data.status == 'waiting' && request.resource.data.p2 == ''
         && request.resource.data.s1 == 0 && request.resource.data.a1 == 0 && request.resource.data.s2 == 0 && request.resource.data.a2 == 0;
@@ -537,7 +539,7 @@ service cloud.firestore {
     }
     match /duels2/{id} {
       allow get: if true;
-      allow list: if request.query.limit <= 10;
+      allow list: if request.query.limit <= 10 || isTeacher();
       allow create: if id.matches('q[0-9a-z]{6,30}') && validDuel2(request.resource.data)
         && request.resource.data.status == 'waiting'
         && request.resource.data.p2 == '' && request.resource.data.p3 == '' && request.resource.data.p4 == ''
@@ -562,6 +564,33 @@ service cloud.firestore {
     // Misión 01: avance de cada estudiante (errores e intentos por actividad). Solo la docente ve la lista.
     // Control remoto: "p-<cuenta>" guarda el canal de cada docente (solo docente);
     // "c-<32 hex>" es el canal secreto que leen y escriben la laptop y el celular.
+    // Contraseña de 4 números de cada administrador (la crea él mismo la primera vez que entra).
+    // Nadie puede leerla: solo se comprueba intentando una escritura con la misma huella.
+    match /apin/{id} {
+      allow get, list: if false;
+      allow create: if id.matches('r[0-9a-f]{20}')
+        && id in get(/databases/$(database)/documents/config/site).data.tch
+        && existsAfter(/databases/$(database)/documents/apinx/$(id))
+        && request.resource.data.keys().hasOnly(['p', 'at'])
+        && request.resource.data.p is string && request.resource.data.p.matches('[0-9a-f]{64}')
+        && request.resource.data.at is timestamp;
+      allow update: if request.resource.data.keys().hasOnly(['p', 'at'])
+        && request.resource.data.p == resource.data.p
+        && request.resource.data.at is timestamp;
+      allow delete: if isTeacher();
+    }
+    // Marca pública: solo dice si el administrador ya creó su contraseña.
+    match /apinx/{id} {
+      allow get: if true;
+      allow list: if isTeacher();
+      allow create: if id.matches('r[0-9a-f]{20}')
+        && existsAfter(/databases/$(database)/documents/apin/$(id))
+        && request.resource.data.keys().hasOnly(['at'])
+        && request.resource.data.at is timestamp;
+      allow update: if false;
+      allow delete: if isTeacher();
+    }
+
     match /remote/{id} {
       allow get: if (isTeacher() && id.matches('p-k[0-9a-f]{20}')) || id.matches('[cs]-[0-9a-f]{32}');
       allow create, update: if isTeacher() && id.matches('p-k[0-9a-f]{20}')

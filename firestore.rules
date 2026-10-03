@@ -211,6 +211,16 @@ service cloud.firestore {
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['who', request.resource.data.who])
         && request.resource.data.size() <= 61
         && museoOk(id, request.resource.data);
+      // Cajón de docentes: cada docente pone su propio cuadro.
+      allow create: if id == 'docentes' && isTeacher()
+        && request.resource.data.who is string && request.resource.data.who.matches('k[0-9a-f]{20}')
+        && request.resource.data.keys().hasOnly(['who', request.resource.data.who])
+        && request.resource.data[request.resource.data.who].matches('[0-9a-z]{1,40}[|][^<>]{1,40}');
+      allow update: if id == 'docentes' && isTeacher()
+        && request.resource.data.who is string && request.resource.data.who.matches('k[0-9a-f]{20}')
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['who', request.resource.data.who])
+        && request.resource.data.size() <= 61
+        && request.resource.data[request.resource.data.who].matches('[0-9a-z]{1,40}[|][^<>]{1,40}');
       allow delete: if isTeacher();
     }
 

@@ -20,8 +20,9 @@ service cloud.firestore {
     }
 
     function validStudent(d) {
-      return d.keys().hasOnly(['dni', 'name', 'section', 'grade', 'createdAt'])
+      return d.keys().hasOnly(['dni', 'name', 'section', 'grade', 'area', 'createdAt'])
         && d.keys().hasAll(['dni', 'name', 'section', 'grade', 'createdAt'])
+        && (!('area' in d) || (d.area is string && d.area.size() <= 24))
         && d.dni is string && d.dni.matches('[0-9]{8}')
         && d.name is string && d.name.size() >= 3 && d.name.size() <= 60
         && d.section in ['A', 'B', 'C', 'D', 'E', 'F']

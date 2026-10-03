@@ -13,7 +13,17 @@ service cloud.firestore {
       return request.auth != null
         && request.auth.token.get('email', '').matches('r[0-9a-f]{20}-[0-9a-f]{6}@[a-z0-9-]+[.]firebaseapp[.]com')
         && get(/databases/$(database)/documents/config/site).data.get('tchA', {})
-             .get(request.auth.token.email.split('-')[0], '') == request.auth.token.email.split('@')[0].split('-')[1];
+             .get(request.auth.token.email.split('-')[0], '').split('[|]')[0] == request.auth.token.email.split('@')[0].split('-')[1];
+    }
+    // Área del administrador (va después de «|» en tchA). Vacío = todas las áreas.
+    function adminArea() {
+      let p = get(/databases/$(database)/documents/config/site).data.get('tchA', {})
+                .get(request.auth.token.email.split('-')[0], '').split('[|]');
+      return p.size() > 1 ? p[1] : '';
+    }
+    // Contenido de cada área: Ciencia en «content», las demás en «content-<área>».
+    function canContent(id) {
+      return isOwner() || adminArea() == '' || (adminArea() == 'cie' && id == 'content') || id == 'content-' + adminArea();
     }
     function isTeacher() {
       return isOwner() || isAdmin();
@@ -67,7 +77,7 @@ service cloud.firestore {
       allow update: if false;
     }
 
-    // config: vs (preguntas de duelos), content (unidades y sesiones), site (portada y docentes), mis1 (misiones).
+    // config: vs (preguntas de duelos), content y content-<área> (unidades y sesiones de cada área), site (portada y docentes), mis1 (misiones).
     // Todos las leen; solo la docente (y sus administradores) las cambian.
     match /config/{id} {
       allow get: if true;
@@ -76,7 +86,7 @@ service cloud.firestore {
         && request.resource.data.data is string && request.resource.data.data.size() <= 300000
         && request.resource.data.updatedAt is timestamp;
       // Contenido de la página (textos, sesiones, preguntas y lista de fichas) que la docente edita y publica.
-      allow create, update: if isTeacher() && id == 'content'
+      allow create, update: if isTeacher() && (id == 'content' || id.matches('content-[a-z0-9]{1,16}')) && canContent(id)
         && request.resource.data.keys().hasOnly(['data', 'savedAt', 'updatedAt'])
         && request.resource.data.data is string && request.resource.data.data.size() <= 900000
         && request.resource.data.savedAt is int
@@ -102,7 +112,8 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['data', 'updatedAt'])
         && request.resource.data.data is string && request.resource.data.data.size() <= 400000
         && request.resource.data.updatedAt is timestamp;
-      allow delete: if isTeacher();
+      // Borrar el contenido de un área (con sus unidades y sesiones) solo lo hace la docente.
+      allow delete: if isOwner() || (isTeacher() && id != 'site' && id != 'content' && !id.matches('content-.*'));
     }
 
     // Fichas que sube la docente, partidas en trozos de hasta 900 000 caracteres (base64).

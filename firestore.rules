@@ -85,6 +85,8 @@ service cloud.firestore {
     // Todos las leen; solo la docente (y sus administradores) las cambian.
     match /config/{id} {
       allow get: if true;
+      // Solo la dueña: listar para la herramienta «Limpiar datos viejos».
+      allow list: if isOwner();
       allow create, update: if isTeacher() && id == 'vs'
         && request.resource.data.keys().hasOnly(['data', 'updatedAt'])
         && request.resource.data.data is string && request.resource.data.data.size() <= 300000
@@ -166,6 +168,8 @@ service cloud.firestore {
     // Control remoto: "p-<cuenta>" guarda el canal de cada docente (solo docente);
     // "c-<32 hex>" es el canal secreto que leen y escriben la laptop y el celular.
     match /remote/{id} {
+      // Solo la dueña: listar y borrar canales viejos del control remoto (con aviso, por partes).
+      allow list, delete: if isOwner();
       // p- de 32 caracteres: se calcula con el DNI y la contraseña de cada docente (nadie más puede adivinarlo).
       allow get: if (isTeacher() && id.matches('p-k[0-9a-f]{20}')) || id.matches('[cs]-[0-9a-f]{32}') || id.matches('p-[0-9a-f]{32}');
       allow create, update: if id.matches('p-[0-9a-f]{32}')

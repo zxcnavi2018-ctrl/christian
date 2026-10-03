@@ -2,10 +2,21 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Cuenta de la docente (Firebase Authentication).
-    function isTeacher() {
+    // Cuenta de la docente (Firebase Authentication con Google).
+    function isOwner() {
       return request.auth != null
         && request.auth.token.email in ['zxc.navi2018@gmail.com'];
+    }
+    // Administradores: la docente les crea una cuenta interna "<huella>-<6 hex>@<proyecto>.firebaseapp.com"
+    // y la anota en config/site.tchA. Entran con su DNI y la clave que ella les dio.
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.get('email', '').matches('r[0-9a-f]{20}-[0-9a-f]{6}@[a-z0-9-]+[.]firebaseapp[.]com')
+        && get(/databases/$(database)/documents/config/site).data.get('tchA', {})
+             .get(request.auth.token.email.split('-')[0], '') == request.auth.token.email.split('@')[0].split('-')[1];
+    }
+    function isTeacher() {
+      return isOwner() || isAdmin();
     }
 
     function validStudent(d) {
@@ -102,9 +113,15 @@ service cloud.firestore {
         && request.resource.data.data is string && request.resource.data.data.size() <= 20000
         && request.resource.data.updatedAt is timestamp;
       allow create, update: if isTeacher() && id == 'site'
-        && request.resource.data.keys().hasOnly(['title', 'bimestre', 'hidden', 'lbl', 'tch', 'tchN', 'areas', 'updatedAt'])
+        && request.resource.data.keys().hasOnly(['title', 'bimestre', 'hidden', 'lbl', 'tch', 'tchN', 'tchA', 'areas', 'updatedAt'])
         && (!('tch' in request.resource.data) || (request.resource.data.tch is list && request.resource.data.tch.size() <= 40))
         && (!('tchN' in request.resource.data) || (request.resource.data.tchN is map && request.resource.data.tchN.size() <= 40))
+        && (!('tchA' in request.resource.data) || (request.resource.data.tchA is map && request.resource.data.tchA.size() <= 40))
+        // Solo la docente agrega o quita administradores y sus claves.
+        && (isOwner() || (resource != null
+              && request.resource.data.get('tch', []) == resource.data.get('tch', [])
+              && request.resource.data.get('tchN', {}) == resource.data.get('tchN', {})
+              && request.resource.data.get('tchA', {}) == resource.data.get('tchA', {})))
         && (!('areas' in request.resource.data) || (request.resource.data.areas is string && request.resource.data.areas.size() <= 3000))
         && (!('lbl' in request.resource.data) || (request.resource.data.lbl is string && request.resource.data.lbl.size() <= 30))
         && request.resource.data.title is string && request.resource.data.title.size() > 0 && request.resource.data.title.size() <= 40
@@ -431,32 +448,6 @@ service cloud.firestore {
     // Misión 01: avance de cada estudiante (errores e intentos por actividad). Solo la docente ve la lista.
     // Control remoto: "p-<cuenta>" guarda el canal de cada docente (solo docente);
     // "c-<32 hex>" es el canal secreto que leen y escriben la laptop y el celular.
-    // Contraseña de 4 números de cada administrador (la crea él mismo la primera vez que entra).
-    // Nadie puede leerla: solo se comprueba intentando una escritura con la misma huella.
-    match /apin/{id} {
-      allow get, list: if false;
-      allow create: if id.matches('r[0-9a-f]{20}')
-        && id in get(/databases/$(database)/documents/config/site).data.tch
-        && existsAfter(/databases/$(database)/documents/apinx/$(id))
-        && request.resource.data.keys().hasOnly(['p', 'at'])
-        && request.resource.data.p is string && request.resource.data.p.matches('[0-9a-f]{64}')
-        && request.resource.data.at is timestamp;
-      allow update: if request.resource.data.keys().hasOnly(['p', 'at'])
-        && request.resource.data.p == resource.data.p
-        && request.resource.data.at is timestamp;
-      allow delete: if isTeacher();
-    }
-    // Marca pública: solo dice si el administrador ya creó su contraseña.
-    match /apinx/{id} {
-      allow get: if true;
-      allow list: if isTeacher();
-      allow create: if id.matches('r[0-9a-f]{20}')
-        && existsAfter(/databases/$(database)/documents/apin/$(id))
-        && request.resource.data.keys().hasOnly(['at'])
-        && request.resource.data.at is timestamp;
-      allow update: if false;
-      allow delete: if isTeacher();
-    }
 
     match /remote/{id} {
       // p- de 32 caracteres: se calcula con el DNI y la contraseña de cada docente (nadie más puede adivinarlo).

@@ -25,6 +25,10 @@ service cloud.firestore {
     function canContent(id) {
       return isOwner() || adminArea() == '' || (adminArea() == 'cie' && id == 'content') || id == 'content-' + adminArea();
     }
+    // Misiones de cada área: «mis1» es Ciencia, «mis1-<área>» las demás.
+    function canMis(id) {
+      return isOwner() || adminArea() == '' || (adminArea() == 'cie' && id == 'mis1') || id == 'mis1-' + adminArea();
+    }
     function isTeacher() {
       return isOwner() || isAdmin();
     }
@@ -108,12 +112,12 @@ service cloud.firestore {
         && request.resource.data.hidden is list && request.resource.data.hidden.size() <= 20
         && request.resource.data.updatedAt is timestamp;
       // Misiones (actividades que crea la docente). Todos las leen; solo ella las cambia.
-      allow create, update: if isTeacher() && id == 'mis1'
+      allow create, update: if isTeacher() && (id == 'mis1' || id.matches('mis1-[a-z0-9]{1,16}')) && canMis(id)
         && request.resource.data.keys().hasOnly(['data', 'updatedAt'])
         && request.resource.data.data is string && request.resource.data.data.size() <= 400000
         && request.resource.data.updatedAt is timestamp;
       // Borrar el contenido de un área (con sus unidades y sesiones) solo lo hace la docente.
-      allow delete: if isOwner() || (isTeacher() && id != 'site' && id != 'content' && !id.matches('content-.*'));
+      allow delete: if isOwner() || (isTeacher() && id != 'site' && id != 'content' && !id.matches('content-.*') && !id.matches('mis1.*'));
     }
 
     // Fichas que sube la docente, partidas en trozos de hasta 900 000 caracteres (base64).
@@ -228,7 +232,7 @@ service cloud.firestore {
     match /mision/{id} {
       allow get: if true;
       allow list, delete: if isTeacher();
-      allow create, update: if id.matches('m1-k[0-9a-f]{20}')
+      allow create, update: if id.matches('m1([a-z0-9]{1,16})?-k[0-9a-f]{20}')
         && exists(/databases/$(database)/documents/students/$(id.split('-')[1]))
         && request.resource.data.keys().hasOnly(['p', 'n', 'sec', 'at'])
         && request.resource.data.p is string && request.resource.data.p.size() <= 4000

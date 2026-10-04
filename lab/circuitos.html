@@ -53,7 +53,7 @@ body{display:flex;flex-direction:column}
 .badge{position:absolute;top:18px;left:50%;transform:translateX(-50%);z-index:2;padding:6px 14px;border-radius:99px;font-weight:900;font-size:14px;color:#14224a;background:#fff;box-shadow:0 8px 20px rgba(0,0,0,.35);pointer-events:none;white-space:nowrap}
 .badge:empty{display:none}
 .badge.bad{background:#fecaca;color:#7f1d1d}
-@media (max-width:760px){.wrap{grid-template-columns:1fr;grid-template-rows:1fr auto;padding:0 8px 8px;gap:8px}.table{padding:6px;border-radius:16px}.side{overflow:visible;gap:6px}.legend{display:none}.mis{flex-direction:row;flex-wrap:wrap;gap:6px}.mis h3{display:none}.mi{flex:1 1 40%;font-size:11.5px;padding:6px 8px}.free{flex:1 1 100%;padding:5px}.tools{padding-left:62px}.tools button{padding:8px 6px;font-size:12px}.moli-say{bottom:6px;left:6px}.moli-say img{width:50px}.moli-say p{font-size:12.5px}.tray{padding:0 8px 6px;gap:6px}.it{width:calc((100% - 24px)/5);min-width:0;font-size:10.5px;padding:4px 2px 5px}.it svg{width:44px;height:28px}}
+@media (max-width:760px){.wrap{grid-template-columns:1fr;grid-template-rows:1fr auto;padding:0 8px 8px;gap:8px}.table{padding:6px;border-radius:16px}.side{overflow:visible;gap:6px}.legend{display:none}.mis{flex-direction:row;flex-wrap:wrap;gap:6px}.mis h3{display:none}.mi{flex:1 1 40%;font-size:11.5px;padding:6px 8px}.free{flex:1 1 100%;padding:5px}.tools{padding-left:62px}.tools button{padding:8px 6px;font-size:12px}.moli-say{bottom:6px;left:6px}.moli-say img{width:50px}.moli-say p{font-size:12.5px}.tray{padding:0 8px 6px;gap:6px}.it{width:calc((100% - 31px)/6);min-width:0;font-size:9.5px;padding:4px 1px 5px}.it svg{width:100%;max-width:44px;height:28px}}
 </style>
 </head>
 <body>
@@ -80,8 +80,11 @@ const T={
  pila:{n:'Pila doble',t:[[-96,0,'−'],[96,0,'+']],w:180,h:70},
  foco:{n:'Foco',t:[[-60,0],[60,0]],w:120,h:90,load:1},
  led:{n:'LED',t:[[-46,0,'−'],[46,0,'+']],w:96,h:50,load:1},
- buzzer:{n:'Zumbador',t:[[-56,0],[56,0]],w:110,h:80,load:1}
+ buzzer:{n:'Zumbador',t:[[-56,0],[56,0]],w:110,h:80,load:1},
+ sw:{n:'Interruptor',t:[[-56,0],[56,0]],w:112,h:64}
 };
+// Interruptor: cerrado deja pasar la corriente; abierto la corta.
+const swArt=open=>`<rect x="-50" y="-24" width="100" height="40" rx="10" fill="#7c2d12" stroke="#431407" stroke-width="3"/><path d="M-56 0H-34M34 0H56" stroke="#9ca3af" stroke-width="6"/><circle cx="-30" cy="0" r="7" fill="#e5e7eb" stroke="#4b5563" stroke-width="2"/><circle cx="30" cy="0" r="7" fill="#e5e7eb" stroke="#4b5563" stroke-width="2"/><g transform="rotate(${open?-38:0} -30 0)"><path d="M-30 0H34" stroke="${open?'#f87171':'#4ade80'}" stroke-width="7" stroke-linecap="round"/><circle cx="30" cy="0" r="6" fill="#1f2937"/></g><text y="34" font-size="13" font-weight="900" fill="${open?'#fecaca':'#bbf7d0'}" text-anchor="middle" stroke="#000" stroke-width="3" paint-order="stroke">${open?'ABIERTO':'CERRADO'}</text>`;
 const art={
  pila:`<rect x="-84" y="-32" width="168" height="64" rx="12" fill="#1f2937" stroke="#0b1220" stroke-width="3"/>
   <g><rect x="-76" y="-24" width="72" height="22" rx="10" fill="url(#cell)"/><rect x="-76" y="2" width="72" height="22" rx="10" fill="url(#cell)"/><rect x="-6" y="-19" width="5" height="12" rx="2" fill="#d1d5db"/><rect x="-6" y="7" width="5" height="12" rx="2" fill="#d1d5db"/>
@@ -94,7 +97,7 @@ const art={
  buzzer:`<g class="wv w1"><circle r="44" fill="none" stroke="#38c6ee" stroke-width="3"/></g><g class="wv w2"><circle r="44" fill="none" stroke="#38c6ee" stroke-width="3"/></g><g class="wv w3"><circle r="44" fill="none" stroke="#38c6ee" stroke-width="3"/></g>
   <rect x="-58" y="-5" width="116" height="10" rx="5" fill="#9ca3af"/><g class="bzb"><circle r="34" fill="#111827" stroke="#000" stroke-width="3"/><circle r="26" fill="#1f2937"/><circle r="6" fill="#000"/><text x="0" y="22" font-size="11" font-weight="900" fill="#9ca3af" text-anchor="middle">BUZZ</text><text x="-18" y="-10" font-size="13" font-weight="900" fill="#e5e7eb">+</text></g>`
 };
-const icon={pila:'<svg viewBox="-100 -50 200 100"><g transform="scale(.95)">'+art.pila.replace(/<text[^>]*>PILA[^<]*<\/text>/,'')+'</g></svg>',foco:'<svg viewBox="-70 -50 140 100">'+art.foco+'</svg>',led:'<svg viewBox="-60 -40 120 80">'+art.led+'</svg>',buzzer:'<svg viewBox="-65 -48 130 96">'+art.buzzer+'</svg>',cable:'<svg viewBox="0 0 120 70"><path d="M14 52 C40 4 80 66 106 18" stroke="#ef4444" stroke-width="8" fill="none" stroke-linecap="round"/><circle cx="14" cy="52" r="8" fill="#d4a017"/><circle cx="106" cy="18" r="8" fill="#d4a017"/></svg>'};
+const icon={pila:'<svg viewBox="-100 -50 200 100"><g transform="scale(.95)">'+art.pila.replace(/<text[^>]*>PILA[^<]*<\/text>/,'')+'</g></svg>',foco:'<svg viewBox="-70 -50 140 100">'+art.foco+'</svg>',led:'<svg viewBox="-60 -40 120 80">'+art.led+'</svg>',buzzer:'<svg viewBox="-65 -48 130 96">'+art.buzzer+'</svg>',sw:'<svg viewBox="-62 -40 124 80">'+swArt(1).replace(/<text[^]*<\/text>/,'')+'</svg>',cable:'<svg viewBox="0 0 120 70"><path d="M14 52 C40 4 80 66 106 18" stroke="#ef4444" stroke-width="8" fill="none" stroke-linecap="round"/><circle cx="14" cy="52" r="8" fill="#d4a017"/><circle cx="106" cy="18" r="8" fill="#d4a017"/></svg>'};
 const DEFS=`<defs><linearGradient id="cell" x1="0" x2="1"><stop offset="0" stop-color="#b45309"/><stop offset=".55" stop-color="#f59e0b"/><stop offset=".56" stop-color="#111827"/><stop offset="1" stop-color="#374151"/></linearGradient>
 <radialGradient id="bulbGlow"><stop offset="0" stop-color="#fff7b0" stop-opacity=".95"/><stop offset=".35" stop-color="#fde047" stop-opacity=".55"/><stop offset="1" stop-color="#fde047" stop-opacity="0"/></radialGradient>
 <radialGradient id="ledGlow"><stop offset="0" stop-color="#ff6b6b" stop-opacity=".9"/><stop offset="1" stop-color="#ff0000" stop-opacity="0"/></radialGradient>
@@ -103,7 +106,7 @@ const DEFS=`<defs><linearGradient id="cell" x1="0" x2="1"><stop offset="0" stop-
 let S=load(ST,{c:[],w:[],n:1});S.c=S.c||[];S.w=S.w||[];S.n=S.n||1;
 let M=load(KEY,{});let sel=null,W=1000,H=620,muted=false;sv.setAttribute('viewBox','0 0 1000 620');
 const tray=document.getElementById('tray');
-tray.innerHTML=['pila','cable','foco','led','buzzer'].map(k=>`<button type="button" class="it" data-k="${k}" aria-label="Arrastra ${k==='cable'?'un cable':T[k].n}">${icon[k]}${k==='cable'?'Cable':T[k].n}</button>`).join('');
+tray.innerHTML=['pila','cable','sw','foco','led','buzzer'].map(k=>`<button type="button" class="it" data-k="${k}" aria-label="Arrastra ${k==='cable'?'un cable':T[k].n}">${icon[k]}${k==='cable'?'Cable':T[k].n}</button>`).join('');
 const comp=id=>S.c.find(c=>c.id===id);
 function tp(tid){const[id,i]=tid.split(':'),c=comp(id);if(!c)return null;const[ox,oy]=T[c.type].t[+i],a=c.r*Math.PI/2;return{x:c.x+ox*Math.cos(a)-oy*Math.sin(a),y:c.y+ox*Math.sin(a)+oy*Math.cos(a)}}
 const ep=e=>e.t&&tp(e.t)||{x:e.x,y:e.y};
@@ -112,9 +115,10 @@ function evaluate(){
  const par={},f=x=>{while(par[x]&&par[x]!==x)x=par[x];return x},un=(a,b)=>{a=f(a);b=f(b);if(a!==b)par[a]=b};
  S.c.forEach(c=>T[c.type].t.forEach((_,i)=>{par[c.id+':'+i]=c.id+':'+i}));
  S.w.forEach(w=>{if(w.a.t&&w.b.t&&par[w.a.t]&&par[w.b.t])un(w.a.t,w.b.t)});
- const bats=S.c.filter(c=>c.type==='pila'),R={on:new Map(),nodes:new Set(),short:false,kind:'',loads:S.c.filter(c=>T[c.type].load).length,bats:bats.length,f,paths:[]};
+ S.c.forEach(c=>{if(c.type==='sw'&&!c.open)un(c.id+':0',c.id+':1')});
+ const bats=S.c.filter(c=>c.type==='pila'),R={on:new Map(),nodes:new Set(),short:false,kind:'',openSw:S.c.some(c=>c.type==='sw'&&c.open),loads:S.c.filter(c=>T[c.type].load).length,bats:bats.length,f,paths:[]};
  if(!bats.length)return R;
- const E=S.c.filter(c=>!c.burned||c.type==='pila').map(c=>({c,id:c.id,a:f(c.id+':0'),b:f(c.id+':1'),bat:c.type==='pila',load:!!T[c.type].load}));
+ const E=S.c.filter(c=>c.type!=='sw'&&(!c.burned||c.type==='pila')).map(c=>({c,id:c.id,a:f(c.id+':0'),b:f(c.id+':1'),bat:c.type==='pila',load:!!T[c.type].load}));
  for(const B of E.filter(e=>e.bat)){
   if(B.a===B.b){R.short=true;continue}
   const out=[];
@@ -131,16 +135,22 @@ function evaluate(){
 }
 const BURN={foco:9,led:6,buzzer:12},VOLT={foco:3,led:3,buzzer:3};
 // ---------- dibujo ----------
+const wd=w=>{const a=ep(w.a),b=ep(w.b),mx=(a.x+b.x)/2,my=(a.y+b.y)/2-Math.min(80,Math.hypot(b.x-a.x,b.y-a.y)*.18);return{a,b,d:`M${a.x} ${a.y} Q${mx} ${my} ${b.x} ${b.y}`}};
+// Mientras se arrastra no se redibuja toda la mesa: solo la pieza y sus cables (más suave en el celular).
+function fastWire(w){const g=sv.querySelector(`[data-w="${w.id}"]`);if(!g)return;const{a,b,d}=wd(w);g.querySelectorAll('path').forEach(p=>p.setAttribute('d',d));g.querySelectorAll('[data-we]').forEach(c=>{const p=c.dataset.we.endsWith(':a')?a:b;c.setAttribute('cx',p.x);c.setAttribute('cy',p.y)})}
+function fastComp(c){const g=sv.querySelector(`[data-c="${c.id}"]`);if(!g)return;g.setAttribute('transform',`translate(${c.x} ${c.y}) rotate(${c.r*90})`);
+ T[c.type].t.forEach((_,i)=>{const t=sv.querySelector(`.term[data-t="${c.id}:${i}"]`),p=tp(c.id+':'+i);if(!t)return;t.querySelectorAll('circle').forEach(q=>{q.setAttribute('cx',p.x);q.setAttribute('cy',p.y)});const x=t.querySelector('text');if(x){x.setAttribute('x',p.x);x.setAttribute('y',p.y-18)}});
+ S.w.forEach(w=>{if((w.a.t||'').split(':')[0]===c.id||(w.b.t||'').split(':')[0]===c.id)fastWire(w)})}
 function render(){
  const R=evaluate();
  let h=DEFS+`<rect x="0" y="0" width="${W}" height="${H}" rx="14" fill="#14532d"/><rect x="0" y="0" width="${W}" height="${H}" rx="14" fill="url(#grid)"/>`;
  const colors=['#ef4444','#111827','#2563eb','#16a34a','#f97316'];
- S.w.forEach((w,i)=>{const a=ep(w.a),b=ep(w.b),mx=(a.x+b.x)/2,my=(a.y+b.y)/2-Math.min(80,Math.hypot(b.x-a.x,b.y-a.y)*.18),on=R.f&&w.a.t&&w.b.t&&R.nodes.has(R.f(w.a.t));
-  const d=`M${a.x} ${a.y} Q${mx} ${my} ${b.x} ${b.y}`,col=w.col||colors[i%colors.length];
+ S.w.forEach((w,i)=>{const{a,b,d}=wd(w),on=R.f&&w.a.t&&w.b.t&&R.nodes.has(R.f(w.a.t));
+  const col=w.col||colors[i%colors.length];
   h+=`<g data-w="${w.id}" class="${sel===w.id?'sel':''}"><path class="wire" d="${d}" stroke="rgba(0,0,0,.35)" stroke-width="13" transform="translate(3 5)"/><path class="wire" d="${d}" stroke="${col}" stroke-width="10"/>${on?`<path class="wire on" d="${d}" stroke="#fef08a" stroke-width="4"/>`:''}${sel===w.id?`<path class="selbox" d="${d}"/>`:''}`+
    [['a',a,w.a.t],['b',b,w.b.t]].map(([k,p,t])=>`<circle data-we="${w.id}:${k}" cx="${p.x}" cy="${p.y}" r="${t?7:11}" fill="${t?'#d4a017':'#9ca3af'}" stroke="#4b5563" stroke-width="2"/><circle data-we="${w.id}:${k}" cx="${p.x}" cy="${p.y}" r="24" fill="transparent"/>`).join('')+'</g>'});
  S.c.forEach(c=>{const d=T[c.type],v=R.on.get(c.id)||0,on=v>0&&!c.burned,br=v>=5.5?' hot':v&&v<2.5?' dim':'';
-  h+=`<g class="comp ${c.type==='buzzer'?'bz':''} ${on?'on'+br:''} ${c.burned?'burned':''} ${sel===c.id?'sel':''}" data-c="${c.id}" transform="translate(${c.x} ${c.y}) rotate(${c.r*90})"><rect x="${-d.w/2-10}" y="${-d.h/2-14}" width="${d.w+20}" height="${d.h+28}" rx="18" fill="rgba(255,255,255,.001)"/>${art[c.type]}${c.burned?`<g class="crack"><path d="M-14 -16 L-2 -2 L-10 6 L4 18 M6 -18 L2 -4 L14 4" stroke="#111" stroke-width="3" fill="none"/><circle r="22" fill="rgba(30,30,30,.55)"/><text y="${d.h/2+16}" font-size="14" font-weight="900" fill="#fecaca" text-anchor="middle" stroke="#000" stroke-width="3" paint-order="stroke">QUEMADO</text></g>`:''}${sel===c.id?`<rect class="selbox" x="${-d.w/2-10}" y="${-d.h/2-10}" width="${d.w+20}" height="${d.h+20}" rx="18"/>`:''}</g>`});
+  h+=`<g class="comp ${c.type==='buzzer'?'bz':''} ${on?'on'+br:''} ${c.burned?'burned':''} ${sel===c.id?'sel':''}" data-c="${c.id}" transform="translate(${c.x} ${c.y}) rotate(${c.r*90})"><rect x="${-d.w/2-10}" y="${-d.h/2-14}" width="${d.w+20}" height="${d.h+28}" rx="18" fill="rgba(255,255,255,.001)"/>${c.type==='sw'?swArt(c.open):art[c.type]}${c.burned?`<g class="crack"><path d="M-14 -16 L-2 -2 L-10 6 L4 18 M6 -18 L2 -4 L14 4" stroke="#111" stroke-width="3" fill="none"/><circle r="22" fill="rgba(30,30,30,.55)"/><text y="${d.h/2+16}" font-size="14" font-weight="900" fill="#fecaca" text-anchor="middle" stroke="#000" stroke-width="3" paint-order="stroke">QUEMADO</text></g>`:''}${sel===c.id?`<rect class="selbox" x="${-d.w/2-10}" y="${-d.h/2-10}" width="${d.w+20}" height="${d.h+20}" rx="18"/>`:''}</g>`});
  S.c.forEach(c=>T[c.type].t.forEach((tt,i)=>{const p=tp(c.id+':'+i);h+=`<g class="term" data-t="${c.id}:${i}"><circle class="hit" cx="${p.x}" cy="${p.y}" r="17"/><circle class="ring" cx="${p.x}" cy="${p.y}" r="10" fill="#d4a017" stroke="#7c5a00" stroke-width="3"/>${tt[2]?`<text x="${p.x}" y="${p.y-18}" font-size="18" font-weight="900" fill="#fff" text-anchor="middle" stroke="#000" stroke-width="3" paint-order="stroke">${tt[2]}</text>`:''}</g>`}));
  sv.innerHTML=h;
  status(R);
@@ -160,10 +170,12 @@ function status(R){
  else if(!R.loads&&S.c.every(c=>c.type==='pila'||c.burned)&&S.c.some(c=>c.burned))m='Ese receptor está <b>quemado</b>: quítalo y pon uno nuevo.',badge.textContent='💥 Quemado';
  else if(R.short)m='¡Cuidado! <b>Cortocircuito</b>: uniste el + y el − sin pasar por un receptor. La pila se calienta y se gasta. Quita ese cable. ⚠️',badge.textContent='⚠️ Cortocircuito',badge.className='badge bad';
  else if(!R.loads)m='Ahora agrega un <b>receptor</b>: un foco, un LED o un zumbador.',badge.textContent='Sin receptor';
+ else if(!R.on.size&&R.openSw)m='El <b>interruptor está abierto</b>: corta el camino y la corriente no pasa. <b>Tócalo</b> para cerrarlo y encender. 🔌',badge.textContent='🔌 Interruptor abierto';
  else if(!R.on.size)m='El circuito está <b>abierto</b>: la corriente necesita un camino completo que salga del <b>+</b> y vuelva al <b>−</b>.',badge.textContent='Circuito abierto';
  else if(R.kind==='simple'){const id=[...R.on.keys()][0],c=comp(id),v=R.on.get(id);m=`¡Muy bien! Es un <b>circuito simple</b>: la corriente sale del +, pasa por el ${LN[c.type]} y vuelve al −. ✨`+(v>=5.5?` ⚠️ Le llegan <b>${Math.round(v)} V</b>: ¡brilla muchísimo! Con más pilas se puede quemar.`:'');badge.textContent='✅ Circuito simple'}
  else if(R.kind==='serie'){m=`¡Genial! Es un <b>circuito compuesto en serie</b>: ${R.on.size} receptores en un solo camino. Si quitas uno, se apagan todos.`;badge.textContent='✅ Circuito compuesto (serie)'}
  else {m=`¡Excelente! Es un <b>circuito compuesto en paralelo</b>: cada receptor tiene su propio camino. Si quitas uno, los demás siguen funcionando.`;badge.textContent='✅ Circuito compuesto (paralelo)'}
+ if(R.on.size&&S.c.some(c=>c.type==='sw'))m+=' 🔌 El <b>interruptor</b> está cerrado: tócalo para abrirlo y apagar.';
  say.innerHTML=m;
  const k=R.kind;
  if(k==='simple'&&!M.s){M.s=1;save(KEY,M);party('¡Misión cumplida: circuito simple! 🎉')}
@@ -188,13 +200,13 @@ function party(t){const b=document.createElement('canvas');b.className='boom';b.
 function fit(){const r=sv.getBoundingClientRect();if(!r.width)return;const nw=r.width<600?470:r.width<900?760:1000,nh=Math.round(nw*r.height/r.width);if(nw!==W||nh!==H){W=nw;H=Math.max(320,nh);sv.setAttribute('viewBox',`0 0 ${W} ${H}`);S.c.forEach(c=>{c.x=Math.min(W-70,Math.max(70,c.x));c.y=Math.min(H-50,Math.max(50,c.y))});render()}}
 addEventListener('resize',fit);
 const pt=e=>{const m=sv.getScreenCTM();const p=sv.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(m.inverse())};
-const near=(p,skip)=>{let best=null,bd=40;S.c.forEach(c=>T[c.type].t.forEach((_,i)=>{const id=c.id+':'+i;if(id===skip)return;const q=tp(id),d=Math.hypot(q.x-p.x,q.y-p.y);if(d<bd){bd=d;best=id}}));return best};
+const near=(p,skip)=>{let best=null,bd=W<600?50:42;S.c.forEach(c=>T[c.type].t.forEach((_,i)=>{const id=c.id+':'+i;if(id===skip)return;const q=tp(id),d=Math.hypot(q.x-p.x,q.y-p.y);if(d<bd){bd=d;best=id}}));return best};
 // ---------- arrastrar desde la bandeja ----------
 let drag=null;
 tray.addEventListener('pointerdown',e=>{const b=e.target.closest('.it');if(!b||b.disabled)return;e.preventDefault();actx();const g=document.createElement('div');g.className='ghost';g.innerHTML=icon[b.dataset.k];g.style.left=e.clientX+'px';g.style.top=e.clientY+'px';document.body.appendChild(g);drag={k:'new',type:b.dataset.k,g,x0:e.clientX,y0:e.clientY}});
 addEventListener('pointermove',e=>{if(!drag)return;if(drag.k==='new'){drag.g.style.left=e.clientX+'px';drag.g.style.top=e.clientY+'px';return}const p=pt(e);drag.moved=drag.moved||Math.hypot(e.clientX-drag.x0,e.clientY-drag.y0)>6;
- if(drag.k==='move'&&drag.moved){const c=comp(drag.id);c.x=Math.min(W-40,Math.max(40,p.x-drag.dx));c.y=Math.min(H-30,Math.max(30,p.y-drag.dy));render()}
- if(drag.k==='we'){const w=S.w.find(w=>w.id===drag.id),e2=w[drag.end];e2.t=null;e2.x=p.x;e2.y=p.y;render();const n=near(p,w[drag.end==='a'?'b':'a'].t);if(n){const el=sv.querySelector(`.term[data-t="${n}"]`);el&&el.classList.add('hot')}}});
+ if(drag.k==='move'&&drag.moved){const c=comp(drag.id);c.x=Math.min(W-40,Math.max(40,p.x-drag.dx));c.y=Math.min(H-30,Math.max(30,p.y-drag.dy));fastComp(c)}
+ if(drag.k==='we'){const w=S.w.find(w=>w.id===drag.id),e2=w[drag.end];if(e2.t){e2.t=null;render()}e2.x=p.x;e2.y=p.y;fastWire(w);const n=near(p,w[drag.end==='a'?'b':'a'].t);sv.querySelectorAll('.term.hot').forEach(x=>x.classList.remove('hot'));if(n){const el=sv.querySelector(`.term[data-t="${n}"]`);el&&el.classList.add('hot')}}});
 addEventListener('pointerup',e=>{if(!drag)return;const d=drag;drag=null;
  if(d.k==='new'){d.g.remove();const r=sv.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom){if(Math.hypot(e.clientX-d.x0,e.clientY-d.y0)<8)say.innerHTML='Mantén presionado y <b>arrastra</b> la pieza hasta la mesa. 👉';return}const p=pt(e);
   if(d.type==='cable'){const id='w'+S.n++;S.w.push({id,a:{t:near({x:p.x-70,y:p.y},null),x:p.x-70,y:p.y},b:{t:null,x:p.x+70,y:p.y}});sel=id}
@@ -202,7 +214,8 @@ addEventListener('pointerup',e=>{if(!drag)return;const d=drag;drag=null;
   tone(520,.08,'sine',.08);render();return}
  if(d.k==='we'){const w=S.w.find(w=>w.id===d.id),o=w[d.end==='a'?'b':'a'],n=near(pt(e),o.t);if(n){w[d.end].t=n;tone(900,.06,'square',.05)}
   if(!d.moved&&d.fresh){S.w=S.w.filter(x=>x!==w)}render();return}
- if(d.k==='move'&&!d.moved){sel=sel===d.id?null:d.id;render()}
+ if(d.k==='move'&&!d.moved){const c=comp(d.id);if(c&&c.type==='sw'){c.open=!c.open;sel=d.id;tone(c.open?300:600,.06,'square',.06);render();return}sel=sel===d.id?null:d.id;render()}
+ if(d.k==='move'||d.k==='we')render();
  if(d.k==='wire'){sel=sel===d.id?null:d.id;render()}
 });
 sv.addEventListener('pointerdown',e=>{actx();const p=pt(e),t=e.target.closest('[data-t],[data-we],[data-c],[data-w]');if(!t){sel=null;render();return}e.preventDefault();

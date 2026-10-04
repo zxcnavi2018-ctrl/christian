@@ -5,7 +5,7 @@
 html,body{height:100%;margin:0}
 body{background:radial-gradient(120% 80% at 50% 0%,var(--bg2),var(--bg) 70%);color:var(--ink);font-family:var(--font);-webkit-tap-highlight-color:transparent;overflow:hidden}
 body::before{content:"";position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:28px 28px;mask-image:radial-gradient(90% 80% at 50% 40%,#000,transparent)}
-.lab-top{position:relative;z-index:2;display:flex;align-items:center;gap:10px;height:58px;padding:0 64px 0 14px}
+.lab-top{position:relative;z-index:2;display:flex;align-items:center;gap:10px;height:58px;padding:0 14px}
 .lab-top b{font-size:18px;font-weight:900;letter-spacing:.01em}
 .back{display:inline-flex;align-items:center;gap:4px;padding:8px 14px;border-radius:99px;background:rgba(255,255,255,.1);color:var(--ink);font-weight:900;font-size:14px;text-decoration:none;border:1px solid rgba(255,255,255,.16)}
 .back:active{transform:scale(.95)}
@@ -21,7 +21,10 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;background-im
 .moli-say img{width:64px;flex:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.4));animation:mbob 3s ease-in-out infinite}
 .moli-say p{margin:0 0 14px;padding:10px 14px;border-radius:16px 16px 16px 4px;background:#fff;color:#14224a;font-weight:800;font-size:14px;line-height:1.35;box-shadow:0 10px 24px rgba(0,0,0,.35);pointer-events:auto}
 .moli-say.open p:empty{display:none}
-@keyframes mbob{50%{transform:translateY(-5px)}}
+@keyframes mbob{0%,100%{transform:translateY(0) rotate(0)}25%{transform:translateY(-6px) rotate(-5deg)}50%{transform:translateY(0) rotate(0) scale(1.03,.97)}75%{transform:translateY(-4px) rotate(5deg)}}
+.moli-say img{transform-origin:50% 90%}
+.moli-say.new img{animation:mcall 1.4s ease-in-out infinite}
+@keyframes mcall{0%,100%{transform:rotate(0)}15%{transform:translateY(-8px) rotate(-10deg)}30%{transform:rotate(8deg)}45%{transform:translateY(-4px) rotate(-6deg)}60%{transform:rotate(0)}}
 .mis{display:flex;flex-direction:column;gap:8px}
 .mis h3{margin:0;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2)}
 .mi{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);font-weight:800;font-size:13.5px}
@@ -30,5 +33,5 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;background-im
 .mi.ok em{background:rgba(34,197,94,.25);color:#86efac}
 .free{padding:8px 12px;border-radius:14px;background:linear-gradient(135deg,rgba(255,211,77,.25),rgba(56,198,238,.2));font-weight:900;font-size:13px;text-align:center}
 .boom{position:fixed;inset:0;pointer-events:none;z-index:30}
-@media (max-width:600px){.lab-top{height:52px;padding-right:58px;gap:8px}.lab-top b{font-size:15px;white-space:nowrap}.back{padding:6px 10px;font-size:12.5px;white-space:nowrap}.chip{font-size:11px;padding:3px 8px}}
+@media (max-width:600px){.lab-top{height:52px;padding-right:10px;gap:8px}.lab-top b{font-size:15px;white-space:nowrap}.back{padding:6px 10px;font-size:12.5px;white-space:nowrap}.chip{font-size:11px;padding:3px 8px}}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important}}

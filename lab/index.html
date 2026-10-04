@@ -22,13 +22,21 @@ body{display:flex;flex-direction:column}
 .card.lock{filter:saturate(.35) brightness(.75)}
 .card.lock .art{opacity:.75}
 .center{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:0}
-.center img{width:min(88%,190px);max-height:72%;object-fit:contain;filter:drop-shadow(0 12px 20px rgba(0,0,0,.45));animation:mbob 3s ease-in-out infinite}
+.center{position:relative;cursor:pointer}
+.center img{width:min(88%,190px);max-height:72%;object-fit:contain;filter:drop-shadow(0 12px 20px rgba(0,0,0,.45));transform-origin:50% 90%;animation:dance 4.2s ease-in-out infinite}
+.center.hop img{animation:hop .7s cubic-bezier(.3,1.6,.5,1)}
+.center::before{content:"";position:absolute;left:50%;top:44%;width:70%;aspect-ratio:1;translate:-50% -50%;border-radius:50%;background:radial-gradient(circle,rgba(56,198,238,.35),transparent 65%);animation:halo 3s ease-in-out infinite;pointer-events:none}
+.spark{position:absolute;font-size:clamp(14px,2.4vw,22px);pointer-events:none;animation:spark 3.6s ease-in-out infinite;opacity:0}
+@keyframes dance{0%,100%{transform:translateY(0) rotate(0)}15%{transform:translateY(-8px) rotate(-6deg)}30%{transform:translateY(0) rotate(0) scale(1.03,.97)}45%{transform:translateY(-6px) rotate(6deg)}60%{transform:translateY(0) rotate(0)}75%{transform:translateY(-10px) rotate(-3deg) scale(1.02)}}
+@keyframes hop{30%{transform:translateY(-26px) rotate(-12deg) scale(1.08)}60%{transform:translateY(0) rotate(10deg) scale(1.05,.92)}80%{transform:rotate(-5deg)}}
+@keyframes halo{50%{transform:scale(1.15);opacity:.6}}
+@keyframes spark{0%{opacity:0;transform:translateY(6px) scale(.4)}25%{opacity:1;transform:translateY(-8px) scale(1)}60%{opacity:0;transform:translateY(-22px) scale(.6) rotate(40deg)}100%{opacity:0}}
 .center p{margin:0;padding:7px 12px;border-radius:14px;background:#fff;color:#14224a;font-weight:900;font-size:clamp(11px,1.5vw,15px);text-align:center;line-height:1.2}
 @keyframes pop{from{opacity:0;transform:scale(.6)}}
 </style>
 </head>
 <body>
-<header class="lab-top"><b>🧪 Laboratorio de Moli</b></header>
+<header class="lab-top"><button type="button" class="back" id="salir">‹ Salir</button><b>🧪 Laboratorio de Moli</b></header>
 <main class="grid" id="grid"></main>
 <script>
 const U=new URLSearchParams(location.search).get('u')||'anon';
@@ -46,12 +54,15 @@ const C=[
  {k:'enf',t:'Enfermedades',s:'Duelo de cartas',href:'enfermedades.html',e:'🦠',g:'linear-gradient(150deg,#e11d48,#7c3aed)',n:3},
  {k:'sol',t:'Sistema solar',e:'🪐',g:'linear-gradient(150deg,#8b5cf6,#4338ca)'},
  {k:'cad',t:'Cadena alimenticia',e:'🦊',g:'linear-gradient(150deg,#84cc16,#15803d)'},
- {k:'iman',t:'Fuerzas e imanes',e:'🧲',g:'linear-gradient(150deg,#f43f5e,#7c3aed)'}
+ {k:'maq',t:'Máquinas simples y compuestas',s:'Teatro de 9 obras',href:'maquinas.html',e:'🎭',g:'linear-gradient(150deg,#b91c1c,#7c3aed)',n:3}
 ];
 const card=(c,i)=>{const done=c.n?Object.values(get(c.k)).filter(Boolean).length:0;const st=!c.href?'🔒 Pronto':done>=c.n?'✅ Listo':c.n?`🎯 ${done}/${c.n}`:'';const art=ART[c.k]||`<svg viewBox="0 0 120 100"><text x="60" y="66" font-size="54" text-anchor="middle">${c.e}</text></svg>`;
- return c.href?`<a class="card" href="${c.href}?u=${encodeURIComponent(U)}" style="--g:${c.g};--i:${i}"><span class="art">${art}</span><span class="st">${st}</span><b>${c.t}</b><small>${c.s}</small></a>`:`<div class="card lock" style="--g:${c.g};--i:${i}" aria-disabled="true"><span class="art">${art}</span><span class="st">${st}</span><b>${c.t}</b><small>Muy pronto</small></div>`};
+ return c.href?`<a class="card" href="${c.href}?u=${encodeURIComponent(U)}&t=${Date.now()}" style="--g:${c.g};--i:${i}"><span class="art">${art}</span><span class="st">${st}</span><b>${c.t}</b><small>${c.s}</small></a>`:`<div class="card lock" style="--g:${c.g};--i:${i}" aria-disabled="true"><span class="art">${art}</span><span class="st">${st}</span><b>${c.t}</b><small>Muy pronto</small></div>`};
 const g=document.getElementById('grid');
-g.innerHTML=C.slice(0,4).map(card).join('')+'<div class="center"><img src="../guia/img/moli.webp" alt="Moli"><p>¡Elige un experimento! 🔬</p></div>'+C.slice(4).map((c,i)=>card(c,i+4)).join('');
+g.innerHTML=C.slice(0,4).map(card).join('')+'<div class="center" id="moli"><span class="spark" style="left:12%;top:14%">✨</span><span class="spark" style="right:10%;top:22%;animation-delay:1.2s">⭐</span><span class="spark" style="left:18%;top:52%;animation-delay:2.4s">🔬</span><img src="../guia/img/moli.webp" alt="Moli"><p id="msay">¡Elige un experimento! 🔬</p></div>'+C.slice(4).map((c,i)=>card(c,i+4)).join('');
+const SAY=['¡Elige un experimento! 🔬','¡Hola! Soy Moli 👋','¿Probamos un circuito? ⚡','¡La ciencia es divertida! 🧪','¡Tócame otra vez! 😄'];let si=0;
+const mo=document.getElementById('moli');mo.addEventListener('click',()=>{mo.classList.remove('hop');void mo.offsetWidth;mo.classList.add('hop');si=(si+1)%SAY.length;document.getElementById('msay').textContent=SAY[si]});
+document.getElementById('salir').onclick=()=>{if(parent!==window)parent.postMessage('lab:close','*');else history.back()};
 </script>
 </body>
 </html>

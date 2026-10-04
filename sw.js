@@ -1,5 +1,5 @@
 // Guarda Moli en el celular: abre rápido y también sin internet.
-const V="moli-677bc4bebc",APPJS="app.js?v=c1be055c55",CDN="moli-cdn";
+const V="moli-9b5aa372ea",APPJS="app.js?v=b1d3ad17f3",CDN="moli-cdn";
 self.addEventListener("install",e=>{self.skipWaiting(),e.waitUntil(caches.open(V).then(c=>c.addAll(["./",APPJS])).catch(()=>{}))});
 self.addEventListener("activate",e=>e.waitUntil((async()=>{for(const k of await caches.keys())k!==V&&k!==CDN&&await caches.delete(k);await self.clients.claim()})()));
 const put=async(n,r,s)=>{try{await(await caches.open(n)).put(r,s)}catch(e){}};

@@ -98,7 +98,9 @@ service cloud.firestore {
         && request.resource.data.savedAt is int
         && request.resource.data.updatedAt is timestamp;
       allow create, update: if isTeacher() && id == 'site'
-        && request.resource.data.keys().hasOnly(['title', 'bimestre', 'hidden', 'lbl', 'tch', 'tchN', 'tchA', 'areas', 'updatedAt'])
+        && request.resource.data.keys().hasOnly(['title', 'bimestre', 'hidden', 'lbl', 'tch', 'tchN', 'tchA', 'areas', 'logo', 'ie', 'updatedAt'])
+        && (!('logo' in request.resource.data) || (request.resource.data.logo is string && request.resource.data.logo.size() <= 60000 && request.resource.data.logo.matches('data:image/png;base64,.*')))
+        && (!('ie' in request.resource.data) || (request.resource.data.ie is string && request.resource.data.ie.size() <= 60))
         && (!('tch' in request.resource.data) || (request.resource.data.tch is list && request.resource.data.tch.size() <= 40))
         && (!('tchN' in request.resource.data) || (request.resource.data.tchN is map && request.resource.data.tchN.size() <= 40))
         && (!('tchA' in request.resource.data) || (request.resource.data.tchA is map && request.resource.data.tchA.size() <= 40))

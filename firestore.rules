@@ -247,5 +247,283 @@ service cloud.firestore {
         && request.resource.data.at is timestamp;
     }
 
+    // ===== COLEGIOS: cada IE tiene su espacio en /ie/<id>, con 1 mes gratis y luego pago anual.
+    match /ie/{sid} {
+      allow get: if true;
+      // Solo la creadora de Moli ve la lista de colegios y activa el pago.
+      allow list, delete: if isOwner();
+      allow update: if isOwner()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['paidUntil'])
+        && request.resource.data.paidUntil is timestamp;
+      allow create: if request.auth != null && sid.matches('i[0-9a-f]{12}')
+        && request.resource.data.keys().hasOnly(['owner', 'name', 'rid', 'pin', 'createdAt', 'trialEnd'])
+        && request.resource.data.owner == request.auth.token.email.lower()
+        && request.resource.data.name is string && request.resource.data.name.size() >= 3 && request.resource.data.name.size() <= 60
+        && request.resource.data.rid is string && request.resource.data.rid.matches('r[0-9a-f]{20}')
+        && request.resource.data.pin is string && request.resource.data.pin.matches('p[0-9a-f]{20}')
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.createdAt > request.time - duration.value(15, 'm')
+        && request.resource.data.createdAt < request.time + duration.value(15, 'm')
+        && request.resource.data.trialEnd == request.resource.data.createdAt + duration.value(30, 'd');
+
+      // Mes gratis o pago vigente: si venció, todo queda en solo lectura.
+      function ieActive() {
+        let d = get(/databases/$(database)/documents/ie/$(sid)).data;
+        return request.time < d.trialEnd || request.time < d.get('paidUntil', d.trialEnd);
+      }
+
+
+    // Cuenta de la docente (Firebase Authentication con Google).
+    function isOwnerI() {
+      return request.auth != null
+        && request.auth.token.email.lower() == get(/databases/$(database)/documents/ie/$(sid)).data.owner;
+    }
+    // Administradores: la docente les crea una cuenta interna "<huella>-<6 hex>@<proyecto>.firebaseapp.com"
+    // y la anota en config/site.tchA. Entran con su DNI y la clave que ella les dio.
+    function isAdminI() {
+      return request.auth != null
+        && request.auth.token.get('email', '').matches('r[0-9a-f]{20}-[0-9a-f]{6}@[a-z0-9-]+[.]firebaseapp[.]com')
+        && get(/databases/$(database)/documents/ie/$(sid)/config/site).data.get('tchA', {})
+             .get(request.auth.token.email.split('-')[0], '').split('[|]')[0] == request.auth.token.email.split('@')[0].split('-')[1];
+    }
+    // Área del administrador (va después de «|» en tchA). Vacío = todas las áreas.
+    function adminAreaI() {
+      let p = get(/databases/$(database)/documents/ie/$(sid)/config/site).data.get('tchA', {})
+                .get(request.auth.token.email.split('-')[0], '').split('[|]');
+      return p.size() > 1 ? p[1] : '';
+    }
+    // Contenido de cada área: Ciencia en «content», las demás en «content-<área>».
+    function canContentI(id) {
+      return isOwnerI() || adminAreaI() == '' || (adminAreaI() == 'cie' && id == 'content') || id == 'content-' + adminAreaI();
+    }
+    // Misiones de cada área: «mis1» es Ciencia, «mis1-<área>» las demás.
+    function canMisI(id) {
+      return isOwnerI() || adminAreaI() == '' || (adminAreaI() == 'cie' && id == 'mis1') || id == 'mis1-' + adminAreaI();
+    }
+    function isTeacherI() {
+      return isOwnerI() || isAdminI();
+    }
+
+    function validStudentI(d) {
+      return d.keys().hasOnly(['dni', 'name', 'section', 'grade', 'area', 'createdAt'])
+        && d.keys().hasAll(['dni', 'name', 'section', 'grade', 'createdAt'])
+        && (!('area' in d) || (d.area is string && d.area.size() <= 24))
+        && d.dni is string && d.dni.matches('[0-9]{8}')
+        && d.name is string && d.name.size() >= 3 && d.name.size() <= 60
+        && d.section in ['A', 'B', 'C', 'D', 'E', 'F']
+        && d.grade in ['5to', '6to']
+        && d.createdAt is timestamp;
+    }
+
+    function validResultI(d) {
+      return d.keys().hasOnly(['unit', 'unitNum', 'session', 'grade', 'section', 'name', 'student', 'dni', 'score', 'total', 'answers', 'createdAt'])
+        && d.keys().hasAll(['unit', 'unitNum', 'session', 'grade', 'section', 'name', 'student', 'dni', 'score', 'total', 'answers', 'createdAt'])
+        && d.unit is string && d.unit.size() <= 20
+        && d.unitNum is string && d.unitNum.size() <= 10
+        && d.session is int && d.session >= 1 && d.session <= 99
+        && d.grade in ['5to', '6to']
+        && d.section in ['A', 'B', 'C', 'D', 'E', 'F']
+        && d.name is string && d.name.size() > 0 && d.name.size() <= 60
+        && d.student is string && d.student.matches('k[0-9a-f]{20}')
+        && d.dni is string && d.dni.matches('[0-9]{8}')
+        && d.total is int && d.total >= 1 && d.total <= 20
+        && d.score is int && d.score >= 0 && d.score <= d.total
+        && d.answers is list && d.answers.size() == d.total
+        && d.createdAt is timestamp;
+    }
+
+    // Cuentas de estudiantes: el id sale del DNI (cifrado), así que solo quien
+    // conoce el DNI puede abrir su cuenta. Solo la docente ve la lista completa.
+    match /students/{id} {
+      allow get: if true;
+      // Solo el docente crea cuentas (desde su lista de Excel).
+      allow create: if ieActive() && (isTeacherI() && id.matches('k[0-9a-f]{20}') && validStudentI(request.resource.data));
+      allow list: if isTeacherI();
+      allow update, delete: if ieActive() && (isTeacherI());
+    }
+
+    // Resultados: uno por estudiante y sesión, no se pueden cambiar.
+    // El estudiante puede ver el suyo (necesita su id); solo la docente ve todos o borra.
+    match /exitTickets/{id} {
+      allow create: if ieActive() && (validResultI(request.resource.data)
+        && id == request.resource.data.unit + '-s' + string(request.resource.data.session) + '-' + request.resource.data.student
+        && get(/databases/$(database)/documents/ie/$(sid)/students/$(request.resource.data.student)).data.dni == request.resource.data.dni);
+      allow get: if id.matches('.*-k[0-9a-f]{20}') || isTeacherI();
+      allow list: if isTeacherI();
+      allow delete: if ieActive() && (isTeacherI());
+      allow update: if ieActive() && (false);
+    }
+
+    // config: vs (preguntas de duelos), content y content-<área> (unidades y sesiones de cada área), site (portada y docentes), mis1 (misiones).
+    // Todos las leen; solo la docente (y sus administradores) las cambian.
+    match /config/{id} {
+      allow get: if true;
+      // Solo la dueña: listar para la herramienta «Limpiar datos viejos».
+      allow list: if isOwnerI();
+      allow create, update: if ieActive() && (isTeacherI() && id == 'vs'
+        && request.resource.data.keys().hasOnly(['data', 'updatedAt'])
+        && request.resource.data.data is string && request.resource.data.data.size() <= 300000
+        && request.resource.data.updatedAt is timestamp);
+      // Contenido de la página (textos, sesiones, preguntas y lista de fichas) que la docente edita y publica.
+      allow create, update: if ieActive() && (isTeacherI() && (id == 'content' || id.matches('content-[a-z0-9]{1,16}')) && canContentI(id)
+        && request.resource.data.keys().hasOnly(['data', 'savedAt', 'updatedAt'])
+        && request.resource.data.data is string && request.resource.data.data.size() <= 900000
+        && request.resource.data.savedAt is int
+        && request.resource.data.updatedAt is timestamp);
+      allow create, update: if ieActive() && isTeacherI() && id == 'site'
+        && request.resource.data.keys().hasOnly(['title', 'bimestre', 'hidden', 'lbl', 'tch', 'tchN', 'tchA', 'areas', 'logo', 'ie', 'updatedAt'])
+        && (!('logo' in request.resource.data) || (request.resource.data.logo is string && request.resource.data.logo.size() <= 60000 && request.resource.data.logo.matches('data:image/png;base64,.*')))
+        && (!('ie' in request.resource.data) || (request.resource.data.ie is string && request.resource.data.ie.size() <= 60))
+        && (!('tch' in request.resource.data) || (request.resource.data.tch is list && request.resource.data.tch.size() <= 40))
+        && (!('tchN' in request.resource.data) || (request.resource.data.tchN is map && request.resource.data.tchN.size() <= 40))
+        && (!('tchA' in request.resource.data) || (request.resource.data.tchA is map && request.resource.data.tchA.size() <= 40))
+        // Solo la docente agrega o quita administradores y sus claves.
+        && (isOwnerI() || (resource != null
+              && request.resource.data.get('tch', []) == resource.data.get('tch', [])
+              && request.resource.data.get('tchN', {}) == resource.data.get('tchN', {})
+              && request.resource.data.get('tchA', {}) == resource.data.get('tchA', {})))
+        && (!('areas' in request.resource.data) || (request.resource.data.areas is string && request.resource.data.areas.size() <= 3000))
+        && (!('lbl' in request.resource.data) || (request.resource.data.lbl is string && request.resource.data.lbl.size() <= 30))
+        && request.resource.data.title is string && request.resource.data.title.size() > 0 && request.resource.data.title.size() <= 40
+        && request.resource.data.bimestre is int && request.resource.data.bimestre >= 1 && request.resource.data.bimestre <= 4
+        && request.resource.data.hidden is list && request.resource.data.hidden.size() <= 20
+        && request.resource.data.updatedAt is timestamp;
+      // Misiones (actividades que crea la docente). Todos las leen; solo ella las cambia.
+      allow create, update: if ieActive() && (isTeacherI() && (id == 'mis1' || id.matches('mis1-[a-z0-9]{1,16}')) && canMisI(id)
+        && request.resource.data.keys().hasOnly(['data', 'updatedAt'])
+        && request.resource.data.data is string && request.resource.data.data.size() <= 400000
+        && request.resource.data.updatedAt is timestamp);
+      // Borrar el contenido de un área (con sus unidades y sesiones) solo lo hace la docente.
+      allow delete: if ieActive() && (isOwnerI() || (isTeacherI() && id != 'site' && id != 'content' && !id.matches('content-.*') && !id.matches('mis1.*')));
+    }
+
+    // Fichas que sube la docente, partidas en trozos de hasta 900 000 caracteres (base64).
+    match /files/{id} {
+      allow get: if true;
+      allow create, update: if ieActive() && (isTeacherI() && id.matches('f[a-z0-9]{1,24}-[0-9]{1,2}')
+        && request.resource.data.keys().hasOnly(['b64', 'updatedAt'])
+        && request.resource.data.b64 is string && request.resource.data.b64.size() <= 900000
+        && request.resource.data.updatedAt is timestamp);
+      allow list: if isTeacherI();
+      allow delete: if ieActive() && (isTeacherI());
+    }
+
+    // Duelos VS: un estudiante espera, otro se une; los dos escriben solo sus puntos.
+    function validDuelI(d) {
+      return d.keys().hasOnly(['status', 'p1', 'n1', 'o1', 'p2', 'n2', 'o2', 'qs', 's1', 'a1', 's2', 'a2', 'hb', 'createdAt', 'updatedAt'])
+        && d.status in ['waiting', 'ready', 'cancel']
+        && d.p1 is string && d.p1.matches('r[0-9a-f]{20}')
+        && d.p2 is string && (d.p2 == '' || d.p2.matches('r[0-9a-f]{20}'))
+        && d.n1 is string && d.n1.size() <= 40 && d.n2 is string && d.n2.size() <= 40
+        && d.o1 is string && d.o1.size() <= 800 && d.o2 is string && d.o2.size() <= 800
+        && d.qs is string && d.qs.size() <= 20000
+        && d.s1 is int && d.s1 >= 0 && d.s1 <= 1000 && d.a1 is int && d.a1 >= 0 && d.a1 <= 5
+        && d.s2 is int && d.s2 >= 0 && d.s2 <= 1000 && d.a2 is int && d.a2 >= 0 && d.a2 <= 5
+        && d.hb is timestamp && d.createdAt is timestamp && d.updatedAt is timestamp;
+    }
+    match /duels/{id} {
+      allow get: if true;
+      allow list: if request.query.limit <= 10 || isTeacherI();
+      allow create: if ieActive() && (id.matches('d[0-9a-z]{6,30}') && validDuelI(request.resource.data)
+        && request.resource.data.status == 'waiting' && request.resource.data.p2 == ''
+        && request.resource.data.s1 == 0 && request.resource.data.a1 == 0 && request.resource.data.s2 == 0 && request.resource.data.a2 == 0);
+      allow update: if ieActive() && (validDuelI(request.resource.data)
+        && request.resource.data.p1 == resource.data.p1 && request.resource.data.qs == resource.data.qs
+        && ((resource.data.status == 'waiting' && request.resource.data.status in ['waiting', 'cancel']
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'hb', 'updatedAt']))
+          || (resource.data.status == 'waiting' && request.resource.data.status == 'ready'
+              && request.resource.data.p2 != '' && request.resource.data.p2 != resource.data.p1
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'p2', 'n2', 'o2', 'hb', 'updatedAt']))
+          || (resource.data.status == 'ready' && request.resource.data.status == 'ready'
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['s1', 'a1', 's2', 'a2', 'updatedAt'])
+              && request.resource.data.a1 >= resource.data.a1 && request.resource.data.a2 >= resource.data.a2
+              && request.resource.data.s1 >= resource.data.s1 && request.resource.data.s2 >= resource.data.s2)));
+      allow delete: if ieActive() && (isTeacherI());
+    }
+
+    // Control remoto: "p-<cuenta>" guarda el canal de cada docente (solo docente);
+    // "c-<32 hex>" es el canal secreto que leen y escriben la laptop y el celular.
+    match /remote/{id} {
+      // Solo la dueña: listar y borrar canales viejos del control remoto (con aviso, por partes).
+      allow list: if isOwnerI();
+      allow delete: if ieActive() && (isOwnerI());
+      // p- de 32 caracteres: se calcula con el DNI y la contraseña de cada docente (nadie más puede adivinarlo).
+      allow get: if (isTeacherI() && id.matches('p-k[0-9a-f]{20}')) || id.matches('[cs]-[0-9a-f]{32}') || id.matches('p-[0-9a-f]{32}');
+      allow create, update: if ieActive() && (id.matches('p-[0-9a-f]{32}')
+        && request.resource.data.keys().hasOnly(['c', 'at'])
+        && request.resource.data.c is string && request.resource.data.c.matches('[0-9a-f]{32}')
+        && request.resource.data.at is timestamp);
+      allow create, update: if ieActive() && (isTeacherI() && id.matches('p-k[0-9a-f]{20}')
+        && request.resource.data.keys().hasOnly(['c', 'at'])
+        && request.resource.data.c is string && request.resource.data.c.matches('[0-9a-f]{32}'));
+      // c-: órdenes del celular. s-: estado de la laptop.
+      allow create, update: if ieActive() && (id.matches('c-[0-9a-f]{32}')
+        && request.resource.data.keys().hasOnly(['cmd', 'arg', 'seq', 'at'])
+        && request.resource.data.cmd is string && request.resource.data.cmd.size() <= 10
+        && request.resource.data.arg is string && request.resource.data.arg.size() <= 60
+        && request.resource.data.seq is int);
+      allow create, update: if ieActive() && (id.matches('s-[0-9a-f]{32}')
+        && request.resource.data.keys().hasOnly(['st', 'cfg', 'at'])
+        && (!('st' in request.resource.data) || (request.resource.data.st is string && request.resource.data.st.size() <= 2000))
+        && (!('cfg' in request.resource.data) || (request.resource.data.cfg is string && request.resource.data.cfg.size() <= 200)));
+    }
+
+    // Foto del fotocheck: el personaje que arma cada estudiante o docente (solo un texto corto con sus elecciones).
+    match /avatar/{id} {
+      allow get: if true;
+      allow create, update: if ieActive() && (id.matches('k[0-9a-f]{20}')
+        && (isTeacherI() || exists(/databases/$(database)/documents/ie/$(sid)/students/$(id)))
+        && request.resource.data.keys().hasOnly(['a', 'at'])
+        && request.resource.data.a is string && request.resource.data.a.matches('[0-9a-z]{1,40}')
+        && request.resource.data.at is timestamp);
+      allow list: if isTeacherI();
+      allow delete: if ieActive() && (isTeacherI());
+    }
+
+    // Museo: una sala por sección (p. ej. 6toA) con el avatar y el nombre corto de cada estudiante.
+    // Cada estudiante solo cambia su propio cuadro, y solo en la sala de su sección.
+    function museoOkI(id, d) {
+      let st = get(/databases/$(database)/documents/ie/$(sid)/students/$(d.who));
+      return st.data.grade + st.data.section == id
+        && d[d.who] is string && d[d.who].matches('[0-9a-z]{1,40}[|][^<>]{1,40}');
+    }
+    match /museo/{id} {
+      allow get: if true;
+      allow create: if ieActive() && (id.matches('[56]to[A-F]')
+        && request.resource.data.who is string && request.resource.data.who.matches('k[0-9a-f]{20}')
+        && request.resource.data.keys().hasOnly(['who', request.resource.data.who])
+        && museoOkI(id, request.resource.data));
+      allow update: if ieActive() && (request.resource.data.who is string && request.resource.data.who.matches('k[0-9a-f]{20}')
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['who', request.resource.data.who])
+        && request.resource.data.size() <= 61
+        && museoOkI(id, request.resource.data));
+      // Cajón de docentes: cada docente pone su propio cuadro.
+      allow create: if ieActive() && (id == 'docentes' && isTeacherI()
+        && request.resource.data.who is string && request.resource.data.who.matches('k[0-9a-f]{20}')
+        && request.resource.data.keys().hasOnly(['who', request.resource.data.who])
+        && request.resource.data[request.resource.data.who].matches('[0-9a-z]{1,40}[|][^<>]{1,40}'));
+      allow update: if ieActive() && (id == 'docentes' && isTeacherI()
+        && request.resource.data.who is string && request.resource.data.who.matches('k[0-9a-f]{20}')
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['who', request.resource.data.who])
+        && request.resource.data.size() <= 61
+        && request.resource.data[request.resource.data.who].matches('[0-9a-z]{1,40}[|][^<>]{1,40}'));
+      allow delete: if ieActive() && (isTeacherI());
+    }
+
+    // Misiones: avance de cada estudiante (errores e intentos por actividad de todas sus misiones). Solo la docente ve la lista.
+    match /mision/{id} {
+      allow get: if true;
+      allow list: if isTeacherI();
+      allow delete: if ieActive() && (isTeacherI());
+      allow create, update: if ieActive() && (id.matches('m1([a-z0-9]{1,16})?-k[0-9a-f]{20}')
+        && exists(/databases/$(database)/documents/ie/$(sid)/students/$(id.split('-')[1]))
+        && request.resource.data.keys().hasOnly(['p', 'n', 'sec', 'at'])
+        && request.resource.data.p is string && request.resource.data.p.size() <= 60000
+        && request.resource.data.n is string && request.resource.data.n.size() <= 60
+        && request.resource.data.sec in ['A', 'B', 'C', 'D', 'E', 'F']
+        && request.resource.data.at is timestamp);
+    }
+    }
+
   }
 }

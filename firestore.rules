@@ -92,8 +92,9 @@ service cloud.firestore {
         && request.resource.data.data is string && request.resource.data.data.size() <= 300000
         && request.resource.data.updatedAt is timestamp;
       // Contenido de la página (textos, sesiones, preguntas y lista de fichas) que la docente edita y publica.
+      // «h» y «u0…u23»: cada unidad en su propio campo, para que los estudiantes descarguen solo la unidad que cambió.
       allow create, update: if isTeacher() && (id == 'content' || id.matches('content-[a-z0-9]{1,16}')) && canContent(id)
-        && request.resource.data.keys().hasOnly(['data', 'savedAt', 'updatedAt'])
+        && request.resource.data.keys().hasOnly(['data', 'savedAt', 'updatedAt', 'h', 'u0', 'u1', 'u2', 'u3', 'u4', 'u5', 'u6', 'u7', 'u8', 'u9', 'u10', 'u11', 'u12', 'u13', 'u14', 'u15', 'u16', 'u17', 'u18', 'u19', 'u20', 'u21', 'u22', 'u23'])
         && request.resource.data.data is string && request.resource.data.data.size() <= 900000
         && request.resource.data.savedAt is int
         && request.resource.data.updatedAt is timestamp;

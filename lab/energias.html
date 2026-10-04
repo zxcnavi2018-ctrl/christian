@@ -9,9 +9,9 @@
 <link rel="stylesheet" href="lab.css">
 <style>
 body{display:flex;flex-direction:column}
-.cards{position:relative;z-index:3;display:flex;align-items:stretch;gap:6px;padding:0 14px 8px;overflow-x:auto;scrollbar-width:none}
+.cards{position:relative;z-index:3;display:flex;flex-wrap:wrap;align-items:stretch;gap:6px;padding:0 14px 8px}
 .cards::-webkit-scrollbar{display:none}
-.grp{flex:none;display:flex;flex-direction:column;gap:3px}.grp>small{font-size:10.5px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;padding-left:4px}.grp>div{display:flex;gap:6px}
+.grp{flex:none;display:flex;flex-direction:column;gap:3px}.grp>small{font-size:10.5px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;padding-left:4px}.grp>div{display:flex;flex-wrap:wrap;gap:6px}
 .grp.r>small{color:#86efac}.grp.n>small{color:#fca5a5}.grp.n{margin-left:6px}
 .ec{flex:none;display:flex;flex-direction:column;align-items:center;gap:1px;width:80px;overflow-wrap:anywhere;padding:6px 4px;border-radius:14px;border:0;color:#fff;font:inherit;font-size:11.5px;font-weight:900;line-height:1.1;cursor:grab;touch-action:none;user-select:none;box-shadow:0 6px 14px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.3)}
 .ec span{font-size:24px;line-height:1.1}
@@ -33,9 +33,10 @@ body{display:flex;flex-direction:column}
 .alarm[hidden]{display:none}
 .alarm>b{display:flex;align-items:center;gap:8px;font-size:15px}
 .alarm>b i{font-style:normal;font-size:22px;animation:ring .5s ease-in-out 6}
-.alarm p{margin:4px 0 6px;font-size:13px;font-weight:700;line-height:1.35;color:#334155}
+.alarm{cursor:pointer}.alarm p{margin:4px 0 6px;font-size:13px;font-weight:700;line-height:1.35;color:#334155}
 .alarm .tm{height:6px;border-radius:99px;background:#e2e8f0;overflow:hidden}
 .alarm .tm i{display:block;height:100%;background:linear-gradient(90deg,#ef4444,#f59e0b)}
+.alarm.min{width:auto;padding:6px 12px;cursor:pointer}.alarm.min p{display:none}.alarm.min>b{font-size:13px}.alarm.min .tm{width:120px}
 .alarm.ok{background:#dcfce7}.alarm.bad{background:#fee2e2}
 @keyframes al{from{transform:translate(-50%,-30px);opacity:0}}
 @keyframes ring{25%{transform:rotate(-18deg)}75%{transform:rotate(18deg)}}
@@ -65,7 +66,7 @@ body{display:flex;flex-direction:column}
 @keyframes fl{to{stroke-dashoffset:-22}}
 @keyframes walk{from{transform:translateX(0)}to{transform:translateX(var(--x,120px))}}
 @keyframes wave{50%{transform:translateX(14px)}}
-@media (max-width:760px){.wrap{grid-template-columns:1fr;grid-template-rows:minmax(300px,1fr) auto;overflow:auto;padding-bottom:96px}.side{overflow:visible}.moli-say img{width:48px}.moli-say p{font-size:12.5px}.ec{width:68px}.ec span{font-size:20px}}
+@media (max-width:760px){.wrap{grid-template-columns:1fr;grid-template-rows:auto auto;overflow:auto;padding:0 8px 80px}.map{aspect-ratio:1000/640}.alarm{top:6px;padding:8px 10px}.alarm>b{font-size:13.5px}.alarm p{font-size:12px}.side{overflow:visible}.moli-say img{width:48px}.moli-say p{font-size:12.5px}.cards{padding:0 8px 6px;gap:4px}.grp{flex:1 1 100%}.grp.n{margin-left:0}.ec{width:calc((100vw - 16px - 24px)/5);font-size:10px;padding:4px 2px}.ec small{font-size:8.5px}.ec span{font-size:18px}}
 </style>
 </head>
 <body>
@@ -74,10 +75,10 @@ body{display:flex;flex-direction:column}
 <div class="wrap">
   <div class="map"><svg id="mp" viewBox="0 0 1000 640" xmlns="http://www.w3.org/2000/svg"></svg>
     <div class="alarm" id="alarm" hidden></div>
-    <div class="start" id="start"><div><h2>🏝️ Isla Moli necesita energía</h2><p>Arrastra las tarjetas de energía a los <b>círculos brillantes</b> de la isla. Cada minuto sonará una <b>alarma</b> con una necesidad de la ciudad: ¡toma buenas decisiones para salvarla!</p><button type="button" id="go">▶ Empezar</button></div></div></div>
+    <div class="start" id="start"><div><h2>🏝️ Isla Moli necesita energía</h2><p><b>Toca</b> una tarjeta de energía (o arrástrala) y se construye en su lugar de la isla. Tienes <b>120 💰</b>: cada energía cuesta. La ciudad paga impuestos cuando tiene luz. Cada minuto sonará una <b>alarma</b>: ¡toma buenas decisiones o la isla se perderá!</p><button type="button" id="go">▶ Empezar</button></div></div></div>
   <aside class="side">
     <div class="met">
-      <div class="clock"><span id="day">Día 1</span><span id="tod">☀️ Día</span><span id="wind">💨 Viento</span></div>
+      <div class="clock"><span id="coins" style="color:#fde047">💰 120</span><span id="day">Día 1</span><span id="tod">☀️ Día</span><span id="wind">💨 Viento</span></div>
       <div class="mt"><span>⚡</span><div class="bar"><i id="bE"></i></div><b id="vE">0/25 MW</b></div>
       <div class="mt"><span>🌿</span><div class="bar"><i id="bA"></i></div><b id="vA">100%</b></div>
       <div class="mt"><span>😊</span><div class="bar"><i id="bH"></i></div><b id="vH">70%</b></div>
@@ -86,7 +87,7 @@ body{display:flex;flex-direction:column}
     <div class="tool"><button type="button" id="pause">⏸ Pausa</button><button type="button" id="reset">🔄 Reiniciar</button></div>
   </aside>
 </div>
-<div class="moli-say"><img src="../guia/img/moli.webp" alt=""><p id="say">Toca una tarjeta para saber qué energía es. Arrástrala a la isla para construirla.</p></div>
+<div class="moli-say"><img src="../guia/img/moli.webp" alt=""><p id="say">Toca una tarjeta de energía para construirla en la isla. ⚡</p></div>
 <script>
 (()=>{
 const U=new URLSearchParams(location.search).get('u')||'anon';
@@ -96,16 +97,16 @@ let MI=load(KEY,{});
 const $=id=>document.getElementById(id),mp=$('mp'),say=$('say');
 // ---------- energías ----------
 const E={
- solar:{n:'Solar',e:'☀️',r:1,mw:9,pol:0,info:'<b>Solar</b>: renovable ☀️. Los paneles usan la luz del sol. No contamina, pero <b>de noche no produce</b>.'},
- eolica:{n:'Eólica',e:'🌬️',r:1,mw:10,pol:0,info:'<b>Eólica</b>: renovable 🌬️. El viento mueve las aspas. Funciona de día y de noche, <b>si hay viento</b>.'},
- hidro:{n:'Hidroeléctrica',e:'💧',r:1,mw:16,pol:0,info:'<b>Hidroeléctrica</b>: renovable 💧. El agua del río mueve turbinas. Con <b>sequía</b> produce menos.'},
- geo:{n:'Geotérmica',e:'🌋',r:1,mw:12,pol:0,info:'<b>Geotérmica</b>: renovable 🌋. Usa el calor de dentro de la Tierra, cerca de volcanes. <b>Funciona siempre</b>.'},
- bio:{n:'Biomasa',e:'🌿',r:1,mw:7,pol:.12,info:'<b>Biomasa</b>: renovable 🌿. Usa restos de plantas y basura orgánica. Contamina <b>muy poquito</b>.'},
- carbon:{n:'Carbón',e:'⚫',r:0,mw:24,pol:1,info:'<b>Carbón</b>: no renovable ⚫. Da mucha energía, pero <b>contamina mucho</b> y <b>se acaba</b>.'},
- petroleo:{n:'Petróleo',e:'🛢️',r:0,mw:20,pol:.8,info:'<b>Petróleo</b>: no renovable 🛢️. Tardó millones de años en formarse: <b>se acaba</b> y contamina.'},
- gas:{n:'Gas natural',e:'🔥',r:0,mw:17,pol:.5,info:'<b>Gas natural</b>: no renovable 🔥. Contamina menos que el carbón, pero <b>también se acaba</b>. En Perú se saca en Camisea (Cusco).'}
+ solar:{c:30,n:'Solar',e:'☀️',r:1,mw:9,pol:0,info:'<b>Solar</b>: renovable ☀️. Los paneles usan la luz del sol. No contamina, pero <b>de noche no produce</b>.'},
+ eolica:{c:40,n:'Eólica',e:'🌬️',r:1,mw:10,pol:0,info:'<b>Eólica</b>: renovable 🌬️. El viento mueve las aspas. Funciona de día y de noche, <b>si hay viento</b>.'},
+ hidro:{c:60,n:'Hidroeléctrica',e:'💧',r:1,mw:16,pol:0,info:'<b>Hidroeléctrica</b>: renovable 💧. El agua del río mueve turbinas. Con <b>sequía</b> produce menos.'},
+ geo:{c:70,n:'Geotérmica',e:'🌋',r:1,mw:12,pol:0,info:'<b>Geotérmica</b>: renovable 🌋. Usa el calor de dentro de la Tierra, cerca de volcanes. <b>Funciona siempre</b>.'},
+ bio:{c:25,n:'Biomasa',e:'🌿',r:1,mw:7,pol:.12,info:'<b>Biomasa</b>: renovable 🌿. Usa restos de plantas y basura orgánica. Contamina <b>muy poquito</b>.'},
+ carbon:{c:20,n:'Carbón',e:'⚫',r:0,mw:24,pol:1,info:'<b>Carbón</b>: no renovable ⚫. Da mucha energía, pero <b>contamina mucho</b> y <b>se acaba</b>.'},
+ petroleo:{c:25,n:'Petróleo',e:'🛢️',r:0,mw:20,pol:.8,info:'<b>Petróleo</b>: no renovable 🛢️. Tardó millones de años en formarse: <b>se acaba</b> y contamina.'},
+ gas:{c:30,n:'Gas natural',e:'🔥',r:0,mw:17,pol:.5,info:'<b>Gas natural</b>: no renovable 🔥. Contamina menos que el carbón, pero <b>también se acaba</b>. En Perú se saca en Camisea (Cusco).'}
 };
-const card=([k,v])=>`<button type="button" class="ec ${v.r?'r':'n'}" data-k="${k}"><span>${v.e}</span>${k==='hidro'?'Hidro&shy;eléctrica':v.n}<small>${v.mw} MW</small></button>`,ent=Object.entries(E);
+const card=([k,v])=>`<button type="button" class="ec ${v.r?'r':'n'}" data-k="${k}"><span>${v.e}</span>${k==='hidro'?'Hidro&shy;eléctrica':v.n}<small>${v.mw} MW · ${v.c}💰</small></button>`,ent=Object.entries(E);
 $('cards').innerHTML=`<div class="grp r"><small>♻️ Renovables</small><div>${ent.filter(e=>e[1].r).map(card).join('')}</div></div><div class="grp n"><small>⛽ No renovables</small><div>${ent.filter(e=>!e[1].r).map(card).join('')}</div></div>`;
 // ---------- lugares de la isla ----------
 const SL=[
@@ -115,7 +116,7 @@ const SL=[
  {id:'i1',x:190,y:380,ok:['carbon','petroleo','gas'],lbl:'Zona industrial'},{id:'i2',x:290,y:400,ok:['carbon','petroleo','gas'],lbl:'Zona industrial'}
 ];
 // ---------- estado ----------
-const fresh=()=>({b:{},fuel:{},t:0,day:1,dem:25,hap:70,pol:0,wind:.6,dry:0,solved:0,ev:null,nextEv:20,dayOk:1});
+const fresh=()=>({coins:150,dark:0,on:0,b:{},fuel:{},t:0,day:1,dem:20,hap:70,pol:0,wind:.6,dry:0,solved:0,ev:null,nextEv:45,dayOk:1});
 let G=fresh(),run=false,paused=false;
 // ---------- dibujo base ----------
 const houses=[[430,280],[480,280],[530,280],[580,280],[630,280],[455,330],[505,330],[555,330],[605,330],[480,380],[530,380],[580,380]];
@@ -157,21 +158,23 @@ function drawPlants(){
  $('slots').innerHTML=SL.filter(s=>!G.b[s.id]).map(s=>`<g class="slot" data-s="${s.id}"><circle class="rg" cx="${s.x}" cy="${s.y}" r="30"/><text x="${s.x}" y="${s.y+7}" font-size="20" text-anchor="middle">${s.ok.map(k=>E[k].e).slice(0,2).join('')}</text><circle cx="${s.x}" cy="${s.y}" r="40" fill="transparent"/></g>`).join('');
 }
 // ---------- simulación ----------
-const isDay=()=>G.t%60<38;
+const isDay=()=>G.t%60<40;
 function supply(){let s=0;for(const[id,k]of Object.entries(G.b)){const e=E[k];if(!e.r&&G.fuel[id]<=0)continue;let v=e.mw;if(k==='solar')v=isDay()?v:0;if(k==='eolica')v*=G.wind;if(k==='hidro')v*=G.dry?.4:1;s+=v}return Math.round(s)}
 function tick(){
- if(!run||paused)return;G.t++;const day=isDay();
+ if(!run||paused||!G.on)return;G.t++;const day=isDay();
  if(G.t%60===0){G.day++;if(G.dayOk&&100-G.pol>70&&!MI.m3){MI.m3=1;save(KEY,MI);party('¡Misión cumplida: un día completo con luz y aire limpio! 🌿')}G.dayOk=1}
  if(G.t%15===0)G.wind=Math.max(.15,Math.min(1,G.wind+(Math.random()-.5)*.5));
- const sp=supply(),ok=sp>=G.dem;if(!ok)G.dayOk=0;
- let p=0;for(const[id,k]of Object.entries(G.b)){const e=E[k];if(!e.r&&G.fuel[id]>0){G.fuel[id]-=1.1;p+=e.pol;if(G.fuel[id]<=0){G.fuel[id]=0;drawPlants();say.innerHTML=`⛽ ¡Se acabó el combustible de la planta de <b>${e.n}</b>! Las energías <b>no renovables se agotan</b>. Quítala y pon una renovable.`;beep(330,.4)}}else if(e.pol)p+=e.pol}
+ const sp=supply(),ok=sp>=G.dem;if(!ok)G.dayOk=0;G.dark=ok?0:G.dark+1;G.coins+=ok?2:0;
+ let p=0;for(const[id,k]of Object.entries(G.b)){const e=E[k];if(!e.r&&G.fuel[id]>0){G.fuel[id]-=1.1;G.coins=Math.max(0,G.coins-.6);p+=e.pol;if(G.fuel[id]<=0){G.fuel[id]=0;drawPlants();say.innerHTML=`⛽ ¡Se acabó el combustible de la planta de <b>${e.n}</b>! Las energías <b>no renovables se agotan</b>. Quítala y pon una renovable.`;beep(330,.4)}}else if(e.pol)p+=e.pol}
  G.pol=Math.max(0,Math.min(100,G.pol+p*1.6-.5));if(G.pol>70)G.dayOk=0;
- G.hap=Math.max(0,Math.min(100,G.hap+(ok?.6:-1.4)+(G.pol>60?-.8:0)));
+ G.hap=Math.max(0,Math.min(100,G.hap+(ok?.8:-.7)+(G.pol>60?-.5:0)));
  if(G.ev){G.ev.left--;$('alarmT').style.width=(G.ev.left/G.ev.dur*100)+'%';if(G.ev.left<=0)endEvent(ok)}
  else if(G.t>=G.nextEv)startEvent();
- if(G.hap<=0){run=false;$('start').hidden=false;$('start').querySelector('h2').textContent='😢 La ciudad se quedó triste';$('start').querySelector('p').innerHTML=`Sobreviviste <b>${G.day} ${G.day===1?'día':'días'}</b>. La gente necesita luz y aire limpio. ¡Inténtalo otra vez!`;$('go').textContent='🔄 Volver a jugar'}
+ if(G.dark===12)say.innerHTML='⚠️ ¡La ciudad lleva mucho tiempo <b>sin luz</b>! Si sigue así, la isla se perderá.';
+ if(G.dark>=45&&G.coins<20)G.hap=0;
+ if(G.hap<=0){run=false;$('start').hidden=false;$('start').querySelector('h2').textContent='😢 La ciudad se quedó triste';$('start').querySelector('p').innerHTML=`Sobreviviste <b>${G.day} ${G.day===1?'día':'días'}</b>. Se quedaron sin energía y sin recursos (💰 ${Math.floor(G.coins)}). Gasta bien tus monedas: las energías renovables cuestan más al inicio, pero no gastan combustible ni se acaban. ¡Inténtalo otra vez!`;$('go').textContent='🔄 Volver a jugar'}
  ui(sp)}
-function ui(sp){sp=sp??supply();const ok=sp>=G.dem,day=isDay();
+function ui(sp){sp=sp??supply();const ok=sp>=G.dem,day=isDay();$('coins').textContent='💰 '+Math.floor(G.coins);
  $('vE').textContent=`${sp}/${G.dem} MW`;$('bE').style.width=Math.min(100,sp/G.dem*100)+'%';$('bE').style.background=ok?'#22c55e':'#ef4444';
  $('vA').textContent=Math.round(100-G.pol)+'%';$('bA').style.width=(100-G.pol)+'%';$('bA').style.background=G.pol>60?'#ef4444':G.pol>30?'#f59e0b':'#4ade80';
  $('vH').textContent=Math.round(G.hap)+'%';$('bH').style.width=G.hap+'%';$('bH').style.background=G.hap<35?'#ef4444':G.hap<60?'#f59e0b':'#facc15';
@@ -194,21 +197,23 @@ const EV=[
  {e:'😷',t:'Humo en la ciudad',p:'La gente tose por la contaminación. Quita una planta que contamine y pon una <b>renovable</b>.',c:()=>G.pol>40,f:()=>{G.hap-=6}}
 ];
 let evi=0;
-function startEvent(){let e=EV.find(x=>x.c&&x.c())||EV[evi++%(EV.length-1)];e.f();G.ev={e,left:30,dur:30};const a=$('alarm');a.className='alarm';a.hidden=false;a.innerHTML=`<b><i>🚨</i>${e.e} ${e.t}</b><p>${e.p}</p><div class="tm"><i id="alarmT" style="width:100%"></i></div>`;say.innerHTML='🚨 ¡Alarma! Lee la necesidad de la ciudad y toma una decisión.';siren()}
-function endEvent(ok){const a=$('alarm');G.ev=null;G.nextEv=G.t+30;if(ok){G.solved++;a.className='alarm ok';a.innerHTML=`<b><i>✅</i>¡Salvaste a la ciudad!</b><p>Tu isla tiene suficiente energía. Alarmas resueltas: <b>${G.solved}</b>.</p>`;ding();if(G.solved>=3&&!MI.m2){MI.m2=1;save(KEY,MI);party('¡Misión cumplida: resolviste 3 alarmas! 🚨')}}else{a.className='alarm bad';G.hap-=8;a.innerHTML=`<b><i>⚠️</i>La ciudad se quedó sin energía</b><p>Construye más energía para la próxima alarma.</p>`;beep(200,.5)}setTimeout(()=>{if(!G.ev)a.hidden=true},5000)}
+function startEvent(){let e=EV.find(x=>x.c&&x.c())||EV[evi++%(EV.length-1)];e.f();G.ev={e,left:40,dur:40};const a=$('alarm');a.className='alarm';a.hidden=false;a.innerHTML=`<b><i>🚨</i>${e.e} ${e.t}</b><p>${e.p}</p><div class="tm"><i id="alarmT" style="width:100%"></i></div>`;clearTimeout(a._m);a._m=setTimeout(()=>G.ev&&a.classList.add('min'),7000);a.onclick=()=>a.classList.toggle('min');say.innerHTML='🚨 ¡Alarma! Lee la necesidad de la ciudad y toma una decisión.';siren()}
+function endEvent(ok){const a=$('alarm');G.ev=null;G.nextEv=G.t+40;if(ok){G.solved++;a.className='alarm ok';a.innerHTML=`<b><i>✅</i>¡Salvaste a la ciudad!</b><p>Tu isla tiene suficiente energía. Alarmas resueltas: <b>${G.solved}</b>.</p>`;ding();if(G.solved>=3&&!MI.m2){MI.m2=1;save(KEY,MI);party('¡Misión cumplida: resolviste 3 alarmas! 🚨')}}else{a.className='alarm bad';G.hap-=8;a.innerHTML=`<b><i>⚠️</i>La ciudad se quedó sin energía</b><p>Construye más energía para la próxima alarma.</p>`;beep(200,.5)}setTimeout(()=>{if(!G.ev)a.hidden=true},5000)}
 // ---------- construir ----------
-function build(sid,k){const s=SL.find(s=>s.id===sid);if(!s||G.b[sid])return;if(!s.ok.includes(k)){say.innerHTML=`Aquí no se puede: en <b>${s.lbl}</b> va ${s.ok.map(x=>E[x].e+' '+E[x].n).join(' o ')}.`;beep(220,.2);return}
- G.b[sid]=k;if(!E[k].r)G.fuel[sid]=100;drawPlants();ui();ding(1);say.innerHTML=E[k].info+(E[k].r?' ✅':' ⚠️');
+function freeFor(k){return SL.find(s=>!G.b[s.id]&&s.ok.includes(k))}
+function build(sid,k){let s=sid&&SL.find(s=>s.id===sid),moved='';if(!s||G.b[s.id]||!s.ok.includes(k)){const f=freeFor(k);if(!f){say.innerHTML=`Ya no hay lugar libre para <b>${E[k].n}</b>. Quita otra planta tocándola.`;beep(220,.2);return}if(s)moved=`La puse en <b>${f.lbl}</b>, que es su lugar. `;s=f;sid=f.id}
+ if(G.coins<E[k].c){say.innerHTML=`💰 No te alcanzan las monedas: ${E[k].n} cuesta <b>${E[k].c}</b> y tienes <b>${Math.floor(G.coins)}</b>. La ciudad paga impuestos cuando tiene luz.`;beep(220,.2);return}
+ G.coins-=E[k].c;G.b[sid]=k;if(!E[k].r)G.fuel[sid]=100;if(!G.on){G.on=1}drawPlants();ui();ding(1);say.innerHTML=moved+E[k].info+(E[k].r?' ✅':' ⚠️');
  const rs=new Set(Object.values(G.b).filter(x=>E[x].r));if(rs.size>=3&&!MI.m1){MI.m1=1;save(KEY,MI);party('¡Misión cumplida: usas 3 energías renovables! ♻️')}}
 let dr=null;
 $('cards').addEventListener('pointerdown',e=>{const b=e.target.closest('.ec');if(!b)return;e.preventDefault();actx();const g=b.cloneNode(true);g.classList.add('eg');g.style.left=e.clientX+'px';g.style.top=e.clientY+'px';document.body.appendChild(g);dr={k:b.dataset.k,g,x:e.clientX,y:e.clientY};mp.classList.add('dragging');mp.querySelectorAll('.slot').forEach(s=>{const ok=SL.find(x=>x.id===s.dataset.s).ok.includes(dr.k);s.classList.toggle('ok',ok);s.classList.toggle('no',!ok)})});
 addEventListener('pointermove',e=>{if(!dr)return;dr.g.style.left=e.clientX+'px';dr.g.style.top=e.clientY+'px'});
 addEventListener('pointerup',e=>{if(!dr)return;const d=dr;dr=null;d.g.remove();mp.classList.remove('dragging');
- if(Math.hypot(e.clientX-d.x,e.clientY-d.y)<8){say.innerHTML=E[d.k].info+' <br>Arrástrala a un círculo brillante de la isla.';return}
+ if(Math.hypot(e.clientX-d.x,e.clientY-d.y)<8){if(!run){say.innerHTML=E[d.k].info;return}build(null,d.k);return}
  const m=mp.getScreenCTM().inverse(),pt=mp.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const q=pt.matrixTransform(m);let best=null,bd=60;SL.forEach(s=>{const dd=Math.hypot(s.x-q.x,s.y-q.y);if(dd<bd&&!G.b[s.id]){bd=dd;best=s}});
- if(best)build(best.id,d.k);else say.innerHTML='Suelta la tarjeta sobre un <b>círculo brillante</b> de la isla.'});
+ build(best?best.id:null,d.k)});
 mp.addEventListener('click',e=>{const p=e.target.closest('.pl');if(p){const sid=p.dataset.s,k=G.b[sid];showRemove(sid,k);return}const s=e.target.closest('.slot');if(s){const sl=SL.find(x=>x.id===s.dataset.s);say.innerHTML=`<b>${sl.lbl}</b>: aquí puedes poner ${sl.ok.map(x=>E[x].e+' '+E[x].n).join(' o ')}.`}});
-function showRemove(sid,k){say.innerHTML=`${E[k].info} <button type="button" id="rm" style="margin-left:6px;padding:4px 10px;border-radius:10px;border:0;background:#ef4444;color:#fff;font:inherit;font-weight:900;cursor:pointer">🗑 Quitar</button>`;$('rm').onclick=()=>{delete G.b[sid];delete G.fuel[sid];drawPlants();ui();say.innerHTML=`Quitaste la planta de ${E[k].n}.`}}
+function showRemove(sid,k){say.innerHTML=`${E[k].info} <button type="button" id="rm" style="margin-left:6px;padding:4px 10px;border-radius:10px;border:0;background:#ef4444;color:#fff;font:inherit;font-weight:900;cursor:pointer">🗑 Quitar</button>`;$('rm').onclick=()=>{G.coins+=Math.floor(E[k].c/2);delete G.b[sid];delete G.fuel[sid];drawPlants();ui();say.innerHTML=`Quitaste la planta de ${E[k].n}. Te devolvieron ${Math.floor(E[k].c/2)} 💰.`}}
 // ---------- misiones, sonido, inicio ----------
 function mis(){$('mis').innerHTML=`<h3>🎯 Misiones</h3><div class="mi ${MI.m1?'ok':''}">Usa 3 energías renovables<em>${MI.m1?'Completado ✅':'Falta'}</em></div><div class="mi ${MI.m2?'ok':''}">Resuelve 3 alarmas<em>${MI.m2?'Completado ✅':`${Math.min(3,G.solved)}/3`}</em></div><div class="mi ${MI.m3?'ok':''}">Un día con luz y aire limpio<em>${MI.m3?'Completado ✅':'Falta'}</em></div>`}
 let ac=null;const actx=()=>{try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();ac.state!=='running'&&ac.resume()}catch(e){}return ac};
@@ -216,12 +221,13 @@ function beep(f,d,ty,v,t0){const a=actx();if(!a)return;const o=a.createOscillato
 function ding(s){(s?[660,990]:[523,659,784,1047]).forEach((f,i)=>beep(f,.25,'triangle',.09,i*.1))}
 function siren(){for(let i=0;i<6;i++)beep(i%2?660:880,.28,'square',.04,i*.3)}
 function party(t){const b=document.createElement('canvas');b.className='boom';b.width=innerWidth;b.height=innerHeight;document.body.appendChild(b);const x=b.getContext('2d'),P=Array.from({length:120},()=>({x:innerWidth/2,y:innerHeight/2,vx:(Math.random()-.5)*14,vy:Math.random()*-14-4,c:`hsl(${Math.random()*360},90%,60%)`,s:4+Math.random()*6}));let n=0;(function f(){x.clearRect(0,0,b.width,b.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.45;x.fillStyle=p.c;x.fillRect(p.x,p.y,p.s,p.s)});if(++n<90)requestAnimationFrame(f);else b.remove()})();ding();setTimeout(()=>{say.innerHTML='<b>'+t+'</b>'},60);mis()}
-$('go').onclick=()=>{actx();if(G.hap<=0)G=fresh(),drawPlants();$('start').hidden=true;run=true;paused=false;$('pause').textContent='⏸ Pausa';say.innerHTML='La ciudad necesita <b>25 MW</b>. ¡Arrastra energías a la isla! ⚡';ui()};
+$('go').onclick=()=>{actx();if(G.hap<=0)G=fresh(),drawPlants();$('start').hidden=true;run=true;paused=false;$('pause').textContent='⏸ Pausa';say.innerHTML='La ciudad necesita <b>20 MW</b>. <b>Toca</b> una tarjeta de energía para construirla. ⚡';ui()};
 $('pause').onclick=()=>{if(!run)return;paused=!paused;$('pause').textContent=paused?'▶ Seguir':'⏸ Pausa'};
 $('reset').onclick=()=>{G=fresh();$('alarm').hidden=true;drawPlants();ui();say.innerHTML='Isla nueva. ¡A construir! 🏝️'};
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&run)paused=true,$('pause').textContent='▶ Seguir'});
 base();drawPlants();ui();setInterval(tick,1000);
 })();
 </script>
+<script src="moli.js"></script>
 </body>
 </html>

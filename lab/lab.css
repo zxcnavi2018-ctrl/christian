@@ -11,9 +11,16 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;background-im
 .back:active{transform:scale(.95)}
 .chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:99px;font-size:12px;font-weight:900;background:rgba(255,255,255,.14)}
 .moli-say{position:fixed;left:12px;bottom:12px;z-index:20;display:flex;align-items:flex-end;gap:8px;max-width:min(560px,calc(100% - 24px));pointer-events:none}
+.moli-say img{pointer-events:auto;cursor:pointer}
+.moli-say p{display:none}
+.moli-say.open p{display:block;animation:sayIn .3s cubic-bezier(.2,1.4,.4,1)}
+.moli-say::after{content:'💬';position:absolute;left:44px;bottom:52px;font-size:20px;opacity:0;transform:scale(.4);transition:.25s;pointer-events:none}
+.moli-say.new::after{opacity:1;transform:scale(1);animation:sayPing 1.2s ease-in-out infinite}
+@keyframes sayIn{from{opacity:0;transform:translateY(10px) scale(.9)}}
+@keyframes sayPing{50%{transform:scale(1.25)}}
 .moli-say img{width:64px;flex:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.4));animation:mbob 3s ease-in-out infinite}
 .moli-say p{margin:0 0 14px;padding:10px 14px;border-radius:16px 16px 16px 4px;background:#fff;color:#14224a;font-weight:800;font-size:14px;line-height:1.35;box-shadow:0 10px 24px rgba(0,0,0,.35);pointer-events:auto}
-.moli-say p:empty{display:none}
+.moli-say.open p:empty{display:none}
 @keyframes mbob{50%{transform:translateY(-5px)}}
 .mis{display:flex;flex-direction:column;gap:8px}
 .mis h3{margin:0;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2)}

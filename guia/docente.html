@@ -1,0 +1,113 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Guía de Moli para docentes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap">
+<style>
+:root{
+  /* Libro de mesa: hojas claras sobre un escritorio azul noche; una sola apariencia a propósito */
+  --desk:#0e1838; --desk2:#1b2f6b; --paper:#fbfcff; --paper2:#eef3fc; --ink:#14224a; --ink2:#4b5a7c;
+  --blue:#2f6fed; --cyan:#38c6ee; --sun:#ffcf4a; --leaf:#e3eaf6;
+  --display:"Nunito",ui-rounded,"Segoe UI",system-ui,sans-serif; --body:"Nunito",ui-rounded,"Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:radial-gradient(120% 90% at 50% 0%,var(--desk2),var(--desk) 70%);color:var(--ink);font-family:var(--body);display:flex;flex-direction:column;align-items:center;padding-inline:16px;padding-block:12px;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+.top{width:min(100%,var(--bw));display:flex;align-items:center;justify-content:space-between;gap:12px;color:#cfdaf7;font-weight:800;font-size:14px;letter-spacing:.04em}
+.top b{color:#fff}
+.stage{--bw:min(100%,calc((100dvh - 150px)*.72),560px);flex:1;display:flex;align-items:center;justify-content:center;width:100%;min-height:0}
+.book{position:relative;width:var(--bw);aspect-ratio:.72;perspective:2200px;touch-action:pan-y;user-select:none}
+.leaf{position:absolute;inset:0;transform-origin:left center;transform-style:preserve-3d;transition:transform .9s cubic-bezier(.3,.7,.2,1),box-shadow .9s;will-change:transform}
+.leaf.turned{transform:rotateY(-178deg);pointer-events:none}
+.page{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:6px 16px 16px 6px;background:linear-gradient(90deg,#dfe6f3 0,var(--paper) 4%,var(--paper) 100%);box-shadow:0 22px 50px rgba(0,0,0,.45),inset 3px 0 6px rgba(20,34,74,.12);overflow:hidden;container-type:size;display:flex;flex-direction:column;padding:6% 6.5% 5% 8%}
+.leaf::after{content:"";position:absolute;inset:0;border-radius:16px 6px 6px 16px;background:linear-gradient(270deg,#d5ddec,#f4f7fc 60%);transform:rotateY(180deg);backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.stack{position:absolute;inset:4px -6px -6px 4px;border-radius:6px 16px 16px 6px;background:repeating-linear-gradient(90deg,#d9e1ef 0 1px,#f3f6fb 1px 3px);box-shadow:0 18px 40px rgba(0,0,0,.35)}
+.num{position:absolute;bottom:3.2cqw;right:6cqw;font-size:3cqw;font-weight:800;color:#9aa8c6;font-variant-numeric:tabular-nums}
+.kick{font-size:2.9cqw;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--blue)}
+h2{margin:.6cqw 0 2.2cqw;font-family:var(--display);font-weight:900;font-size:7cqw;line-height:1.05;letter-spacing:-.01em;text-wrap:balance;color:var(--ink)}
+ol,ul{margin:0 0 2.4cqw;padding:0;list-style:none;display:flex;flex-direction:column;gap:1.4cqw}
+li{display:flex;gap:2cqw;align-items:flex-start;font-size:3.55cqw;line-height:1.32;font-weight:650;color:var(--ink2)}
+li b{color:var(--ink)}
+ol{counter-reset:s}
+ol li::before{counter-increment:s;content:counter(s);flex:none;width:5.2cqw;height:5.2cqw;border-radius:50%;display:grid;place-items:center;background:var(--blue);color:#fff;font-weight:900;font-size:3cqw;margin-top:.1cqw}
+ul li::before{content:"";flex:none;width:2cqw;height:2cqw;border-radius:50%;background:var(--cyan);margin-top:1.4cqw}
+.shots{flex:1;min-height:0;display:flex;gap:3cqw;align-items:center;justify-content:center}
+.ph{height:100%;max-height:100%;aspect-ratio:390/800;border-radius:4.6cqw;background:#0f1730;padding:1.4cqw;box-shadow:0 2cqw 4cqw rgba(20,34,74,.25);flex:none;max-width:44%}
+.ph img{width:100%;height:100%;object-fit:cover;object-position:top;border-radius:3.4cqw;display:block}
+.lap{width:100%;max-height:100%;display:flex;flex-direction:column;align-items:center;min-height:0}
+.lap .scr{background:#0f1730;padding:1.2cqw 1.2cqw 1.6cqw;border-radius:2.4cqw 2.4cqw .6cqw .6cqw;width:100%;min-height:0;display:flex}
+.lap img{width:100%;height:auto;max-height:100%;object-fit:contain;display:block;border-radius:.8cqw}
+.lap .base{width:112%;height:2.2cqw;background:linear-gradient(#c7d0e2,#9aa6bf);border-radius:0 0 3cqw 3cqw}
+.two .lap{width:49%}
+.say{display:flex;align-items:flex-end;gap:2.4cqw;margin-top:2.6cqw}
+.say img{width:14cqw;flex:none;filter:drop-shadow(0 1.2cqw 1.2cqw rgba(20,34,74,.2))}
+.say p{position:relative;margin:0 0 2cqw;padding:2.2cqw 3.2cqw;border-radius:3.4cqw 3.4cqw 3.4cqw .8cqw;background:var(--paper2);border:.35cqw solid var(--leaf);font-size:3.25cqw;line-height:1.3;font-weight:750;color:var(--ink)}
+.cover{padding:0;background:radial-gradient(90% 60% at 50% 38%,#4aa8ff 0,#2f6fed 45%,#173a9b 100%);color:#fff;align-items:center;justify-content:space-between;text-align:center}
+.cover .band{width:100%;padding:7cqw 7cqw 0}
+.cover small{display:block;font-size:3cqw;font-weight:900;letter-spacing:.2em;text-transform:uppercase;opacity:.85}
+.cover h1{margin:2cqw 0 0;font-family:var(--display);font-weight:900;font-size:13cqw;line-height:.95;letter-spacing:-.02em}
+.cover h1 span{display:block;color:var(--sun)}
+.cover .mo{width:56cqw;filter:drop-shadow(0 4cqw 4cqw rgba(0,0,30,.35));animation:bob 3.4s ease-in-out infinite}
+.cover .foot{width:100%;padding:0 7cqw 6cqw;font-size:3.3cqw;font-weight:800;opacity:.92}
+.cover .foot i{display:inline-block;margin-top:2cqw;padding:1.4cqw 3.6cqw;border-radius:99px;background:rgba(255,255,255,.18);font-style:normal}
+@keyframes bob{50%{transform:translateY(-2.2cqw)}}
+.big{flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
+.big img{max-height:100%;max-width:70%}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:2.4cqw;margin-bottom:2cqw}
+.grid div{padding:2.6cqw;border-radius:3cqw;background:var(--paper2);border:.35cqw solid var(--leaf);font-size:3.2cqw;font-weight:700;color:var(--ink2);line-height:1.3}
+.grid b{display:block;font-size:3.6cqw;color:var(--ink)}
+.end{background:linear-gradient(160deg,#173a9b,#0e1838);color:#fff;align-items:center;justify-content:center;text-align:center;gap:3cqw}
+.end h2{color:#fff}
+.end p{margin:0;font-size:3.8cqw;font-weight:700;opacity:.9;max-width:80%}
+.end .mo{width:46cqw}
+.nav{display:flex;align-items:center;justify-content:center;gap:14px;padding-block:10px 4px;width:min(100%,560px)}
+.nav button{border:0;width:46px;height:46px;border-radius:50%;background:#fff;color:var(--ink);font:900 22px var(--body);cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.3)}
+.nav button:disabled{opacity:.35;cursor:default}
+.nav button:focus-visible{outline:3px solid var(--sun);outline-offset:3px}
+.bar{flex:1;max-width:280px;height:8px;border-radius:99px;background:rgba(255,255,255,.18);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--sun));border-radius:99px;transition:width .5s}
+.hint{color:#9fb3e6;font-size:12.5px;font-weight:700;text-align:center;min-height:1.2em}
+.rows{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:space-around;gap:2.2cqw}
+.row{display:grid;grid-template-columns:44% 1fr;gap:3.4cqw;align-items:center}
+.row .lap .scr{padding:.8cqw .8cqw 1cqw;border-radius:1.6cqw 1.6cqw .4cqw .4cqw}
+.row .lap .base{height:1.4cqw}
+.row .lap img{border-radius:.5cqw}
+.row h3,.trio h3{margin:0 0 .8cqw;font-size:4.1cqw;font-weight:900;color:var(--ink);line-height:1.1;display:flex;align-items:center;gap:1.6cqw}
+.row h3 i,.trio h3 i{font-style:normal;flex:none;width:5.4cqw;height:5.4cqw;border-radius:50%;display:grid;place-items:center;background:var(--blue);color:#fff;font-size:3.1cqw}
+.row p,.trio p{margin:0;font-size:3.15cqw;line-height:1.3;font-weight:650;color:var(--ink2)}
+.row p b,.trio p b{color:var(--ink)}
+.trio{flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,1fr);gap:3cqw;align-items:start}
+.trio>div{display:flex;flex-direction:column;align-items:center;text-align:center;gap:1.8cqw;min-width:0;height:100%}
+.trio .ph{max-width:100%;width:100%;height:auto;flex:0 1 auto;min-height:0;border-radius:3.4cqw;padding:1cqw}
+.trio .ph img{border-radius:2.6cqw;aspect-ratio:390/800;height:auto}
+.trio h3{justify-content:center;font-size:3.7cqw}
+.trio p{font-size:2.95cqw}
+.pair{flex:1;min-height:0;display:grid;grid-template-columns:1fr auto 30%;gap:2.4cqw;align-items:center}
+.pair .ph{max-width:100%;width:100%;height:auto}
+.pair .ph img{aspect-ratio:390/800;height:auto}
+.pair .arr{font-size:7cqw;font-weight:900;color:var(--blue)}
+.legend{flex:1;min-height:0;display:grid;grid-template-columns:40% 1fr;gap:3.4cqw;align-items:center}
+.legend .ph{position:relative;max-width:100%;width:100%;height:auto}
+.legend .ph img{aspect-ratio:390/800;height:auto}
+.mk{position:absolute;width:5.4cqw;height:5.4cqw;margin:-2.7cqw 0 0 -2.7cqw;border-radius:50%;display:grid;place-items:center;background:#ff4d6d;color:#fff;font-weight:900;font-size:3cqw;border:.5cqw solid #fff;box-shadow:0 .6cqw 1.4cqw rgba(0,0,0,.3)}
+.legend ol{gap:1.5cqw;margin:0}
+.legend li{font-size:2.9cqw;line-height:1.25;gap:1.6cqw}
+.legend ol li::before{background:#ff4d6d;width:4.6cqw;height:4.6cqw;font-size:2.6cqw}
+@media (prefers-reduced-motion:reduce){.leaf{transition:opacity .3s}.leaf.turned{transform:none;opacity:0}.cover .mo{animation:none}}
+</style>
+<div class="top" style="--bw:min(100%,560px)"><span>📘 <b>Guía de Moli · Docente</b></span><span id="cnt"></span></div>
+<div class="stage"><div class="book" aria-roledescription="libro"><div class="stack"></div><div class="leaf"><div class="page cover"><div class="band"><small>Ciencia y Tecnología · 6.° grado</small><h1>Guía de Moli<span>para docentes</span></h1></div><img class="mo" src="img/moli.webp" alt="Moli, el robot"><div class="foot">Prepara, presenta y evalúa tus sesiones con Moli<br><i>Desliza la hoja para empezar ›</i></div></div></div><div class="leaf"><div class="page"><span class="kick">Hoja 1 · Prepara</span><h2>Entra y arma tu sesión</h2><div class="trio"><div><div class="ph"><img src="img/a-inicio.webp" alt="" loading="lazy"></div><h3><i>1</i>Entra</h3><p>Toca tu <b>fotocheck</b>: tu <b>DNI</b> y la <b>clave de 4 números</b> que te dieron.</p></div><div><div class="ph"><img src="img/t-unidad.webp" alt="" loading="lazy"></div><h3><i>2</i>Unidades</h3><p>Toca a Moli: <b>👁 mostrar</b> o <b>🙈 ocultar</b> sesiones.</p></div><div><div class="ph"><img src="img/t-editar.webp" alt="" loading="lazy"></div><h3><i>3</i>Edita</h3><p><b>✏️ Editar</b>: meta, actividades, ficha y Exit ticket. Luego <b>✓ Listo</b>.</p></div></div><div class="say"><img src="img/moli.webp" alt=""><p>Lo que ocultas, tus estudiantes no lo ven. Tú sí.</p></div><span class="num">1</span></div></div><div class="leaf"><div class="page"><span class="kick">Hoja 2 · Conecta</span><h2>Tu celular es el control</h2><ol><li><span>En la <b>laptop</b> abre Moli y toca el ícono <b>💻</b> (arriba a la derecha): se pone en pantalla completa y espera.</span></li><li><span>En tu <b>celular</b> entra con tu misma cuenta y toca el ícono <b>📱</b> <b>una vez</b>: se conecta y el punto se pone <b>verde 🟢</b>.</span></li><li><span>Toca <b>📱 dos veces rápido</b>: se abre el control.</span></li></ol><div class="pair"><div class="lap"><div class="scr"><img src="img/d-ses-act.webp" alt="" loading="lazy"></div><div class="base"></div></div><span class="arr">⇄</span><div class="ph"><img src="img/t-control.webp" alt="" loading="lazy"></div></div><div class="say"><img src="img/moli.webp" alt=""><p>Lo que toques en el celular pasa en la laptop que proyectas.</p></div><span class="num">2</span></div></div><div class="leaf"><div class="page"><span class="kick">Hoja 3 · El control</span><h2>Botón por botón</h2><div class="legend"><div class="ph"><img src="img/t-control.webp" alt="" loading="lazy"><span class="mk" style="left:11%;top:5.6%">1</span><span class="mk" style="left:30%;top:18.8%">2</span><span class="mk" style="left:17%;top:34%">3</span><span class="mk" style="left:33%;top:42.5%">4</span><span class="mk" style="left:17%;top:50.6%">5</span><span class="mk" style="left:78%;top:43%">6</span><span class="mk" style="left:50%;top:66%">7</span><span class="mk" style="left:50%;top:82%">8</span></div><ol><li><span><b>Moli</b>: tócalo para <b>Apagar</b> o lanzar el <b>🏆 Final</b>.</span></li><li><span><b>Sesión</b>: elige unidad y sesión; <b>➜</b> la abre en la laptop. <b>Visible</b> la muestra a tus estudiantes.</span></li><li><span><b>Pantalla</b> completa y <b>Video grande</b>.</span></li><li><span><b>‹ ›</b> pasan las hojas. <b>˄ ˅</b> suben y bajan.</span></li><li><span><b>Play</b> y <b>Pausa</b> del video.</span></li><li><span><b>Cronómetro</b> de 5, 15, 20 o 30 min: sale debajo de Moli.</span></li><li><span><b>Grupos 1–6</b>: +1 punto y el termómetro sube.</span></li><li><span><b>Animaciones</b>: Silencio, Tambor, Atención (<b>✏️ Cambiar</b> para elegir otras).</span></li></ol></div><span class="num">3</span></div></div><div class="leaf"><div class="page"><span class="kick">Hoja 4 · En clase</span><h2>Animaciones y final</h2><div class="trio"><div><div class="ph"><img src="img/t-anim.webp" alt="" loading="lazy"></div><h3><i>1</i>Pruébalas</h3><p>Panel → <b>Animaciones</b>. Cada una tiene su tecla y <b>▶ Probar</b>.</p></div><div><div class="ph"><img src="img/t-control-off.webp" alt="" loading="lazy"></div><h3><i>2</i>Final y Apagar</h3><p>Toca a Moli en el control: <b>🏆 Final</b> abre el telón con el grupo ganador.</p></div><div><div class="ph"><img src="img/e-exit2.webp" alt="" loading="lazy"></div><h3><i>3</i>Exit ticket</h3><p>Al final, tus estudiantes responden en su celular.</p></div></div><div class="say"><img src="img/moli.webp" alt=""><p>Al apagar el control, los puntos de los grupos vuelven a cero.</p></div><span class="num">4</span></div></div><div class="leaf"><div class="page"><span class="kick">Hoja 5 · Fichas</span><h2>Fichas con Moli</h2><div class="trio"><div><div class="ph"><img src="img/t-trabaja.webp" alt="" loading="lazy"></div><h3><i>1</i>Pídele a Moli</h3><p>Panel → <b>Trabajar con Moli</b>: elige la unidad y escribe tus indicaciones.</p></div><div><div class="ph"><img src="img/e-ficha.webp" alt="" loading="lazy"></div><h3><i>2</i>Tu ficha</h3><p>Moli arma la ficha. Toca <b>☁️ Pasar a Google Docs</b> para publicarla.</p></div><div><div class="ph"><img src="img/e-ses-act.webp" alt="" loading="lazy"></div><h3><i>3</i>La ven así</h3><p>Tus estudiantes tocan <b>Ver ficha</b> en la actividad.</p></div></div><div class="say"><img src="img/moli.webp" alt=""><p>Las fichas en tu Drive no gastan espacio de Moli.</p></div><span class="num">5</span></div></div><div class="leaf"><div class="page"><span class="kick">Hoja 6 · Notas</span><h2>Notas de tus estudiantes</h2><div class="trio"><div><div class="ph"><img src="img/a-panel.webp" alt="" loading="lazy"></div><h3><i>1</i>Tu Panel</h3><p><b>Escáner</b> para tarjetas en papel y <b>Notas de estudiantes</b>.</p></div><div><div class="ph"><img src="img/a-registro.webp" alt="" loading="lazy"></div><h3><i>2</i>Registro</h3><p><b>Ciencia → Registro</b>. La primera vez toca <b>Conectar mi cuenta</b>.</p></div><div><div class="ph"><img src="img/e-notas.webp" alt="" loading="lazy"></div><h3><i>3</i>Así las ven</h3><p>Cada estudiante ve sus notas en <b>Mis notas</b>.</p></div></div><div class="say"><img src="img/moli.webp" alt=""><p>¿Quieres ver Moli como estudiante? Entra con el DNI 00000000.</p></div><span class="num">6</span></div></div></div></div>
+<div class="nav"><button id="pv" type="button" aria-label="Hoja anterior">‹</button><div class="bar"><i></i></div><button id="nx" type="button" aria-label="Hoja siguiente">›</button></div>
+<div class="hint">Desliza la hoja o usa las flechas ← →</div>
+<script>const KEY="moli-guia-doc";
+(()=>{const L=[...document.querySelectorAll('.leaf')],N=L.length,bar=document.querySelector('.bar i'),cnt=document.getElementById('cnt'),pv=document.getElementById('pv'),nx=document.getElementById('nx'),hint=document.querySelector('.hint');let i=0,ac=null;
+try{const s=+localStorage.getItem(KEY);if(s>0&&s<N)i=s}catch(e){}
+function snd(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const d=.32,b=ac.createBuffer(1,ac.sampleRate*d,ac.sampleRate),x=b.getChannelData(0);for(let k=0;k<x.length;k++){const t=k/x.length;x[k]=(Math.random()*2-1)*Math.pow(1-t,2)*Math.sin(Math.PI*Math.min(1,t*4))}const s=ac.createBufferSource(),f=ac.createBiquadFilter(),g=ac.createGain();f.type='bandpass';f.frequency.value=2200;f.Q.value=.7;g.gain.value=.35;s.buffer=b;s.connect(f).connect(g).connect(ac.destination);s.start()}catch(e){}}
+function draw(){L.forEach((l,k)=>{l.classList.toggle('turned',k<i);l.style.zIndex=k<i?k:N-k;l.setAttribute('aria-hidden',k!==i)});bar.style.width=(i/(N-1)*100)+'%';cnt.textContent=(i+1)+' / '+N;pv.disabled=i===0;nx.disabled=i===N-1;try{localStorage.setItem(KEY,i)}catch(e){}}
+function go(d){const j=Math.max(0,Math.min(N-1,i+d));if(j===i)return;i=j;snd();draw();hint.textContent=''}
+pv.onclick=()=>go(-1);nx.onclick=()=>go(1);
+addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')go(1),e.preventDefault();if(e.key==='ArrowLeft')go(-1)});
+const bk=document.querySelector('.book');let x0=null,y0=0;
+bk.addEventListener('pointerdown',e=>{x0=e.clientX;y0=e.clientY});
+bk.addEventListener('pointerup',e=>{if(x0===null)return;const dx=e.clientX-x0,dy=e.clientY-y0;x0=null;if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy))go(dx<0?1:-1);else if(Math.abs(dx)<8&&Math.abs(dy)<8){const r=bk.getBoundingClientRect();go(e.clientX-r.left>r.width*.4?1:-1)}});
+draw()})();
+</script></html>

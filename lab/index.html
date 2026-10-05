@@ -65,7 +65,7 @@ const C=[
  {k:'luna',t:'La Tierra y la Luna',s:'Mareas y fases',href:'luna.html',g:'linear-gradient(150deg,#67e8f9,#0284c7 50%,#172554)',n:3},
  {k:'cad',t:'Cadenas alimenticias (cadena trófica)',s:'¿Quién se come a quién?',href:'cadenas.html',g:'linear-gradient(150deg,#bef264,#65a30d 50%,#14532d)',n:4},
  {k:'eco',t:'Tipos de ecosistemas: bióticos y abióticos',s:'Explora y clasifica',href:'ecosistemas.html',g:'linear-gradient(150deg,#5eead4,#0d9488 50%,#134e4a)',n:3},
- {k:'tens',t:'Tensión superficial y capilaridad',s:'Experimenta con agua',g:'linear-gradient(150deg,#7dd3fc,#0ea5e9 45%,#4338ca)',n:4}
+ {k:'tens',t:'Tensión superficial, cohesión, adhesión y capilaridad',s:'Laboratorio del agua',href:'agua.html',g:'linear-gradient(150deg,#7dd3fc,#0ea5e9 45%,#4338ca)',n:4}
 ];
 let all=0,got=0;
 const card=(c,i)=>{const done=Math.min(c.n,Object.values(get(c.k)).filter(Boolean).length);if(c.href){all+=c.n;got+=done}const st=!c.href?'🔒 Pronto':done>=c.n?'✅ Listo':`🎯 ${done}/${c.n}`;

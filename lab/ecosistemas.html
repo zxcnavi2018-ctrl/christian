@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ecosistemas · Laboratorio de Moli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap">
+<link rel="stylesheet" href="lab.css">
+<style>
+body{display:flex;flex-direction:column;background:radial-gradient(120% 80% at 50% 0%,#0f3d3a,#04120f 70%)}
+.main{flex:1;min-height:0;overflow:auto;width:min(100%,1040px);margin:0 auto;padding:0 10px 12px;display:flex;flex-direction:column;gap:8px}
+.main>*{flex:none}
+.tabs{display:flex;gap:6px}
+.tabs button{flex:1;padding:9px 6px;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;font:inherit;font-weight:900;font-size:14px;cursor:pointer}
+.tabs button.on{background:linear-gradient(135deg,#14b8a6,#0f766e);border-color:#99f6e4;box-shadow:0 6px 16px rgba(0,0,0,.35)}
+.tabs.sm button{font-size:12.5px;padding:7px 4px}
+.scene{position:relative;border-radius:22px;overflow:hidden;aspect-ratio:16/8;box-shadow:0 16px 34px rgba(0,0,0,.45)}
+.scene>svg{position:absolute;inset:0;width:100%;height:100%}
+.it{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 6px;border-radius:14px;border:2px solid rgba(255,255,255,.8);background:rgba(255,255,255,.28);backdrop-filter:blur(2px);color:#fff;font:inherit;font-weight:900;font-size:clamp(9px,1.3vw,12px);line-height:1.05;text-shadow:0 1px 3px rgba(0,0,0,.8);cursor:pointer;animation:bob 3s ease-in-out infinite;animation-delay:var(--d)}
+.it .em{font-size:clamp(22px,4vw,38px);line-height:1;text-shadow:none}
+.it.b{background:rgba(34,197,94,.85);border-color:#bbf7d0;animation:none}
+.it.a{background:rgba(120,83,48,.9);border-color:#fde68a;animation:none}
+.it.bad{animation:no .45s}
+.it.pick{outline:3px solid #fde047;outline-offset:2px}
+@keyframes bob{50%{transform:translate(-50%,calc(-50% - 4px))}}
+@keyframes no{20%,60%{transform:translate(calc(-50% - 6px),-50%)}40%,80%{transform:translate(calc(-50% + 6px),-50%)}}
+.ask{position:absolute;z-index:20;transform:translate(-50%,8px);display:flex;gap:6px;padding:6px;border-radius:14px;background:#fff;box-shadow:0 10px 24px rgba(0,0,0,.45);animation:up .25s}
+.ask button{padding:8px 10px;border-radius:10px;border:0;font:inherit;font-weight:900;font-size:13px;color:#fff;cursor:pointer;white-space:nowrap}
+.ask .yb{background:#16a34a}.ask .ya{background:#92400e}
+.cnt{display:flex;gap:8px}
+.cnt div{flex:1;display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:14px;font-weight:900;font-size:13.5px}
+.cnt .cb{background:rgba(34,197,94,.2);border:1px solid #4ade80}.cnt .ca{background:rgba(180,83,9,.25);border:1px solid #fbbf24}
+.cnt b{font-size:20px;margin-left:auto}
+.box{padding:12px 14px;border-radius:18px;background:#fff;color:#14224a;font-weight:700;font-size:14.5px;line-height:1.45;box-shadow:0 12px 26px rgba(0,0,0,.4);animation:up .4s cubic-bezier(.2,1.3,.4,1)}
+.box h3{margin:0 0 4px;font-size:17px}
+.box button{margin:8px 6px 0 0;padding:10px 16px;border-radius:12px;border:0;background:linear-gradient(135deg,#14b8a6,#0f766e);color:#fff;font:inherit;font-weight:900;font-size:14.5px;cursor:pointer}
+@keyframes up{from{transform:translateY(14px);opacity:0}}
+.bins{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.bin{min-height:150px;padding:10px;border-radius:18px;border:3px dashed rgba(255,255,255,.35);background:var(--g);display:flex;flex-direction:column;gap:6px;transition:.2s}
+.bin h3{margin:0;font-size:16px}
+.bin p{margin:0;font-size:11.5px;font-weight:800;opacity:.92;line-height:1.3}
+.bin .got{display:flex;flex-wrap:wrap;gap:4px}
+.bin .got span{padding:3px 7px;border-radius:99px;background:rgba(255,255,255,.9);color:#14224a;font-size:11.5px;font-weight:900;animation:up .3s}
+.bin.hot{border-color:#fde047;transform:scale(1.02)}
+.bin.bad{animation:shake .45s}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.deck{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.ec{display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 6px;border-radius:16px;border:0;background:linear-gradient(160deg,#fff,#e2e8f0);color:#14224a;font:inherit;font-weight:900;font-size:12.5px;line-height:1.15;text-align:center;cursor:grab;touch-action:none;user-select:none;box-shadow:0 8px 16px rgba(0,0,0,.35)}
+.ec .em{font-size:30px}
+.ec.sel{outline:3px solid #fde047;outline-offset:2px}
+.ec.used{display:none}
+.ghost{position:fixed;z-index:50;pointer-events:none;width:110px;transform:translate(-50%,-50%) rotate(-5deg) scale(1.08)}
+.mini{display:flex;gap:6px;flex-wrap:wrap}
+.mini .mi{flex:1 1 150px;font-size:12px;padding:6px 10px}
+.moli-say{left:auto;right:8px;top:8px;bottom:auto;flex-direction:row-reverse;align-items:flex-start;max-width:min(420px,calc(100% - 16px))}
+.moli-say img{width:46px}
+.moli-say p{margin:40px 0 0;border-radius:16px 4px 16px 16px;font-size:13.5px}
+.moli-say::after{left:auto;right:34px;bottom:auto;top:30px}
+.lab-top{padding-right:62px}
+@media (max-width:600px){.scene{aspect-ratio:4/3.4}.it{padding:3px 4px;border-radius:10px}.bins{grid-template-columns:1fr}.bin{min-height:0}.deck{grid-template-columns:repeat(3,1fr)}.tabs button{font-size:12.5px}}
+</style>
+</head>
+<body>
+<header class="lab-top"><a class="back" id="back" href="index.html">‹ Laboratorio</a><b>🌎 Ecosistemas</b></header>
+<div class="main">
+  <div class="tabs" id="mode"><button type="button" data-m="bio" class="on">🔍 Bióticos y abióticos</button><button type="button" data-m="tip">🗺️ Tipos de ecosistemas</button></div>
+  <div id="view"></div>
+  <div class="mini" id="mis"></div>
+</div>
+<div class="moli-say"><img src="../guia/img/moli.webp" alt=""><p id="say"></p></div>
+<script>
+(()=>{
+const U=new URLSearchParams(location.search).get('u')||'anon';
+document.getElementById('back').href='index.html?u='+encodeURIComponent(U);
+const KEY='lab:'+U+':eco',load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const $=id=>document.getElementById(id),say=$('say');let MI=load(KEY,{}),DONE=load(KEY+'-esc',[]);
+// ---------- escenas: b = biótico (tiene vida), a = abiótico (no tiene vida) ----------
+const SC={
+ sel:{n:'🌳 Selva amazónica',t:'terrestre',
+  bg:'<rect width="1000" height="500" fill="#14532d"/><path d="M0 170 Q70 60 150 150 Q230 50 310 150 Q400 40 480 140 Q560 50 650 150 Q740 40 820 140 Q900 60 1000 140 V500 H0Z" fill="#166534"/><path d="M0 300 Q100 220 200 290 Q300 210 400 290 Q500 220 600 290 Q700 210 800 290 Q900 220 1000 280 V500 H0Z" fill="#15803d"/><path d="M0 430 Q250 390 520 420 T1000 410 V500 H0Z" fill="#78350f"/><path d="M600 500 Q680 440 760 470 T1000 450 V500Z" fill="#0e7490"/>',
+  e:[['☀️','Luz del Sol','a',8,12],['🌧️','Lluvia','a',30,10],['🌬️','Aire','a',55,9],['🌡️','Calor','a',78,12],['🌳','Árbol','b',18,48],['🐒','Mono','b',40,36],['🦜','Guacamayo','b',66,32],['🐸','Rana','b',86,56],['🍄','Hongos','b',30,74],['🐜','Hormigas','b',52,82],['🪨','Rocas','a',12,86],['🟫','Suelo','a',70,86],['💧','Agua del río','a',90,90]],
+  x:'La selva es un ecosistema <b>terrestre</b>: sus seres vivos viven sobre el suelo y en los árboles, con mucha lluvia y calor.'},
+ tit:{n:'🏞️ Lago Titicaca',t:'acuático',
+  bg:'<defs><linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#60a5fa"/><stop offset=".35" stop-color="#bfdbfe"/><stop offset=".36" stop-color="#1d4ed8"/><stop offset="1" stop-color="#172554"/></linearGradient></defs><rect width="1000" height="500" fill="url(#g2)"/><path d="M0 180 L140 90 L260 170 L420 70 L600 175 L760 80 L1000 175Z" fill="#94a3b8"/><path d="M420 70 L452 98 L436 96 L420 108 L404 96 L388 98Z M760 80 L790 106 L774 104 L760 114 L746 104 L730 106Z" fill="#fff"/>'+Array.from({length:6},(_, i)=>`<path d="M${i*180} 210 q30 -8 60 0 t60 0" stroke="rgba(255,255,255,.35)" stroke-width="4" fill="none"/>`).join('')+'<path d="M0 470 Q300 430 600 460 T1000 450 V500 H0Z" fill="#78350f"/>',
+  e:[['☀️','Luz del Sol','a',8,12],['🌬️','Viento','a',32,10],['❄️','Frío','a',60,10],['💧','Agua dulce','a',82,48],['🌾','Totora','b',12,46],['🦆','Zambullidor','b',36,42],['🐸','Rana gigante','b',58,62],['🐟','Carachi (pez)','b',30,70],['🦠','Microalgas','b',78,74],['🪨','Piedras','a',12,88],['🟫','Barro','a',52,90],['🌡️','Temperatura','a',88,16]],
+  x:'El lago Titicaca es un ecosistema <b>acuático</b> de agua dulce: sus seres vivos viven dentro del agua o dependen de ella.'},
+ man:{n:'🦀 Manglar de Tumbes',t:'mixto',
+  bg:'<rect width="1000" height="500" fill="#7dd3fc"/><path d="M0 260 Q250 220 500 250 T1000 240 V500 H0Z" fill="#0e7490" opacity=".9"/><path d="M0 330 Q200 300 420 340 T1000 320 V500 H0Z" fill="#78716c"/>'+Array.from({length:7},(_, i)=>`<g transform="translate(${70+i*140} 250)"><circle r="46" cy="-40" fill="#15803d"/><path d="M0 -10 V70 M0 30 l-26 40 M0 30 l26 40 M0 10 l-36 60 M0 10 l36 60" stroke="#57534e" stroke-width="5" fill="none"/></g>`).join(''),
+  e:[['☀️','Luz del Sol','a',8,12],['🌡️','Calor','a',30,10],['🌬️','Aire','a',56,9],['🌳','Mangle','b',80,30],['🐦','Garza','b',44,30],['🦀','Cangrejo','b',22,72],['🐊','Cocodrilo de Tumbes','b',62,62],['🐚','Concha negra','b',84,80],['🦠','Bacterias','b',42,86],['🌊','Agua salada','a',12,50],['🟫','Lodo','a',64,88],['🪨','Piedras','a',90,58]],
+  x:'El manglar es un ecosistema <b>mixto</b>: une la tierra con el agua del mar y del río. Sus seres vivos viven entre el lodo, el agua y las raíces.'}
+};
+const EXP={a:'no tiene vida: no nace, no se alimenta ni se reproduce. Es un factor <b>abiótico</b>.',b:'tiene vida: nace, se alimenta, crece y se reproduce. Es un ser <b>biótico</b>.'};
+// ---------- tipos de ecosistemas ----------
+const TP=[
+ {e:'🌵',n:'Desierto de Sechura',t:'T',w:'Es <b>terrestre</b>: arena, poco agua y mucho sol.'},
+ {e:'🌳',n:'Selva amazónica',t:'T',w:'Es <b>terrestre</b>: bosque con muchísimos árboles y lluvia.'},
+ {e:'🏔️',n:'Puna altoandina',t:'T',w:'Es <b>terrestre</b>: pastos de altura, frío y vicuñas.'},
+ {e:'🌊',n:'Mar peruano',t:'A',w:'Es <b>acuático</b> de agua salada: anchovetas, lobos marinos.'},
+ {e:'🏞️',n:'Lago Titicaca',t:'A',w:'Es <b>acuático</b> de agua dulce: totoras, ranas gigantes, carachis.'},
+ {e:'🐟',n:'Río Amazonas',t:'A',w:'Es <b>acuático</b> de agua dulce: paiches, delfines rosados.'},
+ {e:'🦀',n:'Manglares de Tumbes',t:'M',w:'Es <b>mixto</b>: mezcla agua de mar y de río con tierra y lodo.'},
+ {e:'🦆',n:'Pantanos de Villa',t:'M',w:'Es <b>mixto</b>: un humedal en Lima donde se juntan agua y tierra; llegan aves migratorias.'},
+ {e:'🏖️',n:'Orilla del mar',t:'M',w:'Es <b>mixto</b>: la orilla se cubre y se descubre con las mareas; viven cangrejos y aves.'}
+];
+const BIN={T:{n:'🌳 Terrestre',d:'Los seres vivos viven sobre la tierra.',g:'linear-gradient(160deg,#65a30d,#365314)'},A:{n:'🌊 Acuático',d:'Los seres vivos viven en el agua (salada o dulce).',g:'linear-gradient(160deg,#0ea5e9,#1e3a8a)'},M:{n:'🦀 Mixto',d:'Se juntan la tierra y el agua.',g:'linear-gradient(160deg,#14b8a6,#713f12)'}};
+let mode='bio',sc='sel',got={},tsel=null;
+$('mode').onclick=e=>{const b=e.target.closest('button');if(!b)return;mode=b.dataset.m;$('mode').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));tone(600,.08,'triangle');mode==='bio'?bio():tip()};
+// ---------- modo 1: clasificar ----------
+function bio(){const S=SC[sc];got={};
+ $('view').innerHTML=`<div class="tabs sm" id="scs" style="margin-bottom:8px">${Object.entries(SC).map(([k,s])=>`<button type="button" data-k="${k}" class="${k===sc?'on':''}">${s.n}${DONE.includes(k)?' ✅':''}</button>`).join('')}</div>
+ <div class="scene" id="scene"><svg viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid slice">${S.bg}</svg>${S.e.map((e,i)=>`<button type="button" class="it" data-i="${i}" style="left:${e[3]}%;top:${e[4]}%;--d:${(i%5)*.4}s"><span class="em">${e[0]}</span>${e[1]}</button>`).join('')}</div>
+ <div class="cnt" style="margin-top:8px"><div class="cb">🌱 Bióticos (con vida)<b id="nb">0</b></div><div class="ca">🪨 Abióticos (sin vida)<b id="na">0</b></div></div><div id="msg" style="margin-top:8px"></div>`;
+ $('scs').onclick=e=>{const b=e.target.closest('button');if(!b)return;sc=b.dataset.k;tone(600,.08,'triangle');bio()};
+ $('scene').addEventListener('click',e=>{const b=e.target.closest('.it');if(!b||b.classList.contains('a')||b.classList.contains('b'))return;ask(b)});
+ say.innerHTML=`Esta es la escena del <b>${S.n.slice(3)}</b>. <b>Toca</b> cada elemento y decide: ¿tiene vida (<b>biótico</b>) o no tiene vida (<b>abiótico</b>)?`}
+function ask(b){document.querySelectorAll('.ask').forEach(x=>x.remove());document.querySelectorAll('.it.pick').forEach(x=>x.classList.remove('pick'));b.classList.add('pick');tone(700,.06,'sine');
+ const a=document.createElement('div');a.className='ask';a.innerHTML='<button type="button" class="yb">🌱 Biótico</button><button type="button" class="ya">🪨 Abiótico</button>';
+ const sc=$('scene'),r=b.getBoundingClientRect(),R=sc.getBoundingClientRect();a.style.left=Math.min(R.width-120,Math.max(120,r.left-R.left+r.width/2))+'px';a.style.top=(r.bottom-R.top>R.height-60?r.top-R.top-60:r.bottom-R.top)+'px';sc.appendChild(a);
+ a.onclick=ev=>{const c=ev.target.closest('button');if(!c)return;ev.stopPropagation();a.remove();b.classList.remove('pick');answer(b,c.classList.contains('yb')?'b':'a')}}
+function answer(b,v){const S=SC[sc],e=S.e[+b.dataset.i],ok=e[2]===v;
+ if(ok){b.classList.add(v);got[b.dataset.i]=v;$('nb').textContent=Object.values(got).filter(x=>x==='b').length;$('na').textContent=Object.values(got).filter(x=>x==='a').length;v==='b'?chirp():thunk();say.innerHTML=`✅ <b>${e[0]} ${e[1]}</b> ${EXP[v]}`;
+  if(Object.keys(got).length===S.e.length)finish()}
+ else{b.classList.remove('bad');void b.offsetWidth;b.classList.add('bad');boing();say.innerHTML=`❌ Piensa otra vez: <b>${e[0]} ${e[1]}</b> ${EXP[e[2]]}`}}
+function finish(){const S=SC[sc];if(!DONE.includes(sc)){DONE.push(sc);save(KEY+'-esc',DONE)}if(!MI.bio){MI.bio=1}if(DONE.length>=3)MI.bio3=1;save(KEY,MI);mis();fanfare();
+ $('msg').innerHTML=`<div class="box"><h3>🎉 ¡Escena completa!</h3>Los <b>seres bióticos</b> (plantas, animales, hongos, bacterias) y los <b>factores abióticos</b> (sol, agua, aire, suelo, temperatura) forman juntos el <b>ecosistema</b>. ${S.x}<br>${DONE.length<3?`<button type="button" id="nx">Siguiente escena ➜</button>`:'<button type="button" id="tp">🗺️ Ir a Tipos de ecosistemas</button>'}</div>`;
+ const n=$('nx');n&&(n.onclick=()=>{sc=Object.keys(SC).find(k=>!DONE.includes(k))||sc;bio()});const t=$('tp');t&&(t.onclick=()=>$('mode').querySelector('[data-m="tip"]').click())}
+// ---------- modo 2: tipos de ecosistemas ----------
+let placed=new Set();
+function tip(){placed=new Set();tsel=null;
+ $('view').innerHTML=`<div class="bins">${Object.entries(BIN).map(([k,b])=>`<div class="bin" data-t="${k}" style="--g:${b.g}"><h3>${b.n}</h3><p>${b.d}</p><div class="got"></div></div>`).join('')}</div><div class="deck" id="deck" style="margin-top:8px">${TP.map((t,i)=>`<button type="button" class="ec" data-i="${i}"><span class="em">${t.e}</span>${t.n}</button>`).join('')}</div><div id="msg" style="margin-top:8px"></div>`;
+ say.innerHTML='¿Cada lugar del Perú es un ecosistema <b>terrestre</b>, <b>acuático</b> o <b>mixto</b>? <b>Arrastra</b> la tarjeta a su grupo, o tócala y luego toca el grupo.'}
+function put(i,bin){const t=TP[i];if(placed.has(i))return;if(t.t===bin.dataset.t){placed.add(i);bin.querySelector('.got').insertAdjacentHTML('beforeend',`<span>${t.e} ${t.n}</span>`);$('deck').querySelector(`[data-i="${i}"]`).classList.add('used');chirp();say.innerHTML='✅ '+t.w;
+  if(placed.size===TP.length){if(!MI.tip){MI.tip=1;save(KEY,MI)}mis();fanfare();$('msg').innerHTML='<div class="box"><h3>🏆 ¡Ecosistemas ordenados!</h3>Un <b>ecosistema</b> es un lugar donde los seres vivos se relacionan entre sí y con el ambiente. Puede ser <b>terrestre</b> (desierto, selva, puna), <b>acuático</b> (mar, lagos, ríos) o <b>mixto</b> (manglares, humedales, orillas). ¡El Perú tiene todos!<br><button type="button" id="rs">🔄 Jugar otra vez</button></div>';$('rs').onclick=tip}}
+ else{bin.classList.remove('bad');void bin.offsetWidth;bin.classList.add('bad');boing();say.innerHTML=`❌ <b>${t.e} ${t.n}</b> no va en ${BIN[bin.dataset.t].n}. Piensa: ¿sus seres vivos viven en la tierra, en el agua o en ambos?`}}
+let dr=null;const binAt=(x,y)=>{const el=document.elementFromPoint(x,y);return el&&el.closest('.bin')};
+document.addEventListener('pointerdown',e=>{const b=e.target.closest('.ec');if(!b)return;e.preventDefault();actx();const g=b.cloneNode(true);g.classList.add('ghost');g.style.left=e.clientX+'px';g.style.top=e.clientY+'px';document.body.appendChild(g);dr={i:+b.dataset.i,b,g,x:e.clientX,y:e.clientY}});
+addEventListener('pointermove',e=>{if(!dr)return;dr.g.style.left=e.clientX+'px';dr.g.style.top=e.clientY+'px';document.querySelectorAll('.bin.hot').forEach(s=>s.classList.remove('hot'));dr.g.style.display='none';const s=binAt(e.clientX,e.clientY);dr.g.style.display='';s&&s.classList.add('hot')});
+addEventListener('pointerup',e=>{if(!dr)return;const d=dr;dr=null;d.g.remove();document.querySelectorAll('.bin.hot').forEach(s=>s.classList.remove('hot'));
+ if(Math.hypot(e.clientX-d.x,e.clientY-d.y)<8){document.querySelectorAll('.ec.sel').forEach(x=>x.classList.remove('sel'));tsel=d.i;d.b.classList.add('sel');say.innerHTML=`<b>${TP[d.i].e} ${TP[d.i].n}</b>: ahora toca el grupo donde va.`;tone(700,.06,'sine');return}
+ const s=binAt(e.clientX,e.clientY);if(s)put(d.i,s)});
+addEventListener('pointercancel',()=>{if(dr){dr.g.remove();dr=null}});
+document.addEventListener('click',e=>{const b=e.target.closest('.bin');if(b&&tsel!=null){const i=tsel;tsel=null;document.querySelectorAll('.ec.sel').forEach(x=>x.classList.remove('sel'));put(i,b)}});
+function mis(){$('mis').innerHTML=`<span class="mi ${MI.bio?'ok':''}">Clasifica una escena<em>${MI.bio?'✅':'Falta'}</em></span><span class="mi ${MI.bio3?'ok':''}">Las 3 escenas<em>${MI.bio3?'✅':DONE.length+'/3'}</em></span><span class="mi ${MI.tip?'ok':''}">Tipos de ecosistemas<em>${MI.tip?'✅':'Falta'}</em></span>`}
+// ---------- sonidos ----------
+let ac=null;const actx=()=>{try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();ac.state!=='running'&&ac.resume()}catch(e){}return ac};
+function tone(f,d,ty,v=.06,t0=0){const a=actx();if(!a)return;const t=a.currentTime+t0,o=a.createOscillator(),g=a.createGain();o.type=ty||'sine';o.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(a.destination);o.start(t);o.stop(t+d)}
+function chirp(){const a=actx();if(!a)return;[0,.09].forEach(t0=>{const t=a.currentTime+t0,o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.setValueAtTime(1800,t);o.frequency.exponentialRampToValueAtTime(2600,t+.07);g.gain.setValueAtTime(.05,t);g.gain.exponentialRampToValueAtTime(.0001,t+.08);o.connect(g).connect(a.destination);o.start(t);o.stop(t+.09)})}
+function thunk(){tone(180,.18,'triangle',.1);tone(120,.2,'sine',.08,.03)}
+function boing(){const a=actx();if(!a)return;const t=a.currentTime,o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.setValueAtTime(320,t);o.frequency.exponentialRampToValueAtTime(110,t+.35);g.gain.setValueAtTime(.08,t);g.gain.exponentialRampToValueAtTime(.0001,t+.4);o.connect(g).connect(a.destination);o.start(t);o.stop(t+.4)}
+function fanfare(){[523,659,784,1047].forEach((f,i)=>tone(f,.28,'triangle',.08,i*.11))}
+mis();bio();
+})();
+</script>
+<script src="moli.js"></script>
+</body>
+</html>

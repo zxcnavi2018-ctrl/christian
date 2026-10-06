@@ -34,7 +34,7 @@ body{display:flex;flex-direction:column}
 @media (max-width:900px){.grid{grid-template-columns:repeat(3,1fr)}}
 @media (max-width:600px){.lab-top .w{display:none}.grid{grid-template-columns:repeat(2,1fr);column-gap:14px;row-gap:30px}.list{padding:4px 14px 40px}.card{padding:12px;border-radius:22px}}
 @media (prefers-reduced-motion:reduce){.card::after{display:none}}
-</style>
+@media (min-width:1200px){.grid{width:min(96vw,1760px);grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));column-gap:26px;row-gap:34px}.card{padding:20px;border-radius:30px}.card b{font-size:clamp(20px,1.5vw,28px)}.card small{font-size:clamp(14px,1vw,17px)}.card .st{font-size:13.5px;padding:5px 12px;top:14px;right:14px}.card .pg{height:8px}}</style>
 </head>
 <body>
 <header class="lab-top"><button type="button" class="back" id="salir">‹ Salir</button><b>🧪 Laboratorio de Moli</b><span class="chip" id="tot"></span></header>

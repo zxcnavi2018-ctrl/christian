@@ -80,5 +80,5 @@ g.addEventListener('pointerout',e=>{const c=e.target.closest('.card');if(c&&!c.c
 g.addEventListener('click',e=>{if(!e.target.closest('a.card'))return;try{const a=new(window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),v=a.createGain();o.type='triangle';o.frequency.setValueAtTime(520,a.currentTime);o.frequency.exponentialRampToValueAtTime(1040,a.currentTime+.15);v.gain.setValueAtTime(.06,a.currentTime);v.gain.exponentialRampToValueAtTime(.0001,a.currentTime+.25);o.connect(v).connect(a.destination);o.start();o.stop(a.currentTime+.26)}catch(_){}});
 document.getElementById('salir').onclick=()=>{if(parent!==window)parent.postMessage('lab:close','*');else history.back()};
 </script>
-<script src="e3d.js"></script></body>
+</body>
 </html>

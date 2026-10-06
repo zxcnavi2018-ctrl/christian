@@ -81,16 +81,12 @@ service cloud.firestore {
       allow update: if false;
     }
 
-    // config: vs (preguntas de duelos), content y content-<área> (unidades y sesiones de cada área), site (portada y docentes), mis1 (misiones).
+    // config: content y content-<área> (unidades y sesiones de cada área), site (portada y docentes), mis1 (misiones).
     // Todos las leen; solo la docente (y sus administradores) las cambian.
     match /config/{id} {
       allow get: if true;
       // Solo la dueña: listar para la herramienta «Limpiar datos viejos».
       allow list: if isOwner();
-      allow create, update: if isTeacher() && id == 'vs'
-        && request.resource.data.keys().hasOnly(['data', 'updatedAt'])
-        && request.resource.data.data is string && request.resource.data.data.size() <= 300000
-        && request.resource.data.updatedAt is timestamp;
       // Contenido de la página (textos, sesiones, preguntas y lista de fichas) que la docente edita y publica.
       // «h» y «u0…u23»: cada unidad en su propio campo, para que los estudiantes descarguen solo la unidad que cambió.
       allow create, update: if isTeacher() && (id == 'content' || id.matches('content-[a-z0-9]{1,16}')) && canContent(id)
@@ -131,39 +127,6 @@ service cloud.firestore {
         && request.resource.data.b64 is string && request.resource.data.b64.size() <= 900000
         && request.resource.data.updatedAt is timestamp;
       allow list, delete: if isTeacher();
-    }
-
-    // Duelos VS: un estudiante espera, otro se une; los dos escriben solo sus puntos.
-    function validDuel(d) {
-      return d.keys().hasOnly(['status', 'p1', 'n1', 'o1', 'p2', 'n2', 'o2', 'qs', 's1', 'a1', 's2', 'a2', 'hb', 'createdAt', 'updatedAt'])
-        && d.status in ['waiting', 'ready', 'cancel']
-        && d.p1 is string && d.p1.matches('r[0-9a-f]{20}')
-        && d.p2 is string && (d.p2 == '' || d.p2.matches('r[0-9a-f]{20}'))
-        && d.n1 is string && d.n1.size() <= 40 && d.n2 is string && d.n2.size() <= 40
-        && d.o1 is string && d.o1.size() <= 800 && d.o2 is string && d.o2.size() <= 800
-        && d.qs is string && d.qs.size() <= 20000
-        && d.s1 is int && d.s1 >= 0 && d.s1 <= 1000 && d.a1 is int && d.a1 >= 0 && d.a1 <= 5
-        && d.s2 is int && d.s2 >= 0 && d.s2 <= 1000 && d.a2 is int && d.a2 >= 0 && d.a2 <= 5
-        && d.hb is timestamp && d.createdAt is timestamp && d.updatedAt is timestamp;
-    }
-    match /duels/{id} {
-      allow get: if true;
-      allow list: if request.query.limit <= 10 || isTeacher();
-      allow create: if id.matches('d[0-9a-z]{6,30}') && validDuel(request.resource.data)
-        && request.resource.data.status == 'waiting' && request.resource.data.p2 == ''
-        && request.resource.data.s1 == 0 && request.resource.data.a1 == 0 && request.resource.data.s2 == 0 && request.resource.data.a2 == 0;
-      allow update: if validDuel(request.resource.data)
-        && request.resource.data.p1 == resource.data.p1 && request.resource.data.qs == resource.data.qs
-        && ((resource.data.status == 'waiting' && request.resource.data.status in ['waiting', 'cancel']
-              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'hb', 'updatedAt']))
-          || (resource.data.status == 'waiting' && request.resource.data.status == 'ready'
-              && request.resource.data.p2 != '' && request.resource.data.p2 != resource.data.p1
-              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'p2', 'n2', 'o2', 'hb', 'updatedAt']))
-          || (resource.data.status == 'ready' && request.resource.data.status == 'ready'
-              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['s1', 'a1', 's2', 'a2', 'updatedAt'])
-              && request.resource.data.a1 >= resource.data.a1 && request.resource.data.a2 >= resource.data.a2
-              && request.resource.data.s1 >= resource.data.s1 && request.resource.data.s2 >= resource.data.s2));
-      allow delete: if isTeacher();
     }
 
     // Control remoto: "p-<cuenta>" guarda el canal de cada docente (solo docente);

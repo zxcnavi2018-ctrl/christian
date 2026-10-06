@@ -192,47 +192,6 @@ service cloud.firestore {
         && (!('cfg' in request.resource.data) || (request.resource.data.cfg is string && request.resource.data.cfg.size() <= 200));
     }
 
-    // Foto del fotocheck: el personaje que arma cada estudiante o docente (solo un texto corto con sus elecciones).
-    match /avatar/{id} {
-      allow get: if true;
-      allow create, update: if id.matches('k[0-9a-f]{20}')
-        && (isTeacher() || exists(/databases/$(database)/documents/students/$(id)))
-        && request.resource.data.keys().hasOnly(['a', 'at'])
-        && request.resource.data.a is string && request.resource.data.a.matches('[0-9a-z]{1,40}')
-        && request.resource.data.at is timestamp;
-      allow list, delete: if isTeacher();
-    }
-
-    // Museo: una sala por sección (p. ej. 6toA) con el avatar y el nombre corto de cada estudiante.
-    // Cada estudiante solo cambia su propio cuadro, y solo en la sala de su sección.
-    function museoOk(id, d) {
-      let st = get(/databases/$(database)/documents/students/$(d.who));
-      return st.data.grade + st.data.section == id
-        && d[d.who] is string && d[d.who].matches('[0-9a-z]{1,40}[|][^<>]{1,40}');
-    }
-    match /museo/{id} {
-      allow get: if true;
-      allow create: if id.matches('[56]to[A-F]')
-        && request.resource.data.who is string && request.resource.data.who.matches('k[0-9a-f]{20}')
-        && request.resource.data.keys().hasOnly(['who', request.resource.data.who])
-        && museoOk(id, request.resource.data);
-      allow update: if request.resource.data.who is string && request.resource.data.who.matches('k[0-9a-f]{20}')
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['who', request.resource.data.who])
-        && request.resource.data.size() <= 61
-        && museoOk(id, request.resource.data);
-      // Cajón de docentes: cada docente pone su propio cuadro.
-      allow create: if id == 'docentes' && isTeacher()
-        && request.resource.data.who is string && request.resource.data.who.matches('k[0-9a-f]{20}')
-        && request.resource.data.keys().hasOnly(['who', request.resource.data.who])
-        && request.resource.data[request.resource.data.who].matches('[0-9a-z]{1,40}[|][^<>]{1,40}');
-      allow update: if id == 'docentes' && isTeacher()
-        && request.resource.data.who is string && request.resource.data.who.matches('k[0-9a-f]{20}')
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['who', request.resource.data.who])
-        && request.resource.data.size() <= 61
-        && request.resource.data[request.resource.data.who].matches('[0-9a-z]{1,40}[|][^<>]{1,40}');
-      allow delete: if isTeacher();
-    }
-
     // Misiones: avance de cada estudiante (errores e intentos por actividad de todas sus misiones). Solo la docente ve la lista.
     match /mision/{id} {
       allow get: if true;

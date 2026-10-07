@@ -30,8 +30,9 @@ body{display:flex;flex-direction:column}
 .diploma-card::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;background:radial-gradient(120% 70% at var(--mx) var(--my),rgba(255,255,255,.35),transparent 55%),linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 45%)}
 .diploma-card::after{content:"";position:absolute;top:-30%;left:0;width:40%;height:160%;z-index:2;background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);transform:translateX(-160%) rotate(20deg);animation:shine 5.5s calc(.4s * var(--i)) ease-in-out infinite;pointer-events:none;will-change:transform}
 .diploma-card:hover{box-shadow:0 26px 44px -12px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.5)}
-.diploma-card.locked{filter:saturate(.3) brightness(.5);pointer-events:none;cursor:not-allowed}
-.diploma-card.locked::after{display:none}
+.diploma-card.locked{filter:saturate(.5) brightness(.65);pointer-events:none;cursor:default;border:2px dashed rgba(251,191,36,.4);box-shadow:inset 0 0 24px rgba(0,0,0,.2),0 12px 28px rgba(0,0,0,.4) !important}
+.diploma-card.locked::before{background:linear-gradient(135deg,rgba(100,116,139,.3),rgba(71,85,105,.2)) !important}
+.diploma-card.locked::after{opacity:.15 !important}
 .diploma-icon{font-size:clamp(50px,12vw,100px);margin-bottom:8px;animation:diplomaBounce 2.5s ease-in-out infinite}
 .diploma-title{position:relative;font-size:clamp(16px,2vw,20px);font-weight:900;line-height:1.08;text-wrap:balance;text-shadow:0 2px 8px rgba(0,0,0,.35);letter-spacing:.02em}
 .diploma-subtitle{position:relative;font-size:clamp(11px,1.3vw,13px);font-weight:800;opacity:.9;text-shadow:0 1px 4px rgba(0,0,0,.25)}
@@ -120,9 +121,9 @@ const card=(c,i)=>{
  if(c.isDiploma){
   const isUnlocked=all>0&&all===got;
   if(isUnlocked){
-   return`<div class="diploma-card" style="--g:${c.g};--i:${i}" title="¡Has completado todos los juegos!"><div class="diploma-icon">🏆</div><b class="diploma-title">${c.t}</b><small class="diploma-subtitle">Has demostrado alta capacidad<br>autónoma para aprender</small></div>`;
+   return`<div class="diploma-card" style="--g:${c.g};--i:${i};box-shadow:0 0 40px rgba(251,191,36,.5),0 18px 34px -10px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.45),inset 0 -10px 24px rgba(0,0,0,.18) !important" title="¡Has completado todos los juegos!"><div class="diploma-icon">🏆</div><b class="diploma-title">${c.t}</b><small class="diploma-subtitle">✨ Has demostrado alta capacidad<br>autónoma para aprender ✨</small></div>`;
   }else{
-   return`<div class="diploma-card locked" style="--g:${c.g};--i:${i}" aria-disabled="true"><div class="diploma-locked-badge">🔒</div><b class="diploma-title">${c.t}</b><small class="diploma-subtitle">Completa todos los juegos</small></div>`;
+   return`<div class="diploma-card locked" style="--g:${c.g};--i:${i}" aria-disabled="true"><div class="diploma-locked-badge">🔒</div><b class="diploma-title">${c.t}</b><small class="diploma-subtitle">🎯 Completa todos los juegos<br>para desbloquear tu premio</small></div>`;
   }
  }
  const done=Math.min(c.n,Object.values(get(c.k)).filter(Boolean).length);if(c.href){all+=c.n;got+=done}const st=!c.href?'🔒 Pronto':done>=c.n?'✅ Listo':`🎯 ${done}/${c.n}`;

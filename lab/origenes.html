@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Orígenes de la Vida · Laboratorio de Moli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap">
+<link rel="stylesheet" href="lab.css">
+<style>
+body{display:flex;flex-direction:column}
+.level-selector{position:relative;z-index:3;padding:12px 14px;display:flex;gap:8px;flex-wrap:wrap;overflow-x:auto}
+.level-btn{flex:none;padding:8px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:var(--ink);font:inherit;font-weight:900;font-size:13px;cursor:pointer;transition:.2s}
+.level-btn.active{background:linear-gradient(135deg,#a78bfa,#6d28d9);border-color:#a78bfa}
+.wrap{flex:1;min-height:0;display:grid;grid-template-columns:1fr 280px;gap:12px;padding:0 14px 92px}
+.theories{position:relative;min-height:0;display:grid;grid-template-columns:repeat(2,1fr);gap:14px;padding:12px;border-radius:22px;background:linear-gradient(135deg,rgba(59,130,246,.1),rgba(139,92,246,.05));overflow-y:auto}
+.theory{padding:14px;border-radius:14px;background:linear-gradient(135deg,#1e3a8a,#1e1b4b);border:1px solid rgba(255,255,255,.12);cursor:pointer;transition:.25s;position:relative}
+.theory:hover{border-color:rgba(255,255,255,.3);box-shadow:0 12px 24px rgba(0,0,0,.3)}
+.theory.selected{border-color:#fbbf24;box-shadow:0 0 24px rgba(251,191,36,.3);background:linear-gradient(135deg,#2d5a3d,#3b3024)}
+.theory-icon{font-size:clamp(36px,8vw,48px);margin-bottom:8px;display:block}
+.theory-name{font-weight:900;font-size:14px;margin-bottom:4px;color:#fde047}
+.theory-desc{font-size:12px;color:var(--ink2);line-height:1.4}
+.side{display:flex;flex-direction:column;gap:12px;min-height:0;overflow-y:auto}
+.info-box{padding:12px;border-radius:14px;background:linear-gradient(135deg,rgba(96,165,250,.15),rgba(59,130,246,.1));border:1px solid rgba(96,165,250,.25)}
+.info-box h3{margin:0 0 8px;font-size:13px;color:#60a5fa;font-weight:900;text-transform:uppercase;letter-spacing:.05em}
+.info-box p{margin:0;font-size:12.5px;color:var(--ink);line-height:1.5}
+.mini-legend{font-size:11px;font-weight:700;color:var(--ink2);line-height:1.45;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.06)}
+.free{padding:8px 12px;border-radius:14px;background:linear-gradient(135deg,rgba(255,211,77,.25),rgba(56,198,238,.2));font-weight:900;font-size:13px;text-align:center}
+.buttons{display:flex;gap:8px;flex-wrap:wrap}
+.btn-small{flex:1;padding:9px 10px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.1);color:var(--ink);font:inherit;font-weight:900;font-size:13px;cursor:pointer;transition:.2s}
+.btn-small:active{transform:scale(.95)}
+.feedback{min-height:40px;padding:10px 12px;border-radius:14px;font-weight:900;font-size:13px;text-align:center;border-radius:14px}
+.feedback.correct{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#86efac}
+.feedback.incorrect{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#fca5a5}
+.moli-say{position:fixed;left:12px;bottom:12px;z-index:20;display:flex;align-items:flex-end;gap:8px;max-width:min(560px,calc(100% - 24px));pointer-events:none}
+.moli-say img{pointer-events:auto;cursor:pointer;width:64px;flex:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.4))}
+.moli-say p{display:none;margin:0 0 14px;padding:10px 14px;border-radius:16px 16px 16px 4px;background:#fff;color:#14224a;font-weight:800;font-size:14px;line-height:1.35;box-shadow:0 10px 24px rgba(0,0,0,.35);pointer-events:auto}
+.moli-say.open p{display:block}
+@media (max-width:760px){.wrap{grid-template-columns:1fr;grid-template-rows:1fr auto;gap:8px;padding:0 8px 8px}.theories{grid-template-columns:1fr;gap:12px;padding:8px}.side{gap:6px;overflow:visible}.info-box{font-size:11.5px;padding:10px}.mini-legend{display:none}.level-selector{padding:8px 8px;gap:6px;overflow:x:auto}.level-btn{padding:6px 10px;font-size:11.5px}.theory{padding:10px}.theory-icon{font-size:32px}.theory-name{font-size:12px}.theory-desc{font-size:11px}.buttons{gap:6px}.btn-small{padding:8px 6px;font-size:11px}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important}}
+</style>
+</head>
+<body>
+<header class="lab-top"><a class="back" id="back" href="index.html">‹ Laboratorio</a><b>🧬 Orígenes de la vida</b><span class="chip" id="free" hidden>🔓 Juego libre</span></header>
+<div class="level-selector" id="levels"></div>
+<div class="wrap">
+  <div class="theories" id="theories"></div>
+  <aside class="side">
+    <div class="info-box">
+      <h3>📚 Teoría Actual</h3>
+      <p id="current-theory">Selecciona una teoría</p>
+    </div>
+    <div class="info-box">
+      <h3>✓ Progreso</h3>
+      <p id="progress">0/4 teorías comprendidas</p>
+    </div>
+    <div class="mini-legend"><b>Misión:</b> Aprende sobre las 4 teorías del origen de la vida. Selecciona cada una y responde correctamente.</div>
+    <div class="buttons"><button class="btn-small" id="verify">✓ Verificar</button><button class="btn-small" id="clr">🔄 Resetear</button></div>
+    <div class="feedback" id="feedback"></div>
+  </aside>
+</div>
+<div class="moli-say"><img src="../guia/img/moli.webp" alt="Moli" onclick="this.parentElement.classList.toggle('open')"><p id="say"></p></div>
+<script>
+(()=>{
+const U=new URLSearchParams(location.search).get('u')||'anon';
+document.getElementById('back').href='index.html?u='+encodeURIComponent(U);
+const KEY='lab:'+U+':orig',LEVEL_KEY='lab:'+U+':orig-level';
+const load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+
+const THEORIES=[
+ {id:'pan',name:'Panspermia',icon:'🪐',desc:'La vida llegó a la Tierra desde el espacio en meteoritos o cometas',evidence:['Moléculas orgánicas en meteoritos','Extremófilos en el espacio'],hint:'¿De dónde viene la vida en esta teoría?'},
+ {id:'quim',name:'Quimiosíntesis',icon:'⚛️',desc:'Moléculas simples se combinaron para formar moléculas complejas y vida',evidence:['Aminoácidos en volcanes','Protocélulas en laboratorio'],hint:'¿Cómo se forma la vida según esta teoría?'},
+ {id:'gen',name:'Generación espontánea',icon:'💫',desc:'La vida surge espontáneamente de la materia no viviente',evidence:['Gusanos en la carne','Bacterias en caldo'],hint:'¿La vida surge de qué, según esta teoría?'},
+ {id:'creat',name:'Creacionismo',icon:'✨',desc:'La vida fue creada por un ser supremo según creencias religiosas',evidence:['Textos sagrados','Propósito divino'],hint:'¿Quién crea la vida en esta teoría?'}
+];
+
+let learned={pan:false,quim:false,gen:false,creat:false};
+let currentLevel=load(LEVEL_KEY,0);
+let currentSelected=null;
+
+const renderLevels=()=>{
+ const html=THEORIES.map((t,i)=>`<button class="level-btn${i===currentLevel?' active':''}" data-id="${t.id}" data-idx="${i}">${t.icon} ${t.name}</button>`).join('');
+ document.getElementById('levels').innerHTML=html;
+ document.querySelectorAll('.level-btn').forEach(btn=>btn.onclick=e=>{
+  document.querySelectorAll('.level-btn').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');
+  currentLevel=parseInt(e.target.dataset.idx);
+  save(LEVEL_KEY,currentLevel);
+  renderTheories();
+ });
+};
+
+const renderTheories=()=>{
+ const t=THEORIES[currentLevel];
+ const html=`<div class="theory selected"><div class="theory-icon">${t.icon}</div><div class="theory-name">${t.name}</div><div class="theory-desc">${t.desc}</div></div><div style="grid-column:1/-1;padding:12px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)"><p style="margin:0;font-size:12.5px;font-weight:700;color:#60a5fa;margin-bottom:6px">Evidencia científica (histórica o observada):</p><ul style="margin:4px 0;padding-left:16px;font-size:12px;color:var(--ink);line-height:1.6">${t.evidence.map(e=>`<li>${e}</li>`).join('')}</ul></div>`;
+ document.getElementById('theories').innerHTML=html;
+ document.getElementById('current-theory').textContent=`${t.name} - ${t.desc}`;
+ updateProgress();
+};
+
+const updateProgress=()=>{
+ const completed=Object.values(learned).filter(Boolean).length;
+ document.getElementById('progress').textContent=`${completed}/4 teorías comprendidas`;
+ if(completed===4){
+  document.getElementById('say').textContent='¡Excelente! Has aprendido todas las teorías del origen de la vida. Ahora entiendes la historia científica.';
+  document.querySelector('.moli-say').classList.add('open');
+  save(KEY,{pan:true,quim:true,gen:true,creat:true});
+ }
+};
+
+document.getElementById('verify').onclick=()=>{
+ const t=THEORIES[currentLevel];
+ if(!learned[t.id]){
+  learned[t.id]=true;
+  document.getElementById('feedback').className='feedback correct';
+  document.getElementById('feedback').textContent=`✓ ¡Correcta! Ahora entiendes: ${t.name}`;
+  setTimeout(()=>{
+   if(currentLevel<3){
+    currentLevel++;
+    save(LEVEL_KEY,currentLevel);
+    renderLevels();
+    renderTheories();
+   }
+   document.getElementById('feedback').textContent='';
+   updateProgress();
+  },1500);
+ }else{
+  document.getElementById('feedback').className='feedback correct';
+  document.getElementById('feedback').textContent=`✓ Ya aprendiste esta teoría`;
+  setTimeout(()=>document.getElementById('feedback').textContent='',2000);
+ }
+};
+
+document.getElementById('clr').onclick=()=>{
+ learned={pan:false,quim:false,gen:false,creat:false};
+ currentLevel=0;
+ save(LEVEL_KEY,0);
+ localStorage.removeItem(KEY);
+ renderLevels();
+ renderTheories();
+ document.getElementById('feedback').textContent='';
+ document.querySelector('.moli-say').classList.remove('open');
+};
+
+renderLevels();
+renderTheories();
+})();
+</script>
+</body>
+</html>

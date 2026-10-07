@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Lamarck vs Darwin · Laboratorio de Moli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap">
+<link rel="stylesheet" href="lab.css">
+<style>
+body{display:flex;flex-direction:column}
+.scenario{position:relative;z-index:3;padding:12px 14px;text-align:center;background:linear-gradient(135deg,rgba(251,146,60,.1),rgba(217,119,6,.05));border-bottom:1px solid rgba(255,255,255,.08)}
+.scenario p{margin:0;font-size:14px;font-weight:900;color:var(--ink)}
+.wrap{flex:1;min-height:0;display:grid;grid-template-columns:1fr 280px;gap:12px;padding:0 14px 92px}
+.canvas{position:relative;min-height:0;border-radius:22px;padding:12px;background:linear-gradient(135deg,#1e1b4b,#0f766e);border:1px solid rgba(255,255,255,.12);overflow:y:auto;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:20px}
+.generation{display:flex;flex-direction:column;align-items:center;gap:12px;padding:16px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);text-align:center}
+.gen-title{font-weight:900;font-size:13px;color:#60a5fa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.animal-display{font-size:clamp(48px,10vw,80px);animation:bounce 2s ease-in-out infinite}
+.animal-stats{font-size:12px;color:var(--ink2);margin-top:8px;line-height:1.6}
+.stat{margin:4px 0}
+.stat strong{color:#fbbf24}
+.choice{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;justify-content:center}
+.choice-btn{flex:1;min-width:120px;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.1);color:var(--ink);font:inherit;font-weight:900;font-size:13px;cursor:pointer;transition:.2s;text-wrap:balance}
+.choice-btn:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.3)}
+.choice-btn:active{transform:scale(.95)}
+.side{display:flex;flex-direction:column;gap:12px;min-height:0;overflow-y:auto}
+.info-box{padding:12px;border-radius:14px;background:linear-gradient(135deg,rgba(251,146,60,.15),rgba(217,119,6,.1));border:1px solid rgba(251,146,60,.25)}
+.info-box h3{margin:0 0 8px;font-size:13px;color:#fb923c;font-weight:900;text-transform:uppercase;letter-spacing:.05em}
+.info-box p{margin:0;font-size:12px;color:var(--ink);line-height:1.5}
+.legend{font-size:12px;font-weight:700;color:var(--ink2);line-height:1.45;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.06)}
+.buttons{display:flex;gap:8px;flex-wrap:wrap}
+.btn-small{flex:1;padding:9px 10px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.1);color:var(--ink);font:inherit;font-weight:900;font-size:13px;cursor:pointer}
+.score{padding:8px 12px;border-radius:14px;background:linear-gradient(135deg,rgba(34,197,94,.25),rgba(16,185,129,.2));font-weight:900;font-size:13px;color:#86efac;text-align:center}
+.moli-say{position:fixed;left:12px;bottom:12px;z-index:20;display:flex;align-items:flex-end;gap:8px}
+.moli-say img{width:64px;flex:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.4));cursor:pointer}
+.moli-say p{display:none;margin:0 0 14px;padding:10px 14px;border-radius:16px 16px 16px 4px;background:#fff;color:#14224a;font-weight:800;font-size:14px;box-shadow:0 10px 24px rgba(0,0,0,.35)}
+.moli-say.open p{display:block}
+@keyframes bounce{0%,100%{transform:translateY(0)}25%{transform:translateY(-10px)}50%{transform:translateY(0)}75%{transform:translateY(-6px)}}
+@media (max-width:760px){.wrap{grid-template-columns:1fr;gap:8px;padding:0 8px 8px}.canvas{gap:16px;padding:8px}.side{gap:6px;overflow:visible}.info-box{font-size:11.5px;padding:10px}.legend{display:none}.scenario{padding:10px 8px}.scenario p{font-size:12px}.generation{padding:12px;gap:10px}.gen-title{font-size:12px}.animal-display{font-size:48px}.choice-btn{min-width:100px;padding:8px 10px;font-size:12px}.buttons{gap:6px}.btn-small{padding:8px 6px;font-size:11px}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important}}
+</style>
+</head>
+<body>
+<header class="lab-top"><a class="back" id="back" href="index.html">‹ Laboratorio</a><b>🧬 Lamarck vs Darwin</b><span class="chip" id="free" hidden>🔓 Juego libre</span></header>
+<div class="scenario"><p id="scenario">Generación 1: Un animal en su ambiente</p></div>
+<div class="wrap">
+  <div class="canvas" id="canvas"></div>
+  <aside class="side">
+    <div class="info-box">
+      <h3>📚 La Teoría de Lamarck</h3>
+      <p>Los rasgos adquiridos por uso y desuso se heredan. Si un animal usa una característica, se desarrolla y se pasa a sus hijos.</p>
+    </div>
+    <div class="score" id="score">Generación: 1/3</div>
+    <div class="legend"><b>Misión:</b> Observa cómo cambian los animales según el uso y desuso de características. ¿Se heredan realmente?</div>
+    <div class="buttons"><button class="btn-small" id="reset">🔄 Nuevo Juego</button></div>
+  </aside>
+</div>
+<div class="moli-say"><img src="../guia/img/moli.webp" alt="Moli" onclick="this.parentElement.classList.toggle('open')"><p id="say"></p></div>
+<script>
+(()=>{
+const U=new URLSearchParams(location.search).get('u')||'anon';
+document.getElementById('back').href='index.html?u='+encodeURIComponent(U);
+const KEY='lab:'+U+':lama',LEVEL_KEY='lab:'+U+':lama-level';
+const load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+
+const ANIMALS=[
+ {name:'Jirafa',icon:'🦒',trait:'Cuello',uses:0},
+ {name:'Serpiente',icon:'🐍',trait:'Patas',uses:0},
+ {name:'Águila',icon:'🦅',trait:'Alas',uses:0}
+];
+
+let currentGen=load(LEVEL_KEY,1);
+let currentAnimal=ANIMALS[currentGen-1]||ANIMALS[0];
+let evolution={};
+
+const render=()=>{
+ const genPercent=(currentGen/3)*100;
+ const traitLevel=currentAnimal.uses;
+
+ let html=`<div class="generation">
+  <div class="gen-title">Generación ${currentGen}</div>
+  <div class="animal-display">${currentAnimal.icon}</div>
+  <div class="animal-stats">
+   <div class="stat"><strong>${currentAnimal.name}</strong></div>
+   <div class="stat">Característica: ${currentAnimal.trait}</div>
+   <div class="stat">Desarrollo: ${Math.min(traitLevel*33,100)}%</div>
+  </div>
+  <div class="choice">
+   <button class="choice-btn" data-use="1">📈 Usa más ${currentAnimal.trait}</button>
+   <button class="choice-btn" data-use="0">😴 Descansa (no usa)</button>
+  </div>
+ </div>`;
+
+ document.getElementById('canvas').innerHTML=html;
+ document.getElementById('scenario').textContent=`Generación ${currentGen}: ¿Cómo usa ${currentAnimal.name} su ${currentAnimal.trait}?`;
+ document.getElementById('score').textContent=`Generación: ${currentGen}/3`;
+
+ document.querySelectorAll('.choice-btn').forEach(btn=>{
+  btn.onclick=e=>{
+   const uses=parseInt(e.target.dataset.use);
+   currentAnimal.uses=uses;
+   evolution[currentGen]=currentAnimal.trait+'_'+uses;
+
+   if(currentGen<3){
+    currentGen++;
+    currentAnimal=ANIMALS[currentGen-1];
+    save(LEVEL_KEY,currentGen);
+    setTimeout(render,500);
+   }else{
+    showResult();
+   }
+  };
+ });
+};
+
+const showResult=()=>{
+ const uses1=evolution[1].includes('1');
+ const uses2=evolution[2].includes('1');
+ const uses3=evolution[3].includes('1');
+
+ let message='';
+ if(uses1&&uses2&&uses3){
+  message='🏆 ¡Correcto! Según Lamarck, el uso continuo heredaría el rasgo desarrollado. Pero Darwin demostraría que NO se heredan rasgos adquiridos.';
+  save(KEY,{level:currentGen,complete:true});
+ }else{
+  message='📊 Interesante: El desuso también cambia a los animales, pero ¿realmente se heredan estos cambios? Esa fue la pregunta que revolucionó la biología.';
+  save(KEY,{level:currentGen,complete:false});
+ }
+
+ document.getElementById('say').textContent=message;
+ document.querySelector('.moli-say').classList.add('open');
+
+ const canvas=document.getElementById('canvas');
+ canvas.innerHTML=`<div class="generation" style="width:100%">
+  <div class="gen-title">Resultado del Experimento</div>
+  <div style="font-size:14px;color:var(--ink);line-height:1.8;padding:12px">${message}</div>
+  <div class="choice"><button class="choice-btn" onclick="location.reload()">Jugar de Nuevo</button></div>
+ </div>`;
+};
+
+document.getElementById('reset').onclick=()=>{
+ currentGen=1;
+ currentAnimal=ANIMALS[0];
+ evolution={};
+ localStorage.removeItem(KEY);
+ save(LEVEL_KEY,1);
+ render();
+ document.querySelector('.moli-say').classList.remove('open');
+};
+
+render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Vulnerabilidad y Sismos · Laboratorio de Moli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap">
+<link rel="stylesheet" href="lab.css">
+<style>
+body{display:flex;flex-direction:column}
+.tray{position:relative;z-index:3;display:flex;gap:8px;padding:8px 14px;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
+.tray::-webkit-scrollbar{display:none}
+.level-chip{flex:none;padding:8px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:var(--ink);font:inherit;font-weight:900;font-size:13px;cursor:pointer;white-space:nowrap;transition:.2s}
+.level-chip.active{background:linear-gradient(135deg,#dc2626,#991b1b);border-color:#dc2626}
+.wrap{flex:1;min-height:0;display:grid;grid-template-columns:1fr 280px;gap:12px;padding:0 14px 92px}
+.canvas{position:relative;min-height:0;border-radius:22px;padding:16px;background:linear-gradient(135deg,#1a0f0f,#2a1515);border:1px solid rgba(255,255,255,.12);overflow-y:auto;display:grid;grid-template-columns:repeat(2,1fr);gap:12px;align-content:start}
+.building{padding:12px;border-radius:14px;background:linear-gradient(135deg,#4b3434,#3a2424);border:2px solid rgba(255,255,255,.15);cursor:pointer;transition:.3s;text-align:center}
+.building:hover{border-color:rgba(255,255,255,.3);background:linear-gradient(135deg,#5a4242,#483030)}
+.building.high-risk{border-color:#dc2626;background:linear-gradient(135deg,rgba(220,38,38,.2),rgba(153,27,27,.2))}
+.building.medium-risk{border-color:#f97316;background:linear-gradient(135deg,rgba(249,115,22,.2),rgba(194,65,12,.2))}
+.building.low-risk{border-color:#22c55e;background:linear-gradient(135deg,rgba(34,197,94,.2),rgba(16,134,67,.2))}
+.building-icon{font-size:40px;margin-bottom:6px;display:block}
+.building-name{font-weight:900;font-size:12px;color:var(--ink);margin-bottom:4px}
+.building-info{font-size:10.5px;color:var(--ink2);line-height:1.4}
+.building-risk{font-size:10px;font-weight:900;margin-top:6px;padding:4px 8px;border-radius:6px;display:inline-block}
+.side{display:flex;flex-direction:column;gap:12px;min-height:0;overflow-y:auto}
+.info-box{padding:12px;border-radius:14px;background:linear-gradient(135deg,rgba(220,38,38,.15),rgba(153,27,27,.1));border:1px solid rgba(220,38,38,.25)}
+.info-box h3{margin:0 0 8px;font-size:13px;color:#ef4444;font-weight:900;text-transform:uppercase;letter-spacing:.05em}
+.info-box p{margin:0;font-size:12px;color:var(--ink);line-height:1.5}
+.score-box{padding:10px 12px;border-radius:14px;background:linear-gradient(135deg,rgba(34,197,94,.25),rgba(16,185,129,.2));font-weight:900;font-size:13px;color:#86efac}
+.legend{font-size:11.5px;font-weight:700;color:var(--ink2);line-height:1.45;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.06)}
+.buttons{display:flex;gap:8px;flex-wrap:wrap}
+.btn-small{flex:1;padding:9px 10px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.1);color:var(--ink);font:inherit;font-weight:900;font-size:13px;cursor:pointer}
+.moli-say{position:fixed;left:12px;bottom:12px;z-index:20;display:flex;align-items:flex-end;gap:8px}
+.moli-say img{width:64px;flex:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.4));cursor:pointer}
+.moli-say p{display:none;margin:0 0 14px;padding:10px 14px;border-radius:16px 16px 16px 4px;background:#fff;color:#14224a;font-weight:800;font-size:13px;box-shadow:0 10px 24px rgba(0,0,0,.35);max-width:300px}
+.moli-say.open p{display:block}
+@media (max-width:760px){.wrap{grid-template-columns:1fr;gap:8px;padding:0 8px 8px}.canvas{grid-template-columns:1fr;gap:10px;padding:12px}.tray{padding:6px 8px;gap:6px}.level-chip{font-size:11.5px;padding:6px 10px}.side{gap:6px;overflow:visible}.info-box{padding:10px;font-size:11.5px}.legend{font-size:10.5px;padding:8px 10px}.buttons{gap:6px}.btn-small{padding:8px 6px;font-size:11px}.building{padding:10px}.building-icon{font-size:32px}.building-name{font-size:11px}.building-info{font-size:9.5px}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important}}
+</style>
+</head>
+<body>
+<header class="lab-top"><a class="back" id="back" href="index.html">‹ Laboratorio</a><b>🏢 Vulnerabilidad y Sismos</b><span class="chip" id="free" hidden>🔓 Juego libre</span></header>
+<div class="tray" id="levels"></div>
+<div class="wrap">
+  <div class="canvas" id="canvas"></div>
+  <aside class="side">
+    <div class="info-box">
+      <h3>📍 Factores de Vulnerabilidad</h3>
+      <p><b>Riesgo Alto:</b> Edificios antiguos, estructuras débiles, mala ubicación.<br><b>Riesgo Medio:</b> Construcción moderada.<br><b>Riesgo Bajo:</b> Edificios modernos, buen diseño antisísmico.</p>
+    </div>
+    <div class="score-box" id="score">Edificios clasificados: 0/9</div>
+    <div class="legend"><b>Misión:</b> Clasifica 9 edificios según su vulnerabilidad a sismos. Observa características de construcción, ubicación y edad.</div>
+    <div class="buttons"><button class="btn-small" id="reset">🔄 Reiniciar</button></div>
+  </aside>
+</div>
+<div class="moli-say"><img src="../guia/img/moli.webp" alt="Moli" onclick="this.parentElement.classList.toggle('open')"><p id="say"></p></div>
+<script>
+(()=>{
+const U=new URLSearchParams(location.search).get('u')||'anon';
+document.getElementById('back').href='index.html?u='+encodeURIComponent(U);
+const KEY='lab:'+U+':vuln',LEVEL_KEY='lab:'+U+':vuln-level';
+const load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+
+const LEVELS=[
+ {name:'Zona de Riesgo',desc:'Edificios en zonas sísmicas',buildings:[
+  {name:'Casa de Barro',icon:'🏚️',age:'50 años',info:'Zona de falla activa',risk:'high'},
+  {name:'Edificio Antiguo',icon:'🏛️',age:'80 años',info:'Zona urbana sísmica',risk:'high'},
+  {name:'Casa Moderna',icon:'🏡',age:'2 años',info:'Zona urbana sísmica',risk:'low'}
+ ]},
+ {name:'Construcción',desc:'Según diseño estructural',buildings:[
+  {name:'Adobe sin refuerzo',icon:'🧱',age:'100 años',info:'Sin anclaje sísmico',risk:'high'},
+  {name:'Concreto estándar',icon:'🏢',age:'25 años',info:'Refuerzo moderado',risk:'medium'},
+  {name:'Diseño antisísmico',icon:'🏗️',age:'3 años',info:'Columnas y vigas reforzadas',risk:'low'}
+ ]},
+ {name:'Preparación',desc:'Sistemas de prevención',buildings:[
+  {name:'Sin medidas',icon:'❌',age:'variado',info:'Sin amortiguadores ni aislamiento',risk:'high'},
+  {name:'Amortiguadores básicos',icon:'⚙️',age:'variado',info:'Sistema de fricción',risk:'medium'},
+  {name:'Aisladores sísmicos',icon:'✅',age:'variado',info:'Desacoplamiento del terreno',risk:'low'}
+ ]}
+];
+
+let currentLevel=load(LEVEL_KEY,0);
+let classified=load(KEY,{});
+let currentScore=Object.keys(classified).length;
+
+const renderLevels=()=>{
+ const html=LEVELS.map((l,i)=>`<button class="level-chip${i===currentLevel?' active':''}" data-idx="${i}">${l.name}</button>`).join('');
+ document.getElementById('levels').innerHTML=html;
+ document.querySelectorAll('.level-chip').forEach(btn=>{
+  btn.onclick=e=>{
+   currentLevel=parseInt(e.target.dataset.idx);
+   save(LEVEL_KEY,currentLevel);
+   renderBuildings();
+  };
+ });
+};
+
+const renderBuildings=()=>{
+ const level=LEVELS[currentLevel];
+ const html=level.buildings.map((b,i)=>{
+  const key=`${currentLevel}-${i}`;
+  const done=classified[key];
+  return`<div class="building${done?` ${done}-risk`:''}" onclick="classifyBuilding(${currentLevel},${i},'${b.risk}')">
+   <span class="building-icon">${b.icon}</span>
+   <div class="building-name">${b.name}</div>
+   <div class="building-info">
+    <div>🕐 ${b.age}</div>
+    <div>${b.info}</div>
+   </div>
+   ${done?`<div class="building-risk" style="background:${done==='high'?'#dc2626':done==='medium'?'#f97316':'#22c55e'};color:#fff">${done==='high'?'⚠️ Alto':done==='medium'?'⚡ Medio':'✓ Bajo'}</div>`:'<div class="building-risk" style="background:rgba(255,255,255,.1);color:var(--ink2)">Sin clasificar</div>}
+  </div>`;
+ }).join('');
+ document.getElementById('canvas').innerHTML=html;
+ updateScore();
+};
+
+const classifyBuilding=(level,idx,correctRisk)=>{
+ const key=`${level}-${idx}`;
+ if(!classified[key]){
+  classified[key]=correctRisk;
+  currentScore++;
+  save(KEY,classified);
+
+  const msg=correctRisk==='high'?'⚠️ Alto riesgo: Necesita refuerzos urgentes':correctRisk==='medium'?'⚡ Riesgo medio: Requiere mejoras de seguridad':'✅ Bajo riesgo: Buena estructura antisísmica';
+  document.getElementById('say').textContent=msg;
+  document.querySelector('.moli-say').classList.add('open');
+
+  if(currentScore===9){
+   setTimeout(()=>{
+    document.getElementById('say').textContent='🎉 ¡Perfecto! Has clasificado todos los edificios. Ahora entiendes cómo evaluar la vulnerabilidad sísmica.';
+   },1500);
+  }
+  renderBuildings();
+ }
+};
+
+document.getElementById('reset').onclick=()=>{
+ classified={};
+ currentScore=0;
+ currentLevel=0;
+ localStorage.removeItem(KEY);
+ save(LEVEL_KEY,0);
+ document.querySelector('.moli-say').classList.remove('open');
+ renderLevels();
+ renderBuildings();
+};
+
+const updateScore=()=>{
+ document.getElementById('score').textContent=`Edificios clasificados: ${currentScore}/9`;
+};
+
+window.classifyBuilding=classifyBuilding;
+renderLevels();
+renderBuildings();
+})();
+</script>
+</body>
+</html>

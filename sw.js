@@ -1,6 +1,6 @@
 // Guarda Moli en el celular: abre rápido y también sin internet.
 // Solo la página principal sale de la caja guardada; el laboratorio y las guías siempre vienen de internet.
-const V="moli-8e4663dffe-w",APPJS="app.js?v=11ad1a32cb",CDN="moli-cdn";
+const V="moli-7cc6a942de-w",APPJS="app.js?v=2dae7c1a0a",CDN="moli-cdn";
 self.addEventListener("install",e=>{self.skipWaiting(),e.waitUntil(caches.open(V).then(c=>c.addAll(["./",APPJS])).catch(()=>{}))});
 self.addEventListener("activate",e=>e.waitUntil((async()=>{for(const k of await caches.keys())k!==V&&k!==CDN&&await caches.delete(k);await self.clients.claim()})()));
 const put=async(n,r,s)=>{try{await(await caches.open(n)).put(r,s)}catch(e){}};

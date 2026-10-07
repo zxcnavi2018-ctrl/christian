@@ -9,9 +9,24 @@
 <link rel="stylesheet" href="lab.css">
 <style>
 body{display:flex;flex-direction:column}
+.lab-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .lab-top .chip{margin-left:auto}
+.lab-top .help{padding:6px 12px;border-radius:10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:var(--ink);font:inherit;font-weight:900;font-size:13px;cursor:pointer}
+#splash{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 50%,#1f2937 100%);animation:splashIn .5s ease-out}
+#splash.hide{animation:splashOut .6s ease-in forwards}
+@keyframes splashIn{from{opacity:0}to{opacity:1}}
+@keyframes splashOut{to{opacity:0;pointer-events:none}}
+.splash-content{text-align:center;animation:splashScale .8s cubic-bezier(.2,1.3,.4,1) both}
+.splash-moli{font-size:clamp(60px,15vw,140px);animation:splashBounce 2s ease-in-out infinite;margin-bottom:16px}
+.splash-text{color:#fff;font-size:clamp(18px,4vw,28px);font-weight:900;margin-bottom:12px;letter-spacing:.5px}
+.splash-sub{color:rgba(255,255,255,.7);font-size:clamp(12px,2vw,16px);margin-bottom:24px}
+.splash-bar{width:min(200px,70vw);height:8px;border-radius:99px;background:rgba(255,255,255,.2);overflow:hidden;margin:0 auto}
+.splash-bar i{display:block;height:100%;background:linear-gradient(90deg,#60a5fa,#06b6d4);border-radius:99px;animation:splash-fill 1.5s ease-in-out}
+@keyframes splashScale{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes splashBounce{0%,100%{transform:translateY(0) rotate(0deg)}25%{transform:translateY(-12px) rotate(-3deg)}75%{transform:translateY(-8px) rotate(3deg)}}
+@keyframes splash-fill{from{width:0}to{width:100%}}
 .list{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;padding:6px 16px 40px}
-.grid{width:min(100%,1080px);margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);column-gap:clamp(14px,2vw,22px);row-gap:clamp(30px,3.4vw,40px);perspective:900px}
+.grid{width:min(100%,1200px);margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);column-gap:clamp(14px,2vw,22px);row-gap:clamp(30px,3.4vw,40px);perspective:900px}
 .card{--rx:0deg;--ry:0deg;--mx:50%;--my:30%;position:relative;display:flex;flex-direction:column;justify-content:flex-end;gap:3px;aspect-ratio:4/5;padding:14px;border-radius:26px;color:#fff;text-decoration:none;overflow:hidden;isolation:isolate;background:var(--g);transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .25s ease,box-shadow .25s;box-shadow:0 18px 34px -10px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.45),inset 0 -10px 24px rgba(0,0,0,.18);animation:in .55s calc(.05s * var(--i)) cubic-bezier(.2,1.3,.4,1) both}
 .card::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;background:radial-gradient(120% 70% at var(--mx) var(--my),rgba(255,255,255,.35),transparent 55%),linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 45%)}
 .card::after{content:"";position:absolute;top:-30%;left:0;width:40%;height:160%;z-index:2;background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);transform:translateX(-160%) rotate(20deg);animation:shine 5.5s calc(.4s * var(--i)) ease-in-out infinite;pointer-events:none;will-change:transform}
@@ -31,14 +46,27 @@ body{display:flex;flex-direction:column}
 @keyframes float{50%{transform:translateY(-6px) rotate(-1.5deg)}}
 .list.scrolling .card::after,.list.scrolling .card .art svg{animation-play-state:paused}.card{contain:layout paint}
 @keyframes shine{0%,70%{transform:translateX(-160%) rotate(20deg)}100%{transform:translateX(330%) rotate(20deg)}}
-@media (max-width:900px){.grid{grid-template-columns:repeat(3,1fr)}}
-@media (max-width:600px){.lab-top .w{display:none}.grid{grid-template-columns:repeat(2,1fr);column-gap:14px;row-gap:30px}.list{padding:4px 14px 40px}.card{padding:12px;border-radius:22px}}
+#help-modal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);animation:fadeIn .3s ease-out}
+#help-modal.open{display:flex;align-items:flex-end}
+#help-modal-content{width:100%;max-height:80vh;overflow-y:auto;background:linear-gradient(135deg,#1e3a8a 0%,#1f2937 100%);border-radius:24px 24px 0 0;padding:24px 20px 40px;color:#fff;animation:slideUp .4s cubic-bezier(.2,1.3,.4,1)}
+#help-modal-content h2{margin:0 0 20px;font-size:24px;font-weight:900;text-shadow:0 2px 8px rgba(0,0,0,.4)}
+.tip-item{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,.1);font-size:14px;line-height:1.6}
+.tip-item:last-child{border-bottom:none;margin-bottom:0}
+.tip-item strong{display:block;color:#60a5fa;margin-bottom:4px;font-size:15px}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@media (min-width:640px){#help-modal-content{max-width:480px;margin:0 auto;border-radius:20px;animation:popIn .4s cubic-bezier(.2,1.3,.4,1)}@keyframes popIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}}
+@media (max-width:1199px){.grid{width:min(100%,1200px)}}
+@media (max-width:900px){.grid{grid-template-columns:repeat(3,1fr);column-gap:18px;row-gap:32px}.card{padding:16px;border-radius:24px}}
+@media (max-width:760px){.lab-top .w{display:none}.lab-top{gap:8px}.lab-top b{font-size:16px}.grid{grid-template-columns:repeat(2,1fr);column-gap:12px;row-gap:28px;width:min(100%,500px)}.list{padding:8px 12px 40px}.card{padding:12px;border-radius:20px;aspect-ratio:3/4}.card b{font-size:13px}.card small{font-size:10.5px}.card .st{font-size:10px;padding:2px 6px;top:6px;right:6px}.card .pg{height:5px;margin-top:4px}.card .art svg{max-width:140px}}
 @media (prefers-reduced-motion:reduce){.card::after{display:none}}
 @media (min-width:1200px){.grid{width:min(96vw,1760px);grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));column-gap:26px;row-gap:34px}.card{padding:20px;border-radius:30px}.card b{font-size:clamp(20px,1.5vw,28px)}.card small{font-size:clamp(14px,1vw,17px)}.card .st{font-size:13.5px;padding:5px 12px;top:14px;right:14px}.card .pg{height:8px}}</style>
 </head>
 <body>
-<header class="lab-top"><button type="button" class="back" id="salir">‹ Salir</button><b>🧪 Laboratorio de Moli</b><span class="chip" id="tot"></span></header>
+<header class="lab-top"><button type="button" class="back" id="salir">‹ Salir</button><b>🧪 Laboratorio de Moli</b><button type="button" class="help" id="help" title="Consejos y ayuda">❓</button><span class="chip" id="tot"></span></header>
 <main class="list"><div class="grid" id="grid"></div></main>
+<div id="splash"><div class="splash-content"><div class="splash-moli">🧬</div><div class="splash-text">Laboratorio de Moli</div><div class="splash-sub">Cargando experimento...</div><div class="splash-bar"><i></i></div></div></div>
+<div id="help-modal"><div id="help-modal-content"><h2>💡 Consejos de Moli</h2><div id="tips-container"></div></div></div>
 <script>
 const U=new URLSearchParams(location.search).get('u')||'anon';
 const get=k=>{try{return JSON.parse(localStorage.getItem('lab:'+U+':'+k)||'{}')}catch(e){return{}}};
@@ -80,6 +108,15 @@ g.addEventListener('pointerout',e=>{const c=e.target.closest('.card');if(c&&!c.c
 // Sonido suave al entrar a un juego
 g.addEventListener('click',e=>{if(!e.target.closest('a.card'))return;try{const a=new(window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),v=a.createGain();o.type='triangle';o.frequency.setValueAtTime(520,a.currentTime);o.frequency.exponentialRampToValueAtTime(1040,a.currentTime+.15);v.gain.setValueAtTime(.06,a.currentTime);v.gain.exponentialRampToValueAtTime(.0001,a.currentTime+.25);o.connect(v).connect(a.destination);o.start();o.stop(a.currentTime+.26)}catch(_){}});
 document.getElementById('salir').onclick=()=>{if(parent!==window)parent.postMessage('lab:close','*');else history.back()};
+// Splash screen: mostrar por 1.8s
+const splash=document.getElementById('splash');if(splash&&!sessionStorage.getItem('lab:splash-shown')){setTimeout(()=>{splash.classList.add('hide');setTimeout(()=>{splash.style.display='none'},600)},1800);sessionStorage.setItem('lab:splash-shown','1')}else if(splash){splash.style.display='none'}
+// Help button: mostrar tips
+const TIPS={circ:'Arrastra componentes para armar el circuito. Los LED encendidos = éxito.',plac:'Gira y observa: continentes chocan, crean montañas.',ener:'Reparte las energías: solar, eólica, hidroeléctrica. Salva la isla.',evo:'Selecciona las criaturas que pueden sobrevivir. Solo los más adaptados avanzan.',enf:'Clasifica síntomas y patógenos. Vence todas las enfermedades.',maq:'Identifica máquinas simples en máquinas compuestas.',sol:'Ordena los 8 planetas por distancia al Sol.',luna:'Observa cómo la Luna orbita la Tierra. Ve las mareas cambiar.',cad:'Construye cadenas: planta → herbívoro → carnívoro.',eco:'Clasifica seres vivos en sus ecosistemas.',tens:'Experimenta con tensión superficial: agua en capas, gotas, meniscos.'};
+const modal=document.getElementById('help-modal');
+const modalContent=document.getElementById('tips-container');
+document.getElementById('help').onclick=()=>{const games=C.filter(c=>c.href).map(c=>c.k);modalContent.innerHTML=games.map(k=>`<div class="tip-item"><strong>${C.find(c=>c.k===k).t}</strong>${TIPS[k]}</div>`).join('');modal.classList.add('open')};
+modal.onclick=e=>{if(e.target===modal)modal.classList.remove('open')};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open'))modal.classList.remove('open')});
 </script>
 <script>(()=>{const l=document.querySelector(".list");if(!l)return;let t=0;l.addEventListener("scroll",()=>{l.classList.add("scrolling"),clearTimeout(t),t=setTimeout(()=>l.classList.remove("scrolling"),180)},{passive:!0})})()</script></body>
 </html>

@@ -163,7 +163,7 @@ document.head.insertAdjacentHTML("beforeend",`<style id="cvcss">
 .corner>.cv-btn{bottom:auto;top:calc(100% + 22px);font-size:clamp(15px,1.25vw,20px);padding:16px 30px;gap:10px;border:2px solid rgba(255,255,255,.55);box-shadow:0 14px 30px -10px rgba(76,29,149,.7),0 0 0 0 rgba(124,58,237,.45);animation:cvGlow 2.6s ease-in-out infinite}
 .corner>.cv-btn span{font-size:1.35em}
 @keyframes cvGlow{50%{box-shadow:0 14px 30px -10px rgba(76,29,149,.7),0 0 0 10px rgba(124,58,237,0)}}
-body:not(.at-home) .corner>.cv-btn{display:none}
+body:not(.at-home) .corner>.cv-btn,body.ar-on .cv-btn,body.editing .cv-btn{display:none!important}
 .cvann{position:fixed;inset:0;z-index:9000;display:grid;place-items:center;padding:16px;background:rgba(8,14,34,.55);backdrop-filter:blur(3px);animation:cvIn .35s ease}
 .cvann.out{animation:cvOut .3s ease forwards}
 .cva-c{position:relative;display:flex;align-items:center;gap:clamp(10px,3vw,34px);width:min(100%,920px);padding:clamp(18px,3.4vw,40px);border-radius:32px;color:#fff;background:radial-gradient(80% 90% at 10% 0%,rgba(255,255,255,.25),transparent 60%),linear-gradient(130deg,#4338ca,#7c3aed 45%,#0ea5e9);box-shadow:0 30px 80px -20px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.4);animation:cvAnn .6s cubic-bezier(.2,1.4,.4,1)}

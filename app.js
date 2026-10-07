@@ -71,15 +71,31 @@ CV_ACU=[["✋","Levantar la mano para participar"],["🤫","No conversamos en cl
 CV_ROL=[["🎤","SPEAKER","Presenta y habla por el equipo"],["🧰","HELPER","Trae y organiza los materiales"],["⏱️","TIMER","Cuida el tiempo del equipo"],["🎨","DESIGNER","Hace que el trabajo se vea bonito y ordenado"]],
 CV_PAL=[["#7c3aed","#06b6d4"],["#0ea5e9","#22c55e"],["#f97316","#ec4899"],["#2563eb","#8b5cf6"],["#14b8a6","#6366f1"],["#e11d48","#f59e0b"]],
 CV_MODE={individual:"👤 Individual",group:"👥 En equipo",grupo:"👥 En equipo",pair:"👫 En pareja",pairs:"👫 En pareja",pareja:"👫 En pareja",whole:"🏫 Toda la clase",clase:"🏫 Toda la clase"},
-CV_K={uni:["📘","Unidad"],ses:["🗓️","Sesión"],meta:["🎯","Meta y criterios"],rol:["👥","Roles"],acu:["🤝","Acuerdos"],act:["🧪","Actividad"],exit:["🎟️","Exit ticket"]},
-CV_BG={meta:["#2563eb","#38bdf8"],rol:["#7c3aed","#c084fc"],acu:["#0d9488","#34d399"],act:["#ea580c","#facc15"],exit:["#db2777","#f472b6"]};
+CV_K={uni:["📘","Unidad"],ses:["🗓️","Sesión"],meta:["🎯","Meta y criterios"],rol:["👥","Roles"],acu:["🤝","Acuerdos"],act:["🧪","Actividad"],exit:["🎟️","Exit ticket"],mq:["🤖","Molí pregunta"],aq:["🤖","Molí pregunta"]},
+CV_BG={meta:["#2563eb","#38bdf8"],rol:["#7c3aed","#c084fc"],acu:["#0d9488","#34d399"],act:["#ea580c","#facc15"],exit:["#db2777","#f472b6"],mq:["#4338ca","#0ea5e9"],aq:["#0e7490","#a855f7"]};
 let cvL=[],cvI=0;
 const cvCol=u=>CV_PAL[(parseInt(u.num,10)||1)%CV_PAL.length],
 cvUT=u=>nz(u.title)?u.title:"Sin nombre todavía",
 cvActOk=x=>x&&(nz(x.title)||nz(x.desc)),
 cvHas=s=>s&&(nz(s.title)||nz(s.meta)||(s.activities||[]).some(cvActOk));
+const cvQK=it=>{const t=JSON.stringify([it.u.title,it.s.title,it.s.meta,(it.s.activities||[]).slice(0,3).map(x=>x&&[x.title,x.desc]),it.prev&&[it.prev.s.title,it.prev.s.meta]]);let h=5381;for(let i=0;i<t.length;i++)h=(h*33^t.charCodeAt(i))>>>0;return"cv:q:"+APP.docId+":"+h.toString(36)},cvBusy=new Set,cvGot={};
+function cvTpl(it){const u=cvUT(it.u);if(it.k==="aq"){const t=String(it.x.title||"").replace(/[¿?¡!«»"]/g,"").trim();return[`¿Qué hicimos en la actividad ${it.j}${t?`, «${t}»`:""}?`,"¿Qué descubrimos o aprendimos con esta actividad?"]}
+if(!it.prev)return[`¿Qué crees que haremos en la unidad «${u}»?`,`¿Qué sabemos sobre ${u.charAt(0).toLowerCase()+u.slice(1)}?`];
+const p=String(it.prev.s.title||"").replace(/[¿?¡!«»"]/g,"").trim();return[`¿Qué hicimos en la sesión anterior${p?`, «${p}»`:""}?`,"¿Qué aprendimos y cómo nos sirve para la clase de hoy?"]}
+function cvQ(it){const k=cvQK(it),c=cvGot[k]||Pt(k,null),key=it.k==="aq"?"a"+it.j:"r";if(c&&Array.isArray(c[key])&&c[key].length)return{q:c[key]};cvAsk(it,k);return{q:cvTpl(it),wait:cvBusy.has(k)}}
+async function cvAsk(it,k){if(cvBusy.has(k)||cvGot[k]===0)return;cvBusy.add(k);const s=it.s,acts=(s.activities||[]).slice(0,3),A={type:"ARRAY",items:{type:"STRING"}},
+P=`Eres Molí, un robot amigable que acompaña a una docente de ${arF()} de 6.° grado de primaria en Perú. Escribe preguntas que tú, Molí, harás en voz alta a las niñas y niños en una diapositiva gigante. Cada pregunta: corta (máximo 14 palabras), clara, abierta, en primera persona del plural («¿Qué observamos…?»), sin la respuesta dentro, con signos ¿?.
+Unidad ${it.u.num}: «${cvUT(it.u)}».
+Sesión ${it.n}: «${s.title||""}». Meta: «${s.meta||""}».
+${it.prev?`Sesión anterior (${it.prev.n}): «${it.prev.s.title||""}». Meta anterior: «${it.prev.s.meta||""}».`:"Es la PRIMERA sesión de la unidad."}
+Actividades de hoy:
+${acts.map((x,j)=>x&&(nz(x.title)||nz(x.desc))?`${j+1}) «${x.title||""}»: ${x.desc||""}`:`${j+1}) (no hay)`).join("\n")}
+Devuelve JSON:
+- "r": 2 preguntas para empezar. ${it.prev?"Que recuerden qué hicieron y qué aprendieron en la sesión anterior.":"Que digan qué creen que haremos en esta unidad y qué saben ya sobre el tema de la unidad."}
+- "a1", "a2", "a3": 2 preguntas cada una para DESPUÉS de esa actividad, sobre lo que hicieron, observaron o descubrieron en ella (si la actividad no existe, lista vacía).`;
+try{const R=await qn(P,{type:"OBJECT",properties:{r:A,a1:A,a2:A,a3:A},required:["r","a1","a2","a3"]},e=>{if(!e||!Array.isArray(e.r))return null;const f=x=>(Array.isArray(x)?x:[]).map(y=>String(y||"").trim()).filter(Boolean).slice(0,2);const o={r:f(e.r),a1:f(e.a1),a2:f(e.a2),a3:f(e.a3)};return o.r.length?o:null},{timeout:4e4,waits:[3e3]});cvGot[k]=R;Rt(k,R)}catch(e){cvGot[k]=0}cvBusy.delete(k);const w=document.getElementById("cvw"),c=cvL[cvI];w&&c&&(c.k==="mq"||c.k==="aq")&&cvQK(c)===k&&cvShow(cvI,1)}
 function cvItems(){const L=[];APP.units.filter(u=>!u.hidden).forEach(u=>{const ss=[];(u.sessions||[]).forEach((s,i)=>{cvHas(s)&&ss.push({s,n:i+1})});L.push({k:"uni",u,ss});
-ss.forEach(({s,n})=>{const b={u,s,n};L.push({...b,k:"ses"},{...b,k:"meta"},{...b,k:"rol"},{...b,k:"acu"});(s.activities||[]).slice(0,3).forEach((x,j)=>{cvActOk(x)&&L.push({...b,k:"act",x,j:j+1})});L.push({...b,k:"exit"})})});return L}
+ss.forEach(({s,n},q)=>{const b={u,s,n,prev:q?ss[q-1]:null};L.push({...b,k:"ses"},{...b,k:"meta"},{...b,k:"mq"},{...b,k:"rol"},{...b,k:"acu"});(s.activities||[]).slice(0,3).forEach((x,j)=>{cvActOk(x)&&L.push({...b,k:"act",x,j:j+1},{...b,k:"aq",x,j:j+1})});L.push({...b,k:"exit"})})});return L}
 const cvCrumb=it=>`<div class="cv-crumb">${a(it.u.icon||"📘")} Unidad ${a(it.u.num)} · ${a(cvUT(it.u))} <b>Sesión ${it.n}</b>${it.s.hidden?'<span class="cv-hid">🙈 Oculta para estudiantes</span>':""}</div>`;
 function cvSlide(it){const u=it.u,s=it.s,[c1,c2]=it.k in CV_BG?CV_BG[it.k]:cvCol(u),st=`style="--c1:${c1};--c2:${c2}"`;
 if(it.k==="uni")return`<div class="cv-sl cv-center" ${st}><span class="cv-pill">UNIDAD ${a(u.num)}</span><div class="cv-ico">${a(u.icon||"📘")}</div><h2 class="cv-h1">${a(cvUT(u))}</h2>${nz(u.product)?`<p class="cv-sub">🏆 Producto: ${a(u.product)}</p>`:""}<p class="cv-sub">${it.ss.length?it.ss.length+(it.ss.length>1?" sesiones":" sesión"):"Aún no tiene sesiones: créalas con «Trabajar con Moli»."}</p></div>`;
@@ -87,14 +103,15 @@ if(it.k==="ses")return`<div class="cv-sl cv-center" ${st}><span class="cv-pill">
 if(it.k==="meta"){const cr=(s.criteria||[]).filter(nz);return`<div class="cv-sl" ${st}>${cvCrumb(it)}<h2 class="cv-h2">🎯 Meta de la sesión</h2><p class="cv-lead cv-meta-l">${nz(s.meta)?a(s.meta):"Sin meta todavía"}</p>${cr.length?`<h3 class="cv-h3">✅ Criterios de éxito</h3><ul class="cv-cards cv-crit">${cr.map(c=>`<li>${a(c)}</li>`).join("")}</ul>`:""}${nz(s.rubric)?`<p class="cv-sub">📏 Criterio de la rúbrica: ${a(s.rubric)}</p>`:""}</div>`}
 if(it.k==="rol")return`<div class="cv-sl" ${st}>${cvCrumb(it)}<h2 class="cv-h2">👥 Roles de trabajo</h2><ul class="cv-cards cv-c4">${CV_ROL.map(([i,n,d])=>`<li class="cv-role"><span>${i}</span><b>${n}</b><small>${d}</small></li>`).join("")}</ul></div>`;
 if(it.k==="acu")return`<div class="cv-sl" ${st}>${cvCrumb(it)}<h2 class="cv-h2">🤝 Acuerdos de convivencia</h2><ul class="cv-cards cv-c3">${CV_ACU.map(([i,t])=>`<li class="cv-role"><span>${i}</span><b>${t}</b></li>`).join("")}</ul></div>`;
+if(it.k==="mq"||it.k==="aq"){const Q=cvQ(it),im=it.k==="aq"?"curiosa":it.prev?"pensativa":"hola",tt=it.k==="aq"?`Sobre la actividad ${it.j}${nz(it.x.title)?": "+a(it.x.title):""}`:it.prev?`Recordamos la sesión ${it.prev.n}${nz(it.prev.s.title)?": "+a(it.prev.s.title):""}`:"¡Empezamos la unidad!";return`<div class="cv-sl cv-mq" ${st}>${cvCrumb(it)}<div class="cv-mqb"><img class="cv-moli" src="img/moli/${im}.webp" alt="Molí"><div class="cv-bub"><p class="cv-mqt">${tt}</p><ol>${Q.q.map(x=>`<li>${a(x)}</li>`).join("")}</ol>${Q.wait?'<p class="cv-think">✨ Molí está leyendo la sesión…</p>':""}</div></div></div>`}
 if(it.k==="act"){const x=it.x,m=CV_MODE[String(x.mode||"").toLowerCase()],yv=/^[\w-]{11}$/.test(x.yt||"");return`<div class="cv-sl${yv?" cv-hasvid":""}" ${st}>${cvCrumb(it)}<div class="cv-acth"><span class="cv-num">${it.j}</span><h2 class="cv-h2">Actividad ${it.j}</h2>${m?`<span class="cv-pill">${m}</span>`:""}</div>${nz(x.title)?`<h3 class="cv-at">${a(x.title)}</h3>`:""}${nz(x.desc)?`<p class="cv-lead cv-box">${a(x.desc)}</p>`:""}${nz(x.ficha)||x.file?`<span class="cv-pill">📄 ${a(nz(x.ficha)?x.ficha:"Ficha de la actividad")}</span>`:""}${yv?`<div class="cv-vid"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/${a(x.yt)}?rel=0&playsinline=1${+x.yts?"&start="+ +x.yts:""}" title="Video de la actividad" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe></div>`:""}</div>`}
 const qs=((s.ticket&&s.ticket.questions)||[]).filter(x=>x&&nz(x.q));
 return`<div class="cv-sl" ${st}>${cvCrumb(it)}<h2 class="cv-h2">🎟️ Exit ticket${qs.length?` <small>${qs.length} pregunta${qs.length>1?"s":""}</small>`:""}</h2>${qs.length?`<ol class="cv-cards cv-q">${qs.map(x=>`<li><b>${a(x.q)}</b>${(x.options||[]).filter(nz).length?`<ul>${x.options.map((o,k)=>nz(o)?`<li class="${k===x.answer?"ok":""}">${k===x.answer?"✓ ":""}${a(o)}</li>`:"").join("")}</ul>`:""}</li>`).join("")}</ol>`:'<p class="cv-lead">Sin preguntas todavía.</p>'}</div>`}
 function cvThumb(it,i){const[c1,c2]=it.k in CV_BG?CV_BG[it.k]:cvCol(it.u),st=`style="--c1:${c1};--c2:${c2}"`;
 if(it.k==="uni")return`<button type="button" class="cv-th cv-tu" data-cvi="${i}" ${st}><small>UNIDAD ${a(it.u.num)}</small><span>${a(cvUT(it.u))}</span></button>`;
 const[ic,lb]=CV_K[it.k];return`<button type="button" class="cv-th${it.k==="ses"?" cv-ts":""}" data-cvi="${i}" ${st} title="Sesión ${it.n} · ${lb}${it.j?" "+it.j:""}"><small>S${it.n}${it.s.hidden&&it.k==="ses"?" 🙈":""}</small><i>${ic}</i><span>${it.k==="ses"?a(nz(it.s.title)?it.s.title:"Sesión "+it.n):lb+(it.j?" "+it.j:"")}</span></button>`}
-function cvShow(i){const w=document.getElementById("cvw");if(!w||!cvL.length)return;cvI=Math.max(0,Math.min(cvL.length-1,i));const it=cvL[cvI],sl=w.querySelector(".cv-slide");
-sl.innerHTML=cvSlide(it);sl.scrollTop=0;sl.classList.remove("in");void sl.offsetWidth;sl.classList.add("in");
+function cvShow(i,re){const w=document.getElementById("cvw");if(!w||!cvL.length)return;cvI=Math.max(0,Math.min(cvL.length-1,i));const it=cvL[cvI],sl=w.querySelector(".cv-slide");
+it.s&&cvQ({...it,k:"mq"});sl.innerHTML=cvSlide(it);if(!re){sl.scrollTop=0;sl.classList.remove("in");void sl.offsetWidth;sl.classList.add("in")}
 w.querySelector(".cv-where").textContent=it.k==="uni"?`Unidad ${it.u.num}`:`Unidad ${it.u.num} · Sesión ${it.n} · ${CV_K[it.k][1]}${it.j?" "+it.j:""}`;
 w.querySelector(".cv-count").textContent=`${cvI+1} / ${cvL.length}`;
 w.querySelector('[data-cv="prev"]').disabled=cvI===0;w.querySelector('[data-cv="next"]').disabled=cvI===cvL.length-1;
@@ -161,6 +178,19 @@ document.head.insertAdjacentHTML("beforeend",`<style id="cvcss">
 .cv-q ul li.ok{background:#dcfce7;color:#166534;font-weight:900}
 .cv-hasvid{gap:clamp(8px,1.6cqmin,16px)}.cv-hasvid .cv-num{width:clamp(40px,9cqmin,84px);height:clamp(40px,9cqmin,84px);font-size:clamp(22px,6cqmin,56px)}.cv-hasvid .cv-h2{font-size:clamp(24px,6.4cqmin,60px)}.cv-hasvid .cv-at{font-size:clamp(19px,5cqmin,46px)}.cv-hasvid .cv-box{flex:0 0 auto;font-size:clamp(15px,3.6cqmin,34px);padding:clamp(10px,2cqmin,22px) clamp(14px,3cqmin,32px)}
 .cv-vid{flex:1;min-height:0;display:flex;justify-content:center;align-items:stretch}.cv-vid iframe{height:100%;aspect-ratio:16/9;max-width:100%;min-height:0;border:0;border-radius:18px;background:#000;box-shadow:0 14px 34px -12px rgba(0,0,0,.55)}
+.cv-mqb{flex:1;min-height:0;display:flex;align-items:center;gap:clamp(12px,3cqmin,40px)}
+.cv-moli{flex:none;height:min(118cqh,52cqw);max-height:none;width:auto;margin:-9cqh -5cqw -9cqh -3cqw;filter:drop-shadow(0 18px 30px rgba(0,0,0,.35));animation:cvBob 3s ease-in-out infinite}
+@keyframes cvBob{50%{transform:translateY(-10px) rotate(-1.5deg)}}
+.cv-bub{position:relative;flex:1;min-width:0;padding:clamp(16px,4cqmin,44px);border-radius:32px;background:#fff;color:#0f172a;box-shadow:0 18px 40px -14px rgba(0,0,0,.45)}
+.cv-bub::before{content:"";position:absolute;left:-22px;top:42%;border:14px solid transparent;border-right:24px solid #fff;border-left:0}
+.cv-mqt{margin:0 0 .5em;font-weight:900;font-size:clamp(14px,3.6cqmin,32px);color:var(--c1);letter-spacing:.02em}
+.cv-bub ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:clamp(10px,2.6cqmin,28px);counter-reset:m}
+.cv-bub li{counter-increment:m;display:flex;gap:.45em;font-weight:900;font-size:clamp(20px,6.6cqmin,60px);line-height:1.18}
+.cv-bub li::before{content:counter(m);flex:none;display:grid;place-items:center;width:1.4em;height:1.4em;border-radius:30%;background:linear-gradient(135deg,var(--c1),var(--c2));color:#fff;font-size:.8em}
+.cv-think{margin:.8em 0 0;font-weight:800;font-size:clamp(12px,2.6cqmin,20px);color:#64748b;animation:cvPl 1.4s ease-in-out infinite}
+@keyframes cvPl{50%{opacity:.4}}
+@media (min-width:761px){.cv-mq{height:100%;min-height:0}}
+@media (max-width:760px){.cv-mqb{flex-direction:column}.cv-moli{height:auto;width:min(70vw,300px);margin:-8% 0 -10%}.cv-bub::before{left:50%;top:-20px;translate:-50% 0;border:14px solid transparent;border-bottom:22px solid #fff;border-top:0}}
 .cv-crit>li{font-size:clamp(17px,4.6cqmin,42px)}
 .cv-strip{flex:none;display:flex;gap:8px;overflow-x:auto;padding:4px 4px 8px;scroll-snap-type:x proximity;scrollbar-width:thin}
 .cv-th{flex:none;scroll-snap-align:center;position:relative;width:86px;height:76px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:6px;border-radius:12px;border:2px solid transparent;color:#fff;font:inherit;text-align:center;cursor:pointer;overflow:hidden;opacity:.72;background:linear-gradient(135deg,var(--c1),var(--c2));transition:transform .15s,opacity .15s,border-color .15s}

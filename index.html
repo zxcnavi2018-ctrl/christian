@@ -436,7 +436,12 @@ dialog.tk.rcdark .rc-offo small{color:#cbd5e1}.sq-r,.sq-mv,.sq-it,.sq-intro .rob
 <script src="app.js?v=d77c511eae"></script>
 <script>"serviceWorker"in navigator&&!navigator.webdriver&&addEventListener("load",()=>setTimeout(()=>navigator.serviceWorker.register("sw.js").catch(()=>{}),3e3))</script>
 <style id="nbcss">
-.robot-body{transition:background-image .45s ease-in-out}
+.robot-body{transition:none!important}.robot-body.mph1{animation:moliMorph .7s linear!important}
+.robot-body.mph2{animation:moliMorphS .52s linear!important}
+@keyframes moliMorph{0%{scale:1 1;translate:0 0;animation-timing-function:cubic-bezier(.5,0,.9,.5)}17%{scale:1.1 .84;translate:0 5%;animation-timing-function:cubic-bezier(.2,.7,.4,1)}40%{scale:.93 1.09;translate:0 -8%;animation-timing-function:cubic-bezier(.45,0,.55,1)}62%{scale:1.035 .97;translate:0 0;animation-timing-function:ease-in-out}81%{scale:.99 1.012;translate:0 0;animation-timing-function:ease-in-out}100%{scale:1 1;translate:0 0}}
+@keyframes moliMorphS{0%{scale:1 1;animation-timing-function:cubic-bezier(.5,0,.9,.5)}20%{scale:1.05 .92;animation-timing-function:cubic-bezier(.2,.7,.4,1)}50%{scale:.975 1.035;animation-timing-function:ease-in-out}100%{scale:1 1}}
+@media (prefers-reduced-motion:reduce){.robot-body.mph1,.robot-body.mph2{animation:none!important}}
+
 
 #splash .sp-moli.sp-hola{background-image:url(img/moli/hola-cuerpo.webp)!important}
 .sp-l{position:absolute;top:0;bottom:0;left:50%;aspect-ratio:1;translate:-50% 0;background:center/contain no-repeat;pointer-events:none}
@@ -813,5 +818,7 @@ const skip=r=>r.closest(".s3-moli,.sq-mol,.sq-bodyR,#shh2,.sq-arm,.s3-arm2");
 const tick=()=>{if(document.hidden||RM)return;const now=Date.now();document.querySelectorAll(".robot").forEach(r=>{if(skip(r)||!r.offsetParent)return;
 const t=r._mi||(r._mi={n:now+1500+Math.random()*3500,alt:0});if(now<t.n)return;
 if(t.alt){r.style.removeProperty("--moli");t.alt=0;t.n=now+2800+Math.random()*3200}else{r.style.setProperty("--moli",F[ALT[Math.random()*ALT.length|0]]);t.alt=1;t.n=now+1300+Math.random()*900}})};
-setInterval(tick,250)})();</script></body>
+setInterval(tick,250)})();</script><script>(()=>{if(matchMedia("(prefers-reduced-motion: reduce)").matches||!window.MutationObserver)return;const S=new WeakMap(),bg=b=>getComputedStyle(b).backgroundImage,seed=n=>{n&&n.querySelectorAll&&n.querySelectorAll(".robot-body").forEach(b=>{S.has(b)||S.set(b,bg(b))})};
+const go=(r,soft)=>{const b=r.querySelector(".robot-body");if(!b)return;const p=S.get(b),n=bg(b);if(void 0===p)return void S.set(b,n);if(n===p||!r.offsetParent)return void S.set(b,n);S.set(b,n);b.style.setProperty("background-image",p,"important");b.classList.remove("mph1","mph2");void b.offsetWidth;b.classList.add(soft?"mph2":"mph1");clearTimeout(b._mt);b._mt=setTimeout(()=>{b.style.removeProperty("background-image")},soft?100:118);clearTimeout(b._mc);b._mc=setTimeout(()=>b.classList.remove("mph1","mph2"),700)};
+new MutationObserver(L=>{const D=new Set;L.forEach(m=>{if("childList"===m.type)return void m.addedNodes.forEach(n=>1===n.nodeType&&requestAnimationFrame(()=>seed(n)));const t=m.target;if(t.classList&&t.classList.contains("robot-body"))return;const r=t.closest&&t.closest(".robot");r&&!D.has(r)&&(D.add(r),go(r,"style"===m.attributeName))})}).observe(document.body,{subtree:!0,childList:!0,attributes:!0,attributeFilter:["data-mx","style"]});requestAnimationFrame(()=>seed(document.body))})();</script></body>
 </html>

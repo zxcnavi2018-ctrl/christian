@@ -190,6 +190,14 @@ body:not(.at-home) .corner>.cv-btn{display:none}
 .cv-min{display:none}
 #cvw.cv-max .cv-min{display:grid;place-items:center;position:absolute;right:14px;bottom:14px;z-index:2;width:44px;height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.4);background:rgba(15,23,42,.35);color:#fff;font-size:22px;cursor:pointer;opacity:.35;transition:opacity .2s}
 #cvw.cv-max .cv-min:hover{opacity:1}
+#shh2[data-k="angry"] .s3-moli>.robot,#shh2[data-k="angry"] .s3-moli>.robot .robot-body{--robot-img:url(img/moli/enojada.webp)!important;--moli:url(img/moli/enojada.webp)!important}
+#shh2[data-k="angry"] .s3-red,#shh2[data-k="angry"] .s3-brow,#shh2[data-k="angry"] .s3-vein,#shh2[data-k="angry"] .s3-steam{display:none!important}
+#shh2[data-k="shh"] .s3-moli>.robot,#shh2[data-k="shh"] .s3-moli>.robot .robot-body{--robot-img:url(img/moli/timida.webp)!important;--moli:url(img/moli/timida.webp)!important}
+#shh2[data-k="shh"] .s3-moli>.robot{animation:shSway 2.4s ease-in-out infinite}
+@keyframes shSway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg) translateY(-6px)}}
+#shh2[data-k="shh"] .s3-moli::after{content:"🤫";position:absolute;right:-6%;top:6%;z-index:3;font-size:clamp(70px,15vh,170px);filter:drop-shadow(0 10px 18px rgba(0,0,0,.35));animation:shBadge 1.3s ease-in-out infinite}
+@keyframes shBadge{50%{transform:scale(1.15) rotate(-8deg)}}
+.tmx{left:22px!important;top:18px!important;right:auto!important;bottom:auto!important;translate:none!important;font-size:clamp(46px,6.4vw,112px)!important;padding:.16em .55em!important}
 .cv-btn:hover{transform:translateY(-2px);box-shadow:0 14px 28px -8px rgba(76,29,149,.7)}.cv-btn:active{transform:scale(.96)}.cv-btn[hidden]{display:none}
 #cvw{position:fixed;inset:min(2.5vh,22px) min(2.5vw,26px);z-index:3000;display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:24px;background:linear-gradient(160deg,#0f1b3d,#1b2a5c 60%,#26174d);box-shadow:0 0 0 100vmax rgba(8,14,34,.62),0 30px 80px rgba(0,0,0,.5);color:#fff;font-family:inherit;animation:cvIn .3s cubic-bezier(.2,1.2,.4,1)}
 #cvw:fullscreen{inset:0;border-radius:0;padding:16px}

@@ -26,6 +26,18 @@ body{display:flex;flex-direction:column}
 @keyframes splashBounce{0%,100%{transform:translateY(0) rotate(0deg)}25%{transform:translateY(-12px) rotate(-3deg)}75%{transform:translateY(-8px) rotate(3deg)}}
 @keyframes splash-fill{from{width:0}to{width:100%}}
 .list{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;padding:6px 16px 40px}
+.diploma-card{position:relative;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:8px;aspect-ratio:4/5;padding:14px;border-radius:26px;color:#fff;text-decoration:none;overflow:hidden;isolation:isolate;background:linear-gradient(150deg,#1e3a8a,#3b82f6 45%,#fbbf24 100%);transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .25s ease,box-shadow .25s;box-shadow:0 18px 34px -10px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.45),inset 0 -10px 24px rgba(0,0,0,.18);animation:in .55s calc(.05s * var(--i)) cubic-bezier(.2,1.3,.4,1) both;text-align:center}
+.diploma-card::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;background:radial-gradient(120% 70% at var(--mx) var(--my),rgba(255,255,255,.35),transparent 55%),linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 45%)}
+.diploma-card::after{content:"";position:absolute;top:-30%;left:0;width:40%;height:160%;z-index:2;background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);transform:translateX(-160%) rotate(20deg);animation:shine 5.5s calc(.4s * var(--i)) ease-in-out infinite;pointer-events:none;will-change:transform}
+.diploma-card:hover{box-shadow:0 26px 44px -12px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.5)}
+.diploma-card.locked{filter:saturate(.3) brightness(.5);pointer-events:none;cursor:not-allowed}
+.diploma-card.locked::after{display:none}
+.diploma-icon{font-size:clamp(50px,12vw,100px);margin-bottom:8px;animation:diplomaBounce 2.5s ease-in-out infinite}
+.diploma-title{position:relative;font-size:clamp(16px,2vw,20px);font-weight:900;line-height:1.08;text-wrap:balance;text-shadow:0 2px 8px rgba(0,0,0,.35);letter-spacing:.02em}
+.diploma-subtitle{position:relative;font-size:clamp(11px,1.3vw,13px);font-weight:800;opacity:.9;text-shadow:0 1px 4px rgba(0,0,0,.25)}
+.diploma-locked-badge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:clamp(40px,10vw,70px);opacity:.6;animation:pulse 2s ease-in-out infinite}
+@keyframes diplomaBounce{0%,100%{transform:translateY(0) rotate(0deg)}25%{transform:translateY(-10px) rotate(-2deg)}75%{transform:translateY(-6px) rotate(2deg)}}
+@keyframes pulse{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.1)}}
 .grid{width:min(100%,1200px);margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);column-gap:clamp(14px,2vw,22px);row-gap:clamp(30px,3.4vw,40px);perspective:900px}
 .card{--rx:0deg;--ry:0deg;--mx:50%;--my:30%;position:relative;display:flex;flex-direction:column;justify-content:flex-end;gap:3px;aspect-ratio:4/5;padding:14px;border-radius:26px;color:#fff;text-decoration:none;overflow:hidden;isolation:isolate;background:var(--g);transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .25s ease,box-shadow .25s;box-shadow:0 18px 34px -10px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.45),inset 0 -10px 24px rgba(0,0,0,.18);animation:in .55s calc(.05s * var(--i)) cubic-bezier(.2,1.3,.4,1) both}
 .card::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;background:radial-gradient(120% 70% at var(--mx) var(--my),rgba(255,255,255,.35),transparent 55%),linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 45%)}
@@ -58,9 +70,9 @@ body{display:flex;flex-direction:column}
 @media (min-width:640px){#help-modal-content{max-width:480px;margin:0 auto;border-radius:20px;animation:popIn .4s cubic-bezier(.2,1.3,.4,1)}@keyframes popIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}}
 @media (max-width:1199px){.grid{width:min(100%,1200px)}}
 @media (max-width:900px){.grid{grid-template-columns:repeat(3,1fr);column-gap:18px;row-gap:32px}.card{padding:16px;border-radius:24px}}
-@media (max-width:760px){.lab-top .w{display:none}.lab-top{gap:8px}.lab-top b{font-size:16px}.grid{grid-template-columns:repeat(2,1fr);column-gap:12px;row-gap:28px;width:min(100%,500px)}.list{padding:8px 12px 40px}.card{padding:12px;border-radius:20px;aspect-ratio:3/4}.card b{font-size:13px}.card small{font-size:10.5px}.card .st{font-size:10px;padding:2px 6px;top:6px;right:6px}.card .pg{height:5px;margin-top:4px}.card .art svg{max-width:140px}}
+@media (max-width:760px){.lab-top .w{display:none}.lab-top{gap:8px}.lab-top b{font-size:16px}.grid{grid-template-columns:repeat(2,1fr);column-gap:12px;row-gap:28px;width:min(100%,500px)}.list{padding:8px 12px 40px}.card{padding:12px;border-radius:20px;aspect-ratio:3/4}.card b{font-size:13px}.card small{font-size:10.5px}.card .st{font-size:10px;padding:2px 6px;top:6px;right:6px}.card .pg{height:5px;margin-top:4px}.card .art svg{max-width:140px}.diploma-card{padding:12px;border-radius:20px;aspect-ratio:3/4}.diploma-icon{font-size:clamp(40px,10vw,80px)}.diploma-title{font-size:12px}.diploma-subtitle{font-size:9.5px}}
 @media (prefers-reduced-motion:reduce){.card::after{display:none}}
-@media (min-width:1200px){.grid{width:min(96vw,1760px);grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));column-gap:26px;row-gap:34px}.card{padding:20px;border-radius:30px}.card b{font-size:clamp(20px,1.5vw,28px)}.card small{font-size:clamp(14px,1vw,17px)}.card .st{font-size:13.5px;padding:5px 12px;top:14px;right:14px}.card .pg{height:8px}}</style>
+@media (min-width:1200px){.grid{width:min(96vw,1760px);grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));column-gap:26px;row-gap:34px}.card{padding:20px;border-radius:30px}.card b{font-size:clamp(20px,1.5vw,28px)}.card small{font-size:clamp(14px,1vw,17px)}.card .st{font-size:13.5px;padding:5px 12px;top:14px;right:14px}.card .pg{height:8px}.diploma-card{padding:20px;border-radius:30px}.diploma-title{font-size:clamp(18px,1.5vw,26px)}.diploma-subtitle{font-size:clamp(12px,1vw,15px)}.diploma-icon{font-size:clamp(80px,12vw,120px)}}</style>
 </head>
 <body>
 <header class="lab-top"><button type="button" class="back" id="salir">‹ Salir</button><b>🧪 Laboratorio de Moli</b><button type="button" class="help" id="help" title="Consejos y ayuda">❓</button><span class="chip" id="tot"></span></header>
@@ -94,10 +106,20 @@ const C=[
  {k:'luna',t:'La Tierra y la Luna',s:'Mareas y fases',href:'luna.html',g:'linear-gradient(150deg,#67e8f9,#0284c7 50%,#172554)',n:3},
  {k:'cad',t:'Cadenas alimenticias (cadena trófica)',s:'¿Quién se come a quién?',href:'cadenas.html',g:'linear-gradient(150deg,#bef264,#65a30d 50%,#14532d)',n:4},
  {k:'eco',t:'Tipos de ecosistemas: bióticos y abióticos',s:'Explora y clasifica',href:'ecosistemas.html',g:'linear-gradient(150deg,#5eead4,#0d9488 50%,#134e4a)',n:3},
- {k:'tens',t:'Tensión superficial, cohesión, adhesión y capilaridad',s:'Laboratorio del agua',href:'agua.html',g:'linear-gradient(150deg,#7dd3fc,#0ea5e9 45%,#4338ca)',n:4}
+ {k:'tens',t:'Tensión superficial, cohesión, adhesión y capilaridad',s:'Laboratorio del agua',href:'agua.html',g:'linear-gradient(150deg,#7dd3fc,#0ea5e9 45%,#4338ca)',n:4},
+ {k:'diploma',t:'Diploma de Honor',s:'¡Felicitaciones!',href:null,g:'linear-gradient(150deg,#1e3a8a,#3b82f6 45%,#fbbf24)',n:1,isDiploma:true}
 ];
 let all=0,got=0;
-const card=(c,i)=>{const done=Math.min(c.n,Object.values(get(c.k)).filter(Boolean).length);if(c.href){all+=c.n;got+=done}const st=!c.href?'🔒 Pronto':done>=c.n?'✅ Listo':`🎯 ${done}/${c.n}`;
+const card=(c,i)=>{
+ if(c.isDiploma){
+  const isUnlocked=all>0&&all===got;
+  if(isUnlocked){
+   return`<div class="diploma-card" style="--g:${c.g};--i:${i}" title="¡Has completado todos los juegos!"><div class="diploma-icon">🏆</div><b class="diploma-title">${c.t}</b><small class="diploma-subtitle">Has demostrado alta capacidad<br>autónoma para aprender</small></div>`;
+  }else{
+   return`<div class="diploma-card locked" style="--g:${c.g};--i:${i}" aria-disabled="true"><div class="diploma-locked-badge">🔒</div><b class="diploma-title">${c.t}</b><small class="diploma-subtitle">Completa todos los juegos</small></div>`;
+  }
+ }
+ const done=Math.min(c.n,Object.values(get(c.k)).filter(Boolean).length);if(c.href){all+=c.n;got+=done}const st=!c.href?'🔒 Pronto':done>=c.n?'✅ Listo':`🎯 ${done}/${c.n}`;
  const inner=`<span class="art">${ART[c.k]}</span><span class="st">${st}</span><b>${c.t}</b><small>${c.href?c.s:'Muy pronto'}</small><span class="pg"><i style="width:${done/c.n*100}%"></i></span>`;
  return c.href?`<a class="card" href="${c.href}?u=${encodeURIComponent(U)}&t=${Date.now()}" style="--g:${c.g};--i:${i}">${inner}</a>`:`<div class="card lock" style="--g:${c.g};--i:${i}" aria-disabled="true">${inner}</div>`};
 const g=document.getElementById('grid');g.innerHTML=C.map(card).join('');

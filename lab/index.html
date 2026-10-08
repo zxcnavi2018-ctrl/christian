@@ -116,9 +116,9 @@ const C=[
  {k:'cad',t:'Cadenas alimenticias (cadena trófica)',s:'¿Quién se come a quién?',href:'cadenas.html',g:'linear-gradient(150deg,#bef264,#65a30d 50%,#14532d)',n:4},
  {k:'eco',t:'Tipos de ecosistemas: bióticos y abióticos',s:'Explora y clasifica',href:'ecosistemas.html',g:'linear-gradient(150deg,#5eead4,#0d9488 50%,#134e4a)',n:3},
  {k:'tens',t:'Tensión superficial, cohesión, adhesión y capilaridad',s:'Laboratorio del agua',href:'agua.html',g:'linear-gradient(150deg,#7dd3fc,#0ea5e9 45%,#4338ca)',n:4},
- {k:'orig',t:'Orígenes de la vida: Panspermia, Quimiosíntesis y más',s:'Aprende las teorías',href:'origenes.html',g:'linear-gradient(150deg,#a78bfa,#7c3aed 50%,#581c87)',n:2},
- {k:'lama',t:'Teoría de Lamarck vs Darwin',s:'Evolución por uso y desuso',href:'lamarck.html',g:'linear-gradient(150deg,#fb923c,#d97706 50%,#92400e)',n:3},
- {k:'vuln',t:'Vulnerabilidad, Sismos y Prevención',s:'Zonas, factores y riesgos',href:'vulnerabilidad.html',g:'linear-gradient(150deg,#dc2626,#991b1b 50%,#7f1d1d)',n:3},
+ {k:'orig',t:'Orígenes de la vida',s:'4 historias para jugar',href:'origenes.html',g:'linear-gradient(150deg,#a78bfa,#7c3aed 50%,#581c87)',n:4},
+ {k:'lama',t:'Lamarck: uso y desuso',s:'Haz evolucionar animales',href:'lamarck.html',g:'linear-gradient(150deg,#fb923c,#d97706 50%,#92400e)',n:3},
+ {k:'vuln',t:'Teatro de la vulnerabilidad',s:'Decide y prepárate para el sismo',href:'vulnerabilidad.html',g:'linear-gradient(150deg,#dc2626,#991b1b 50%,#7f1d1d)',n:4},
  {k:'diploma',t:'Diploma de Honor',s:'¡Felicitaciones!',href:null,g:'linear-gradient(150deg,#1e3a8a,#3b82f6 45%,#fbbf24)',n:1,isDiploma:true}
 ];
 let all=0,got=0;
@@ -143,7 +143,7 @@ document.getElementById('salir').onclick=()=>{if(parent!==window)parent.postMess
 // Splash screen: mostrar por 1.8s
 const splash=document.getElementById('splash');if(splash&&!sessionStorage.getItem('lab:splash-shown')){setTimeout(()=>{splash.classList.add('hide');setTimeout(()=>{splash.style.display='none'},600)},1800);sessionStorage.setItem('lab:splash-shown','1')}else if(splash){splash.style.display='none'}
 // Help button: mostrar tips
-const TIPS={circ:'Arrastra componentes para armar el circuito. Los LED encendidos = éxito.',plac:'Gira y observa: continentes chocan, crean montañas.',ener:'Reparte las energías: solar, eólica, hidroeléctrica. Salva la isla.',evo:'Selecciona las criaturas que pueden sobrevivir. Solo los más adaptados avanzan.',enf:'Clasifica síntomas y patógenos. Vence todas las enfermedades.',maq:'Identifica máquinas simples en máquinas compuestas.',sol:'Ordena los 8 planetas por distancia al Sol.',luna:'Observa cómo la Luna orbita la Tierra. Ve las mareas cambiar.',cad:'Construye cadenas: planta → herbívoro → carnívoro.',eco:'Clasifica seres vivos en sus ecosistemas.',tens:'Experimenta con tensión superficial: agua en capas, gotas, meniscos.'};
+const TIPS={circ:'Arrastra componentes para armar el circuito. Los LED encendidos = éxito.',plac:'Gira y observa: continentes chocan, crean montañas.',ener:'Reparte las energías: solar, eólica, hidroeléctrica. Salva la isla.',evo:'Selecciona las criaturas que pueden sobrevivir. Solo los más adaptados avanzan.',enf:'Clasifica síntomas y patógenos. Vence todas las enfermedades.',maq:'Identifica máquinas simples en máquinas compuestas.',sol:'Ordena los 8 planetas por distancia al Sol.',luna:'Observa cómo la Luna orbita la Tierra. Ve las mareas cambiar.',cad:'Construye cadenas: planta → herbívoro → carnívoro.',eco:'Clasifica seres vivos en sus ecosistemas.',tens:'Experimenta con tensión superficial: agua en capas, gotas, meniscos.',orig:'Vive 4 historias: maneja el ovni de la panspermia, cocina la sopa primitiva, haz el experimento de Redi y une los relatos de los pueblos.',lama:'Toca rápido para que el animal use su cuerpo. Sus crías heredan los cambios, ¡así pensaba Lamarck!',vuln:'Dirige la obra: cada decisión sube o baja la vulnerabilidad. Termina con 40 o menos para que todos estén a salvo del sismo.'};
 
 // Diploma: PDF A4 horizontal con el nombre del estudiante
 const dipBtn=document.getElementById('dip-dl');

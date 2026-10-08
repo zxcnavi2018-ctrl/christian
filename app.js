@@ -168,10 +168,10 @@ document.addEventListener("click",e=>{e.target.closest("#cvBtn")&&(e.stopPropaga
 cvApi.go=(u,n)=>{const o=document.getElementById("cvw");o&&(document.removeEventListener("keydown",cvKey,!0),o.remove());cvOpen(u);if(!document.getElementById("cvw"))return;let i=cvL.findIndex(x=>x.u.key===u&&x.k==="ses"&&x.n===n);i<0&&(i=cvL.findIndex(x=>x.u.key===u));cvShow(Math.max(0,i))};
 cvApi.tour=()=>{if(cvApi.tour.on)return;const me=da();if(!me||!me.key)return;const K="ciencia4b:tour:"+APP.docId+":"+me.key;if(Pt(K,0))return;
 const sp=document.getElementById("splash");if(sp&&sp.isConnected&&getComputedStyle(sp).display!=="none"&&getComputedStyle(sp).opacity!=="0")return void setTimeout(cvApi.tour,800);
-if(document.body.classList.contains("ar-on")||document.querySelector("dialog[open]")||document.getElementById("cvw"))return void setTimeout(cvApi.tour,1500);
-cvApi.tour.on=1;const T=La(),nm=String(me.name||"").trim().split(/\s+/)[0]||"",q=s=>{const e=typeof s=="function"?s():document.querySelector(s);if(!e)return null;const r=e.getBoundingClientRect(),cs=getComputedStyle(e);return r.width>4&&r.height>4&&r.bottom>0&&r.top<innerHeight&&cs.visibility!=="hidden"&&cs.display!=="none"?e:null},
+if(document.body.classList.contains("ar-on")||[...document.querySelectorAll("dialog[open]")].some(d=>d.getBoundingClientRect().width>innerWidth*.3)||document.getElementById("cvw"))return void setTimeout(cvApi.tour,1500);
+cvApi.tour.on=1;const T=La(),nm=String(me.name||"").trim().split(/\s+/)[0]||"",q=s=>{const e=typeof s=="function"?s():document.querySelector(s);if(!e)return null;let r=e.getBoundingClientRect();const cs=getComputedStyle(e);if(!(r.width>4&&r.height>4&&cs.visibility!=="hidden"&&cs.display!=="none"))return null;if(r.bottom<=0||r.top>=innerHeight){e.scrollIntoView({block:"center"});r=e.getBoundingClientRect()}return r.bottom>0&&r.top<innerHeight?e:null},
 area=()=>{const c=[...document.querySelectorAll(".ar-card[data-ar]")].filter(x=>!/^(notes|units|misiones|exit|u|back|back2|moli)$/.test(x.dataset.ar)&&q(()=>x));return c.find(x=>new RegExp(String(APP.site.title||"ciencia").slice(0,5),"i").test(x.textContent))||c[0]||null},
-hubOpen=()=>!!q(".hub-t.t-pp"),inner=()=>q('[data-ar="back2"]'),menuQ=()=>q('[data-ar="units"]');
+hubOpen=()=>!!q(".hub-t.t-pp"),openD=()=>[...document.querySelectorAll("dialog[open]")].some(d=>{const b=d.getBoundingClientRect();return b.width>innerWidth*.3&&b.height>innerHeight*.25&&getComputedStyle(d).visibility!=="hidden"&&getComputedStyle(d).opacity!=="0"}),inner=()=>q('[data-ar="back2"]'),menuQ=()=>q('[data-ar="units"]');
 const S=[
 {t:`¡Hola${nm?", "+nm:""}! 👋 Soy <b>Molí</b>. Te enseño la página en un ratito. <b>Sigue lo que brilla</b> ✨`,img:"hola"},
 {s:"#manBtn",t:"📖 <b>Guía</b>: el manual de Molí, por si olvidas algo."},
@@ -189,32 +189,34 @@ T&&{s:"#panBtn",t:"🧰 <b>Panel</b>: tus herramientas de profe (cuentas, áreas
 {s:'[data-ar="units"]',t:"📘 <b>Unidades</b>: las sesiones de cada unidad. ¡Entra!",tap:1,w:inner},
 {t:"Aquí eliges una unidad y ves sus <b>sesiones, fichas y videos</b>. 🎬",img:"feliz"},
 {s:'[data-ar="back2"]',t:"Regresa con este botón. ↩️",tap:1,w:menuQ},
-{s:'[data-ar="notes"]',t:"📝 <b>Mis notas</b>: tus notas de cada sesión. ¡Entra!",tap:1,w:inner},
-{t:"Aquí ves <b>cómo te fue</b> en cada sesión y qué te falta. ⭐",img:"orgullosa"},
-{s:'[data-ar="back2"]',t:"Regresa. ↩️",tap:1,w:menuQ},
+!T&&{s:'[data-ar="notes"]',t:"📝 <b>Mis notas</b>: tus notas de cada sesión. ¡Entra!",tap:1,w:inner},
+!T&&{t:"Aquí ves <b>cómo te fue</b> en cada sesión y qué te falta. ⭐",img:"orgullosa"},
+!T&&{s:'[data-ar="back2"]',t:"Regresa. ↩️",tap:1,w:menuQ},
+T&&{s:'[data-ar="registro"]',t:"📒 <b>Registro de notas</b>: tus registros por sección se llenan solos. ¡Entra!",tap:1,w:()=>!!q("dialog[open] .tk-x")||!!inner()},
+T&&{t:"Eliges el librito de la unidad: una hoja por sesión y la hoja final con el <b>Producto</b>. 📊",img:"orgullosa"},
+T&&{s:()=>q("dialog[open] .tk-x")||inner(),t:"Ciérralo para seguir. ↩️",tap:1,w:()=>!openD()&&!inner()&&!!menuQ()},
 {s:'[data-ar="misiones"]',t:"🎯 <b>Misiones</b>: retos y tareas. ¡Entra!",tap:1,w:()=>!!q("dialog[open] .tk-x")||!!inner()},
 {t:"Cada unidad tiene su <b>mapa de aventura</b>. Las <b>misiones de refuerzo</b> te ayudan a practicar lo que te costó. 💪",img:"estrellas"},
-{s:()=>q("dialog[open] .tk-x")||inner(),t:"Ciérralo para seguir. ↩️",tap:1,w:()=>!document.querySelector("dialog[open]")&&!inner()&&!!menuQ()},
+{s:()=>q("dialog[open] .tk-x")||inner(),t:"Ciérralo para seguir. ↩️",tap:1,w:()=>!openD()&&!inner()&&!!menuQ()},
 {s:"#fwdBtn",if:()=>!menuQ(),t:"Volvamos: toca ▶ otra vez.",tap:1,w:()=>!!area()||!!menuQ()},
 {s:area,if:()=>!menuQ(),t:"Toca tu área.",tap:1,w:()=>!!menuQ()},
 {s:'[data-ar="exit"]',t:"🎟️ <b>Exit tickets</b>: las preguntitas del final de cada sesión. ¡Entra!",tap:1,w:()=>!!q("dialog[open] .tk-x")},
 {t:"Cada unidad tiene su <b>librito</b>: respóndelo al terminar la clase (¡tienes 5 minutos!). ⏱️",img:"decidida"},
-{s:"dialog[open] .tk-x",t:"Ciérralo con ✕ para terminar. ↩️",tap:1,w:()=>!document.querySelector("dialog[open]")},
+{s:"dialog[open] .tk-x",t:"Ciérralo con ✕ para terminar. ↩️",tap:1,w:()=>!openD()},
 {t:"🎉 ¡Listo! Ya conoces la página. <b>¡Ahora explora libremente!</b>",img:"emocionada",end:1}
 ].filter(Boolean);
 const R=document.createElement("div");R.id="tour";R.innerHTML='<i class="tb"></i><i class="tb"></i><i class="tb"></i><i class="tb"></i><i class="tg"></i><div class="tbx"><img alt="Molí"><div><p></p><div class="ta"><small></small><button type="button">Siguiente ›</button></div></div></div>';document.body.appendChild(R);
 const B=[...R.querySelectorAll(".tb")],G=R.querySelector(".tg"),X=R.querySelector(".tbx"),P=X.querySelector("p"),N=X.querySelector("button"),C=X.querySelector("small"),I=X.querySelector("img");
 let k=-1,tgt=null,raf=0,waitT=0,t0=0;
-const lay=()=>{const W=innerWidth,H=innerHeight;let r=null;const dl=[...document.querySelectorAll("dialog[open]")].pop(),host=dl||document.body;R.parentNode!==host&&host.appendChild(R);const cb=R.getBoundingClientRect(),ox=cb.left,oy=cb.top;if(S[k]&&S[k].s){tgt=q(S[k].s)||tgt&&q(()=>tgt);r=tgt&&tgt.getBoundingClientRect()}
+const lay=()=>{raf=requestAnimationFrame(lay);try{lay1()}catch(e){}};const lay1=()=>{const W=innerWidth,H=innerHeight;let r=null;const dl=[...document.querySelectorAll("dialog[open]")].filter(d=>{const b=d.getBoundingClientRect();return b.width>W*.3&&b.height>H*.25&&getComputedStyle(d).visibility!=="hidden"&&getComputedStyle(d).display!=="none"&&getComputedStyle(d).opacity!=="0"}).pop(),host=dl||document.body;R.parentNode!==host&&host.appendChild(R);const cb=R.getBoundingClientRect(),ox=cb.left,oy=cb.top;if(S[k]&&S[k].s){tgt=q(S[k].s)||tgt&&q(()=>tgt)||tgt;r=tgt&&tgt.isConnected?tgt.getBoundingClientRect():null;r&&!(r.width>2&&r.height>2)&&(r=null)}
 if(r){const p=8,x0=Math.max(0,r.left-p),y0=Math.max(0,r.top-p),x1=Math.min(W,r.right+p),y1=Math.min(H,r.bottom+p);[[0,0,W,y0],[0,y1,W,H-y1],[0,y0,x0,y1-y0],[x1,y0,W-x1,y1-y0]].forEach((v,i)=>Object.assign(B[i].style,{left:v[0]-ox+"px",top:v[1]-oy+"px",width:v[2]+"px",height:v[3]+"px"}));Object.assign(G.style,{display:"block",left:x0-ox+"px",top:y0-oy+"px",width:x1-x0+"px",height:y1-y0+"px"});
 const bh=X.offsetHeight,below=y1+14+bh<H-8,top=below?y1+14:Math.max(8,y0-14-bh);X.style.top=top-oy+"px";X.style.left=Math.min(W-X.offsetWidth-8,Math.max(8,(x0+x1)/2-X.offsetWidth/2))-ox+"px";X.classList.remove("mid")}
-else{Object.assign(B[0].style,{left:-ox+"px",top:-oy+"px",width:W+"px",height:H+"px"});[1,2,3].forEach(i=>B[i].style.width="0");G.style.display="none";X.classList.add("mid");X.style.left=X.style.top=""}
-raf=requestAnimationFrame(lay)};
-const go=n=>{k=n;tgt=null;clearInterval(waitT);const st=S[k];if(!st)return fin();if(st.if&&!st.if())return go(k+1);const need=st.s?q(st.s):1;
-if(st.s&&!need){t0=t0||Date.now();if(Date.now()-t0>(st.tap?6e3:2500)){t0=0;return go(k+1)}return void setTimeout(()=>k===n&&go(n),300)}t0=0;
+else{Object.assign(B[0].style,{left:-ox+"px",top:-oy+"px",width:W+"px",height:H+"px"});[1,2,3].forEach(i=>B[i].style.width="0");G.style.display="none";X.classList.add("mid");X.style.left=X.style.top=""}};
+const go=n=>{k=n;tgt=null;clearInterval(waitT);R.dataset.a=0;R.dataset.w="";const st=S[k];if(!st)return fin();if(st.if&&!st.if())return go(k+1);const need=st.s?q(st.s):1;
+if(st.s&&need&&need.nodeType)tgt=need;if(st.s&&!need){t0=t0||Date.now();if(Date.now()-t0>(st.tap?6e3:2500)){t0=0;return go(k+1)}return void setTimeout(()=>k===n&&go(n),300)}t0=0;
 I.src=`img/moli/${st.img||(st.tap?"decidida":"idea")}.webp`;P.innerHTML=st.t;C.textContent=`${k+1} / ${S.length}`;N.hidden=!!st.tap;N.textContent=st.end?"¡Empezar! 🚀":"Siguiente ›";X.classList.remove("in");void X.offsetWidth;X.classList.add("in");R.classList.toggle("tap",!!st.tap)};
-const clk=e=>{const st=S[k];if(!st||!st.tap||!tgt)return;if(!(e.target===tgt||tgt.contains(e.target)))return;const n=k;R.classList.remove("tap");G.classList.add("hit");setTimeout(()=>G.classList.remove("hit"),400);let w=0;waitT=setInterval(()=>{w+=200;if(k!==n)return clearInterval(waitT);if(!st.w||st.w()||w>8e3){clearInterval(waitT);setTimeout(()=>k===n&&go(n+1),350)}},200)};
-document.addEventListener("click",clk,!0);N.onclick=()=>go(k+1);
+const clk=e=>{const st=S[k];if(!st||!st.tap||!tgt)return;if(!(e.target===tgt||tgt.contains(e.target))){const r=tgt.getBoundingClientRect();if(!(e.clientX>=r.left-8&&e.clientX<=r.right+8&&e.clientY>=r.top-8&&e.clientY<=r.bottom+8)||R.contains(e.target))return;e.preventDefault();e.stopPropagation();setTimeout(()=>tgt.click(),0)}const n=k;if(R.dataset.w===String(n))return;R.dataset.w=n;R.classList.remove("tap");G.classList.add("hit");setTimeout(()=>G.classList.remove("hit"),400);let w=0;clearInterval(waitT);waitT=setInterval(()=>{w+=200;if(k!==n){R.dataset.w="";return clearInterval(waitT)}if(!st.w||st.w()){clearInterval(waitT);R.dataset.w="";setTimeout(()=>k===n&&go(n+1),350)}else if(w>=2500){clearInterval(waitT);R.dataset.w="";const at=(+R.dataset.a||0)+1;R.dataset.a=at;at>=3?go(n+1):R.classList.add("tap")}},200)};
+document.addEventListener("click",clk,!0);N.onclick=()=>go(k+1);const auto=setInterval(()=>{const st=S[k];if(!R.isConnected)return clearInterval(auto);st&&st.tap&&st.w&&!R.dataset.w&&st.w()&&(R.dataset.w=k,setTimeout(()=>{const n=+R.dataset.w;R.dataset.w="";k===n&&go(n+1)},350))},400);
 const key=e=>{e.key==="Escape"&&e.stopPropagation()};document.addEventListener("keydown",key,!0);
 function fin(){Rt(K,1);cancelAnimationFrame(raf);clearInterval(waitT);document.removeEventListener("click",clk,!0);document.removeEventListener("keydown",key,!0);R.classList.add("out");setTimeout(()=>R.remove(),300);cvApi.tour.on=0}
 lay();go(0)};

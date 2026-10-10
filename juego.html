@@ -36,6 +36,16 @@
   .lk-green { background: #dcfce7; border: 2px solid #16a34a; } .lk-notes { background: #e0f2fe; border: 2px solid #0284c7; } .lk-folder { background: #fef3c7; border: 2px solid #d97706; }
   .lk-item button { border: 0; border-radius: 10px; padding: 10px 14px; font-size: 15px; font-weight: 700; margin: 0 6px 6px 0; color: #fff; }
   .lk-green button { background: #16a34a; } .lk-notes button { background: #0284c7; } .lk-folder button { background: #d97706; }
+  #bookPanel { position: fixed; inset: 0; background: rgba(2,6,23,.8); z-index: 16; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 16px; color: #fff; }
+  #bookPanel h2 { margin: 0 0 18px; font-size: 22px; text-align: center; }
+  #books { display: flex; gap: 22px; flex-wrap: wrap; justify-content: center; }
+  .book { width: 150px; height: 210px; border: 0; border-radius: 6px 14px 14px 6px; color: #fff; padding: 16px 12px 14px 20px; text-align: left; position: relative; box-shadow: inset 10px 0 0 rgba(0,0,0,.22), 0 12px 28px rgba(0,0,0,.5); display: flex; flex-direction: column; justify-content: space-between; font-family: inherit; transition: transform .15s; }
+  .book:active { transform: scale(.96); }
+  .book .bk-n { font-size: 15px; font-weight: 700; opacity: .9; } .book .bk-u { font-size: 30px; font-weight: 800; line-height: 1.05; }
+  .book .bk-i { font-size: 46px; } .book .bk-t { font-size: 13px; font-weight: 600; line-height: 1.25; }
+  .bk7 { background: linear-gradient(160deg, #14b8a6, #2563eb); } .bk8 { background: linear-gradient(160deg, #ec4899, #7c3aed); }
+  .bk-notes.bk7 { background: linear-gradient(160deg, #0ea5e9, #1e3a8a); } .bk-notes.bk8 { background: linear-gradient(160deg, #f59e0b, #b45309); }
+  #bookClose { margin-top: 22px; background: #334155; color: #fff; border: 0; border-radius: 12px; padding: 11px 28px; font-size: 15px; font-weight: 700; }
   #lockerClose { width: 100%; background: #334155; color: #fff; border: 0; border-radius: 12px; padding: 11px; font-size: 15px; font-weight: 700; }
   #musicBtn { position: fixed; top: 10px; right: 10px; background: rgba(15,23,42,.7); color: #fff; border: 1px solid rgba(255,255,255,.25); border-radius: 8px; padding: 6px 10px; font-size: 12px; z-index: 5; display: none; }
 </style>
@@ -54,14 +64,15 @@
 <div id="toast"></div>
 <div id="lockerPanel"><div id="lockerCard">
   <h2 id="lockerTitle">Mi locker</h2><p class="sub" id="lockerSub"></p>
-  <div class="lk-item lk-green"><b>📗 Mi cuaderno verde</b><button data-moli="u:unit7">Unidad 7</button><button data-moli="u:unit8">Unidad 8</button></div>
+  <div class="lk-item lk-green"><b>📗 Mi cuaderno verde</b><button data-books="u">Abrir mi cuaderno</button></div>
   <div class="lk-item lk-folder"><b>📁 Folder · Librito de Exit tickets</b><button data-moli="exit">Ver mis libritos</button></div>
   <button id="lockerClose">Cerrar</button>
 </div></div>
+<div id="bookPanel"><h2 id="bookTitle"></h2><div id="books"></div><button id="bookClose">Cerrar</button></div>
 <div id="moliWin"><div id="moliBar"><button id="moliBack">← Volver al colegio</button><span id="moliHint"></span></div><iframe id="moliFrame" allow="autoplay; fullscreen"></iframe></div>
 <div id="start">
-  <h1>Innova Schools Tacna</h1>
-  <p>Apareces afuera, frente a las puertas del colegio. Acércate y ábrelas para entrar. Puedes subir escaleras, cruzar el puente y entrar a todas las aulas.</p>
+  <h1 id="introH">Innova Schools Tacna</h1>
+  <p id="introTxt">Apareces afuera, frente a las puertas del colegio. Acércate y ábrelas para entrar. Puedes subir escaleras, cruzar el puente y entrar a todas las aulas.</p>
   <p id="helpPc"><b>PC:</b> clic para mirar · W A S D mover · Shift correr · Espacio saltar · <b>E</b> abrir/cerrar puertas</p>
   <p id="moliInfo"></p>
   <p id="helpTouch"><b>Celular:</b> joystick izquierdo para caminar · arrastra el dedo en la derecha para mirar · botón <b>ABRIR</b> junto a una puerta</p>
@@ -434,13 +445,20 @@ function screenTex(kind) {                                        // lo que el p
     g.fillStyle = '#0e7490'; g.font = 'bold 66px sans-serif'; g.fillText('🧪 Laboratorio de Molí', 512, 130);
     g.fillStyle = '#155e75'; g.font = '34px sans-serif'; g.fillText('Juegos y experimentos de ciencia', 512, 215);
     g.font = '64px sans-serif'; g.fillText('⚡ 🌱 💧 🌍 🔬', 512, 305);
-  } else {
-    g.strokeStyle = '#f59e0b'; g.lineWidth = 8; g.setLineDash([18, 16]); g.beginPath(); g.moveTo(90, 360); g.bezierCurveTo(300, 250, 520, 420, 720, 320); g.bezierCurveTo(840, 260, 900, 330, 950, 300); g.stroke(); g.setLineDash([]);
-    [[90, 360], [330, 318], [560, 372], [720, 320], [950, 300]].forEach(([x, y], k) => { g.fillStyle = k === 4 ? '#ef4444' : '#16a34a'; g.beginPath(); g.arc(x, y, 18, 0, 6.3); g.fill(); });
-    g.fillStyle = '#9a3412'; g.font = 'bold 72px sans-serif'; g.fillText('💪 Refuerzo', 512, 105);
-    g.fillStyle = '#7c2d12'; g.font = '36px sans-serif'; g.fillText('Mapas de refuerzo · Molí', 512, 185);
+  } else {                                                        // los 2 mapas de refuerzo (Unidad 7 y Unidad 8)
+    g.fillStyle = '#7c2d12'; g.font = 'bold 44px sans-serif'; g.fillText('🗺️ Mapas de refuerzo', 512, 42);
+    [[22, '#0d9488', '#99f6e4', 'Unidad 7', 'Microorganismos en acción', '🦠'], [522, '#7c3aed', '#f5d0fe', 'Unidad 8', 'Sistema reproductor humano', '🧬']].forEach(([x0, c1, c2, u, t, ic]) => {
+      const w = 480, h = 300, y0 = 76, gr2 = g.createLinearGradient(x0, y0, x0 + w, y0 + h); gr2.addColorStop(0, c2); gr2.addColorStop(1, '#fffbeb');
+      g.fillStyle = gr2; g.fillRect(x0, y0, w, h); g.strokeStyle = c1; g.lineWidth = 6; g.strokeRect(x0, y0, w, h);
+      g.fillStyle = 'rgba(59,130,246,.25)'; g.beginPath(); g.ellipse(x0 + 360, y0 + 230, 90, 40, 0, 0, 6.3); g.fill();          // lago
+      const pts = [[x0 + 50, y0 + 255], [x0 + 140, y0 + 200], [x0 + 110, y0 + 125], [x0 + 230, y0 + 150], [x0 + 300, y0 + 95], [x0 + 420, y0 + 120]];
+      g.strokeStyle = '#b45309'; g.lineWidth = 6; g.setLineDash([14, 12]); g.beginPath(); pts.forEach(([x, y], k) => k ? g.lineTo(x, y) : g.moveTo(x, y)); g.stroke(); g.setLineDash([]);
+      pts.forEach(([x, y], k) => { g.fillStyle = k === pts.length - 1 ? '#ef4444' : k < 2 ? '#16a34a' : '#f59e0b'; g.beginPath(); g.arc(x, y, 15, 0, 6.3); g.fill(); g.fillStyle = '#fff'; g.font = 'bold 16px sans-serif'; g.fillText(k === pts.length - 1 ? '★' : String(k + 1), x, y + 1); });
+      g.font = '44px sans-serif'; g.fillText(ic, x0 + 50, y0 + 60);
+      g.fillStyle = c1; g.font = 'bold 34px sans-serif'; g.fillText(u, x0 + 250, y0 + 40); g.font = '22px sans-serif'; g.fillText(t, x0 + 250, y0 + 72);
+    });
   }
-  g.fillStyle = 'rgba(15,23,42,.75)'; g.font = 'bold 28px sans-serif'; g.fillText('Toca la pizarra para entrar', 512, 410);
+  g.fillStyle = 'rgba(15,23,42,.75)'; g.font = 'bold 26px sans-serif'; g.fillText('Toca la pizarra para entrar', 512, 418);
   return new THREE.CanvasTexture(c);
 }
 const lockerGeo = new THREE.PlaneGeometry(1, 1);
@@ -517,7 +535,7 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
       boxAt(du + 0.3, ds + 0.05, 0.77, 0.26, 0.06, 0.2, 0x16a34a, false);               // libro
       { const [tx, tz] = P(du - 0.25, ds); moliTag('Mis notas', tx, fy + 1.45, tz); }
       const [fx, fz] = P(du, ds - 0.6);
-      addUse('Folder «Mis notas» del profesor', fx, fz, fy, () => { if (ME && ME.teacher) openMoli('reg'); else toast('📂 Este folder «Mis notas» es del profesor'); }, 'Abrir'); }
+      addUse('Mis notas', fx, fz, fy, () => { if (ME && ME.teacher) openMoli('reg'); else if (ME) openBooks('n'); else toast('🔑 Entra con tu DNI en Molí para ver tus notas'); }, 'Abrir'); }
     // junto a la ventana: mesita rectangular mediana con laptop, parlante y su silla
     { const wu = 0.2, ws = 0.32;
       boxAt(wu, ws, 0, 1.0, 0.7, 0.52, 0xd6d3d1, true); boxAt(wu, ws, 0.7, 1.08, 0.04, 0.58, 0xf5f5f4, false);
@@ -527,7 +545,7 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
       boxAt(wu + 0.32, ws + 0.055, 0.81, 0.08, 0.08, 0.01, 0x6b7280, false);
       const [cx2, cz2] = P(wu, ws + 0.62); chair(cx2, cz2, svec[0], svec[1], Math.atan2(svec[0], svec[1]), fy); }
     // el proyector proyecta "Refuerzo · mapas de refuerzo"; al tocar la pizarra se abren los refuerzos de Molí
-    { const [sx, sz] = P(-(Wc / 2 - T - 0.235), Dp / 2 - T), scr = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 1.45), new THREE.MeshBasicMaterial({ map: screenTex('ref') }));
+    { const [sx, sz] = P(-(Wc / 2 - T - 0.29), Dp / 2 - T), scr = new THREE.Mesh(new THREE.PlaneGeometry(3.38, 1.43), new THREE.MeshBasicMaterial({ map: screenTex('ref') }));
       scr.position.set(sx, fy + 1.72, sz); scr.rotation.y = Math.atan2(uvec[0], uvec[1]); scene.add(scr);
       const [ux, uz] = P(-(Wc / 2 - T - 1.2), Dp / 2 - T); addUse('Pizarra: mapas de refuerzo', ux, uz, fy, () => openMoli('mis'), 'Ver');
       const [gx, gz] = P(-(Wc / 2 - T - 0.6), Dp / 2 - T); moliTag('Mapas de refuerzo', gx, fy + 2.75, gz); }
@@ -573,7 +591,7 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
     clusters(true);
   } else if (kind === 'lab') {                                        // laboratorio de ciencias: 6 mesas largas, 3 sillas adelante y 3 atrás por mesa
     teach();
-    { const [sx, sz] = P(-(Wc / 2 - T - 0.235), Dp / 2 - T), scr = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 1.45), new THREE.MeshBasicMaterial({ map: screenTex('lab') }));
+    { const [sx, sz] = P(-(Wc / 2 - T - 0.29), Dp / 2 - T), scr = new THREE.Mesh(new THREE.PlaneGeometry(3.38, 1.43), new THREE.MeshBasicMaterial({ map: screenTex('lab') }));
       scr.position.set(sx, fy + 1.72, sz); scr.rotation.y = Math.atan2(uvec[0], uvec[1]); scene.add(scr);
       const [ux, uz] = P(-(Wc / 2 - T - 1.2), Dp / 2 - T); addUse('Laboratorio de Molí', ux, uz, fy, () => openMoli('lab'), 'Jugar');
       const [gx, gz] = P(-(Wc / 2 - T - 0.6), Dp / 2 - T); moliTag('Laboratorio de Molí', gx, fy + 2.75, gz); }
@@ -1279,6 +1297,9 @@ function update(dt) {
   P.vy -= 18 * dt; P.y += P.vy * dt;
   if (P.y <= g) { P.y = g; P.vy = 0; }
   if (restricted() && P.y < FH - 0.05) { P.y = FH; P.vy = 0; }      // dentro de la zona nunca se cae del piso 2
+  // anti-atasco: si empujas 2 s y casi no te mueves, vuelves a tu sitio
+  if (m > 0.3 && dt > 0) { P.pushT = (P.pushT || 0) + dt; P.pushD = (P.pushD || 0) + Math.hypot(P.x - ox, P.z - oz); } else { P.pushT = 0; P.pushD = 0; }
+  if (P.pushT > 2) { if (P.pushD < 0.25 && myRoom() && seatInRoom(myRoom())) toast('🪑 Te regresé a tu sitio'); P.pushT = 0; P.pushD = 0; }
   if (P.y < -30) { P.x = 1; P.z = 35; P.y = 0; }
   // puertas
   for (const d of doors) {
@@ -1347,6 +1368,10 @@ function toast(msg, sec = 4) { toastEl.textContent = msg; toastEl.style.display 
 function refreshChip() {
   ME = readMe();
   chipEl.textContent = myRoom() ? '👋 ' + firstName() + ' · 6to ' + ME.section : ME && ME.teacher ? '👩‍🏫 Docente · Molí' : '🔑 Entrar con Molí';
+  if (myRoom()) {                                                  // alumno con cuenta: sólo su salón
+    document.getElementById('introH').textContent = '🏫 Mi salón ' + myRoom();
+    document.getElementById('introTxt').textContent = 'Te sentarás en tu salón. Camina para levantarte, busca tu locker que brilla y toca la pizarra para ver tus mapas de refuerzo.';
+  }
   document.getElementById('moliInfo').textContent = myRoom() ? 'Hola ' + firstName() + ': aparecerás sentado en tu salón ' + myRoom() + '.' : 'Si entras con tu DNI en Molí, aparecerás sentado en tu salón de 6to.';
 }
 function strHash(t) { let h = 7; for (const ch of String(t)) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return h; }
@@ -1392,7 +1417,7 @@ function checkLocker() {                                          // al acercart
   myLocker = { n, glow };
   toast('🔒 Tu locker es el N° ' + String(n).padStart(2, '0') + ', ' + firstName() + ' (el que brilla)', 5);
 }
-function setUi(on) { uiOpen = on; for (const k in keys) keys[k] = false; joy.x = joy.y = 0; if (on && document.exitPointerLock) document.exitPointerLock(); music.duck(on); }
+function setUi(on) { uiOpen = on; for (const k in keys) keys[k] = false; joy.x = joy.y = 0; joyId = lookId = null; knob.style.left = knob.style.top = '40px'; if (on && document.exitPointerLock) document.exitPointerLock(); music.duck(on); }
 function openLocker() {
   document.getElementById('lockerTitle').textContent = '🔒 Locker ' + String(myLocker.n).padStart(2, '0');
   document.getElementById('lockerSub').textContent = (ME && ME.name ? ME.name + ' · ' : '') + '6to ' + (ME ? ME.section : '');
@@ -1419,6 +1444,16 @@ function openMoli(target) {
     }, 400);
   }
 }
+const UNITS = [['unit7', '7', 'Microorganismos en acción', '🦠'], ['unit8', '8', 'El sistema reproductor humano', '🧬']];
+function openBooks(kind) {                                        // los libros de frente: Unidad 7 y Unidad 8 para elegir
+  lockerPanel.style.display = 'none';
+  document.getElementById('bookTitle').textContent = kind === 'n' ? '📂 Mis notas · elige tu unidad' : '📗 Mi cuaderno · elige tu unidad';
+  document.getElementById('books').innerHTML = UNITS.map(([k, n, t, ic]) => `<button class="book bk${n}${kind === 'n' ? ' bk-notes' : ''}" data-open="${kind}:${k}"><span class="bk-n">${kind === 'n' ? 'Mis notas' : 'Cuaderno de sesiones'}</span><span class="bk-i">${kind === 'n' ? '📊' : ic}</span><span class="bk-u">Unidad ${n}</span><span class="bk-t">${t}</span></button>`).join('');
+  document.querySelectorAll('#books .book').forEach(b => b.addEventListener('click', () => { document.getElementById('bookPanel').style.display = 'none'; openMoli(b.dataset.open); }));
+  setUi(true); document.getElementById('bookPanel').style.display = 'flex';
+}
+document.getElementById('bookClose').addEventListener('click', () => { document.getElementById('bookPanel').style.display = 'none'; setUi(false); });
+document.querySelectorAll('[data-books]').forEach(b => b.addEventListener('click', () => openBooks(b.dataset.books)));
 function closeMoli() {
   clearInterval(moliPoll); moliWin.style.display = 'none'; moliFrame.src = 'about:blank'; setUi(false);
   const had = myRoom(); refreshChip(); if (!had && myRoom()) toast('✅ ¡Listo, ' + firstName() + '! Toca tu nombre arriba para ir a tu salón ' + myRoom() + '.', 5);
@@ -1513,7 +1548,8 @@ function loop(now) {
   clouds.children.forEach(g => { g.position.x += g.userData.v * Math.min(dt, 0.1); if (g.position.x > 440) g.position.x = -440; });
   renderer.render(scene, camera);
 }
-camera.position.set(P.x, P.y + 1.6, P.z);
+if (myRoom()) seatInRoom(myRoom());                                 // de fondo, ya se ve su salón desde su silla
+camera.position.set(P.x, P.y + (P.seated ? 1.15 : 1.6), P.z); camera.rotation.set(P.pitch, P.yaw, 0);
 requestAnimationFrame(loop);
 window.G = { P, update, doors, colliders, floors, camera, renderer, scene, toggle, nearestDoor, keys, joy };
 </script>

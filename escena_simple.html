@@ -93,7 +93,7 @@ function room(name, level, cx, floor, cz, w, d, o = {}) {
 }
 
 // ================= PATIO (centro), CANCHA y ÁREA VERDE =================
-flat(32, 29.5, -3, -1.75, 0xb3ae9f, 0.02, 0.04);                       // patio
+flat(48, 29.5, 5, -1.75, 0xb3ae9f, 0.02, 0.04);                       // patio
 label('PATIO', -4, 0.4, -13, 3, '#fff', 'rgba(71,85,105,.9)');
 // cancha de losa
 flat(16.5, 10, -4.25, -5, 0x64748b, 0.06, 0.1);
@@ -178,7 +178,7 @@ room('KC', 'inicial', A.xc[1], 0, A.zc, 5.85, 5.8, { side: 'z' });
 label('PABELLÓN A', -41.5, 2 * FH + 1.2, A.zc, 3, '#fff', 'rgba(0,114,206,.9)');
 
 // ================= PABELLÓN F (diagonal, lado derecho) =================
-const F = { x: 16.3, z: -2.3, rot: 0.849, sw: 5.5, depth: 6 };
+const F = { x: 20.4, z: 1.67, rot: 0.44, sw: 5.5, depth: 6 };
 const F_ROWS = [
   [['2D','primaria'], ['3A','primaria'], ['3B','primaria'], ['3C','primaria'], ['3D','primaria']],
   [['7B','secundaria'], ['7C','secundaria'], ['7D','secundaria'], ['8A','secundaria'], ['8B','secundaria']],
@@ -333,7 +333,7 @@ function toggleDoors() {
 
 // ---------- Cámaras ----------
 const presets = {
-  iso:    { p: [50, 62, 78],  t: [-8, 0, 3] },
+  iso:    { p: [55, 66, 82],  t: [-4, 0, 3] },
   puente: { p: [-8, 12, 24],  t: [-17, 4, 6] },
   puertas:{ p: [0, 9, 56],    t: [0, 2, 26] },
   planta: { p: [-8, 130, 3],  t: [-8, 0, 2] }

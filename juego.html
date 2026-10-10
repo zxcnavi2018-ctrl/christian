@@ -602,7 +602,7 @@ lowWall(A.xc[0] - 4.5, A.zc + 5.8, A.xc[0] + 4.5, A.zc + 5.8, FH);
 // ===================================================================
 //  PABELLÓN F  (diagonal)
 // ===================================================================
-const F = { x: 28.36, z: -4.09, rot: 0.44, sw: 9, depth: 8, yo: 0.6 };   // un poco más alto que D; se sube por escaleras de 4 gradas frente a cada puerta
+const F = { x: 28.36, z: -4.09, rot: 0.44, sw: 9, depth: 8, yo: 0 };   // a nivel del suelo, sin escaleras
 const F_ROWS = [
   [['2D','primaria'], ['3A','primaria'], ['3B','primaria'], ['3C','primaria'], ['3D','primaria']],
   [['7B','secundaria'], ['7C','secundaria'], ['7D','secundaria'], ['8A','secundaria'], ['8B','secundaria']],
@@ -624,25 +624,6 @@ label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
   [wx, wz] = lw(F.x, F.z, F.rot, 13.5, lz);
   floorSlab(wx, wz, 18, 1.8, F.rot, 2 * FH + yo);
   lowWallLocal(F.x, F.z, F.rot, 4.5, 22.5, lz - 0.8, 2 * FH + yo);
-  // una sola escalera de 4 gradas a lo largo de toda la cara de F (divide el patio), con 2 barandales que la parten en 3 tramos
-  if (yo > 0) {
-    const c = Math.cos(F.rot), sn = Math.sin(F.rot), iron = 0x1f2937;
-    for (let k = 1; k <= 4; k++) {
-      const top = k * (yo / 4), lzc = -(F.depth / 2) - 0.2 - 0.4 * (4 - k);
-      const [gx, gz] = lw(F.x, F.z, F.rot, 0, lzc);
-      addSolid(gx, 0, gz, 2 * L, top, 0.4, F.rot, 0xd6d3d1, false);
-      floors.push({ x: gx, z: gz, hw: L, hd: 0.2, c, s: sn, y: top });
-    }
-    const zt = -(F.depth / 2) - 0.15, zb = -(F.depth / 2) - 1.5;
-    [-7.02, 10.98].forEach(lxr => {                                    // entre puertas, para no tapar ninguna
-      const [tx, tz] = lw(F.x, F.z, F.rot, lxr, zt), [bx, bz] = lw(F.x, F.z, F.rot, lxr, zb);
-      slopedBar(bx, 0.15 + 0.95, bz, tx, yo + 0.95, tz, 0.05);
-      slopedBar(bx, 0.15 + 0.45, bz, tx, yo + 0.45, tz, 0.03);
-      addSolid(bx, 0, bz, 0.05, 1.1, 0.05, 0, iron, false); addSolid(tx, yo, tz, 0.05, 0.95, 0.05, 0, iron, false);
-      const [mx, mz] = lw(F.x, F.z, F.rot, lxr, (zt + zb) / 2);
-      addCollider(mx, mz, 0.1, Math.abs(zt - zb), F.rot, 0, 1.8);
-    });
-  }
 })();
 
 // ---- cercos de las áreas verdes: palitos con soga para que los niños no pisen el pasto ----

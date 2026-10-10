@@ -108,7 +108,7 @@ function readMe() {
 let ME = readMe();
 const myRoom = () => (ME && !ME.teacher && /^[A-D]$/.test(ME.section || '')) ? '6' + ME.section : null;
 const firstName = () => String(ME && ME.name || '').split(' ')[0];
-const ROOMINFO = {}, SALON6 = {};                                 // centro de cada salón / lockers y pizarra de los sextos
+const ROOMINFO = {}, SALON6 = {}, fakeInteriors = [];                                 // centro de cada salón / lockers y pizarra de los sextos
 let uiOpen = false;
 const SKY_HORIZON = 0xcfe8ff;                                          // horizonte celeste claro
 const SUN_DIR = new THREE.Vector3(-0.45, 0.78, 0.35).normalize();      // sol alto (de día)
@@ -339,7 +339,7 @@ function buildWall(ox, oz, rot, lx, lz, axis, len, y0, ops, color, o = {}) {
       const n = o.normal || [0, 1];
       const nw = [n[0] * Math.cos(rot) + n[1] * Math.sin(rot), -n[0] * Math.sin(rot) + n[1] * Math.cos(rot)];
       const dir = ((-Math.sin(phi)) * nw[0] + (-Math.cos(phi)) * nw[1]) >= 0 ? 1 : -1;
-      registerDoor(op.name || o.name || 'Puerta', cx, cz, y0, [{ pivot: leaf, base: phi, sgn: dir }], col, Math.PI / 2);
+      if (!op.locked) registerDoor(op.name || o.name || 'Puerta', cx, cz, y0, [{ pivot: leaf, base: phi, sgn: dir }], col, Math.PI / 2);   // los salones cerrados no se abren
       if (op.sign && o.name) {
         const off = t / 2 + 0.012, [sx, sz] = lw(ox, oz, rot, axis === 'x' ? lx + op.u + n[0] * off : lx + n[0] * off, axis === 'x' ? lz + n[1] * off : lz + op.u + n[1] * off);
         plaque(o.name, sx, y0 + 2.42, sz, Math.atan2(nw[0], nw[1]));                 // cartelito rectangular pegado en la pared, sobre la puerta
@@ -352,6 +352,25 @@ function buildWall(ox, oz, rot, lx, lz, axis, len, y0, ops, color, o = {}) {
 
 // ---- mobiliario (instancias) ----
 const furn = { tops: [], peds: [], seats: [], backs: [], legs: [], lapB: [], lapS: [] };
+// ---- Molí flotando (plano, tipo etiqueta) sobre las cosas interactivas ----
+const moliTags = [], moliImg = new Image();
+function drawTag(t) {
+  const g = t.g; g.clearRect(0, 0, 512, 160);
+  g.fillStyle = 'rgba(255,255,255,.96)'; g.strokeStyle = '#16a34a'; g.lineWidth = 8;
+  g.beginPath(); g.roundRect ? g.roundRect(70, 34, 430, 96, 46) : g.rect(70, 34, 430, 96); g.fill(); g.stroke();
+  if (moliImg.complete && moliImg.naturalWidth) g.drawImage(moliImg, 0, 0, 150, 150); else { g.fillStyle = '#22c55e'; g.beginPath(); g.arc(75, 80, 60, 0, 6.3); g.fill(); }
+  g.fillStyle = '#14532d'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  let fs = 46; do { g.font = 'bold ' + fs + 'px sans-serif'; fs -= 2; } while (g.measureText(t.text).width > 330 && fs > 20);
+  g.fillText(t.text, 310, 84); t.tex.needsUpdate = true;
+}
+function moliTag(text, x, y, z) {
+  const c = document.createElement('canvas'); c.width = 512; c.height = 160;
+  const t = { text, g: c.getContext('2d'), tex: new THREE.CanvasTexture(c) };
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: t.tex, transparent: true, depthWrite: false }));
+  sp.scale.set(1.05, 0.33, 1); sp.position.set(x, y, z); scene.add(sp);
+  t.sp = sp; t.y = y; t.ph = Math.random() * 6; drawTag(t); moliTags.push(t); return sp;
+}
+if (MOLI_BASE === '') { moliImg.onload = () => moliTags.forEach(drawTag); moliImg.src = 'img/moli/feliz.webp'; }   // misma web de Molí: con su dibujo
 const ROOMLIGHTS = [];                                              // luces de los sextos (una sola PointLight real que va al salón donde estás)
 const spinners = [];                                               // aspas de ventiladores (giran en el bucle si están prendidos)
 function addUse(name, x, z, y, fn, verb = 'Abrir') {               // algo que se toca (locker, pizarra, proyección)
@@ -489,12 +508,13 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
       const th = pl.rotation.y;
       SALON6[rname] = { plane: pl, LL, fy, x: lx, z: lz, ax: [Math.cos(th), -Math.sin(th)], nrm: [Math.sin(th), Math.cos(th)], rot: th }; }
     // mesa del profesor: junto a la pizarra, pegada a la pared del fondo, con el folder "Mis notas" (para el docente)
-    { const du = -(Wc / 2 - T) + 0.8, ds = Dp - 2 * T - 0.38;
-      boxAt(du, ds, 0, 1.5, 0.72, 0.72, 0x8b5a2b, true);                                 // cuerpo de la mesa
-      boxAt(du, ds, 0.72, 1.6, 0.05, 0.78, 0xa16207, false);                             // tablero
-      boxAt(du, ds - 0.85, 0.42, 0.44, 0.05, 0.44, 0x1f2937, false); boxAt(du, ds - 1.06, 0.62, 0.44, 0.42, 0.05, 0x1f2937, false);   // silla del docente
+    { const du = -(Wc / 2 - T) + 0.72, ds = Dp - 2 * T - 1.05;                          // el profesor mira a las mesitas; su silla queda contra la pared
+      boxAt(du, ds, 0, 1.2, 0.72, 0.68, 0x8b5a2b, true);                                 // cuerpo de la mesa
+      boxAt(du, ds, 0.72, 1.3, 0.05, 0.76, 0xa16207, false);                             // tablero
+      boxAt(du, ds + 0.62, 0.42, 0.44, 0.05, 0.44, 0x1f2937, false); boxAt(du, ds + 0.84, 0.62, 0.44, 0.42, 0.05, 0x1f2937, false);   // silla del docente (respaldo a la pared)
       boxAt(du - 0.25, ds, 0.77, 0.32, 0.03, 0.24, 0x0284c7, false);                    // folder azul "Mis notas"
-      boxAt(du + 0.35, ds + 0.05, 0.77, 0.28, 0.06, 0.22, 0x16a34a, false);             // libro
+      boxAt(du + 0.3, ds + 0.05, 0.77, 0.26, 0.06, 0.2, 0x16a34a, false);               // libro
+      { const [tx, tz] = P(du - 0.25, ds); moliTag('Mis notas', tx, fy + 1.45, tz); }
       const [fx, fz] = P(du, ds - 0.6);
       addUse('Folder «Mis notas» del profesor', fx, fz, fy, () => { if (ME && ME.teacher) openMoli('reg'); else toast('📂 Este folder «Mis notas» es del profesor'); }, 'Abrir'); }
     // junto a la ventana: mesita rectangular mediana con laptop, parlante y su silla
@@ -508,7 +528,8 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
     // el proyector proyecta "Refuerzo · mapas de refuerzo"; al tocar la pizarra se abren los refuerzos de Molí
     { const [sx, sz] = P(-(Wc / 2 - T - 0.235), Dp / 2 - T), scr = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 1.45), new THREE.MeshBasicMaterial({ map: screenTex('ref') }));
       scr.position.set(sx, fy + 1.72, sz); scr.rotation.y = Math.atan2(uvec[0], uvec[1]); scene.add(scr);
-      const [ux, uz] = P(-(Wc / 2 - T - 1.2), Dp / 2 - T); addUse('Pizarra: mapas de refuerzo', ux, uz, fy, () => openMoli('mis'), 'Ver'); }
+      const [ux, uz] = P(-(Wc / 2 - T - 1.2), Dp / 2 - T); addUse('Pizarra: mapas de refuerzo', ux, uz, fy, () => openMoli('mis'), 'Ver');
+      const [gx, gz] = P(-(Wc / 2 - T - 0.6), Dp / 2 - T); moliTag('Mapas de refuerzo', gx, fy + 2.75, gz); }
     // 5 grupos: dos a cada lado (adelante y atrás) y uno al centro
     const G5 = [[-1.5, 1.6], [2.25, 1.6], [-1.5, 6.0], [2.25, 6.0], [0.4, 3.8]];
     seatsOut = []; clusters(false, G5); SALON6[rname].seats = seatsOut; seatsOut = null;
@@ -553,7 +574,8 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
     teach();
     { const [sx, sz] = P(-(Wc / 2 - T - 0.235), Dp / 2 - T), scr = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 1.45), new THREE.MeshBasicMaterial({ map: screenTex('lab') }));
       scr.position.set(sx, fy + 1.72, sz); scr.rotation.y = Math.atan2(uvec[0], uvec[1]); scene.add(scr);
-      const [ux, uz] = P(-(Wc / 2 - T - 1.2), Dp / 2 - T); addUse('Laboratorio de Molí', ux, uz, fy, () => openMoli('lab'), 'Jugar'); }
+      const [ux, uz] = P(-(Wc / 2 - T - 1.2), Dp / 2 - T); addUse('Laboratorio de Molí', ux, uz, fy, () => openMoli('lab'), 'Jugar');
+      const [gx, gz] = P(-(Wc / 2 - T - 0.6), Dp / 2 - T); moliTag('Laboratorio de Molí', gx, fy + 2.75, gz); }
     for (const uu of [-0.9, 2.0]) for (const ss of [1.9, 4.2, 6.5]) {
       boxAt(uu, ss, 0, 2.5, 0.66, 0.8, 0x475569, true);                // cuerpo de la mesa
       boxAt(uu, ss, 0.66, 2.6, 0.08, 0.9, 0x1e293b, false);            // cubierta oscura de laboratorio
@@ -588,6 +610,13 @@ function room(name, level, cx, fl, cz, w, d, o = {}) {
   const rot = o.rot || 0, door = o.door || '+x', yo = o.yo || 0, y0 = fl * FH + yo, col = 0xc9cbce;   // paredes en gris
   const opp = (door[0] === '+' ? '-' : '+') + door[1];
   ROOMINFO[name] = { cx, cz, y0 };
+  const kind = o.kind || ((level === 'inicial' || level === 'primaria' || level === 'secundaria') ? 'class' : level);
+  const closed = (kind === 'class' && o.special !== '6B') || kind === 'ml' || kind === 'prof';   // sólo los sextos y el laboratorio se pueden visitar
+  const fakeWin = (isX, sg, u, ww) => {                                 // por la ventana se ve un salón pintado (no hay muebles reales)
+    const lx = isX ? sg * (w / 2 - T - 0.06) : u, lz = isX ? u : sg * (d / 2 - T - 0.06), [x, z] = lw(cx, cz, rot, lx, lz);
+    const nx = isX ? sg : 0, nz = isX ? 0 : sg, nwx = nx * Math.cos(rot) + nz * Math.sin(rot), nwz = -nx * Math.sin(rot) + nz * Math.cos(rot);
+    fakeInteriors.push({ x, y: y0 + 1.7, z, sx: ww, sy: 1.6, sz: 1, rot: Math.atan2(nwx, nwz), color: 0xffffff });
+  };
   for (const side of ['+x', '-x', '+z', '-z']) {
     if (o.skipWall === side) continue;                                  // muro compartido con el módulo vecino (salón unido)
     const sg = side[0] === '+' ? 1 : -1, isX = side[1] === 'x';
@@ -596,11 +625,12 @@ function room(name, level, cx, fl, cz, w, d, o = {}) {
     if (side === door) {
       if (o.doorOps) o.doorOps.forEach(q => ops.push(q));
       else {
-        ops.push({ type: 'door', u: -len * 0.28, w: 1.2, name: 'Puerta ' + name, sign: true });
+        ops.push({ type: 'door', u: -len * 0.28, w: 1.2, name: 'Puerta ' + name, sign: true, locked: closed });
+        if (closed) fakeWin(isX, sg, len * 0.18, len * 0.45);
         if (o.special === '6B') ops.push({ type: 'swin', u: len * 0.18, w: len * 0.45, name: 'Ventana ' + name });   // ventana corrediza al pasillo
         else ops.push({ type: 'window', u: len * 0.18, w: len * 0.45 });
       }
-    } else if (side === opp && !o.noOpp && o.special !== '6B') ops.push({ type: 'window', u: 0, w: len * 0.7 });   // los sextos: al fondo sólo muro
+    } else if (side === opp && !o.noOpp && o.special !== '6B') { ops.push({ type: 'window', u: 0, w: len * 0.7 }); if (closed) fakeWin(isX, sg, 0, len * 0.7); }   // los sextos: al fondo sólo muro
     (o.extra || []).forEach(e => { if (e.side === side) ops.push({ type: 'door', u: e.u, w: 1.2, name: e.name }); });
     // los muros de extremo van lisos (solo muro, sin ventanas)
     buildWall(cx, cz, rot, isX ? sg * (w / 2 - T / 2) : 0, isX ? 0 : sg * (d / 2 - T / 2), isX ? 'z' : 'x', len, y0, ops, col,
@@ -613,8 +643,7 @@ function room(name, level, cx, fl, cz, w, d, o = {}) {
   }
   else { addSolid(cx, Math.min(yo, 0), cz, w, 0.04, d, rot, 0xc6c5c1, false); }
   if (o.roof) { addSolid(cx, y0 + RH, cz, w, 0.2, d, rot, 0x94a3b8, false); roofs.push({ x: cx, z: cz, hw: w / 2, hd: d / 2, c: Math.cos(rot), s: Math.sin(rot), y: y0 + RH + 0.2 }); }
-  const kind = o.kind || ((level === 'inicial' || level === 'primaria' || level === 'secundaria') ? 'class' : level);
-  furnish(kind, cx, cz, rot, y0, w, d, door, o.mlRole || o.special, name);
+  if (!closed) furnish(kind, cx, cz, rot, y0, w, d, door, o.mlRole || o.special, name);
 }
 
 function steps(x0, z0, dx, dz, n, rise, run, w, yBase, thin) {   // (x0,z0) = arranque, (dx,dz) = dirección unitaria
@@ -1153,6 +1182,17 @@ const hexGeo = (function () {                                     // una mesita:
 })();
 buildInstanced(furn.tops, furnMat, hexGeo); buildInstanced(furn.peds, furnMat);
 buildInstanced(furn.seats, furnMat); buildInstanced(furn.backs, furnMat); buildInstanced(furn.legs, furnMat, undefined, false); buildInstanced(furn.lapB, furnMat, undefined, false); buildInstanced(furn.lapS, furnMat, undefined, false);
+buildInstanced(fakeInteriors, new THREE.MeshBasicMaterial({ map: (function () {   // salón pintado detrás de las ventanas (1 sola llamada de dibujo)
+  const c = document.createElement('canvas'); c.width = 512; c.height = 256; const g = c.getContext('2d');
+  let gr = g.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, '#b9bec4'); gr.addColorStop(0.62, '#a9aeb5'); gr.addColorStop(0.63, '#cfd2d6'); gr.addColorStop(1, '#bfc3c8'); g.fillStyle = gr; g.fillRect(0, 0, 512, 256);
+  g.fillStyle = '#f1f5f9'; g.fillRect(60, 6, 160, 8); g.fillRect(300, 6, 160, 8);                   // focos
+  g.fillStyle = '#334155'; g.fillRect(150, 40, 220, 92); g.fillStyle = '#e5e7eb'; g.fillRect(156, 46, 208, 80);   // pizarra
+  for (const [x, y, r] of [[95, 196, 58], [260, 206, 66], [425, 196, 58]]) {
+    g.fillStyle = '#ea580c'; for (let k = -2; k <= 2; k++) g.fillRect(x + k * r * 0.42 - 9, y - 30, 18, 26);    // sillas naranjas
+    g.fillStyle = '#e7e5e0'; g.beginPath(); g.ellipse(x, y, r, r * 0.32, 0, 0, 6.3); g.fill();           // mesa
+    g.fillStyle = '#6b7280'; g.fillRect(x - 3, y + r * 0.3, 6, 22);
+  }
+  const t = new THREE.CanvasTexture(c); return t; })() }), new THREE.PlaneGeometry(1, 1), false);
 buildInstanced(glassItems, new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.5, depthWrite: false }), undefined, false);
 
 // ===================================================================
@@ -1333,6 +1373,7 @@ function checkLocker() {                                          // al acercart
   inside(0.05, 0.3, 0.22, -0.07, -0.12, 0x16a34a);                // cuaderno verde
   inside(0.03, 0.32, 0.24, 0.02, -0.11, 0xf59e0b);                // folder de exit tickets
   addUse('Mi locker ' + String(n).padStart(2, '0'), cx + s.nrm[0] * 0.6, cz + s.nrm[1] * 0.6, s.fy, openLocker, 'Abrir');
+  moliTag('Mi locker ' + String(n).padStart(2, '0'), cx + s.nrm[0] * 0.3, s.fy + 1.85, cz + s.nrm[1] * 0.3);
   myLocker = { n, glow };
   toast('🔒 Tu locker es el N° ' + String(n).padStart(2, '0') + ', ' + firstName() + ' (el que brilla)', 5);
 }
@@ -1441,6 +1482,7 @@ function loop(now) {
   const dt = (now - last) / 1000; last = now;
   update(P.started && !uiOpen ? dt : 0);
   if (P.started) { checkLocker(); updateRoomLamp(); }
+  for (const t of moliTags) t.sp.position.y = t.y + Math.sin(now / 600 + t.ph) * 0.05;
   if (myLocker) myLocker.glow.material.opacity = 0.25 + 0.2 * Math.sin(now / 300);
   sky.position.copy(camera.position); const tNow = now / 1000; spinners.forEach(f => { if (f.on) f.b.rotation.z += Math.min(dt, 0.05) * 14; });
   sun.position.set(P.x + SUN_DIR.x * 120, SUN_DIR.y * 120, P.z + SUN_DIR.z * 120); sun.target.position.set(P.x, 0, P.z);

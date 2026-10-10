@@ -311,8 +311,7 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role) {
   if (kind === 'class') {
     teach(); lockers(); clusters(false);                              // pizarra grande + ecran + proyector; lockers al fondo
   } else if (kind === 'ml') {                                         // media lab: salón gigante (2 módulos unidos), mesas en roseta con laptops
-    if (role !== 'second') teach();
-    if (role !== 'first') lockers();
+    if (role !== 'second') teach();                                   // el media lab no lleva lockers
     clusters(true);
   } else if (kind === 'lab') {
     teach();
@@ -412,7 +411,16 @@ function ironRail(x0, z0, x1, z1, y) {
 (function ground() {
   const g = new THREE.Mesh(new THREE.PlaneGeometry(600, 600), new THREE.MeshLambertMaterial({ map: concreteTex('#8d8c87', 200) }));
   g.rotation.x = -Math.PI / 2; g.receiveShadow = true; scene.add(g);
-  flat(300, 8, 0, 30, 0xb4b3ae, 0.02, 0.04);          // vereda (frente del colegio z=26)
+  // vereda exterior: gris de vereda con juntas de losas de 1.5 m
+  const sw = (function () {
+    const n = 256, c = document.createElement('canvas'); c.width = c.height = n;
+    const g = c.getContext('2d'); g.fillStyle = '#939392'; g.fillRect(0, 0, n, n);
+    for (let i = 0; i < 2200; i++) { g.fillStyle = (Math.random() < 0.5 ? 'rgba(255,255,255,' : 'rgba(0,0,0,') + (Math.random() * 0.08) + ')'; g.fillRect(Math.random() * n, Math.random() * n, 1 + Math.random() * 3, 1 + Math.random() * 3); }
+    g.fillStyle = 'rgba(0,0,0,0.38)'; g.fillRect(0, n - 3, n, 3); g.fillRect(n - 3, 0, 3, n);
+    const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 4; t.repeat.set(300 / 1.5, 8 / 1.5); return t;
+  })();
+  const vereda = new THREE.Mesh(new THREE.PlaneGeometry(300, 8), new THREE.MeshLambertMaterial({ map: sw }));
+  vereda.rotation.x = -Math.PI / 2; vereda.position.set(0, 0.035, 30); vereda.receiveShadow = true; scene.add(vereda);
   flat(300, 14, 0, 41, 0x3f4146, 0.02, 0.04);         // calle
   for (let x = -100; x < 100; x += 6) flat(3, 0.3, x, 41, 0xfacc15, 0.05, 0.02);
   // patio más ancho y largo, con borde azulito en todo el perímetro (el lado derecho sigue la cara del pabellón F)

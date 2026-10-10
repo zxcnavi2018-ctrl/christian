@@ -165,6 +165,15 @@ function label(text, x, y, z, scale = 2.2, color = '#ffffff', bg = 'rgba(15,23,4
   s.position.set(x, y, z); s.scale.set(scale * (w / h) / 2, scale / 2, 1);
   scene.add(s); return s;
 }
+function plaque(text, x, y, z, rotY, w = 0.62, h = 0.2) {         // cartelito plano (no flota): fondo azul noche y letras blancas
+  const c = document.createElement('canvas'); c.width = 320; c.height = 104; const g = c.getContext('2d');
+  g.fillStyle = '#0f1d3d'; g.fillRect(0, 0, 320, 104); g.strokeStyle = '#e5e7eb'; g.lineWidth = 6; g.strokeRect(5, 5, 310, 94);
+  g.fillStyle = '#ffffff'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  let fs = 56; do { g.font = 'bold ' + fs + 'px sans-serif'; fs -= 2; } while (g.measureText(text).width > 290 && fs > 18);
+  g.fillText(text, 160, 55);
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(c) }));
+  m.position.set(x, y, z); m.rotation.y = rotY; scene.add(m); return m;
+}
 function flat(w, d, x, z, color, y = 0.03, h = 0.06) {
   const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({ color }));
   m.position.set(x, y, z); m.receiveShadow = true; scene.add(m); return m;
@@ -269,8 +278,8 @@ function buildWall(ox, oz, rot, lx, lz, axis, len, y0, ops, color, o = {}) {
       const col = addCollider(cx, cz, axis === 'x' ? b - a : 0.2, axis === 'x' ? 0.2 : b - a, rot, y0, y0 + DOOR_H);
       registerDoor(op.name || o.name || 'Puerta', cx, cz, y0, [{ slide: true, pivot: grp, bx: grp.position.x, by: grp.position.y, bz: grp.position.z, dx: tg[0], dz: tg[1], dist: pw + 0.05 }], col, 1);
       if (op.sign && o.name) {
-        const [sx, sz] = lw(ox, oz, rot, axis === 'x' ? lx + op.u + n[0] * 0.15 : lx + n[0] * 0.15, axis === 'x' ? lz + n[1] * 0.15 : lz + op.u + n[1] * 0.15);
-        label(o.name, sx, y0 + 2.55, sz, 0.34, '#ffffff', 'rgba(15,23,42,.85)', 256, 64);
+        const off = t / 2 + 0.012, [sx, sz] = lw(ox, oz, rot, axis === 'x' ? lx + op.u + n[0] * off : lx + n[0] * off, axis === 'x' ? lz + n[1] * off : lz + op.u + n[1] * off);
+        plaque(o.name, sx, y0 + 2.42, sz, Math.atan2(nw[0], nw[1]));                 // cartelito rectangular pegado en la pared, sobre la puerta
       }
     }
     else {
@@ -287,8 +296,8 @@ function buildWall(ox, oz, rot, lx, lz, axis, len, y0, ops, color, o = {}) {
       const dir = ((-Math.sin(phi)) * nw[0] + (-Math.cos(phi)) * nw[1]) >= 0 ? 1 : -1;
       registerDoor(op.name || o.name || 'Puerta', cx, cz, y0, [{ pivot: leaf, base: phi, sgn: dir }], col, Math.PI / 2);
       if (op.sign && o.name) {
-        const [sx, sz] = lw(ox, oz, rot, axis === 'x' ? lx + op.u + n[0] * 0.15 : lx + n[0] * 0.15, axis === 'x' ? lz + n[1] * 0.15 : lz + op.u + n[1] * 0.15);
-        label(o.name, sx, y0 + 2.55, sz, 0.34, '#ffffff', 'rgba(15,23,42,.85)', 256, 64);
+        const off = t / 2 + 0.012, [sx, sz] = lw(ox, oz, rot, axis === 'x' ? lx + op.u + n[0] * off : lx + n[0] * off, axis === 'x' ? lz + n[1] * off : lz + op.u + n[1] * off);
+        plaque(o.name, sx, y0 + 2.42, sz, Math.atan2(nw[0], nw[1]));                 // cartelito rectangular pegado en la pared, sobre la puerta
       }
     }
     cur = b;
@@ -592,14 +601,12 @@ function ironRail(x0, z0, x1, z1, y) {
   const sh = new THREE.Shape(patio.map(V2));
   const pm = new THREE.Mesh(new THREE.ShapeGeometry(sh), new THREE.MeshLambertMaterial({ map: concreteTex('#c6c6c4', 1 / 3), side: THREE.DoubleSide }));
   pm.rotation.x = -Math.PI / 2; pm.position.y = 0.03; pm.receiveShadow = true; scene.add(pm);
-  label('PATIO', 4, 0.6, -28, 1.6, '#fff', 'rgba(71,85,105,.9)');
   // cancha de losa 4 veces más grande (2x2): 33 x 20 m, cubre el patio
   const cx0 = -16.4, cx1 = 12.4, cz0 = -23.5, cz1 = -3.5, ccx = (cx0 + cx1) / 2, ccz = (cz0 + cz1) / 2;
   flat(cx1 - cx0, cz1 - cz0, ccx, ccz, 0xc3c6ca, 0.06, 0.06);               // gris plomo claro (color del piso)
   const lineMat = new THREE.LineBasicMaterial({ color: 0xffffff });
   const pts = [[cx0 + 0.6, cz0 + 0.6], [cx1 - 0.6, cz0 + 0.6], [cx1 - 0.6, cz1 - 0.6], [cx0 + 0.6, cz1 - 0.6]].map(p => new THREE.Vector3(p[0], 0.1, p[1]));
   scene.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), lineMat));
-  label('CANCHA DE LOSA', ccx, 0.7, ccz, 1.8, '#fff', 'rgba(30,41,59,.9)');
 })();
 function grass(w, d, x, z) { flat(w, d, x, z, 0x5a9a45, 0.03, 0.06); }
 
@@ -626,7 +633,6 @@ B_ROWS.forEach((row, f) => { let zc0 = B.z0; row.forEach((r, i) => {
       : undefined,
     noOpp: r[1] === 'bano', special: /^6[A-D]$/.test(r[0]) ? '6B' : undefined });   // 6B, 6C y 6D con el mismo diseño
 }); });
-label('PABELLÓN B', B.x, 3 * FH + 1.2, B.z0 + B.len / 2, 3, '#fff', 'rgba(0,114,206,.9)');
 // pasadizos de B (pisos 2 y 3) con murito de la altura de la baranda
 const bz = B.z0 + B.len - 9;                      // límite entre 6B y 7A (z = 3)
 floorSlab(bFace + 0.9, B.z0 + B.len / 2, 1.8, B.len, 0, FH);
@@ -650,7 +656,6 @@ D_COLS.forEach((col, k) => col.forEach((r, f) => {
   room(r[0], r[1], D.xc[k], f, D.zc, D.sw, D.depth, { door: '-z', roof: f === 2, extra,
     kind: isML ? 'ml' : undefined, mlRole: isML ? (k === 0 ? 'first' : 'second') : undefined, skipWall: isML ? (k === 0 ? '+x' : '-x') : undefined });
 }));
-label('PABELLÓN D', -5.7, 3 * FH + 1.2, D.zc, 3, '#fff', 'rgba(244,114,22,.9)');
 const dN = D.zc - D.depth / 2;                    // borde norte de D (z = 1.9)
 const zsD = dN - 0.9;                             // eje del pasadizo (z = 1.0)
 const xTopD = D.xc[0] - D.sw / 2;                 // x = -14.7 (extremo oeste del pasadizo: aquí nace el puentecito)
@@ -695,7 +700,6 @@ const E_SLOTS = [
 E_SLOTS.forEach((col, k) => col.forEach((r, f) => {
   room(r[0], r[1], E.xc[k], f, E.zc, E.sw, E.depth, { door: '+z', roof: f === 2, endWin: k === 0 ? ['+x'] : k === 3 ? ['-x'] : [], special: r[0] === '6A' ? '6B' : undefined });   // 6A igual que 6B
 }));
-label('PABELLÓN E', 0, 3 * FH + 1.2, E.zc, 3, '#fff', 'rgba(244,114,22,.9)');
 [1, 2].forEach(f => {
   floorSlab(0, eS + 0.9, 36, 1.8, 0, f * FH);
   lowWallGaps2(-18, 18, eS + 1.8, f * FH, f === 1 ? [[E_xT - 0.1, E_xT + 1.9], [E_xB - 1.9, E_xB + 0.1]] : [[E_xT - 0.1, E_xT + 1.9]]);   // huecos de los descansos de la escalera
@@ -704,7 +708,6 @@ label('PABELLÓN E', 0, 3 * FH + 1.2, E.zc, 3, '#fff', 'rgba(244,114,22,.9)');
   floorSlab(-18.6, eS + 0.9, 1.5, 1.8, 0, f * FH, 0.2, 0xc6c5c1);
   ironRail(-19.3, eS + 0.18, -17.9, eS + 0.18, f * FH); ironRail(-19.3, eS + 1.62, -17.9, eS + 1.62, f * FH);
 });
-label('PUENTE B ↔ E', -18.6, FH + 2.0, eS + 0.9, 1.0, '#111', 'rgba(250,204,21,.95)');
 // escalera de E entre la sala de docentes y 6A (piso 2) y, por la misma ruta encima, al piso 3 (estilo de la de D)
 (function () {
   const zs = eS + 2.7, run = 0.4, n = 11, r = FH / n, iron = 0x1f2937;
@@ -732,7 +735,6 @@ const A = { zc: -30, xc: [-38.5, -47.5] };
 room('KB', 'inicial', A.xc[0], 0, A.zc, 9, 8, { door: '+z', endWin: ['+x'] });
 room('5C', 'primaria', A.xc[0], 1, A.zc, 9, 8, { door: '+z', roof: true, endWin: ['+x'] });
 room('KC', 'inicial', A.xc[1], 0, A.zc, 9, 8, { door: '+z', roof: true, endWin: ['-x'] });
-label('PABELLÓN A', -43, 2 * FH + 1.2, A.zc, 3, '#fff', 'rgba(0,114,206,.9)');
 floorSlab(A.xc[0], A.zc + 4.9, 9, 1.8, 0, FH);
 lowWall(A.xc[0] - 4.5, A.zc + 5.8, A.xc[0] + 4.5, A.zc + 5.8, FH);
 
@@ -751,7 +753,6 @@ F_ROWS.forEach((row, f) => row.forEach((r, i) => {
   const extra = [];
   room(r[0], r[1], wx, f, wz, F.sw, F.depth, { rot: F.rot, yo: f > 0 ? F.yo : (i >= 3 ? -DROP : 0), h: f === 0 ? RH + F.yo + (i >= 3 ? DROP : 0) : undefined, door: '-z', roof: f === 2, extra, endWin: i === 0 ? ['-x'] : i === 4 ? ['+x'] : [] });
 }));
-label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
 (function () {
   const lz = -(F.depth / 2 + 0.9), L = 2.5 * F.sw, c = Math.cos(F.rot), sn = Math.sin(F.rot), iron = 0x1f2937, Y2 = FH + F.yo, Y3 = 2 * FH + F.yo, hi = Y2, lo = Y2;
   // pasadizo del piso 2 parejo (3C y 3D son más altos por dentro, así no hay gradas arriba)
@@ -855,7 +856,6 @@ function fenceRect(cx, cz, w, d) {
 const zG = zsD - 1.8;
 grass(8.5, 1.7, -1.6, zG);
 [-20.5, -13.5, -6.5].forEach(z => grass(1.7, 5.5, -18, z));                      // tres áreas verdes frente a B (baños, BgB, BgA)
-label('ÁREA VERDE', -18, 2.6, -13.5, 1.0, '#fff', 'rgba(22,101,52,.9)');
 fenceRect(-1.6, zG, 8.5, 1.7);
 [-20.5, -13.5, -6.5].forEach(z => fenceRect(-18, z, 1.7, 5.5));
 (function () {                                                    // cerco del área verde frente a 2D (en el marco de F)
@@ -864,7 +864,6 @@ fenceRect(-1.6, zG, 8.5, 1.7);
   fenceLine(...P(x0, z0), ...P(x1, z0)); fenceLine(...P(x1, z0), ...P(x1, z1)); fenceLine(...P(x1, z1), ...P(x0, z1)); fenceLine(...P(x0, z1), ...P(x0, z0));
   delete window.__fz;
 })();
-label('ÁREA VERDE', -1.6, 3.0, zG, 1.2, '#fff', 'rgba(22,101,52,.9)');
 
 
 // ---- puente corto D <-> F: del pasadizo de D (piso 2) al extremo del pasadizo de F, junto a la puerta de 7B ----
@@ -882,7 +881,6 @@ label('ÁREA VERDE', -1.6, 3.0, zG, 1.2, '#fff', 'rgba(22,101,52,.9)');
     addCollider((xt + xe) / 2, z + k * 1.0, xe - xt, 0.1, 0, FH, FH + 1.7);   // evita caerse por el costado
     ironRail(xe, z + k, 6.55, z + k, FH + F.yo);                          // baranda sobre el descanso
   });
-  label('PUENTE D ↔ F', 4.6, FH + 2.4, z, 1.0, '#111', 'rgba(250,204,21,.95)');
 })();
 
 // ---- puente (B <-> descanso de la escalera de D), en diagonal, baranda de fierro y sin techo ----
@@ -899,7 +897,6 @@ label('ÁREA VERDE', -1.6, 3.0, zG, 1.2, '#fff', 'rgba(22,101,52,.9)');
     ironRail(ax, az, bx, bz2, FH);
   });
   floorSlab(P2.x - 0.45, dN + 0.6, 0.9, 1.2, 0, FH - 0.004);              // rincón entre el puente y la pared de D (sin hueco)
-  label('PUENTE', mx, FH + 2.0, mz, 1.0, '#111', 'rgba(250,204,21,.95)');
 })();
 
 // ===================================================================
@@ -919,14 +916,11 @@ label('ÁREA VERDE', -1.6, 3.0, zG, 1.2, '#fff', 'rgba(22,101,52,.9)');
   addSolid(-25, 0, 19.75, 8, 0.04, 12.5, 0, 0xc6c5c1, false);
   addSolid(-25, RH, 19.75, 8, 0.2, 12.5, 0, 0x94a3b8, false);
   roofs.push({ x: -25, z: 19.75, hw: 4, hd: 6.25, c: 1, s: 0, y: RH + 0.2 });
-  label('WELCOME LOBBY', -25, RH + 1.0, 19.75, 1.4, '#fff', 'rgba(100,116,139,.95)');
-  label('PABELLÓN C', -25, RH + 2.4, 19.75, 2.4, '#fff', 'rgba(100,116,139,.95)');
   // entrada: por dentro del colegio (abierta hacia el patio, muro liso hacia la calle)
   buildWall(0, 0, 0, -18.75, 25.9, 'x', 4.5, 0, [], wc);
   addSolid(-18.75, RH, 23.5, 4.5, 0.2, 5, 0, 0xc2c5ca, false);
   roofs.push({ x: -18.75, z: 23.5, hw: 2.25, hd: 2.5, c: 1, s: 0, y: RH + 0.2 });
   addSolid(-18.75, 0, 23.5, 4.5, 0.04, 5, 0, 0xc6c5c1, false);
-  label('ENTRADA', -18.75, RH + 0.7, 20.8, 0.9, '#fff', 'rgba(22,163,74,.95)');
   // baño (más delgado) y enfermería (vidrios corredizos): puertas y ventanas hacia adentro, muro liso hacia la calle
   room('BAÑO', 'bano', -15.1, 0, 23.5, 2.8, 5, { door: '-z', roof: true, noOpp: true });
   room('ENFERMERÍA', 'topico', -10.35, 0, 23.5, 6.7, 5, { door: '-z', roof: true, noOpp: true,
@@ -959,7 +953,7 @@ label('ÁREA VERDE', -1.6, 3.0, zG, 1.2, '#fff', 'rgba(22,101,52,.9)');
     const l2 = makeLeaf(lwid - 0.02, 2.65, b.x + b.w - 0.175, 0.03, Z, 0, mat, true);
     const col = addCollider(b.x + b.w / 2, Z, b.w - 0.35, 0.3, 0, 0, 2.7);
     openNow(registerDoor(b.n, b.x + b.w / 2, Z, 0, [{ pivot: l1, base: 0, sgn: -1 }, { pivot: l2, base: 0, sgn: 1 }], col, Math.PI / 2.2));
-    label(b.n.charAt(7), b.x + b.w / 2, 3.25, Z + 0.75, 0.55, '#fff', 'rgba(15,23,42,.9)', 128, 128);
+    plaque('Puerta ' + b.n.charAt(7), b.x + b.w / 2, 2.95, Z + 0.215, 0, 0.7, 0.22);
   });
   // techito sobre las puertas 1, 2 y 3, por DENTRO del colegio: losa chica sostenida por fierros (sombra al entrar)
   const iron = 0x1f2937, cx0 = -6.3, cx1 = 3.6, cz0 = 19.9, cz1 = 25.4, ytop = 3.0 + 0.7;
@@ -972,7 +966,6 @@ label('ÁREA VERDE', -1.6, 3.0, zG, 1.2, '#fff', 'rgba(22,101,52,.9)');
     addSolid(px, ytop - 0.2, (cz0 + cz1) / 2, 0.05, 0.05, cz1 - cz0, 0, iron, false);                  // viga de fierro hacia la fachada
     addSolid(px, ytop - 0.6, (cz0 + cz1) / 2 + 0.6, 0.04, 0.04, Math.hypot(cz1 - cz0 - 1.2, 0.5), 0, iron, false);   // tirante
   });
-  label('INGRESO', 1, 5.4, Z + 1.2, 1.4, '#fff', 'rgba(22,163,74,.95)');
 })();
 
 // ===================================================================

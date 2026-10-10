@@ -19,6 +19,24 @@
   .btn { position: fixed; width: 78px; height: 78px; border-radius: 50%; border: 0; color: #fff; font-weight: 700; font-size: 14px; display: none; touch-action: none; }
   #useBtn { right: 22px; bottom: 40px; background: rgba(37,99,235,.9); }
   #jumpBtn { right: 110px; bottom: 110px; width: 62px; height: 62px; background: rgba(71,85,105,.85); }
+  #moliChip { position: fixed; top: 44px; left: 10px; color: #fff; background: rgba(22,101,52,.88); padding: 6px 10px; border-radius: 8px; font-size: 12px; border: 0; z-index: 5; display: none; }
+  #backMoli { position: fixed; top: 46px; right: 10px; color: #fff; background: rgba(22,101,52,.88); padding: 6px 10px; border-radius: 8px; font-size: 12px; border: 0; z-index: 5; display: none; }
+  #toast { position: fixed; top: 84px; left: 50%; transform: translateX(-50%); background: rgba(15,23,42,.92); color: #fff; padding: 10px 16px; border-radius: 12px; font-size: 14px; font-weight: 600; display: none; z-index: 6; text-align: center; max-width: 86vw; }
+  #moliWin { position: fixed; inset: 0; background: #0f172a; z-index: 20; display: none; flex-direction: column; }
+  #moliBar { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: #166534; color: #fff; font-size: 14px; font-weight: 600; }
+  #moliBar button { background: #fff; color: #166534; border: 0; border-radius: 10px; padding: 8px 12px; font-weight: 700; font-size: 14px; }
+  #moliHint { flex: 1; font-size: 13px; font-weight: 500; }
+  #moliFrame { flex: 1; width: 100%; border: 0; background: #fff; }
+  #lockerPanel { position: fixed; inset: 0; background: rgba(2,6,23,.75); z-index: 15; display: none; align-items: center; justify-content: center; padding: 16px; }
+  #lockerCard { background: #fffaf0; color: #1f2937; border-radius: 18px; padding: 18px; width: min(420px, 92vw); max-height: 92vh; overflow: auto; box-shadow: 0 10px 40px rgba(0,0,0,.4); }
+  #lockerCard h2 { margin: 0 0 4px; font-size: 20px; }
+  #lockerCard .sub { margin: 0 0 14px; color: #6b7280; font-size: 13px; }
+  .lk-item { border-radius: 14px; padding: 12px; margin-bottom: 10px; }
+  .lk-item b { display: block; font-size: 16px; margin-bottom: 8px; }
+  .lk-green { background: #dcfce7; border: 2px solid #16a34a; } .lk-notes { background: #e0f2fe; border: 2px solid #0284c7; } .lk-folder { background: #fef3c7; border: 2px solid #d97706; }
+  .lk-item button { border: 0; border-radius: 10px; padding: 10px 14px; font-size: 15px; font-weight: 700; margin: 0 6px 6px 0; color: #fff; }
+  .lk-green button { background: #16a34a; } .lk-notes button { background: #0284c7; } .lk-folder button { background: #d97706; }
+  #lockerClose { width: 100%; background: #334155; color: #fff; border: 0; border-radius: 12px; padding: 11px; font-size: 15px; font-weight: 700; }
   #musicBtn { position: fixed; top: 10px; right: 10px; background: rgba(15,23,42,.7); color: #fff; border: 1px solid rgba(255,255,255,.25); border-radius: 8px; padding: 6px 10px; font-size: 12px; z-index: 5; display: none; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -31,10 +49,21 @@
 <button class="btn" id="useBtn">ABRIR</button>
 <button class="btn" id="jumpBtn">SALTAR</button>
 <button id="musicBtn">🎵 Música: sí</button>
+<button id="moliChip"></button>
+<button id="backMoli">← Molí</button>
+<div id="toast"></div>
+<div id="lockerPanel"><div id="lockerCard">
+  <h2 id="lockerTitle">Mi locker</h2><p class="sub" id="lockerSub"></p>
+  <div class="lk-item lk-green"><b>📗 Mi cuaderno verde</b><button data-moli="u:unit7">Unidad 7</button><button data-moli="u:unit8">Unidad 8</button></div>
+  <div class="lk-item lk-folder"><b>📁 Folder · Librito de Exit tickets</b><button data-moli="exit">Ver mis libritos</button></div>
+  <button id="lockerClose">Cerrar</button>
+</div></div>
+<div id="moliWin"><div id="moliBar"><button id="moliBack">← Volver al colegio</button><span id="moliHint"></span></div><iframe id="moliFrame" allow="autoplay; fullscreen"></iframe></div>
 <div id="start">
   <h1>Innova Schools Tacna</h1>
   <p>Apareces afuera, frente a las puertas del colegio. Acércate y ábrelas para entrar. Puedes subir escaleras, cruzar el puente y entrar a todas las aulas.</p>
   <p id="helpPc"><b>PC:</b> clic para mirar · W A S D mover · Shift correr · Espacio saltar · <b>E</b> abrir/cerrar puertas</p>
+  <p id="moliInfo"></p>
   <p id="helpTouch"><b>Celular:</b> joystick izquierdo para caminar · arrastra el dedo en la derecha para mirar · botón <b>ABRIR</b> junto a una puerta</p>
   <button id="go">JUGAR</button>
 </div>
@@ -66,6 +95,21 @@ function inPoly(x, z, poly) {
 const baseAt = (x, z) => inPoly(x, z, LOW) ? -DROP : 0;
 
 const isTouch0 = matchMedia('(pointer:coarse)').matches || 'ontouchstart' in window;
+// ---- conexión con Molí: el juego vive en la misma web, la sesión del alumno (DNI) está en localStorage ----
+const MOLI_ME = 'ciencia4b:me:1ba4092d0e';
+const MOLI_BASE = /^https?:$/.test(location.protocol) ? '' : 'https://ciencia6abcd.web.app/';   // abierto como archivo: usa la web de Molí
+function readMe() {
+  try {
+    const qs = new URLSearchParams(location.search);
+    if (qs.get('seccion')) return { key: 'demo-' + qs.get('seccion'), name: qs.get('nombre') || 'Estudiante', section: qs.get('seccion').toUpperCase() };   // prueba: ?seccion=B&nombre=Ana
+    return JSON.parse(localStorage.getItem(MOLI_ME) || 'null');
+  } catch (e) { return null; }
+}
+let ME = readMe();
+const myRoom = () => (ME && !ME.teacher && /^[A-D]$/.test(ME.section || '')) ? '6' + ME.section : null;
+const firstName = () => String(ME && ME.name || '').split(' ')[0];
+const ROOMINFO = {}, SALON6 = {};                                 // centro de cada salón / lockers y pizarra de los sextos
+let uiOpen = false;
 const SKY_HORIZON = 0xcfe8ff;                                          // horizonte celeste claro
 const SUN_DIR = new THREE.Vector3(-0.45, 0.78, 0.35).normalize();      // sol alto (de día)
 const SUN_VIS = new THREE.Vector3(-0.35, 0.62, -0.70).normalize();     // sol dibujado en el cielo (se ve al aparecer, mirando al norte)
@@ -75,7 +119,7 @@ const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.05, 5
 camera.rotation.order = 'YXZ';
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(innerWidth, innerHeight);
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setPixelRatio(Math.min(devicePixelRatio, isTouch0 ? 1.5 : 2));   // en celular, un poco menos de resolución: más fluido
 const SHADOWS = !isTouch0 || /[?&]sombras/.test(location.search);       // en celulares van desactivadas (manchas negras); ?sombras las activa
 renderer.shadowMap.enabled = SHADOWS;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -101,29 +145,30 @@ const sky = new THREE.Mesh(new THREE.SphereGeometry(450, 32, 16), new THREE.Shad
 }));
 sky.renderOrder = -1; scene.add(sky);
 
-// nubes (sprites suaves que se desplazan despacio)
-const cloudTex = (function () {
-  const c = document.createElement('canvas'); c.width = c.height = 128;
-  const g = c.getContext('2d'), gr = g.createRadialGradient(64, 64, 4, 64, 64, 62);
-  gr.addColorStop(0, 'rgba(255,255,255,0.95)'); gr.addColorStop(0.5, 'rgba(255,255,255,0.5)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
-  g.fillStyle = gr; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c);
-})();
+// nubes: cada nube es UNA sola imagen (pocas llamadas de dibujo) con formas pre-dibujadas, se desplazan despacio
+const cloudTexs = [0, 1, 2, 3, 4, 5].map(k => {
+  const c = document.createElement('canvas'); c.width = 512; c.height = 256; const g = c.getContext('2d');
+  const tint = ['255,255,255', '255,255,255', '255,243,224', '234,244,255', '255,233,236', '255,255,255'][k];
+  for (let b = 0; b < 9; b++) {
+    const x = 90 + Math.random() * 330, y = 110 + Math.random() * 60, r = 50 + Math.random() * 60, gr = g.createRadialGradient(x, y, 4, x, y, r);
+    gr.addColorStop(0, 'rgba(' + tint + ',0.85)'); gr.addColorStop(0.55, 'rgba(' + tint + ',0.45)'); gr.addColorStop(1, 'rgba(' + tint + ',0)');
+    g.fillStyle = gr; g.fillRect(0, 0, 512, 256);
+  }
+  return new THREE.CanvasTexture(c);
+});
 const clouds = new THREE.Group(); scene.add(clouds);
 (function () {
   const rnd = (a, b) => a + Math.random() * (b - a);
   for (let i = 0; i < 46; i++) {
-    const grp = new THREE.Group(), n = Math.floor(rnd(6, 10)), sz = rnd(45, 85);
-    for (let k = 0; k < n; k++) {
-      const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: cloudTex, color: [0xffffff, 0xffffff, 0xfff3e0, 0xeaf4ff, 0xffe9ec][Math.floor(Math.random() * 5)], transparent: true, depthWrite: false, fog: false, opacity: rnd(0.8, 0.95) }));
-      sp.scale.set(sz * rnd(0.8, 1.4), sz * rnd(0.4, 0.65), 1); sp.position.set(rnd(-sz, sz) * 1.2, rnd(-4, 6), rnd(-sz, sz) * 0.5); grp.add(sp);
-    }
+    const sz = rnd(70, 140), sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: cloudTexs[i % 6], transparent: true, depthWrite: false, fog: false, opacity: rnd(0.85, 1) }));
+    sp.scale.set(sz * 2, sz, 1);
     let ang, rad, py, px, pz, tries = 0;
     do {                                                       // deja despejado el cielo alrededor del sol
       ang = rnd(0, 6.28); rad = rnd(90, 380); py = rnd(60, 120); px = Math.cos(ang) * rad; pz = Math.sin(ang) * rad;
       const l = Math.hypot(px, py, pz);
-    if ((px * SUN_VIS.x + py * SUN_VIS.y + pz * SUN_VIS.z) / l < 0.9 || ++tries > 20) break;
+      if ((px * SUN_VIS.x + py * SUN_VIS.y + pz * SUN_VIS.z) / l < 0.9 || ++tries > 20) break;
     } while (true);
-    grp.position.set(px, py, pz); grp.userData.v = rnd(0.6, 1.6); clouds.add(grp);
+    sp.position.set(px, py, pz); sp.userData.v = rnd(0.6, 1.6); clouds.add(sp);
   }
 })();
 
@@ -307,7 +352,11 @@ function buildWall(ox, oz, rot, lx, lz, axis, len, y0, ops, color, o = {}) {
 
 // ---- mobiliario (instancias) ----
 const furn = { tops: [], peds: [], seats: [], backs: [], legs: [], lapB: [], lapS: [] };
+const ROOMLIGHTS = [];                                              // luces de los sextos (una sola PointLight real que va al salón donde estás)
 const spinners = [];                                               // aspas de ventiladores (giran en el bucle si están prendidos)
+function addUse(name, x, z, y, fn, verb = 'Abrir') {               // algo que se toca (locker, pizarra, proyección)
+  const d = { name, x, z, y, leaves: [], col: { on: false }, angle: 0, target: 0, max: 0, open: false, use: fn, verb }; doors.push(d); return d;
+}
 function addSwitch(name, x, z, y, fn) {                            // interruptor que se usa con ABRIR / E (empieza prendido)
   doors.push({ name, x, z, y, leaves: [], col: { on: false }, angle: 0, target: 0, max: 0, open: true, sw: fn });
 }
@@ -315,7 +364,7 @@ function chair(x, z, ox, oz, yaw, fy) {                            // silla nara
   furn.seats.push({ x, y: fy + 0.45, z, sx: 0.42, sy: 0.05, sz: 0.42, rot: yaw, color: 0xf97316 });
   furn.backs.push({ x: x + ox * 0.2, y: fy + 0.68, z: z + oz * 0.2, sx: 0.42, sy: 0.4, sz: 0.05, rot: yaw, color: 0xea580c });
   const px = oz, pz = -ox;
-  for (const a of [-0.17, 0.17]) for (const b of [-0.17, 0.17]) furn.legs.push({ x: x + ox * a + px * b, y: fy + 0.215, z: z + oz * a + pz * b, sx: 0.035, sy: 0.43, sz: 0.035, rot: yaw, color: 0x8a8f98 });
+  for (const b of [-0.17, 0.17]) furn.legs.push({ x: x + px * b, y: fy + 0.215, z: z + pz * b, sx: 0.035, sy: 0.43, sz: 0.38, rot: yaw, color: 0x8a8f98 });   // patas gris medio (patín a cada lado)
 }
 const lockerTex = (function () {
   const c = document.createElement('canvas'); c.width = 1024; c.height = 256;
@@ -339,20 +388,41 @@ function rocketTex(n) {                                           // cohete de p
   g.fillStyle = '#111827'; g.textAlign = 'center'; g.font = 'bold 34px sans-serif'; g.fillText('GRUPO', 128, 262); g.font = 'bold 96px sans-serif'; g.fillText(String(n), 128, 360);
   return new THREE.CanvasTexture(c);
 }
-const locker26Tex = (function () {                                  // 13 x 2 lockers vacíos con etiqueta numerada
+function drawLocker26(mine, name) {                             // 13 x 2 lockers vacíos con etiqueta; el del alumno, amarillo y con su nombre
   const c = document.createElement('canvas'); c.width = 1560; c.height = 300;
   const g = c.getContext('2d'), cols = 13, rows = 2, cw = c.width / cols, ch = c.height / rows;
   g.fillStyle = '#c8a27a'; g.fillRect(0, 0, c.width, c.height);
   for (let r = 0; r < rows; r++) for (let q = 0; q < cols; q++) {
-    const x = q * cw, y = r * ch, n = r * cols + q + 1;
-    g.fillStyle = '#4a3527'; g.fillRect(x + 8, y + 8, cw - 16, ch - 16);                       // hueco vacío
+    const x = q * cw, y = r * ch, n = r * cols + q + 1, me = n === mine;
+    g.fillStyle = '#4a3527'; g.fillRect(x + 8, y + 8, cw - 16, ch - 16);
     g.fillStyle = 'rgba(0,0,0,0.25)'; g.fillRect(x + 8, y + 8, cw - 16, 10);
-    g.fillStyle = '#ffffff'; g.fillRect(x + 22, y + 18, cw - 44, 38);                           // etiqueta
-    g.strokeStyle = '#1f2937'; g.lineWidth = 2; g.strokeRect(x + 22, y + 18, cw - 44, 38);
-    g.fillStyle = '#111827'; g.font = 'bold 28px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(String(n).padStart(2, '0'), x + cw / 2, y + 38);
+    g.fillStyle = me ? '#fde047' : '#ffffff'; g.fillRect(x + 14, y + 16, cw - 28, me ? 56 : 38);
+    g.strokeStyle = '#1f2937'; g.lineWidth = 2; g.strokeRect(x + 14, y + 16, cw - 28, me ? 56 : 38);
+    g.fillStyle = '#111827'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = 'bold 26px sans-serif'; g.fillText(String(n).padStart(2, '0'), x + cw / 2, y + (me ? 32 : 36));
+    if (me) { g.font = 'bold 15px sans-serif'; g.fillText(String(name || '').split(' ')[0].slice(0, 10), x + cw / 2, y + 58); }
   }
   return new THREE.CanvasTexture(c);
-})();
+}
+const locker26Tex = drawLocker26(0, '');
+function screenTex(kind) {                                        // lo que el proyector proyecta en el ecran
+  const c = document.createElement('canvas'); c.width = 1024; c.height = 440; const g = c.getContext('2d');
+  const gr = g.createRadialGradient(512, 220, 40, 512, 220, 560);
+  gr.addColorStop(0, kind === 'lab' ? '#ecfeff' : '#fff7ed'); gr.addColorStop(1, kind === 'lab' ? '#a5f3fc' : '#fed7aa');
+  g.fillStyle = gr; g.fillRect(0, 0, 1024, 440); g.textAlign = 'center'; g.textBaseline = 'middle';
+  if (kind === 'lab') {
+    g.fillStyle = '#0e7490'; g.font = 'bold 66px sans-serif'; g.fillText('🧪 Laboratorio de Molí', 512, 130);
+    g.fillStyle = '#155e75'; g.font = '34px sans-serif'; g.fillText('Juegos y experimentos de ciencia', 512, 215);
+    g.font = '64px sans-serif'; g.fillText('⚡ 🌱 💧 🌍 🔬', 512, 305);
+  } else {
+    g.strokeStyle = '#f59e0b'; g.lineWidth = 8; g.setLineDash([18, 16]); g.beginPath(); g.moveTo(90, 360); g.bezierCurveTo(300, 250, 520, 420, 720, 320); g.bezierCurveTo(840, 260, 900, 330, 950, 300); g.stroke(); g.setLineDash([]);
+    [[90, 360], [330, 318], [560, 372], [720, 320], [950, 300]].forEach(([x, y], k) => { g.fillStyle = k === 4 ? '#ef4444' : '#16a34a'; g.beginPath(); g.arc(x, y, 18, 0, 6.3); g.fill(); });
+    g.fillStyle = '#9a3412'; g.font = 'bold 72px sans-serif'; g.fillText('💪 Refuerzo', 512, 105);
+    g.fillStyle = '#7c2d12'; g.font = '36px sans-serif'; g.fillText('Mapas de refuerzo · Molí', 512, 185);
+  }
+  g.fillStyle = 'rgba(15,23,42,.75)'; g.font = 'bold 28px sans-serif'; g.fillText('Toca la pizarra para entrar', 512, 410);
+  return new THREE.CanvasTexture(c);
+}
 const lockerGeo = new THREE.PlaneGeometry(1, 1);
 
 function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
@@ -386,6 +456,7 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
     pl.scale.set(Dp - 1.2, 1.2, 1); pl.position.set(lx, fy + 0.75, lz);
     pl.rotation.y = Math.atan2(-uvec[0], -uvec[1]); scene.add(pl);
   };
+  let seatsOut = null;                                              // (sextos) aquí se guardan las sillas para aparecer sentado
   const clusters = (laptops, spots) => {                            // hexágonos (rosetas) de 6 integrantes (por defecto 6 grupos)
     for (const [uu, ss] of (spots || [[-0.7, 1.4], [-0.7, 3.8], [-0.7, 6.2], [2.0, 1.4], [2.0, 3.8], [2.0, 6.2]])) {
       const [tx, tz] = P(uu, ss);
@@ -400,6 +471,7 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
         const o = [Math.cos(th) * uvec[0] + Math.sin(th) * svec[0], Math.cos(th) * uvec[1] + Math.sin(th) * svec[1]];
         const yaw = Math.atan2(o[0], o[1]);
         chair(tx + o[0] * 1.05, tz + o[1] * 1.05, o[0], o[1], yaw, fy);
+        if (seatsOut) seatsOut.push({ x: tx + o[0] * 1.05, z: tz + o[1] * 1.05, tx, tz });
         if (laptops) {                                                // laptop frente a cada silla: base + pantalla hacia el centro
           furn.lapB.push({ x: tx + o[0] * 0.58, y: fy + 0.775, z: tz + o[1] * 0.58, sx: 0.34, sy: 0.02, sz: 0.24, rot: yaw, color: 0x374151 });
           furn.lapS.push({ x: tx + o[0] * 0.47, y: fy + 0.89, z: tz + o[1] * 0.47, sx: 0.34, sy: 0.22, sz: 0.015, rot: yaw, color: 0x0f172a });
@@ -413,15 +485,38 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
     const LL = Dp - 2 * T - 0.4, uL = Wc / 2 - T - 0.26;
     boxAt(uL, Dp / 2 - T, 0, 0.52, 1.5, LL, 0xc8a27a, true);
     { const [lx, lz] = P(uL - 0.27, Dp / 2 - T), pl = new THREE.Mesh(lockerGeo, new THREE.MeshLambertMaterial({ map: locker26Tex }));
-      pl.scale.set(LL, 1.4, 1); pl.position.set(lx, fy + 0.78, lz); pl.rotation.y = Math.atan2(-uvec[0], -uvec[1]); scene.add(pl); }
+      pl.scale.set(LL, 1.4, 1); pl.position.set(lx, fy + 0.78, lz); pl.rotation.y = Math.atan2(-uvec[0], -uvec[1]); scene.add(pl);
+      const th = pl.rotation.y;
+      SALON6[rname] = { plane: pl, LL, fy, x: lx, z: lz, ax: [Math.cos(th), -Math.sin(th)], nrm: [Math.sin(th), Math.cos(th)], rot: th }; }
+    // mesa del profesor: junto a la pizarra, pegada a la pared del fondo, con el folder "Mis notas" (para el docente)
+    { const du = -(Wc / 2 - T) + 0.8, ds = Dp - 2 * T - 0.38;
+      boxAt(du, ds, 0, 1.5, 0.72, 0.72, 0x8b5a2b, true);                                 // cuerpo de la mesa
+      boxAt(du, ds, 0.72, 1.6, 0.05, 0.78, 0xa16207, false);                             // tablero
+      boxAt(du, ds - 0.85, 0.42, 0.44, 0.05, 0.44, 0x1f2937, false); boxAt(du, ds - 1.06, 0.62, 0.44, 0.42, 0.05, 0x1f2937, false);   // silla del docente
+      boxAt(du - 0.25, ds, 0.77, 0.32, 0.03, 0.24, 0x0284c7, false);                    // folder azul "Mis notas"
+      boxAt(du + 0.35, ds + 0.05, 0.77, 0.28, 0.06, 0.22, 0x16a34a, false);             // libro
+      const [fx, fz] = P(du, ds - 0.6);
+      addUse('Folder «Mis notas» del profesor', fx, fz, fy, () => { if (ME && ME.teacher) openMoli('reg'); else toast('📂 Este folder «Mis notas» es del profesor'); }, 'Abrir'); }
+    // junto a la ventana: mesita rectangular mediana con laptop, parlante y su silla
+    { const wu = 0.2, ws = 0.32;
+      boxAt(wu, ws, 0, 1.0, 0.7, 0.52, 0xd6d3d1, true); boxAt(wu, ws, 0.7, 1.08, 0.04, 0.58, 0xf5f5f4, false);
+      boxAt(wu - 0.12, ws + 0.06, 0.74, 0.36, 0.02, 0.26, 0x374151, false);              // laptop: base
+      boxAt(wu - 0.12, ws - 0.07, 0.75, 0.36, 0.24, 0.02, 0x111827, false);              // laptop: pantalla
+      boxAt(wu + 0.32, ws - 0.02, 0.74, 0.14, 0.22, 0.14, 0x1f2937, false);              // parlante
+      boxAt(wu + 0.32, ws + 0.055, 0.81, 0.08, 0.08, 0.01, 0x6b7280, false);
+      const [cx2, cz2] = P(wu, ws + 0.62); chair(cx2, cz2, svec[0], svec[1], Math.atan2(svec[0], svec[1]), fy); }
+    // el proyector proyecta "Refuerzo · mapas de refuerzo"; al tocar la pizarra se abren los refuerzos de Molí
+    { const [sx, sz] = P(-(Wc / 2 - T - 0.235), Dp / 2 - T), scr = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 1.45), new THREE.MeshBasicMaterial({ map: screenTex('ref') }));
+      scr.position.set(sx, fy + 1.72, sz); scr.rotation.y = Math.atan2(uvec[0], uvec[1]); scene.add(scr);
+      const [ux, uz] = P(-(Wc / 2 - T - 1.2), Dp / 2 - T); addUse('Pizarra: mapas de refuerzo', ux, uz, fy, () => openMoli('mis'), 'Ver'); }
     // 5 grupos: dos a cada lado (adelante y atrás) y uno al centro
     const G5 = [[-1.5, 1.6], [2.25, 1.6], [-1.5, 6.0], [2.25, 6.0], [0.4, 3.8]];
-    clusters(false, G5);
+    seatsOut = []; clusters(false, G5); SALON6[rname].seats = seatsOut; seatsOut = null;
     const tubeMat = new THREE.MeshBasicMaterial({ color: 0xf8fafc }), strMat = new THREE.MeshLambertMaterial({ color: 0xe5e7eb });
-    { const [lx, lz] = P(0.4, (Dp - 2 * T) / 2), lamp = new THREE.PointLight(0xfff4e0, 0.55, 8, 1.5); lamp.position.set(lx, fy + RH - 0.4, lz); scene.add(lamp);
+    { const [lx, lz] = P(0.4, (Dp - 2 * T) / 2), lamp = { x: lx, z: lz, y: fy + RH - 0.4, fy, on: true }; ROOMLIGHTS.push(lamp);
       boxAt(-Wc / 2 + T + 0.9, 0.02, 1.25, 0.09, 0.13, 0.03, 0xf8fafc, false);              // interruptor de luz junto a la puerta, por dentro
       const [sx, sz] = P(-Wc / 2 + T + 0.9, 0.35);
-      addSwitch('Luces ' + rname, sx, sz, fy, on => { tubeMat.color.setHex(on ? 0xf8fafc : 0x9ca3af); lamp.intensity = on ? 0.55 : 0; }); }
+      addSwitch('Luces ' + rname, sx, sz, fy, on => { tubeMat.color.setHex(on ? 0xf8fafc : 0x9ca3af); lamp.on = on; }); }
     G5.forEach(([uu, ss], gi) => {
       const top = fy + RH - 0.04;
       if (gi < 4) [-0.35, 0.35].forEach(d2 => {                                   // 2 focos largos encima de cada grupo (el del centro no)
@@ -456,6 +551,9 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
     clusters(true);
   } else if (kind === 'lab') {                                        // laboratorio de ciencias: 6 mesas largas, 3 sillas adelante y 3 atrás por mesa
     teach();
+    { const [sx, sz] = P(-(Wc / 2 - T - 0.235), Dp / 2 - T), scr = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 1.45), new THREE.MeshBasicMaterial({ map: screenTex('lab') }));
+      scr.position.set(sx, fy + 1.72, sz); scr.rotation.y = Math.atan2(uvec[0], uvec[1]); scene.add(scr);
+      const [ux, uz] = P(-(Wc / 2 - T - 1.2), Dp / 2 - T); addUse('Laboratorio de Molí', ux, uz, fy, () => openMoli('lab'), 'Jugar'); }
     for (const uu of [-0.9, 2.0]) for (const ss of [1.9, 4.2, 6.5]) {
       boxAt(uu, ss, 0, 2.5, 0.66, 0.8, 0x475569, true);                // cuerpo de la mesa
       boxAt(uu, ss, 0.66, 2.6, 0.08, 0.9, 0x1e293b, false);            // cubierta oscura de laboratorio
@@ -489,6 +587,7 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
 function room(name, level, cx, fl, cz, w, d, o = {}) {
   const rot = o.rot || 0, door = o.door || '+x', yo = o.yo || 0, y0 = fl * FH + yo, col = 0xc9cbce;   // paredes en gris
   const opp = (door[0] === '+' ? '-' : '+') + door[1];
+  ROOMINFO[name] = { cx, cz, y0 };
   for (const side of ['+x', '-x', '+z', '-z']) {
     if (o.skipWall === side) continue;                                  // muro compartido con el módulo vecino (salón unido)
     const sg = side[0] === '+' ? 1 : -1, isX = side[1] === 'x';
@@ -702,7 +801,7 @@ E_SLOTS.forEach((col, k) => col.forEach((r, f) => {
 }));
 [1, 2].forEach(f => {
   floorSlab(0, eS + 0.9, 36, 1.8, 0, f * FH);
-  lowWallGaps2(-18, 18, eS + 1.8, f * FH, f === 1 ? [[E_xT - 0.1, E_xT + 1.9], [E_xB - 1.9, E_xB + 0.1]] : [[E_xT - 0.1, E_xT + 1.9]]);   // huecos de los descansos de la escalera
+  lowWallGaps2(-18, 18, eS + 1.8, f * FH, f === 1 ? [[E_xT, E_xT + 1.9], [E_xB - 1.9, E_xB]] : [[E_xT, E_xT + 1.9]]);   // huecos de los descansos de la escalera
   lowWall(18, eS, 18, eS + 1.8, f * FH);
   // puente corto B <-> E (une el pasadizo de B con el de E, a la altura de la puerta 6D)
   floorSlab(-18.6, eS + 0.9, 1.5, 1.8, 0, f * FH, 0.2, 0xc6c5c1);
@@ -760,10 +859,10 @@ F_ROWS.forEach((row, f) => row.forEach((r, i) => {
   floorSlab(wx, wz, 2 * L, 1.8, F.rot, hi);
   const xT = 8.2;                                                       // parte alta de la escalera frente a 3C
   const xB = xT + 15 * 0.4;                                             // pie del tramo al piso 3 (descanso en el piso 2)
-  lowWallLocal(F.x, F.z, F.rot, -L, xT - 1.9, lz - 0.8, hi); lowWallLocal(F.x, F.z, F.rot, xT + 0.5, xB - 0.1, lz - 0.8, hi); lowWallLocal(F.x, F.z, F.rot, xB + 1.9, L, lz - 0.8, hi);   // huecos de los descansos
+  lowWallLocal(F.x, F.z, F.rot, -L, xT - 1.8, lz - 0.8, hi); lowWallLocal(F.x, F.z, F.rot, xT + 0.5, xB, lz - 0.8, hi); lowWallLocal(F.x, F.z, F.rot, xB + 1.9, L, lz - 0.8, hi);   // huecos de los descansos
   [wx, wz] = lw(F.x, F.z, F.rot, 0, lz);
   floorSlab(wx, wz, 2 * L, 1.8, F.rot, Y3);                                // pasadizo del piso 3 a lo largo de todo F
-  lowWallLocal(F.x, F.z, F.rot, -L, xT - 1.9, lz - 0.8, Y3); lowWallLocal(F.x, F.z, F.rot, xT + 0.5, L, lz - 0.8, Y3);
+  lowWallLocal(F.x, F.z, F.rot, -L, xT - 1.8, lz - 0.8, Y3); lowWallLocal(F.x, F.z, F.rot, xT + 0.5, L, lz - 0.8, Y3);
   [-L + 0.1, L - 0.1].forEach(ex => buildWall(F.x, F.z, F.rot, ex, lz, 'z', 1.8, Y3, [], 0x1f3366, { T: 0.2, h: 1.0 }));   // murito en las puntas del piso 3   // hueco donde llega el tramo al piso 3
   // escalera al piso 2 frente a 3C (mismo estilo que la de D: tramos flotantes, descanso de metal, baranda de fierro)
   const W = (lx, lz2) => lw(F.x, F.z, F.rot, lx, lz2), run = 0.4, n = 15, y0 = -DROP, rise = (Y2 - y0) / n, zs = lz - 1.8;   // del patio de abajo al piso 2
@@ -889,14 +988,16 @@ fenceRect(-1.6, zG, 8.5, 1.7);
   const P2 = { x: xTopD, z: zsD };                         // nace en el extremo oeste del pasadizo de D
   const len = Math.hypot(P2.x - P1.x, P2.z - P1.z), ang = Math.atan2(-(P2.z - P1.z), P2.x - P1.x);
   const mx = (P1.x + P2.x) / 2, mz = (P1.z + P2.z) / 2;
+  floorSlab(P1.x + 0.25, P1.z - 1.45, 0.5, 0.7, 0, FH - 0.004);          // rincón junto al murito de B (lado sur del puente)
   const ext = 1.2;                                                        // el piso entra 1,2 m en cada pasadizo: sin huecos en las puntas diagonales
   addSolid(mx, FH - 0.204, mz, len + 2 * ext, 0.2, 2.2, ang, 0xc6c5c1, false);      // visual 4 mm más abajo: evita parpadeo con los escalones
   floors.push({ x: mx, z: mz, hw: len / 2 + ext, hd: 1.1, c: Math.cos(ang), s: Math.sin(ang), y: FH });
   [-1, 1].forEach(k => {
-    const [ax, az] = lw(mx, mz, ang, -len / 2 + 1.1, k * 0.92), [bx, bz2] = lw(mx, mz, ang, len / 2 - 1.7, k * 0.92);   // sin invadir pasadizo ni descanso
+    const tAt = xt => (xt - mx - k * 0.92 * Math.sin(ang)) / Math.cos(ang);       // la baranda va justo hasta el borde de cada pasadizo
+    const [ax, az] = lw(mx, mz, ang, tAt(P1.x + 0.08), k * 0.92), [bx, bz2] = lw(mx, mz, ang, tAt(P2.x - 0.06), k * 0.92);
     ironRail(ax, az, bx, bz2, FH);
   });
-  floorSlab(P2.x - 0.45, dN + 0.6, 0.9, 1.2, 0, FH - 0.004);              // rincón entre el puente y la pared de D (sin hueco)
+  floorSlab(P2.x - 0.65, dN + 0.6, 1.3, 1.2, 0, FH - 0.004);              // rincón entre el puente y la pared de D (sin hueco)
 })();
 
 // ===================================================================
@@ -1050,7 +1151,7 @@ const hexGeo = (function () {                                     // una mesita:
   const g = new THREE.ExtrudeGeometry(new THREE.Shape([pt(ri, 0), pt(1, 0), pt(1, a), pt(ri, a)]), { depth: 1, bevelEnabled: false });
   g.rotateX(Math.PI / 2); g.translate(0, 0.5, 0); return g;
 })();
-buildInstanced(furn.tops, furnMat, hexGeo); buildInstanced(furn.peds, furnMat, new THREE.CylinderGeometry(1, 1, 1, 10));
+buildInstanced(furn.tops, furnMat, hexGeo); buildInstanced(furn.peds, furnMat);
 buildInstanced(furn.seats, furnMat); buildInstanced(furn.backs, furnMat); buildInstanced(furn.legs, furnMat, undefined, false); buildInstanced(furn.lapB, furnMat, undefined, false); buildInstanced(furn.lapS, furnMat, undefined, false);
 buildInstanced(glassItems, new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.5, depthWrite: false }), undefined, false);
 
@@ -1108,6 +1209,7 @@ function nearestDoor() {
   return best;
 }
 function toggle(d) {
+  if (d.use) { d.use(); return; }
   if (d.sw) { d.open = !d.open; d.sw(d.open); return; }             // interruptor: prende / apaga
   d.open = !d.open; d.target = d.open ? d.max : 0;
   if (d.open) d.col.on = false;
@@ -1121,10 +1223,11 @@ function update(dt) {
   let fwd = (keys['KeyW'] || keys['ArrowUp'] ? 1 : 0) - (keys['KeyS'] || keys['ArrowDown'] ? 1 : 0) + joy.y;
   let str = (keys['KeyD'] || keys['ArrowRight'] ? 1 : 0) - (keys['KeyA'] || keys['ArrowLeft'] ? 1 : 0) + joy.x;
   const m = Math.hypot(fwd, str); if (m > 1) { fwd /= m; str /= m; }
+  if (P.seated && (m > 0.05 || wantJump)) P.seated = false;             // al caminar, se levanta de la silla
   const sy = Math.sin(P.yaw), cy = Math.cos(P.yaw);
   P.x += (-sy * fwd + cy * str) * speed * dt;
   P.z += (-cy * fwd - sy * str) * speed * dt;
-  resolve();
+  if (!P.seated) resolve();
   // vertical
   const g = groundY(P.x, P.z, P.y);
   if (wantJump && P.y <= g + 0.02) P.vy = 6.2;
@@ -1145,10 +1248,10 @@ function update(dt) {
     }
   }
   const nd = nearestDoor();
-  if (nd) { promptEl.style.display = 'block'; promptEl.textContent = (nd.sw ? (nd.open ? 'Apagar' : 'Prender') : (nd.open ? 'Cerrar' : 'Abrir')) + ' · ' + nd.name + (isTouch ? '' : '  [E]'); }
+  if (nd) { promptEl.style.display = 'block'; promptEl.textContent = nd.use ? nd.verb + ' · ' + nd.name + (isTouch ? '' : '  [E]') : (nd.sw ? (nd.open ? 'Apagar' : 'Prender') : (nd.open ? 'Cerrar' : 'Abrir')) + ' · ' + nd.name + (isTouch ? '' : '  [E]'); }
   else promptEl.style.display = 'none';
   if (wantUse) { if (nd) toggle(nd); wantUse = false; }
-  camera.position.set(P.x, P.y + 1.6, P.z);
+  camera.position.set(P.x, P.y + (P.seated ? 1.15 : 1.6), P.z);
   camera.rotation.set(P.pitch, P.yaw, 0);
 }
 
@@ -1183,19 +1286,104 @@ const music = (function () {
       master = ctx.createGain(); master.gain.value = 0.55; master.connect(lp); lp.connect(comp); comp.connect(ctx.destination);
       setInterval(tick, 520);
     },
-    toggle() { on = !on; if (master) master.gain.setTargetAtTime(on ? 0.55 : 0, ctx.currentTime, 0.2); return on; }
+    toggle() { on = !on; if (master) master.gain.setTargetAtTime(on ? 0.55 : 0, ctx.currentTime, 0.2); return on; },
+    duck(d) { if (master) master.gain.setTargetAtTime(on && !d ? 0.55 : 0, ctx.currentTime, 0.3); }
   };
 })();
 const musicBtn = document.getElementById('musicBtn');
+// ===================================================================
+//  MOLÍ (sólo 6to): aparecer frente a tu salón, tu locker, cuaderno, Mis notas, exit tickets, refuerzo y laboratorio
+// ===================================================================
+const toastEl = document.getElementById('toast'), chipEl = document.getElementById('moliChip'), backMoli = document.getElementById('backMoli');
+const moliWin = document.getElementById('moliWin'), moliFrame = document.getElementById('moliFrame'), moliHint = document.getElementById('moliHint');
+const lockerPanel = document.getElementById('lockerPanel');
+let toastT = 0, moliPoll = 0, myLocker = null;
+function toast(msg, sec = 4) { toastEl.textContent = msg; toastEl.style.display = 'block'; clearTimeout(toastT); toastT = setTimeout(() => toastEl.style.display = 'none', sec * 1000); }
+function refreshChip() {
+  ME = readMe();
+  chipEl.textContent = myRoom() ? '👋 ' + firstName() + ' · 6to ' + ME.section : ME && ME.teacher ? '👩‍🏫 Docente · Molí' : '🔑 Entrar con Molí';
+  document.getElementById('moliInfo').textContent = myRoom() ? 'Hola ' + firstName() + ': aparecerás sentado en tu salón ' + myRoom() + '.' : 'Si entras con tu DNI en Molí, aparecerás sentado en tu salón de 6to.';
+}
+function strHash(t) { let h = 7; for (const ch of String(t)) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return h; }
+function spawnAtRoom(room) {                                      // frente a la puerta del salón, mirándola
+  const d = doors.find(q => q.name === 'Puerta ' + room), c = ROOMINFO[room]; if (!d || !c) return false;
+  const dx = d.x - c.cx, dz = d.z - c.cz, out = Math.abs(dx) > Math.abs(dz) ? [Math.sign(dx), 0] : [0, Math.sign(dz)];
+  P.x = d.x + out[0] * 1.3; P.z = d.z + out[1] * 1.3; P.y = d.y; P.vy = 0; P.yaw = Math.atan2(out[0], out[1]); P.pitch = 0;
+  return true;
+}
+function seatInRoom(room) {                                       // sentado en una silla de su salón, mirando a su mesa
+  const s = SALON6[room]; if (!s || !s.seats || !s.seats.length) return spawnAtRoom(room);
+  const c = s.seats[strHash((ME && ME.key) || room) % s.seats.length];
+  P.x = c.x; P.z = c.z; P.y = s.fy; P.vy = 0; P.yaw = Math.atan2(-(c.tx - c.x), -(c.tz - c.z)); P.pitch = -0.05; P.seated = true;
+  return true;
+}
+function lockerCell(s, n) {                                       // centro del locker n en la pared de lockers
+  const q = (n - 1) % 13, r = Math.floor((n - 1) / 13), lx = -s.LL / 2 + (q + 0.5) * s.LL / 13, ly = 0.35 - r * 0.7;
+  return [s.x + s.ax[0] * lx + s.nrm[0] * 0.02, s.fy + 0.78 + ly, s.z + s.ax[1] * lx + s.nrm[1] * 0.02];
+}
+function checkLocker() {                                          // al acercarte a los lockers de tu salón se te asigna el tuyo
+  const room = myRoom(); if (!room || myLocker || P.seated) return;
+  const s = SALON6[room]; if (!s || Math.abs(P.y - s.fy) > 1 || Math.hypot(P.x - s.x, P.z - s.z) > 3.2) return;
+  const n = 1 + strHash(ME.key || ME.name) % 26;
+  s.plane.material.map = drawLocker26(n, ME.name); s.plane.material.needsUpdate = true;
+  const [cx, cy, cz] = lockerCell(s, n), cw = s.LL / 13;
+  const glow = new THREE.Mesh(new THREE.PlaneGeometry(cw * 0.96, 0.66), new THREE.MeshBasicMaterial({ color: 0xfde047, transparent: true, opacity: 0.35, depthWrite: false, blending: THREE.AdditiveBlending }));
+  glow.position.set(cx + s.nrm[0] * 0.01, cy, cz + s.nrm[1] * 0.01); glow.rotation.y = s.rot; scene.add(glow);
+  const inside = (w, h, d, off, dy, color) => { const m = new THREE.Mesh(new THREE.BoxGeometry(d, h, w), new THREE.MeshLambertMaterial({ color })); m.position.set(cx - s.nrm[0] * 0.28 + s.ax[0] * off, cy + dy, cz - s.nrm[1] * 0.28 + s.ax[1] * off); m.rotation.y = s.rot + Math.PI / 2; scene.add(m); };
+  inside(0.05, 0.3, 0.22, -0.07, -0.12, 0x16a34a);                // cuaderno verde
+  inside(0.03, 0.32, 0.24, 0.02, -0.11, 0xf59e0b);                // folder de exit tickets
+  addUse('Mi locker ' + String(n).padStart(2, '0'), cx + s.nrm[0] * 0.6, cz + s.nrm[1] * 0.6, s.fy, openLocker, 'Abrir');
+  myLocker = { n, glow };
+  toast('🔒 Tu locker es el N° ' + String(n).padStart(2, '0') + ', ' + firstName() + ' (el que brilla)', 5);
+}
+function setUi(on) { uiOpen = on; for (const k in keys) keys[k] = false; joy.x = joy.y = 0; if (on && document.exitPointerLock) document.exitPointerLock(); music.duck(on); }
+function openLocker() {
+  document.getElementById('lockerTitle').textContent = '🔒 Locker ' + String(myLocker.n).padStart(2, '0');
+  document.getElementById('lockerSub').textContent = (ME && ME.name ? ME.name + ' · ' : '') + '6to ' + (ME ? ME.section : '');
+  setUi(true); lockerPanel.style.display = 'flex';
+}
+function openMoli(target) {
+  lockerPanel.style.display = 'none';
+  const key = ME && ME.key || 'anon', nm = encodeURIComponent(ME && ME.name || '');
+  let src = MOLI_BASE + 'index.html#/', hint = '', act = null, arg;
+  if (target.startsWith('u:')) { src = MOLI_BASE + 'index.html#/u/' + target.slice(2); hint = '📗 Cuaderno · Unidad ' + target.slice(-1); }
+  else if (target.startsWith('n:')) { act = 'notes'; arg = target.slice(2); hint = '📂 Mis notas · Unidad ' + target.slice(-1); }
+  else if (target === 'lab') { src = MOLI_BASE + 'lab/index.html?u=' + encodeURIComponent(key) + '&n=' + nm + '&t=' + Date.now(); hint = '🧪 Laboratorio de Molí'; }
+  else if (target === 'exit') { act = 'exit'; hint = '📁 Mis libritos de Exit ticket'; }
+  else if (target === 'reg') { act = 'reg'; hint = '📂 Mis notas · Registro del docente'; }
+  else if (target === 'mis') { act = 'mis'; hint = '💪 Mis mapas de refuerzo'; }
+  else if (target === 'login') hint = '🔑 Entra con tu DNI y luego vuelve al colegio';
+  moliHint.textContent = hint; moliFrame.src = src; moliWin.style.display = 'flex'; setUi(true);
+  clearInterval(moliPoll);
+  if (act) {                                                      // Molí abre la pantalla pedida con su acceso directo (__moliGo)
+    let tries = 0; moliPoll = setInterval(() => {
+      tries++; let go = null; try { go = moliFrame.contentWindow.__moliGo; } catch (e) { tries = 99; }
+      if (go) { clearInterval(moliPoll); setTimeout(() => { try { go[act](arg); } catch (e) {} }, 1300); }
+      if (tries > 50) clearInterval(moliPoll);
+    }, 400);
+  }
+}
+function closeMoli() {
+  clearInterval(moliPoll); moliWin.style.display = 'none'; moliFrame.src = 'about:blank'; setUi(false);
+  const had = myRoom(); refreshChip(); if (!had && myRoom()) toast('✅ ¡Listo, ' + firstName() + '! Toca tu nombre arriba para ir a tu salón ' + myRoom() + '.', 5);
+}
+document.getElementById('moliBack').addEventListener('click', closeMoli);
+addEventListener('message', e => { if (e.data === 'lab:close' && e.source === moliFrame.contentWindow) closeMoli(); });
+document.getElementById('lockerClose').addEventListener('click', () => { lockerPanel.style.display = 'none'; setUi(false); });
+document.querySelectorAll('[data-moli]').forEach(b => b.addEventListener('click', () => openMoli(b.dataset.moli)));
+chipEl.addEventListener('click', () => { if (!myRoom()) openMoli('login'); else if (seatInRoom(myRoom())) toast('🪑 En tu salón ' + myRoom()); });
+backMoli.addEventListener('click', () => { location.href = MOLI_BASE + 'index.html'; });
+refreshChip();
 musicBtn.addEventListener('click', () => { musicBtn.textContent = '🎵 Música: ' + (music.toggle() ? 'sí' : 'no'); });
 document.getElementById('go').addEventListener('click', () => {
   startEl.style.display = 'none'; P.started = true;
-  musicBtn.style.display = 'block'; music.start();
+  musicBtn.style.display = 'block'; music.start(); chipEl.style.display = 'block'; backMoli.style.display = 'block';
+  refreshChip(); if (myRoom() && seatInRoom(myRoom())) toast('🪑 ¡Hola ' + firstName() + '! Estás sentado en tu salón ' + myRoom() + '. Camina para levantarte y ve a los lockers.', 5);
   if (isTouch) { for (const id of ['joy', 'useBtn', 'jumpBtn']) document.getElementById(id).style.display = 'block'; }
   else renderer.domElement.requestPointerLock && renderer.domElement.requestPointerLock();
 });
-renderer.domElement.addEventListener('click', () => { if (!isTouch && P.started) renderer.domElement.requestPointerLock && renderer.domElement.requestPointerLock(); });
-addEventListener('keydown', e => { keys[e.code] = true; if (e.code === 'KeyE') wantUse = true; if (e.code === 'Space') { wantJump = true; e.preventDefault(); } });
+renderer.domElement.addEventListener('click', () => { if (!isTouch && P.started && !uiOpen) renderer.domElement.requestPointerLock && renderer.domElement.requestPointerLock(); });
+addEventListener('keydown', e => { if (uiOpen) return; keys[e.code] = true; if (e.code === 'KeyE') wantUse = true; if (e.code === 'Space') { wantJump = true; e.preventDefault(); } });
 addEventListener('keyup', e => { keys[e.code] = false; });
 addEventListener('mousemove', e => {
   if (document.pointerLockElement !== renderer.domElement) return;
@@ -1211,7 +1399,7 @@ function joyMove(t) {
 }
 function inEl(el, t) { const r = el.getBoundingClientRect(); return t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom; }
 addEventListener('touchstart', e => {
-  if (!P.started) return;
+  if (!P.started || uiOpen) return;
   for (const t of e.changedTouches) {
     if (inEl(joyEl, t) && joyId === null) { joyId = t.identifier; joyMove(t); }
     else if (inEl(document.getElementById('useBtn'), t)) wantUse = true;
@@ -1220,7 +1408,7 @@ addEventListener('touchstart', e => {
   }
 }, { passive: false });
 addEventListener('touchmove', e => {
-  if (!P.started) return; e.preventDefault();
+  if (!P.started || uiOpen) return; e.preventDefault();
   for (const t of e.changedTouches) {
     if (t.identifier === joyId) joyMove(t);
     else if (t.identifier === lookId) {
@@ -1238,6 +1426,12 @@ addEventListener('touchend', e => {
 addEventListener('touchcancel', () => { joyId = lookId = null; joy.x = joy.y = 0; });
 addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
 
+const roomLamp = new THREE.PointLight(0xfff4e0, 0, 8, 1.5); scene.add(roomLamp);
+function updateRoomLamp() {                                        // la luz del salón donde está el jugador
+  let best = null, bd = 30;
+  for (const l of ROOMLIGHTS) { if (Math.abs(P.y - l.fy) > 1.5) continue; const d = (l.x - P.x) ** 2 + (l.z - P.z) ** 2; if (d < bd) { bd = d; best = l; } }
+  if (best && best.on) { roomLamp.position.set(best.x, best.y, best.z); roomLamp.intensity = 0.55; } else roomLamp.intensity = 0;
+}
 // ===================================================================
 //  BUCLE
 // ===================================================================
@@ -1245,7 +1439,9 @@ let last = performance.now();
 function loop(now) {
   requestAnimationFrame(loop);
   const dt = (now - last) / 1000; last = now;
-  update(P.started ? dt : 0);
+  update(P.started && !uiOpen ? dt : 0);
+  if (P.started) { checkLocker(); updateRoomLamp(); }
+  if (myLocker) myLocker.glow.material.opacity = 0.25 + 0.2 * Math.sin(now / 300);
   sky.position.copy(camera.position); const tNow = now / 1000; spinners.forEach(f => { if (f.on) f.b.rotation.z += Math.min(dt, 0.05) * 14; });
   sun.position.set(P.x + SUN_DIR.x * 120, SUN_DIR.y * 120, P.z + SUN_DIR.z * 120); sun.target.position.set(P.x, 0, P.z);
   clouds.children.forEach(g => { g.position.x += g.userData.v * Math.min(dt, 0.1); if (g.position.x > 440) g.position.x = -440; });

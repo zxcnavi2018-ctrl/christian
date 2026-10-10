@@ -48,10 +48,10 @@ const colliders = [];   // OBB: {x,z,hw,hd,c,s,R,y0,y1,on}
 const floors = [];      // superficies caminables: {x,z,hw,hd,c,s,y}
 const doors = [];       // puertas interactivas
 const roofs = [];       // techos (losas superiores) para la lluvia
-const F = { x: 28.36, z: -4.09, rot: 0.44, sw: 9, depth: 8, yo: 0 };   // pabellón F (diagonal); 2D y 3A al nivel del patio
-// DESNIVEL: desde la esquina de E hasta el límite 3A|3B de F bajan 5 gradas; 3B, 3C, 3D y el patio de ese lado quedan más abajo
+const F = { x: 28.36, z: -4.09, rot: 0.44, sw: 9, depth: 8, yo: 0 };   // pabellón F (diagonal); 2D, 3A y 3B al nivel del patio
+// DESNIVEL: desde la esquina de 2A (pabellón E) hasta el límite 3B|3C de F bajan 5 gradas; 3C, 3D y el patio de ese lado quedan más abajo
 const DROP = 0.75;
-const LOW = [[18, -31.2], lw(F.x, F.z, F.rot, -4.5, -4), lw(F.x, F.z, F.rot, -4.5, 4), lw(F.x, F.z, F.rot, 22.5, 4),
+const LOW = [[18, -31.2], lw(F.x, F.z, F.rot, 4.5, -4), lw(F.x, F.z, F.rot, 4.5, 4), lw(F.x, F.z, F.rot, 22.5, 4),
   [51.8, lw(F.x, F.z, F.rot, 22.5, 4)[1]], [51.8, -59.8], [18, -59.8]];
 function inPoly(x, z, poly) {
   let ins = false;
@@ -487,7 +487,7 @@ function ironRail(x0, z0, x1, z1, y) {
   flat(300, 14, 0, 41, 0x3f4146, 0.02, 0.04);         // calle
   for (let x = -100; x < 100; x += 6) flat(3, 0.3, x, 41, 0xfacc15, 0.05, 0.02);
   // patio hasta el fondo, sin borde (el lado derecho sigue la cara del pabellón F)
-  // patio de arriba: termina en la línea de gradas (de la esquina de E al límite 3A|3B de F); E queda como entrante
+  // patio de arriba: termina en la línea de gradas (de la esquina de 2A al límite 3B|3C de F); E queda como entrante
   const A = LOW[0], Bq = LOW[1], e0 = [10.12, -1.7], e1 = [51.6, -21.2];
   const tq = ((Bq[0] - A[0]) * (A[1] - e0[1]) - (Bq[1] - A[1]) * (A[0] - e0[0])) / ((Bq[0] - A[0]) * (e1[1] - e0[1]) - (Bq[1] - A[1]) * (e1[0] - e0[0]));
   const Q = [e0[0] + (e1[0] - e0[0]) * tq, e0[1] + (e1[1] - e0[1]) * tq];
@@ -631,12 +631,12 @@ F_ROWS.forEach((row, f) => row.forEach((r, i) => {
   const lx = (i - 2) * F.sw;
   const [wx, wz] = lw(F.x, F.z, F.rot, lx, 0);
   const extra = [];
-  room(r[0], r[1], wx, f, wz, F.sw, F.depth, { rot: F.rot, yo: i < 2 ? 0 : -DROP, door: '-z', roof: i < 3 ? f === 1 : f === 2, extra, endWin: i === 0 ? ['-x'] : i === 4 ? ['+x'] : [] });
+  room(r[0], r[1], wx, f, wz, F.sw, F.depth, { rot: F.rot, yo: i < 3 ? 0 : -DROP, door: '-z', roof: i < 3 ? f === 1 : f === 2, extra, endWin: i === 0 ? ['-x'] : i === 4 ? ['+x'] : [] });
 }));
 label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
 (function () {
-  const lz = -(F.depth / 2 + 0.9), L = 2.5 * F.sw, XJ = -4.5, c = Math.cos(F.rot), sn = Math.sin(F.rot), iron = 0x1f2937, hi = FH, lo = FH - DROP;   // XJ: límite entre 3A y 3B
-  // pasadizo del piso 2: frente a 7B-7C al nivel de D; desde 7D baja con 5 gradas
+  const lz = -(F.depth / 2 + 0.9), L = 2.5 * F.sw, XJ = 4.5, c = Math.cos(F.rot), sn = Math.sin(F.rot), iron = 0x1f2937, hi = FH, lo = FH - DROP;   // XJ: límite entre 3B y 3C
+  // pasadizo del piso 2: frente a 7B-7D al nivel de D; desde 8A baja con 5 gradas
   let [wx, wz] = lw(F.x, F.z, F.rot, (-L + XJ) / 2, lz);
   floorSlab(wx, wz, XJ + L, 1.8, F.rot, hi);
   [wx, wz] = lw(F.x, F.z, F.rot, (XJ + 2 + L) / 2, lz);
@@ -674,7 +674,7 @@ label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
     window.__fz = { lcx, lcz, wl, wd }; }
 })();
 
-// ---- DESNIVEL del patio: 5 gradas de la esquina de E al límite 3A|3B de F, con 2 barandales; muros donde el suelo baja ----
+// ---- DESNIVEL del patio: 5 gradas de la esquina de 2A (E) al límite 3B|3C de F, con 2 barandales; muros donde el suelo baja ----
 (function () {
   const A = LOW[0], B2 = LOW[1], iron = 0x1f2937, run = 0.4, nst = 4, rise = DROP / 5;
   const dx = B2[0] - A[0], dz = B2[1] - A[1], Lf = Math.hypot(dx, dz), ux = dx / Lf, uz = dz / Lf;
@@ -699,7 +699,7 @@ label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
   face(18.1, -59.8, 18.1, -31.2);                                     // a lo largo de E y del fondo
   face(LOW[3][0], LOW[3][1], LOW[4][0], LOW[4][1]);                   // detrás del extremo de F
   face(51.9, LOW[4][1], 51.9, -59.9); face(18, -59.9, 51.9, -59.9);   // bajo el muro perimetral
-  { const P = lw(F.x, F.z, F.rot, -4.5, -4), Q2 = [A[0] + ux * len, A[1] + uz * len]; face(Q2[0], Q2[1], P[0], P[1]); }   // tramo corto sin gradas junto a F
+  { const P = lw(F.x, F.z, F.rot, 4.5, -4), Q2 = [A[0] + ux * len, A[1] + uz * len]; face(Q2[0], Q2[1], P[0], P[1]); }   // tramo corto sin gradas junto a F
 })();
 
 // ---- cercos de las áreas verdes: palitos con soga para que los niños no pisen el pasto ----
@@ -851,9 +851,28 @@ label('ÁREA VERDE', -3.1, 3.0, zG, 1.2, '#fff', 'rgba(22,101,52,.9)');
   cr(0, eS + 0.9, 36, 1.8, 0, 2 * FH);                                            // E (piso 3)
   cr(A.xc[0], A.zc + 4.9, 9, 1.8, 0, FH);                                         // A (piso 2)
   const lzF = -(F.depth / 2 + 0.9);
-  let [fx, fz] = lw(F.x, F.z, F.rot, -13.5, lzF); cr(fx, fz, 18, 1.8, F.rot, FH);            // F piso 2, frente a 7B-7C
-  [fx, fz] = lw(F.x, F.z, F.rot, 0, lzF); cr(fx, fz, 9, 1.8, F.rot, FH - DROP);                   // F piso 2, frente a 7D (más abajo)
+  let [fx, fz] = lw(F.x, F.z, F.rot, -9, lzF); cr(fx, fz, 27, 1.8, F.rot, FH);               // F piso 2, frente a 7B-7D
   [fx, fz] = lw(F.x, F.z, F.rot, 13.5, lzF); cr(fx, fz, 18, 1.8, F.rot, 2 * FH - DROP);    // F piso 3
+})();
+
+// ===================================================================
+//  TOLDOS celestes: del murito del piso 3 de E (desde 10A) al murito del media lab de D, dos paños lado a lado, sin postes
+// ===================================================================
+(function () {
+  const yE = 2 * FH + 1.0, zN = eS + 1.8, zS = dN - 1.8, S = 1.3;          // altura y bordes (murito de E / murito de D)
+  const mat = new THREE.MeshLambertMaterial({ color: 0x87ceeb, emissive: 0x1d4f6b, side: THREE.DoubleSide, transparent: true, opacity: 0.93 });
+  const sail = (xa, xb) => {
+    const g = new THREE.PlaneGeometry(xb - xa, zS - zN, 36, 30); g.rotateX(-Math.PI / 2);
+    const pos = g.attributes.position;
+    for (let k = 0; k < pos.count; k++) {
+      const x = (xa + xb) / 2 + pos.getX(k), z = (zN + zS) / 2 + pos.getZ(k), u = (x - xa) / (xb - xa), v = (z - zN) / (zS - zN);
+      const y = yE - S * Math.sin(Math.PI * u) * Math.sin(Math.PI * v) + 0.04 * Math.sin(x * 0.9 + z * 0.6) * Math.sin(Math.PI * u) * Math.sin(Math.PI * v);   // se hunde al centro por su peso
+      pos.setXYZ(k, x, y, z);
+    }
+    g.computeVertexNormals();
+    const m = new THREE.Mesh(g, mat); m.castShadow = true; scene.add(m);
+  };
+  sail(bFace + 1.7, -3); sail(-3, 12.4);
 })();
 
 // ===================================================================
@@ -871,7 +890,7 @@ lampRow(-16, eS + 0.9, 16, eS + 0.9, YG); lampRow(-16, eS + 0.9, 16, eS + 0.9, Y
 lampRow(A.xc[0] - 3, A.zc + 4.9, A.xc[0] + 3, A.zc + 4.9, YG);                                                                // A
 for (let lx = -19; lx <= 19; lx += 6) {                                                                                       // F
   const [fx, fz] = lw(F.x, F.z, F.rot, lx, -(F.depth / 2 + 0.9));
-  lamps.push([fx, FH + (lx < -4.5 ? 0 : -DROP) - 0.23, fz]); if (lx >= 5) lamps.push([fx, 2 * FH - DROP - 0.23, fz]);
+  lamps.push([fx, FH + (lx < 4.5 ? 0 : -DROP) - 0.23, fz]); if (lx >= 5) lamps.push([fx, 2 * FH - DROP - 0.23, fz]);
 }
 [-4.6, -1.35, 1.9].forEach(x => [21.3, 23.9].forEach(z => lamps.push([x, 3.5, z])));                                          // techito de las puertas
 [15, 19, 23].forEach(z => lamps.push([-25, RH - 0.1, z]));                                                                    // lobby

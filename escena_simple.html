@@ -161,7 +161,7 @@ let doorsOpen = false, doorAngle = 0;
   const wood = new THREE.MeshLambertMaterial({ color: 0x854d0e });
   const dark = new THREE.MeshLambertMaterial({ color: 0x1e293b });
   const logo = new THREE.Mesh(new THREE.BoxGeometry(13, 3.8, 0.6), wallMat);
-  logo.position.set(-6.5, 1.9, 0); g.add(logo);
+  logo.position.set(14.35 + 6.5, 1.9, 0); g.add(logo);
   const bays = [
     { n: '1 Principal', w: 2.8, roof: true },
     { n: '2', w: 2.8, roof: true },
@@ -201,7 +201,7 @@ function toggleDoors() {
 const presets = {
   iso:    { p: [30, 38, 38],  t: [-18, 3, 2] },
   puente: { p: [-6, 14, 20],  t: [-14, 4.5, 4.8] },
-  puertas: { p: [-5, 7, 46], t: [-5, 2, 22] },
+  puertas: { p: [4, 7, 46], t: [4, 2, 22] },
   planta: { p: [-18, 85, 3],  t: [-18, 0, 2] }
 };
 function view(k) {

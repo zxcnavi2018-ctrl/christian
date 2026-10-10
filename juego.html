@@ -861,6 +861,92 @@ function toggleFog() { fogOn = !fogOn; applyFog(); }
 fogBtn.addEventListener('click', toggleFog); applyFog();
 
 // ===================================================================
+//  PRESENCIA: una silueta te observa de lejos o junto a una pared; si la miras de frente, desaparece
+// ===================================================================
+const watcher = new THREE.Group(); watcher.visible = false; scene.add(watcher);
+(function () {
+  const dark = new THREE.MeshBasicMaterial({ color: 0x06060a }), eye = new THREE.MeshBasicMaterial({ color: 0xdfe9ff, fog: false });
+  const part = (w, h, d, x, y, z, m = dark) => { const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); b.position.set(x, y, z); watcher.add(b); return b; };
+  part(0.17, 0.8, 0.18, -0.11, 0.4, 0); part(0.17, 0.8, 0.18, 0.11, 0.4, 0);            // piernas
+  part(0.5, 0.7, 0.26, 0, 1.15, 0);                                                      // torso
+  part(0.12, 0.7, 0.12, -0.33, 1.08, 0); part(0.12, 0.7, 0.12, 0.33, 1.08, 0);           // brazos caídos
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.15, 12, 10), dark); head.position.set(0, 1.66, 0); watcher.add(head);
+  part(0.035, 0.02, 0.02, -0.055, 1.69, 0.135, eye); part(0.035, 0.02, 0.02, 0.055, 1.69, 0.135, eye);   // ojos que brillan
+})();
+const WS = { state: 'hidden', timer: 14 + Math.random() * 10, look: 0, visTime: 0, beat: 0 };
+let actx = null;
+function initAudio() { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { actx = null; } }
+function thump(vol) {                                              // latido "lub-dub" grave
+  if (!actx) return; const t = actx.currentTime;
+  [[0, 1], [0.2, 0.7]].forEach(([dt, v]) => {
+    const o = actx.createOscillator(), g = actx.createGain(); o.type = 'sine'; o.frequency.value = 52;
+    g.gain.setValueAtTime(0.0001, t + dt); g.gain.linearRampToValueAtTime(vol * v, t + dt + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + dt + 0.2);
+    o.connect(g); g.connect(actx.destination); o.start(t + dt); o.stop(t + dt + 0.25);
+  });
+}
+function whoosh() {                                                // soplo corto cuando desaparece
+  if (!actx) return; const t = actx.currentTime, n = Math.floor(actx.sampleRate * 0.5), buf = actx.createBuffer(1, n, actx.sampleRate), d = buf.getChannelData(0);
+  for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+  const src = actx.createBufferSource(), f = actx.createBiquadFilter(), g = actx.createGain(); src.buffer = buf; f.type = 'lowpass'; f.frequency.value = 500;
+  g.gain.value = 0.07; src.connect(f); f.connect(g); g.connect(actx.destination); src.start(t);
+}
+function inCollider(x, y, z, pad) {
+  for (const o of colliders) {
+    if (!o.on || y < o.y0 || y > o.y1) continue;
+    const dx = x - o.x, dz = z - o.z; if (dx * dx + dz * dz > (o.R + pad) ** 2) continue;
+    const lx = dx * o.c - dz * o.s, lz = dx * o.s + dz * o.c;
+    if (Math.abs(lx) <= o.hw + pad && Math.abs(lz) <= o.hd + pad) return true;
+  }
+  return false;
+}
+function lineOfSight(x0, y0, z0, x1, y1, z1) {
+  const n = Math.max(2, Math.ceil(Math.hypot(x1 - x0, z1 - z0) / 0.9));
+  for (let i = 1; i < n; i++) { const t = i / n; if (inCollider(x0 + (x1 - x0) * t, y0 + (y1 - y0) * t, z0 + (z1 - z0) * t, 0)) return false; }
+  return true;
+}
+function nearWallDist(x, z) {                                       // distancia al muro/columna más cercano ("junto a algo")
+  let best = 99;
+  for (const o of colliders) { if (!o.on || o.y1 < 1.2 || o.y0 > 1.5) continue; const d = Math.hypot(x - o.x, z - o.z) - o.R; if (d < best) best = d; }
+  return best;
+}
+function spawnWatcher() {
+  const fx = -Math.sin(P.yaw), fz = -Math.cos(P.yaw), eye = P.y + 1.6;
+  for (let k = 0; k < 70; k++) {
+    const dist = 15 + Math.random() * 20, off = (Math.random() < 0.5 ? -1 : 1) * (0.7 + Math.random() * 0.75);          // periferia: 40°–83° a un lado
+    const c = Math.cos(off), sn = Math.sin(off), dx = fx * c - fz * sn, dz = fx * sn + fz * c;
+    const x = P.x + dx * dist, z = P.z + dz * dist;
+    if (x < -80 || x > 80 || z < -62 || z > 48) continue;
+    const y = groundY(x, z, P.y + 0.1);
+    if (Math.abs(y - P.y) > 4.2 || inCollider(x, y + 0.5, z, 0.6) || inCollider(x, y + 1.3, z, 0.6)) continue;
+    const nw = nearWallDist(x, z);
+    if (!(nw > 0.5 && nw < 1.8) && Math.random() < 0.8) continue;                                                       // casi siempre pegada a algo
+    if (!lineOfSight(P.x, eye, P.z, x, y + 1.2, z)) continue;
+    watcher.position.set(x, y, z); watcher.visible = true; WS.state = 'visible'; WS.look = 0; WS.visTime = 0; WS.beat = 0; return true;
+  }
+  return false;
+}
+function updateWatcher(dt) {
+  if (!P.started) return;
+  if (WS.state === 'hidden') { WS.timer -= dt; if (WS.timer <= 0 && !spawnWatcher()) WS.timer = 1.5; return; }
+  const wx = watcher.position.x, wy = watcher.position.y + 1.3, wz = watcher.position.z;
+  const ex = P.x, ey = P.y + 1.6, ez = P.z, dx = wx - ex, dy = wy - ey, dz = wz - ez, dist = Math.hypot(dx, dy, dz);
+  watcher.rotation.y = Math.atan2(-dx, -dz) + Math.PI;                  // mira al jugador
+  watcher.rotation.z = Math.sin(WS.visTime * 1.3) * 0.012;
+  WS.visTime += dt;
+  const cp = Math.cos(P.pitch), fwd = [-Math.sin(P.yaw) * cp, Math.sin(P.pitch), -Math.cos(P.yaw) * cp];
+  const dot = (dx * fwd[0] + dy * fwd[1] + dz * fwd[2]) / dist;
+  if (dot > 0.94) WS.look += dt; else WS.look = Math.max(0, WS.look - dt * 0.5);       // ¿la estás mirando de frente?
+  const vanish = WS.look > 0.28 || dist < 6 || WS.visTime > 40;
+  if (vanish) {
+    watcher.visible = false; WS.state = 'hidden'; WS.timer = 7 + Math.random() * 13; whoosh();
+    document.getElementById('vig').style.opacity = 1; return;
+  }
+  // sientes que te mira: latido y viñeta que se cierra
+  WS.beat -= dt; if (WS.beat <= 0) { thump(Math.min(0.2, 0.05 + 3 / dist * 0.05)); WS.beat = 0.95; }
+  document.getElementById('vig').style.opacity = 1 + 0.7 * (0.5 + 0.5 * Math.sin(WS.visTime * 6.6));
+}
+
+// ===================================================================
 //  INSTANCIAS (todo el muro/piso en pocos draw calls)
 // ===================================================================
 function buildInstanced(items, material, geo, cast = true) {
@@ -985,7 +1071,7 @@ const isTouch = matchMedia('(pointer:coarse)').matches || 'ontouchstart' in wind
 document.getElementById(isTouch ? 'helpPc' : 'helpTouch').style.display = 'none';
 const startEl = document.getElementById('start');
 document.getElementById('go').addEventListener('click', () => {
-  startEl.style.display = 'none'; P.started = true;
+  startEl.style.display = 'none'; P.started = true; initAudio();
   if (isTouch) { for (const id of ['joy', 'useBtn', 'jumpBtn']) document.getElementById(id).style.display = 'block'; }
   else renderer.domElement.requestPointerLock && renderer.domElement.requestPointerLock();
 });
@@ -1043,7 +1129,7 @@ function loop(now) {
   requestAnimationFrame(loop);
   const dt = (now - last) / 1000; last = now;
   update(P.started ? dt : 0);
-  updateRain(Math.min(dt, 0.05));
+  updateRain(Math.min(dt, 0.05)); updateWatcher(Math.min(dt, 0.05));
   sky.position.copy(camera.position); const tNow = now / 1000; updateLamps(tNow); updateLampLights(tNow);
   sun.position.set(P.x + SUN_DIR.x * 120, SUN_DIR.y * 120, P.z + SUN_DIR.z * 120); sun.target.position.set(P.x, 0, P.z);
   mist.children.forEach(m => { m.position.x += m.userData.v * Math.min(dt, 0.1); if (m.position.x > 62) m.position.x = -72; });
@@ -1052,7 +1138,7 @@ function loop(now) {
 }
 camera.position.set(P.x, P.y + 1.6, P.z);
 requestAnimationFrame(loop);
-window.G = { P, update, doors, colliders, floors, camera, renderer, scene, toggle, nearestDoor, keys, joy };
+window.G = { WS, watcher, spawnWatcher, updateWatcher, P, update, doors, colliders, floors, camera, renderer, scene, toggle, nearestDoor, keys, joy };
 </script>
 </body>
 </html>

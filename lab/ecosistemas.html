@@ -90,7 +90,7 @@ body{display:flex;flex-direction:column;background:radial-gradient(120% 80% at 5
 (()=>{
 const U=new URLSearchParams(location.search).get('u')||'anon';
 document.getElementById('back').href='index.html?u='+encodeURIComponent(U);
-const KEY='lab:'+U+':eco',load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const KEY='lab:'+U+':eco2',load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 const $=id=>document.getElementById(id),say=$('say'),main=$('main');
 let MI=load(KEY,{}),DONE=load(KEY+'-pas',[]);
 const TY={T:{n:'Terrestre',e:'🌳',d:'Los seres vivos viven sobre la tierra'},A:{n:'Acuático',e:'🌊',d:'Los seres vivos viven en el agua'},M:{n:'Mixto',e:'🦀',d:'Se juntan la tierra y el agua'}};

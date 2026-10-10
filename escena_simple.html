@@ -27,6 +27,8 @@
 <div id="btns">
   <button onclick="view('iso')">Isométrica</button>
   <button onclick="view('puente')">Puente 2.º piso</button>
+  <button onclick="view('puertas')">Puertas</button>
+  <button id="doorBtn" onclick="toggleDoors()">Abrir puertas</button>
   <button onclick="view('planta')">Planta</button>
 </div>
 
@@ -128,12 +130,60 @@ label("PUENTE 2.º PISO", bridge.position.x, FH + 3.6, bz, 2.6, '#111', 'rgba(25
 label("entre 6B y 7A", (bx1 + bx2) / 2, FH + 5.4, bz, 2.4, '#fff', 'rgba(15,23,42,.85)');
 
 // ---------- Ingreso ----------
-label('INGRESO', -9, 2.4, 22, 3, '#fff', 'rgba(22,163,74,.95)');
+label('INGRESO', -9, 6.4, 22, 2, '#fff', 'rgba(22,163,74,.95)');
+
+
+// ---------- Puertas del ingreso (4 bahías, todas dobles) ----------
+const pivots = [];
+let doorsOpen = false, doorAngle = 0;
+(function buildDoors() {
+  const g = new THREE.Group();
+  g.position.set(-6, 0, 22);
+  const wallMat = new THREE.MeshLambertMaterial({ color: 0xe2e8f0 });
+  const wood = new THREE.MeshLambertMaterial({ color: 0x854d0e });
+  const dark = new THREE.MeshLambertMaterial({ color: 0x1e293b });
+  const logo = new THREE.Mesh(new THREE.BoxGeometry(6, 3.8, 0.6), wallMat);
+  logo.position.set(-4, 1.9, 0); g.add(logo);
+  const bays = [
+    { n: '1 Principal', w: 1.8, d: 1.10, roof: true },
+    { n: '2', w: 1.5, d: 0.95, roof: true },
+    { n: '3', w: 1.5, d: 0.95, roof: true },
+    { n: '4 Sin techo', w: 2.2, d: 1.80, roof: false }
+  ];
+  let cx = 0;
+  bays.forEach((b, i) => {
+    const bg = new THREE.Group(); bg.position.x = cx;
+    [0, b.w].forEach(px => { const c = new THREE.Mesh(new THREE.BoxGeometry(0.35, 3.6, 1.2), wallMat); c.position.set(px, 1.8, 0); bg.add(c); });
+    if (b.roof) { const r = new THREE.Mesh(new THREE.BoxGeometry(b.w + 0.35, 0.5, 1.6), wallMat); r.position.set(b.w / 2, 3.35, 0); bg.add(r); }
+    const lw = b.d / 2;
+    const mk = (px, dir) => {
+      const pv = new THREE.Group(); pv.position.set(px, 1.4, 0);
+      const leaf = new THREE.Mesh(new THREE.BoxGeometry(lw, 2.6, 0.1), i < 3 ? wood : new THREE.MeshLambertMaterial({ color: 0xffffff }));
+      leaf.position.x = dir * lw / 2; pv.add(leaf);
+      if (i < 3) { const f = new THREE.Mesh(new THREE.BoxGeometry(lw, 2.6, 0.06), dark); f.position.set(dir * lw / 2, 0, -0.04); pv.add(f); }
+      bg.add(pv); return pv;
+    };
+    pivots.push({ l: mk(0.18, 1), r: mk(b.w - 0.18, -1) });
+    g.add(bg);
+    cx += b.w + 0.45;
+  });
+  scene.add(g);
+  // etiquetas
+  bays.forEach((b, i) => {
+    const bx = -6 + bays.slice(0, i).reduce((a, q) => a + q.w + 0.45, 0) + b.w / 2;
+    label(b.n + ' · ' + b.d.toFixed(2).replace('.', ',') + ' m', bx, 4.6, 22.8, 0.9, '#fff', 'rgba(15,23,42,.9)');
+  });
+})();
+function toggleDoors() {
+  doorsOpen = !doorsOpen;
+  document.getElementById('doorBtn').textContent = doorsOpen ? 'Cerrar puertas' : 'Abrir puertas';
+}
 
 // ---------- Cámaras ----------
 const presets = {
   iso:    { p: [30, 38, 38],  t: [-18, 3, 2] },
   puente: { p: [-6, 14, 20],  t: [-14, 4.5, 4.8] },
+  puertas: { p: [-5, 7, 46], t: [-5, 2, 22] },
   planta: { p: [-18, 85, 3],  t: [-18, 0, 2] }
 };
 function view(k) {
@@ -148,7 +198,9 @@ addEventListener('resize', () => {
   camera.updateProjectionMatrix();
   renderer.setSize(innerWidth, innerHeight);
 });
-(function loop() { requestAnimationFrame(loop); controls.update(); renderer.render(scene, camera); })();
+(function loop() { requestAnimationFrame(loop);
+  doorAngle += ((doorsOpen ? Math.PI / 2.2 : 0) - doorAngle) * 0.08;
+  pivots.forEach(q => { q.l.rotation.y = -doorAngle; q.r.rotation.y = doorAngle; }); controls.update(); renderer.render(scene, camera); })();
 </script>
 </body>
 </html>

@@ -774,6 +774,20 @@ fenceRect(-10.75, -25.3, 8.5, 1.7); fenceRect(0, -25.3, 8.5, 1.7);
 })();
 
 // ===================================================================
+//  TECHOS de los pasadizos del último nivel (para que no queden al cielo abierto)
+// ===================================================================
+(function () {
+  const cr = (cx, cz, w, d, rot, y) => { addSolid(cx, y + RH, cz, w, 0.2, d, rot, 0x94a3b8, false); };
+  cr(bFace + 0.9, B.z0 + B.len / 2, 1.8, B.len, 0, 2 * FH);                       // B (piso 3)
+  cr(-5.7, zsD, 18, 1.8, 0, 2 * FH);                                              // D (piso 3)
+  cr(0, eS + 0.9, 36, 1.8, 0, 2 * FH);                                            // E (piso 3)
+  cr(A.xc[0], A.zc + 4.9, 9, 1.8, 0, FH);                                         // A (piso 2)
+  const lzF = -(F.depth / 2 + 0.9);
+  let [fx, fz] = lw(F.x, F.z, F.rot, -9, lzF); cr(fx, fz, 27, 1.8, F.rot, FH + F.yo);      // F piso 2, frente a 7B-7D
+  [fx, fz] = lw(F.x, F.z, F.rot, 13.5, lzF); cr(fx, fz, 18, 1.8, F.rot, 2 * FH + F.yo);    // F piso 3
+})();
+
+// ===================================================================
 //  FOCOS en los pasillos (techo de cada pasadizo y debajo de los pasadizos), techito de las puertas y lobby
 // ===================================================================
 const lamps = [];

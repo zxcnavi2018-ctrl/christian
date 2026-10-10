@@ -10,7 +10,7 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;background-im
 .back{display:inline-flex;align-items:center;gap:4px;padding:8px 14px;border-radius:99px;background:rgba(255,255,255,.1);color:var(--ink);font-weight:900;font-size:14px;text-decoration:none;border:1px solid rgba(255,255,255,.16)}
 .back:active{transform:scale(.95)}
 .chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:99px;font-size:12px;font-weight:900;background:rgba(255,255,255,.14)}
-.moli-say{position:fixed;left:12px;bottom:12px;z-index:20;display:flex;align-items:flex-end;gap:8px;max-width:min(560px,calc(100% - 24px));pointer-events:none}
+.moli-say{position:fixed;left:12px;bottom:12px;z-index:40;display:flex;align-items:flex-end;gap:8px;max-width:min(560px,calc(100% - 24px));pointer-events:none}
 .moli-say img{pointer-events:auto;cursor:pointer}
 .moli-say p{display:none}
 .moli-say.open p{display:block;animation:sayIn .3s cubic-bezier(.2,1.4,.4,1)}
@@ -21,6 +21,18 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;background-im
 .moli-say img{width:64px;flex:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.4));animation:mbob 3s ease-in-out infinite}
 .moli-say p{margin:0 0 14px;padding:10px 14px;border-radius:16px 16px 16px 4px;background:#fff;color:#14224a;font-weight:800;font-size:14px;line-height:1.35;box-shadow:0 10px 24px rgba(0,0,0,.35);pointer-events:auto}
 .moli-say.open p:empty{display:none}
+.moli-col{display:none;flex-direction:column;gap:6px;margin:0 0 14px;max-height:min(62vh,460px);overflow:auto;pointer-events:auto}
+.moli-col.top{margin:40px 0 0}
+.moli-say.open .moli-col{display:flex;animation:sayIn .3s cubic-bezier(.2,1.4,.4,1)}
+.moli-say .moli-col p{margin:0!important}
+.moli-help{padding:10px 14px;border-radius:16px;background:#fff;color:#14224a;font-weight:800;font-size:13.5px;line-height:1.35;box-shadow:0 10px 24px rgba(0,0,0,.35)}
+.moli-help .mh-t{display:block;font-size:14.5px;color:#1d4ed8}
+.moli-help ol{margin:4px 0 8px;padding-left:20px;display:flex;flex-direction:column;gap:3px}
+.moli-help .mh-m{display:block;padding:6px 10px;border-radius:10px;background:#fef3c7;color:#92400e;text-align:center}
+.moli-say img.hop{animation:mhop .6s cubic-bezier(.3,1.6,.5,1)}
+@keyframes mhop{40%{transform:translateY(-12px) rotate(-10deg) scale(1.1)}70%{transform:rotate(8deg)}}
+.mis-glow{animation:misGlow 1s ease-in-out 3;border-radius:16px}
+@keyframes misGlow{50%{box-shadow:0 0 0 4px #fde047,0 0 26px rgba(253,224,71,.85)}}
 @keyframes mbob{0%,100%{transform:translateY(0) rotate(0)}25%{transform:translateY(-6px) rotate(-5deg)}50%{transform:translateY(0) rotate(0) scale(1.03,.97)}75%{transform:translateY(-4px) rotate(5deg)}}
 .moli-say img{transform-origin:50% 90%}
 .moli-say.new img{animation:mcall 1.4s ease-in-out infinite}

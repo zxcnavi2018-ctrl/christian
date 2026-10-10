@@ -216,19 +216,22 @@ walkway(A.xc[0], A.zc + A.depth / 2 + 0.9, 0, 0, 6, 0, 1, +1);
 walkway(F.x, F.z, 0, -(F.depth / 2 + 0.9), 27.5, F.rot, 1, -1);
 walkway(F.x, F.z, 8.25, -(F.depth / 2 + 0.9), 11, F.rot, 2, -1);
 
-// ================= ESCALERA lado D: esquina norte de D, junto al puente =================
+// ================= ESCALERA lado D: pegada a la cara norte de D, sube hacia el puente =================
 (function stairsD() {
-  const n = 11, rise = FH / n, run = 0.29, x = -13.6;
-  const zTop = D.zc - D.depth / 2;                       // borde norte de D (inicio del pasadizo)
+  const n = 11, rise = FH / n, run = 0.4;
+  const zs = D.zc - D.depth / 2 - 0.9;                   // z del eje de la escalera (justo al norte del pasadizo)
+  const xTop = D.xc[0] - D.sw / 2;                        // x = -14.7 (cara oeste de D, donde arranca el puente)
   for (let i = 0; i < n; i++) {
     const h = (i + 1) * rise;
-    const st = new THREE.Mesh(new THREE.BoxGeometry(1.8, h, run), new THREE.MeshLambertMaterial({ color: 0x94a3b8 }));
-    st.position.set(x, h / 2, zTop - n * run + (i + 0.5) * run);
+    const st = new THREE.Mesh(new THREE.BoxGeometry(run, h, 1.8), new THREE.MeshLambertMaterial({ color: 0x94a3b8 }));
+    st.position.set(xTop + n * run - (i + 0.5) * run, h / 2, zs - 1.8);
     scene.add(st);
   }
-  const r = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, n * run), railMat);
-  r.position.set(x - 0.9, FH * 0.5 + 0.9, zTop - n * run / 2); scene.add(r);
-  label('ESCALERA', x, FH + 1.6, zTop - 1.5, 1.2, '#111', 'rgba(250,204,21,.95)');
+  // descanso al nivel del piso 2: une escalera, pasadizo y puente
+  flat(1.8, 5.4, xTop - 0.9, zs + 0.0, 0xa8b3c4, FH - 0.1, 0.2);
+  const r = new THREE.Mesh(new THREE.BoxGeometry(n * run, 0.06, 0.06), railMat);
+  r.position.set(xTop + n * run / 2, FH * 0.5 + 0.9, zs - 2.7); scene.add(r);
+  label('ESCALERA', xTop + n * run / 2, FH + 1.6, zs - 1.8, 1.2, '#111', 'rgba(250,204,21,.95)');
 })();
 
 // ================= ENLACE CORTO: 7B (F, piso 2) <-> ML (D, piso 2) =================

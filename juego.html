@@ -640,10 +640,11 @@ label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
   let [wx, wz] = lw(F.x, F.z, F.rot, 0, lz);
   floorSlab(wx, wz, 2 * L, 1.8, F.rot, hi);
   const xT = 8.2;                                                       // parte alta de la escalera frente a 3C
-  lowWallLocal(F.x, F.z, F.rot, -L, xT - 1.9, lz - 0.8, hi); lowWallLocal(F.x, F.z, F.rot, xT + 0.5, L, lz - 0.8, hi);   // hueco donde llega el descanso
+  const xB = xT + 13 * 0.4;                                             // pie del tramo al piso 3 (descanso en el piso 2)
+  lowWallLocal(F.x, F.z, F.rot, -L, xT - 1.9, lz - 0.8, hi); lowWallLocal(F.x, F.z, F.rot, xT + 0.5, xB - 0.1, lz - 0.8, hi); lowWallLocal(F.x, F.z, F.rot, xB + 1.9, L, lz - 0.8, hi);   // huecos de los descansos
   [wx, wz] = lw(F.x, F.z, F.rot, 13.5, lz);
   floorSlab(wx, wz, 18, 1.8, F.rot, 2 * FH);
-  lowWallLocal(F.x, F.z, F.rot, 4.5, 22.5, lz - 0.8, 2 * FH);
+  lowWallLocal(F.x, F.z, F.rot, 4.5, xT - 1.9, lz - 0.8, 2 * FH); lowWallLocal(F.x, F.z, F.rot, xT + 0.5, 22.5, lz - 0.8, 2 * FH);   // hueco donde llega el tramo al piso 3
   // escalera al piso 2 frente a 3C (mismo estilo que la de D: tramos flotantes, descanso de metal, baranda de fierro)
   const W = (lx, lz2) => lw(F.x, F.z, F.rot, lx, lz2), run = 0.4, n = 13, y0 = -DROP, rise = (FH - y0) / n, zs = lz - 1.8;   // del patio de abajo al piso 2
   { const [sx, sz] = W(xT + n * run, zs); steps(sx, sz, -c, sn, n, rise, run, 1.8, y0, true); }
@@ -658,6 +659,21 @@ label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
   { const [lx0, lz0] = W(xT - 0.9, zs); floorSlab(lx0, lz0, 1.8, 1.8, F.rot, lo, 0.12, 0x4b5563); }
   { const [a1, a2] = W(xT - 1.8, zs - 0.78), [b1, b2] = W(xT, zs - 0.78); ironRail(a1, a2, b1, b2, lo); }
   { const [a1, a2] = W(xT - 1.68, zs - 0.9), [b1, b2] = W(xT - 1.68, zs + 0.9); ironRail(a1, a2, b1, b2, lo); }
+  // segundo tramo, por la misma ruta encima del primero: del piso 2 (descanso en xB) al piso 3 (descanso en xT)
+  { const r2 = FH / n;
+    { const [sx, sz] = W(xB, zs); steps(sx, sz, -c, sn, n, r2, run, 1.8, FH, true); }
+    { const [p0, p1] = W(xB + 0.9, zs); floorSlab(p0, p1, 1.8, 1.8, F.rot, FH, 0.12, 0x4b5563); }          // descanso de abajo (piso 2)
+    { const [a1, a2] = W(xB, zs - 0.78), [b1, b2] = W(xB + 1.8, zs - 0.78); ironRail(a1, a2, b1, b2, FH); }
+    { const [a1, a2] = W(xB + 1.68, zs - 0.9), [b1, b2] = W(xB + 1.68, zs + 0.9); ironRail(a1, a2, b1, b2, FH); }
+    { const [p0, p1] = W(xT - 0.9, zs); floorSlab(p0, p1, 1.8, 1.8, F.rot, 2 * FH, 0.12, 0x4b5563); }       // descanso de arriba (piso 3)
+    { const [a1, a2] = W(xT - 1.8, zs - 0.78), [b1, b2] = W(xT, zs - 0.78); ironRail(a1, a2, b1, b2, 2 * FH); }
+    { const [a1, a2] = W(xT - 1.68, zs - 0.9), [b1, b2] = W(xT - 1.68, zs + 0.9); ironRail(a1, a2, b1, b2, 2 * FH); }
+    const k = -0.72, [ax, az] = W(xB - 0.5 * run, zs + k), [bx, bz] = W(xT + 0.5 * run, zs + k);
+    slopedBar(ax, FH + r2 + 0.95, az, bx, 2 * FH + 0.95, bz, 0.05); slopedBar(ax, FH + r2 + 0.45, az, bx, 2 * FH + 0.45, bz, 0.03);
+    for (let i = 0; i < n; i += 2) { const [px, pz] = W(xB - (i + 0.5) * run, zs + k); addSolid(px, FH + (i + 1) * r2, pz, 0.04, 0.95, 0.04, F.rot, iron, false); }
+    addSolid(bx, 2 * FH, bz, 0.04, 0.95, 0.04, F.rot, iron, false);
+    addCollider((ax + bx) / 2, (az + bz) / 2, n * run, 0.1, F.rot, FH, 2 * FH + 1.1);                          // no caerse por el lado de afuera
+  }
   // pasto debajo de la escalera
   { const [gx, gz] = W(xT + n * run / 2, zs); const m = new THREE.Mesh(new THREE.BoxGeometry(n * run, 0.06, 1.6), new THREE.MeshLambertMaterial({ color: 0x5a9a45 })); m.position.set(gx, y0 + 0.04, gz); m.rotation.y = F.rot; scene.add(m); }
   // otra área verde frente a 2D (como las de D), con su cerco

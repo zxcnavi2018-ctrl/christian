@@ -96,13 +96,13 @@ function room(name, level, cx, floor, cz, w, d, o = {}) {
 flat(32, 29.5, -3, -1.75, 0xb3ae9f, 0.02, 0.04);                       // patio
 label('PATIO', -4, 0.4, -13, 3, '#fff', 'rgba(71,85,105,.9)');
 // cancha de losa
-flat(18.5, 10, -3.25, -5, 0x64748b, 0.06, 0.1);
+flat(16.5, 10, -4.25, -5, 0x64748b, 0.06, 0.1);
 (function courtLines() {
-  const pts = [[-12.5, -10], [6, -10], [6, 0], [-12.5, 0]].map(p => new THREE.Vector3(p[0], 0.13, p[1]));
+  const pts = [[-12.5, -10], [4, -10], [4, 0], [-12.5, 0]].map(p => new THREE.Vector3(p[0], 0.13, p[1]));
   scene.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0xffffff })));
-  scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-3.25, 0.13, -10), new THREE.Vector3(-3.25, 0.13, 0)]), new THREE.LineBasicMaterial({ color: 0xffffff })));
+  scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-4.25, 0.13, -10), new THREE.Vector3(-4.25, 0.13, 0)]), new THREE.LineBasicMaterial({ color: 0xffffff })));
 })();
-label('CANCHA DE LOSA', -3.25, 1.2, -5, 3.4, '#fff', 'rgba(30,41,59,.9)');
+label('CANCHA DE LOSA', -4.25, 1.2, -5, 3.4, '#fff', 'rgba(30,41,59,.9)');
 // área verde pequeña
 flat(3.2, 11, -17, -3.5, 0x4ade80, 0.06, 0.12);
 [-8, -4, 0].forEach(z => {
@@ -178,7 +178,7 @@ room('KC', 'inicial', A.xc[1], 0, A.zc, 5.85, 5.8, { side: 'z' });
 label('PABELLÓN A', -41.5, 2 * FH + 1.2, A.zc, 3, '#fff', 'rgba(0,114,206,.9)');
 
 // ================= PABELLÓN F (diagonal, lado derecho) =================
-const F = { x: 21.3, z: -2.3, rot: 0.849, sw: 5.5, depth: 6 };
+const F = { x: 10.3, z: -2.3, rot: 0.849, sw: 5.5, depth: 6 };
 const F_ROWS = [
   [['2D','primaria'], ['3A','primaria'], ['3B','primaria'], ['3C','primaria'], ['3D','primaria']],
   [['7B','secundaria'], ['7C','secundaria'], ['7D','secundaria'], ['8A','secundaria'], ['8B','secundaria']],
@@ -215,6 +215,19 @@ walkway(A.xc[0], A.zc + A.depth / 2 + 0.9, 0, 0, 6, 0, 1, +1);
 // F: cara hacia el patio (-z local). Piso 2 completo, piso 3 solo frente a 4A y 4B
 walkway(F.x, F.z, 0, -(F.depth / 2 + 0.9), 27.5, F.rot, 1, -1);
 walkway(F.x, F.z, 8.25, -(F.depth / 2 + 0.9), 11, F.rot, 2, -1);
+
+// ================= ENLACE CORTO: 7B (F, piso 2) <-> ML (D, piso 2) =================
+(function linkF() {
+  const x1 = D.xc[1] + D.sw / 2, x2 = 2.0, z = 7.5;        // de la cara derecha de D hasta la cara de F
+  const len = x2 - x1;
+  const slab = new THREE.Mesh(new THREE.BoxGeometry(len, 0.2, 1.8), new THREE.MeshLambertMaterial({ color: 0xfacc15 }));
+  slab.position.set((x1 + x2) / 2, FH - 0.1, z); scene.add(slab);
+  [-0.85, 0.85].forEach(k => {
+    const r = new THREE.Mesh(new THREE.BoxGeometry(len, 0.06, 0.06), railMat);
+    r.position.set((x1 + x2) / 2, FH + 1.0, z + k); scene.add(r);
+  });
+  label('7B ↔ ML', (x1 + x2) / 2, FH + 2.2, z, 1.4, '#111', 'rgba(250,204,21,.95)');
+})();
 
 // ================= PABELLÓN C: lobby en L con puertas de vidrio =================
 room('', 'lab', -24, 0, 17.25, 14, 7.5);          // cuerpo principal x -31..-17, z 13.5..21

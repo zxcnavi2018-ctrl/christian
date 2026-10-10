@@ -289,15 +289,18 @@ cParts.forEach(q => {
 
 // ================= PUENTE: ML (D, piso 2) -> corredor de B, entre 6B y 7A =================
 const bz = B.z0 + 6 * B.sw;                    // límite entre 6B y 7A (z = 6)
-const bx1 = bFace + 1.8;                        // borde exterior del corredor
-const bx2 = D.xc[0] - D.sw / 2;                 // cara de D hacia B
-const bridge = new THREE.Mesh(new THREE.BoxGeometry(bx2 - bx1, 2.6, 2.2), new THREE.MeshLambertMaterial({ color: 0xfacc15, transparent: true, opacity: 0.85 }));
-bridge.position.set((bx1 + bx2) / 2, FH + 1.4, bz);
+const bx1 = bFace + 1.8;                        // borde exterior del corredor de B (x = -19.2)
+const P1 = { x: bx1, z: bz };                   // sale de B entre 6B y 7A
+const P2 = { x: D.xc[0] - D.sw / 2 - 0.9, z: D.zc - D.depth / 2 - 0.8 };   // llega al descanso de la escalera de D
+const blen = Math.hypot(P2.x - P1.x, P2.z - P1.z), bang = Math.atan2(-(P2.z - P1.z), P2.x - P1.x);
+const bridge = new THREE.Mesh(new THREE.BoxGeometry(blen, 2.6, 2.2), new THREE.MeshLambertMaterial({ color: 0xfacc15, transparent: true, opacity: 0.85 }));
+bridge.position.set((P1.x + P2.x) / 2, FH + 1.4, (P1.z + P2.z) / 2);
+bridge.rotation.y = bang;
 scene.add(bridge);
 const be = new THREE.LineSegments(new THREE.EdgesGeometry(bridge.geometry), new THREE.LineBasicMaterial({ color: 0x713f12 }));
-be.position.copy(bridge.position); scene.add(be);
-label('PUENTE', bridge.position.x, FH + 4.4, bz, 1.8, '#111', 'rgba(250,204,21,.95)');
-label('entre 6B y 7A', bridge.position.x, FH + 5.6, bz, 2.0, '#fff', 'rgba(15,23,42,.85)');
+be.position.copy(bridge.position); be.rotation.y = bang; scene.add(be);
+label('PUENTE', bridge.position.x, FH + 4.4, bridge.position.z, 1.8, '#111', 'rgba(250,204,21,.95)');
+label('entre 6B y 7A', bridge.position.x, FH + 5.6, bridge.position.z, 2.0, '#fff', 'rgba(15,23,42,.85)');
 
 // ================= INGRESO =================
 label('INGRESO', -9, 6.4, 26, 2, '#fff', 'rgba(22,163,74,.95)');

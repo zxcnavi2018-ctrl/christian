@@ -483,9 +483,6 @@ function ironRail(x0, z0, x1, z1, y) {
   label('CANCHA DE LOSA', ccx, 0.7, ccz, 1.8, '#fff', 'rgba(30,41,59,.9)');
 })();
 function grass(w, d, x, z) { flat(w, d, x, z, 0x5a9a45, 0.03, 0.06); }
-// área verde en el centro de la cancha: pasto y dos pinos pequeños
-grass(3.2, 8, -4, -13.5);
-label('ÁREA VERDE', -4, 3.6, -13.5, 1.2, '#fff', 'rgba(22,101,52,.9)');
 // dos rectángulos verdes delgados, cerca del patio, frente a B
 [[-10.75], [0]].forEach(([x]) => { grass(8.5, 1.7, x, -25.3); });
 label('ÁREA VERDE', -5.4, 3.4, -25.3, 1.2, '#fff', 'rgba(22,101,52,.9)');
@@ -627,53 +624,26 @@ label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
   [wx, wz] = lw(F.x, F.z, F.rot, 13.5, lz);
   floorSlab(wx, wz, 18, 1.8, F.rot, 2 * FH + yo);
   lowWallLocal(F.x, F.z, F.rot, 4.5, 22.5, lz - 0.8, 2 * FH + yo);
-  // una escalera de 4 gradas frente a cada puerta de la planta baja (3 carriles, divididos por 2 barandales)
-  if (yo > 0) [0, 1, 2, 3, 4].forEach(i => {
-    const cl = (i - 2) * F.sw - 2.52, sw = 4.5, c = Math.cos(F.rot), sn = Math.sin(F.rot), iron = 0x1f2937;
+  // una sola escalera de 4 gradas a lo largo de toda la cara de F (divide el patio), con 2 barandales que la parten en 3 tramos
+  if (yo > 0) {
+    const c = Math.cos(F.rot), sn = Math.sin(F.rot), iron = 0x1f2937;
     for (let k = 1; k <= 4; k++) {
       const top = k * (yo / 4), lzc = -(F.depth / 2) - 0.2 - 0.4 * (4 - k);
-      const [gx, gz] = lw(F.x, F.z, F.rot, cl, lzc);
-      addSolid(gx, 0, gz, sw, top, 0.4, F.rot, 0xd6d3d1, false);
-      floors.push({ x: gx, z: gz, hw: sw / 2, hd: 0.2, c, s: sn, y: top });
+      const [gx, gz] = lw(F.x, F.z, F.rot, 0, lzc);
+      addSolid(gx, 0, gz, 2 * L, top, 0.4, F.rot, 0xd6d3d1, false);
+      floors.push({ x: gx, z: gz, hw: L, hd: 0.2, c, s: sn, y: top });
     }
     const zt = -(F.depth / 2) - 0.15, zb = -(F.depth / 2) - 1.5;
-    [-0.75, 0.75].forEach(off => {
-      const [tx, tz] = lw(F.x, F.z, F.rot, cl + off, zt), [bx, bz] = lw(F.x, F.z, F.rot, cl + off, zb);
+    [-7.02, 10.98].forEach(lxr => {                                    // entre puertas, para no tapar ninguna
+      const [tx, tz] = lw(F.x, F.z, F.rot, lxr, zt), [bx, bz] = lw(F.x, F.z, F.rot, lxr, zb);
       slopedBar(bx, 0.15 + 0.95, bz, tx, yo + 0.95, tz, 0.05);
       slopedBar(bx, 0.15 + 0.45, bz, tx, yo + 0.45, tz, 0.03);
       addSolid(bx, 0, bz, 0.05, 1.1, 0.05, 0, iron, false); addSolid(tx, yo, tz, 0.05, 0.95, 0.05, 0, iron, false);
-      const [mx, mz] = lw(F.x, F.z, F.rot, cl + off, (zt + zb) / 2);
+      const [mx, mz] = lw(F.x, F.z, F.rot, lxr, (zt + zb) / 2);
       addCollider(mx, mz, 0.1, Math.abs(zt - zb), F.rot, 0, 1.8);
     });
-  });
-})();
-
-// pasto inclinado frente a F, entre las escaleras: sube suave desde el patio hasta la base del pabellón
-(function () {
-  const L = 2.5 * F.sw, zf = -(F.depth / 2) - 3.4, zw = -(F.depth / 2), h = F.yo, c = Math.cos(F.rot), sn = Math.sin(F.rot);
-  const cls = [0, 1, 2, 3, 4].map(i => (i - 2) * F.sw - 2.52);
-  const edges = [-L]; cls.forEach(cl => { edges.push(cl - 2.3, cl + 2.3); }); edges.push(L);
-  const mat = new THREE.MeshLambertMaterial({ color: 0x5a9a45, side: THREE.DoubleSide });
-  for (let k = 0; k < edges.length; k += 2) {
-    const x0 = Math.max(edges[k], -L), x1 = Math.min(edges[k + 1], L);
-    if (x1 - x0 < 0.5) continue;
-    const V = (x, y, z) => [x, y, z], t = 0.03;
-    const A0 = V(x0, t, zf), B0 = V(x0, 0, zw), C0 = V(x0, h, zw), A1 = V(x1, t, zf), B1 = V(x1, 0, zw), C1 = V(x1, h, zw);
-    const tri = [A0, B0, C0, A1, C1, B1, A0, A1, B1, A0, B1, B0, B0, B1, C1, B0, C1, C0, A0, C0, C1, A0, C1, A1];
-    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(tri.flat(), 3)); g.computeVertexNormals();
-    const m = new THREE.Mesh(g, mat); m.position.set(F.x, 0, F.z); m.rotation.y = F.rot; m.receiveShadow = true; scene.add(m);
-    const nt = 6, dz = (zw - zf) / nt;                              // para caminar sobre la pendiente: tramos que suben de a poquito
-    for (let j = 0; j < nt; j++) {
-      const lzc = zf + (j + 0.5) * dz, y = t + (h - t) * (j + 0.5) / nt;
-      const [gx, gz] = lw(F.x, F.z, F.rot, (x0 + x1) / 2, lzc);
-      floors.push({ x: gx, z: gz, hw: (x1 - x0) / 2, hd: dz / 2 + 0.01, c, s: sn, y });
-    }
   }
 })();
-
-// otra área verde en el patio, junto a la cancha (lado de F)
-grass(8, 5, 21, -17);
-label('ÁREA VERDE', 21, 3.0, -17, 1.2, '#fff', 'rgba(22,101,52,.9)');
 
 // ---- cercos de las áreas verdes: palitos con soga para que los niños no pisen el pasto ----
 function fenceLine(ax, az, bx, bz, gaps = []) {                 // gaps: tramos [d0, d1] (m desde A) sin soga, para pasar
@@ -695,14 +665,7 @@ function fenceRect(cx, cz, w, d) {
   fenceLine(x0 - m, z0 - m, x1 + m, z0 - m); fenceLine(x1 + m, z0 - m, x1 + m, z1 + m);
   fenceLine(x1 + m, z1 + m, x0 - m, z1 + m); fenceLine(x0 - m, z1 + m, x0 - m, z0 - m);
 }
-fenceRect(-4, -13.5, 3.2, 8); fenceRect(-10.75, -25.3, 8.5, 1.7); fenceRect(0, -25.3, 8.5, 1.7); fenceRect(21, -17, 8, 5);
-(function () {                                                    // franja frente a F: soga con pasos libres frente a cada puerta
-  const L = 2.5 * F.sw, z0 = -(F.depth / 2) - 0.1, z1 = -(F.depth / 2) - 3.5;
-  const P = (lx, lz) => lw(F.x, F.z, F.rot, lx, lz);
-  const doorGaps = [0, 1, 2, 3, 4].map(i => { const c = (i - 2) * F.sw - 2.52 + L; return [c - 2.4, c + 2.4]; });
-  fenceLine(...P(-L, z1), ...P(L, z1), doorGaps);
-  fenceLine(...P(-L, z0), ...P(-L, z1)); fenceLine(...P(L, z0), ...P(L, z1));
-})();
+fenceRect(-10.75, -25.3, 8.5, 1.7); fenceRect(0, -25.3, 8.5, 1.7);
 
 // ---- puente corto D <-> F: del pasadizo de D (piso 2) al extremo del pasadizo de F, junto a la puerta de 7B ----
 (function () {

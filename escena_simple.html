@@ -22,7 +22,7 @@
   <span class="dot" style="background:#0072CE"></span>Inicial
   <span class="dot" style="background:#F37021"></span>Primaria
   <span class="dot" style="background:#78BE20"></span>Secundaria
-  <span class="dot" style="background:#94A3B8"></span>ML / Lab
+  <span class="dot" style="background:#94A3B8"></span>ML / Lab <span class="dot" style="background:#f8fafc"></span>Sala docentes
 </div>
 <div id="btns">
   <button onclick="view('iso')">Isométrica</button>
@@ -33,7 +33,7 @@
 </div>
 
 <script>
-const COL = { inicial: 0x0072CE, primaria: 0xF37021, secundaria: 0x78BE20, lab: 0x94A3B8 };
+const COL = { inicial: 0x0072CE, primaria: 0xF37021, secundaria: 0x78BE20, lab: 0x94A3B8, prof: 0xf8fafc };
 const FH = 3.2;      // alto de piso
 const RH = 3.0;      // alto del salón
 
@@ -85,7 +85,7 @@ function room(name, level, x, floor, z, w, d) {
 // ---------- Pabellón B (3 pisos, 7 módulos a lo largo de Z) ----------
 const B = { x: -21.8, z0: -23.85, sw: 4.77, depth: 4 };
 const B_ROWS = [
-  [['KA','inicial'], ['PkB','inicial'], ['PkA','inicial'], ['BgC','inicial'], ['BgB','inicial'], ['BgA','inicial'], null],
+  [['KA','inicial'], ['PkB','inicial'], ['PkA','inicial'], ['BgC','inicial'], ['BgB','inicial'], ['BgA','inicial'], ['Docentes','prof']],
   [['5B','primaria'], ['5A','primaria'], ['6D','primaria'], ['6C','primaria'], ['LAB','lab'], ['6B','primaria'], ['7A','secundaria']],
   [['9D','secundaria'], ['9C','secundaria'], ['9B','secundaria'], ['9A','secundaria'], ['8C','secundaria'], ['ML','lab'], ['ML','lab']]
 ];

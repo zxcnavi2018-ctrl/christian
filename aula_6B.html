@@ -446,9 +446,27 @@ function softTex(base, n, amp, lines) {                           // textura sua
   if (lines) { g.fillStyle = lines; g.fillRect(0, 0, n, 2); g.fillRect(0, 0, 2, n); }
   const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 4; return t;
 }
+function hqCanvas(n, draw) { const c = document.createElement('canvas'); c.width = c.height = n; draw(c.getContext('2d'), n); const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8; return t; }
+const terrazzoTex = () => hqCanvas(512, (g, n) => {                // piso: vinílico tipo terrazo (1 baldosa de 60 cm)
+  const gr = g.createLinearGradient(0, 0, n, n); gr.addColorStop(0, '#e4ded3'); gr.addColorStop(1, '#dcd5c9'); g.fillStyle = gr; g.fillRect(0, 0, n, n);
+  for (let i = 0; i < 9000; i++) { g.fillStyle = `rgba(${Math.random() < .5 ? '255,255,255' : '90,80,70'},${Math.random() * .07})`; g.fillRect(Math.random() * n, Math.random() * n, 1.5, 1.5); }
+  const cols = ['#9c9488', '#b8afa2', '#7d756b', '#c9bfb0', '#a89a86', '#8f9aa3'];
+  for (let i = 0; i < 1400; i++) { g.fillStyle = cols[i % cols.length]; g.globalAlpha = .35 + Math.random() * .4; g.beginPath(); const r = .8 + Math.random() * 2.6; g.ellipse(Math.random() * n, Math.random() * n, r, r * (.5 + Math.random() * .5), Math.random() * 3, 0, 6.3); g.fill(); }
+  g.globalAlpha = 1; g.fillStyle = 'rgba(110,100,88,.55)'; g.fillRect(0, 0, n, 3); g.fillRect(0, 0, 3, n);
+  g.fillStyle = 'rgba(255,255,255,.25)'; g.fillRect(0, 3, n, 2); g.fillRect(3, 0, 2, n);
+});
+const paintTex = () => hqCanvas(512, (g, n) => {                   // pared: pintura con textura de rodillo
+  g.fillStyle = '#f7f7f5'; g.fillRect(0, 0, n, n);
+  for (let i = 0; i < 260; i++) { const x = Math.random() * n, y = Math.random() * n, r = 20 + Math.random() * 70, gr = g.createRadialGradient(x, y, 0, x, y, r); const v = Math.random() < .5 ? '255,255,255' : '160,160,155'; gr.addColorStop(0, `rgba(${v},.05)`); gr.addColorStop(1, `rgba(${v},0)`); g.fillStyle = gr; g.fillRect(x - r, y - r, 2 * r, 2 * r); }
+  for (let i = 0; i < 16000; i++) { g.fillStyle = `rgba(${Math.random() < .5 ? '255,255,255' : '120,120,115'},${Math.random() * .06})`; g.fillRect(Math.random() * n, Math.random() * n, 1, 1); }
+});
+const laminateTex = () => hqCanvas(256, (g, n) => {                // mesas: laminado blanco con veta suave
+  g.fillStyle = '#fbfaf7'; g.fillRect(0, 0, n, n);
+  for (let i = 0; i < 70; i++) { g.strokeStyle = `rgba(170,165,155,${.04 + Math.random() * .06})`; g.lineWidth = .6 + Math.random(); g.beginPath(); const y = Math.random() * n; g.moveTo(0, y); g.bezierCurveTo(n * .3, y + Math.random() * 6 - 3, n * .7, y + Math.random() * 6 - 3, n, y); g.stroke(); }
+});
 const TEX = {
-  plaster: softTex('#ffffff', 128, 0.05),                          // paredes: pintura con grano muy leve
-  vinyl: softTex('#e9e6df', 128, 0.06, 'rgba(120,115,105,.35)'),    // piso vinílico en baldosas de 60 cm
+  plaster: paintTex(),                          // paredes: pintura con grano muy leve
+  vinyl: terrazzoTex(),    // piso vinílico en baldosas de 60 cm
   ceiling: softTex('#f4f3ef', 128, 0.07, 'rgba(150,150,150,.45)'),  // techo de placas
   wood: (function () { const c = document.createElement('canvas'); c.width = 256; c.height = 64; const g = c.getContext('2d');
     g.fillStyle = '#b07a3c'; g.fillRect(0, 0, 256, 64);
@@ -1701,6 +1719,21 @@ requestAnimationFrame(loop);
     o.getWorldPosition(wp); if (!in6B(wp.x, wp.y, wp.z)) scene.remove(o);
   });
   kids.length = 0; setRain(false);
+  // mesas con laminado, zócalos, reloj de pared y tacho de basura
+  scene.children.forEach(o => { if (o.isInstancedMesh && o.geometry === hexGeo) o.material = new THREE.MeshLambertMaterial({ map: laminateTex() }); });
+  const zb = (w, d, x, z) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, 0.12, d), new THREE.MeshLambertMaterial({ color: 0x4b5563 })); m.position.set(x, FH + 0.06, z); scene.add(m); };
+  zb(0.025, 8.6, -28.79, -1.5); zb(7.6, 0.025, -25, -5.79); zb(7.6, 0.025, -25, 2.79);
+  { const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d');
+    g.fillStyle = '#1f2937'; g.beginPath(); g.arc(128, 128, 124, 0, 6.3); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(128, 128, 110, 0, 6.3); g.fill();
+    g.fillStyle = '#111827'; for (let k = 0; k < 12; k++) { const a = k * Math.PI / 6; g.fillRect(128 + Math.sin(a) * 92 - 3, 128 - Math.cos(a) * 92 - 9, 6, 18); }
+    g.font = 'bold 22px sans-serif'; g.textAlign = 'center'; g.fillText('INNOVA', 128, 90);
+    const clk = new THREE.Mesh(new THREE.CircleGeometry(0.22, 32), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), toneMapped: false }));
+    clk.position.set(-21.215, FH + 2.55, -4.0); clk.rotation.y = -Math.PI / 2; scene.add(clk);
+    const hand = (len, w, col) => { const h = new THREE.Mesh(new THREE.PlaneGeometry(w, len), new THREE.MeshBasicMaterial({ color: col })); h.geometry.translate(0, len / 2, 0); h.position.set(-21.22, FH + 2.55, -4.0); h.rotation.y = -Math.PI / 2; scene.add(h); return h; };
+    const hh = hand(0.11, 0.018, 0x111827), mh = hand(0.16, 0.012, 0x111827), sh = hand(0.17, 0.005, 0xef4444);
+    setInterval(() => { const d = new Date(), s = d.getSeconds(), m = d.getMinutes() + s / 60, h = d.getHours() % 12 + m / 60;
+      hh.rotation.set(0, -Math.PI / 2, -h * Math.PI / 6, 'YXZ'); mh.rotation.set(0, -Math.PI / 2, -m * Math.PI / 30, 'YXZ'); sh.rotation.set(0, -Math.PI / 2, -s * Math.PI / 30, 'YXZ'); }, 1000); }   // reloj con la hora real
+  { const bin = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.14, 0.42, 16, 1, true), new THREE.MeshLambertMaterial({ color: 0x16a34a, side: THREE.DoubleSide })); bin.position.set(-21.55, FH + 0.21, -5.45); scene.add(bin); addCollider(-21.55, -5.45, 0.34, 0.34, 0, FH, FH + 0.45); }
   const box = (w, h, d, x, y, z, c) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({ color: c })); m.position.set(x, y, z); m.receiveShadow = true; scene.add(m); return m; };
   box(1.8, 0.2, 9, -20.1, FH - 0.1, -1.5, 0xc6c5c1); floors.push({ x: -20.1, z: -1.5, hw: 0.9, hd: 4.5, c: 1, s: 0, y: FH });   // pasillo frente al 6B
   box(1.8, 0.2, 9, -20.1, 2 * FH - 0.1, -1.5, 0x94a3b8);                                                                     // techo del pasillo

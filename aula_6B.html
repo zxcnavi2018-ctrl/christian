@@ -58,7 +58,16 @@
   #dots i { width: 8px; height: 8px; border-radius: 50%; background: #cbd5e1; display: block; transition: all .3s; }
   #dots i.on { background: #ff7a2f; width: 20px; border-radius: 6px; }
   #sheet { position: fixed; z-index: 25; display: none; opacity: 0; overflow: hidden; border-radius: 10px; box-shadow: 0 24px 60px rgba(0,0,0,.45);
-    transition: left .6s cubic-bezier(.2,.85,.25,1), top .6s cubic-bezier(.2,.85,.25,1), width .6s cubic-bezier(.2,.85,.25,1), height .6s cubic-bezier(.2,.85,.25,1), opacity .35s, border-radius .6s; }
+    transition: left .7s cubic-bezier(.34,1.28,.5,1), top .7s cubic-bezier(.34,1.28,.5,1), width .7s cubic-bezier(.34,1.28,.5,1), height .7s cubic-bezier(.34,1.28,.5,1), opacity .3s; }
+  #sheet.closing { transition: left .45s cubic-bezier(.55,0,.75,.2), top .45s cubic-bezier(.55,0,.75,.2), width .45s cubic-bezier(.55,0,.75,.2), height .45s cubic-bezier(.55,0,.75,.2), opacity .3s .2s; }
+  #sheet > * { opacity: 0; transition: opacity .3s; } #sheet.show > * { opacity: 1; transition: opacity .35s .3s; }
+  #sheet.show::before { content: ''; position: absolute; top: 0; bottom: 0; left: -40%; width: 30%; z-index: 3; pointer-events: none; background: linear-gradient(100deg, transparent, rgba(255,255,255,.55), transparent); animation: shine 1s .45s ease-out forwards; }
+  @keyframes shine { to { left: 120%; } }
+  #rotate { position: fixed; inset: 0; z-index: 60; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; color: #fff; padding: 24px;
+    background: radial-gradient(circle at 30% 20%, rgba(255,138,61,.4), transparent 50%), radial-gradient(circle at 75% 80%, rgba(79,143,247,.5), transparent 55%), #1a1438; }
+  #rotate .ph { font-size: 72px; animation: turn 1.8s ease-in-out infinite; } #rotate b { font-size: 24px; } #rotate span { font-size: 15px; color: #cbd5e1; }
+  @keyframes turn { 0%, 20% { transform: rotate(0); } 55%, 100% { transform: rotate(-90deg); } }
+  @media (orientation: portrait) and (max-width: 900px) { #rotate { display: flex; } }
   #sheet .tit { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); background: #fff; color: #1d4ed8; border: 3px solid #2b2547; border-radius: 999px; padding: 4px 14px; font-weight: 900; font-size: 14px; white-space: nowrap; z-index: 2; }
   .slot { position: absolute; inset: 0; }                         /* aquí se conectará el contenido */
   #sheet.cuaderno { background: #16a34a; border: 4px solid #2b2547; }
@@ -100,6 +109,7 @@
 <div id="moliWin"><div id="moliBar"><button id="moliBack">← Volver al colegio</button><span id="moliHint"></span></div><iframe id="moliFrame" allow="autoplay; fullscreen"></iframe></div>
 <div id="tourBar"><button id="prevBtn" aria-label="Anterior">◀</button><div id="stopName"><span id="stopTxt">Mi salón</span><div id="dots"></div></div><button id="nextBtn" aria-label="Siguiente">▶</button></div>
 <div id="sheet"></div>
+<div id="rotate"><div class="ph">📱</div><b>Gira tu celular</b><span>Tu salón se ve en horizontal ↻</span></div>
 <div id="start">
   <h1 id="introH">Innova Schools Tacna</h1>
   <p id="introTxt">Apareces afuera, frente a las puertas del colegio. Acércate y ábrelas para entrar. Puedes subir escaleras, cruzar el puente y entrar a todas las aulas.</p>
@@ -488,7 +498,10 @@ function makeBookLike(col, label, paperCol, w, d, th) {            // tapa de at
   const hinge = new THREE.Group(); hinge.position.set(-w / 2, 0.006 + th, 0); g.add(hinge);
   const cover = new THREE.Mesh(new THREE.BoxGeometry(w, 0.006, d), [cm, cm, toon(0xffffff, { map: coverTex('#' + new THREE.Color(col).getHexString(), label) }), cm, cm, cm]);
   cover.position.set(w / 2, 0.003, 0); hinge.add(cover);
-  g.userData.hinge = hinge; return g;
+  const pm = toon(0xffffff, { map: linedTex }), leaves = [0, 1].map(k => {             // 2 hojitas que se pasan detrás de la tapa
+    const lh = new THREE.Group(); lh.position.set(-w / 2, 0.005 + th - k * 0.001, 0); g.add(lh);
+    const lf = new THREE.Mesh(new THREE.BoxGeometry(w - 0.014, 0.0015, d - 0.014), pm); lf.position.x = (w - 0.014) / 2; lh.add(lf); return lh; });
+  g.userData.hinge = hinge; g.userData.leaves = leaves; return g;
 }
 const makeNotebook = () => makeBookLike(0x16a34a, 'MI CUADERNO', 0xf8fafc, 0.21, 0.29, 0.014);
 const makeFolder = (col, paper, label) => makeBookLike(col, label, paper, 0.24, 0.32, 0.01);
@@ -508,7 +521,8 @@ function makeLaptop() {                                            // base con t
 function projTex(on) {                                              // lo que se ve en el ecran: apagado (gris) o prendido (en blanco, listo para conectar)
   const c = document.createElement('canvas'); c.width = 512; c.height = 220; const g = c.getContext('2d');
   if (!on) { g.fillStyle = '#d6d3c8'; g.fillRect(0, 0, 512, 220); g.fillStyle = 'rgba(0,0,0,.05)'; for (let x = 0; x < 512; x += 24) g.fillRect(x, 0, 2, 220); }
-  else { const gr = g.createRadialGradient(256, 100, 20, 256, 110, 300); gr.addColorStop(0, '#ffffff'); gr.addColorStop(1, '#eef2f7'); g.fillStyle = gr; g.fillRect(0, 0, 512, 220); }
+  else { const gr = g.createRadialGradient(256, 105, 10, 256, 110, 290); gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.6, '#fbfdff'); gr.addColorStop(1, '#e3ebf5'); g.fillStyle = gr; g.fillRect(0, 0, 512, 220);
+    g.fillStyle = 'rgba(255,248,225,.35)'; g.beginPath(); g.ellipse(256, 100, 120, 55, 0, 0, 6.3); g.fill(); }
   return new THREE.CanvasTexture(c);
 }
 const LOCKER_COLS = ['#4f8ff7', '#ff8a3d', '#3ccf7a', '#f4f7fb'];          // azul, naranja, verde y blanco
@@ -650,8 +664,8 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
       const [tx, tz] = P(uu, ss);
       for (let k = 0; k < 6; k++) {                                  // el hexágono son 6 mesitas iguales, cada una con su pata
         const tb = k * Math.PI / 3 + Math.PI / 6, bx = Math.sin(tb), bz = Math.cos(tb);
-        furn.tops.push({ x: tx + bx * 0.025, y: fy + 0.725, z: tz + bz * 0.025, sx: 0.83, sy: 0.035, sz: 0.83, rot: k * Math.PI / 3, color: 0xf7f6f2 });   // tablero blanco paloma
-        furn.rims.push({ x: tx + bx * 0.025, y: fy + 0.695, z: tz + bz * 0.025, sx: 0.835, sy: 0.026, sz: 0.835, rot: k * Math.PI / 3, color: 0x9aa3ae });   // canto gris
+        furn.tops.push({ x: tx + bx * 0.008, y: fy + 0.725, z: tz + bz * 0.008, sx: 0.84, sy: 0.035, sz: 0.84, rot: k * Math.PI / 3, color: 0xe9e7e1 });   // tablero blanco paloma
+        furn.rims.push({ x: tx + bx * 0.03, y: fy + 0.698, z: tz + bz * 0.03, sx: 0.8, sy: 0.022, sz: 0.8, rot: k * Math.PI / 3, color: 0xb9c0c8 });   // canto gris, escondido debajo del tablero
         furn.frames.push({ x: tx + bx * 0.39, y: fy + 0.665, z: tz + bz * 0.39, sx: 0.36, sy: 0.04, sz: 0.36, rot: k * Math.PI / 3 + Math.PI / 6, color: 0x5b6470 });   // bastidor de fierro
         for (const [rr, tt] of [[0.9, 0.1], [0.9, Math.PI / 3 - 0.1], [0.42, 0.24], [0.42, Math.PI / 3 - 0.24]]) {
           const an = tt + k * Math.PI / 3; furn.tlegs.push({ x: tx + bx * 0.025 + rr * 0.83 * Math.sin(an), y: fy + 0.34, z: tz + bz * 0.025 + rr * 0.83 * Math.cos(an), sx: 1, sy: 0.68, sz: 1, rot: 0, color: 0x8d939c });
@@ -731,9 +745,23 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
       const cs = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([i, j]) => new THREE.Vector3(sx + ex[0] * 1.69 * i, fy + 1.72 + 0.715 * j, sz + ex[1] * 1.69 * i));
       const pos = []; for (let k = 0; k < 4; k++) { const c1 = cs[k].clone().sub(apex), c2 = cs[(k + 1) % 4].clone().sub(apex); pos.push(0, 0, 0, c1.x, c1.y, c1.z, c2.x, c2.y, c2.z); }
       const bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-      const beam = new THREE.Mesh(bg, new THREE.MeshBasicMaterial({ color: 0xfff6d8, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending })); beam.position.copy(apex); scene.add(beam);
+      const cols = []; for (let k = 0; k < 4; k++) cols.push(0.62, 0.6, 0.52, 0.1, 0.1, 0.09, 0.1, 0.1, 0.09);          // más fuerte en el lente, suave en el ecran
+      bg.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
+      const beam = new THREE.Mesh(bg, new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending })); beam.position.copy(apex); scene.add(beam);
+      const glowTex = (function () { const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'), gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.3, 'rgba(255,240,200,.7)'); gr.addColorStop(1, 'rgba(255,240,200,0)'); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); })();
+      const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending })); glow.scale.set(0.35, 0.35, 1); glow.position.copy(apex); scene.add(glow);
+      const DN = 70, dp = new Float32Array(DN * 3), seeds = [];                                                          // polvito flotando dentro del haz
+      for (let k = 0; k < DN; k++) { const t = Math.sqrt(Math.random()) * 0.95, a = Math.random(), b = Math.random(); seeds.push([t, a, b, Math.random() * 6.3]); }
+      const dg = new THREE.BufferGeometry(); dg.setAttribute('position', new THREE.BufferAttribute(dp, 3));
+      const dust = new THREE.Points(dg, new THREE.PointsMaterial({ size: 0.025, map: glowTex, color: 0xfff3cf, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending }));
+      dust.position.copy(apex); dust.frustumCulled = false; scene.add(dust);
+      const rel = cs.map(c => c.clone().sub(apex)), tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
+      animHooks.push(t => { if (dust.material.opacity <= 0) return; for (let k = 0; k < DN; k++) { const [tt, a, b, ph] = seeds[k];
+        tmp.copy(rel[0]).lerp(rel[1], a); tmp2.copy(rel[3]).lerp(rel[2], a); tmp.lerp(tmp2, (b + Math.sin(t * 0.3 + ph) * 0.05 + 1) % 1); tmp.multiplyScalar((tt + t * 0.015) % 0.95);
+        dp[k * 3] = tmp.x; dp[k * 3 + 1] = tmp.y + Math.sin(t * 0.7 + ph) * 0.01; dp[k * 3 + 2] = tmp.z; } dg.attributes.position.needsUpdate = true; });
+      const spill = new THREE.PointLight(0xf2f6ff, 0, 5, 1.5); spill.position.set(sx + uvec[0] * 0.7, fy + 1.7, sz + uvec[1] * 0.7); scene.add(spill);   // la luz del proyector ilumina la pared
       const [cx3, cz3] = P(-(Wc / 2 - T - 3.9), Dp / 2 - T);
-      F6.pizarra = { obj: scr, scr, beam, offTex, onTex, look: new THREE.Vector3(sx, fy + 1.66, sz), from: new THREE.Vector3(cx3, fy + 1.4, cz3) }; }
+      F6.pizarra = { obj: scr, scr, beam, glow, dust, spill, offTex, onTex, look: new THREE.Vector3(sx, fy + 1.66, sz), from: new THREE.Vector3(cx3, fy + 1.4, cz3) }; }
     // 5 grupos: dos a cada lado (adelante y atrás) y uno al centro
     const G5 = [[-1.5, 1.6], [2.25, 1.6], [-1.5, 6.0], [2.25, 6.0], [0.4, 3.8]];
     seatsOut = []; clusters(false, G5); SALON6[rname].seats = seatsOut;
@@ -1411,7 +1439,7 @@ function buildInstanced(items, material, geo, cast = true) {
     dummy.updateMatrix(); m.setMatrixAt(i, dummy.matrix); col.setHex(it.color); m.setColorAt(i, col);
   });
   m.instanceMatrix.needsUpdate = true; if (m.instanceColor) m.instanceColor.needsUpdate = true;
-  m.castShadow = cast; m.receiveShadow = true; m.frustumCulled = false; scene.add(m);
+  m.castShadow = cast; m.receiveShadow = true; m.frustumCulled = false; scene.add(m); return m;
 }
 buildInstanced(solidItems, new THREE.MeshLambertMaterial({ color: 0xffffff }));
 const furnMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
@@ -1420,7 +1448,18 @@ const hexGeo = (function () {                                     // una mesita:
   const g = new THREE.ExtrudeGeometry(new THREE.Shape([pt(ri, 0), pt(1, 0), pt(1, a), pt(ri, a)]), { depth: 1, bevelEnabled: false });
   g.rotateX(Math.PI / 2); g.translate(0, 0.5, 0); return g;
 })();
-buildInstanced(furn.tops, furnMat, hexGeo); buildInstanced(furn.peds, furnMat); buildInstanced(furn.rims, furnMat, hexGeo, false);
+const topGeo = (function () {                                     // tablero con los bordes redondeados (bisel)
+  const ri = 0.3, pt = (r, t) => new THREE.Vector2(r * Math.sin(t), r * Math.cos(t)), a = Math.PI / 3;
+  const g = new THREE.ExtrudeGeometry(new THREE.Shape([pt(ri + 0.02, 0.03), pt(0.985, 0.012), pt(0.985, a - 0.012), pt(ri + 0.02, a - 0.03)]), { depth: 0.4, bevelEnabled: true, bevelThickness: 0.3, bevelSize: 0.014, bevelSegments: 3 });
+  g.rotateX(Math.PI / 2); g.translate(0, 0.5, 0); return g;
+})();
+const laminate = (function () {                                   // laminado blanco paloma con fibrita suave
+  const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d'); g.fillStyle = '#ffffff'; g.fillRect(0, 0, 256, 256);
+  for (let i = 0; i < 1400; i++) { g.fillStyle = 'rgba(150,140,125,' + Math.random() * 0.06 + ')'; g.fillRect(Math.random() * 256, Math.random() * 256, 4 + Math.random() * 18, 1); }
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(2, 2); return t;
+})();
+buildInstanced(furn.tops, new THREE.MeshLambertMaterial({ color: 0xffffff, map: laminate }), topGeo).userData.noInk = true;
+buildInstanced(furn.peds, furnMat); buildInstanced(furn.rims, furnMat, hexGeo, false);
 buildInstanced(furn.frames, furnMat, undefined, false); buildInstanced(furn.tlegs, furnMat, new THREE.CylinderGeometry(0.016, 0.014, 1, 10), false);
 (function buildChairs() {
   const list = chairs.filter(c => in6B(c.x, c.fy + 0.5, c.z)); if (!list.length) return;
@@ -1918,6 +1957,7 @@ function inkMat(boxMode) {                                         // contorno "
 }
 const INK_BOX = inkMat(true), INK_NRM = inkMat(false);
 function addInk(o) {
+  if (o.userData.noInk) return;
   const geo = o.geometry; if (!geo || geo.type === 'PlaneGeometry' || geo.type === 'ShapeGeometry' || geo.type === 'BufferGeometry') return;
   if ([].concat(o.material).some(m => m.transparent || m.isShaderMaterial || m.side === THREE.DoubleSide)) return;
   if (!geo.boundingBox) geo.computeBoundingBox();
@@ -1997,7 +2037,9 @@ function addInk(o) {
 // ===================================================================
 const sheet = document.getElementById('sheet');
 const ease = k => k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
-const tween = (ms, f) => new Promise(res => { const t0 = performance.now(); (function step(now) { const k = Math.min(1, Math.max(0, (now - t0) / ms)); f(ease(k)); if (k < 1) requestAnimationFrame(step); else res(); })(t0); });
+const outBack = k => { const c = 1.55; return 1 + (c + 1) * Math.pow(k - 1, 3) + c * Math.pow(k - 1, 2); };   // se pasa un poquito y regresa (rebote)
+const outCubic = k => 1 - Math.pow(1 - k, 3), inCubic = k => k * k * k;
+const tween = (ms, f, e = ease) => new Promise(res => { const t0 = performance.now(); (function step(now) { const k = Math.min(1, Math.max(0, (now - t0) / ms)); f(e(k)); if (k < 1) requestAnimationFrame(step); else res(); })(t0); });
 const wait = ms => new Promise(r => setTimeout(r, ms));
 function screenRect(obj) {                                          // el rectángulo que ocupa el objeto en la pantalla
   const b = new THREE.Box3().setFromObject(obj), v = new THREE.Vector3(); let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
@@ -2015,46 +2057,74 @@ const SHEETS = {                                                    // lo que se
 };
 function bigRect(ar) { const mw = innerWidth * 0.92, mh = innerHeight - 200; let w = Math.min(mw, 980), h = w / ar; if (h > mh) { h = mh; w = h * ar; } return { x: (innerWidth - w) / 2, y: Math.max(14, (innerHeight - 100 - h) / 2), w, h }; }
 const place = r => Object.assign(sheet.style, { left: r.x + 'px', top: r.y + 'px', width: r.w + 'px', height: r.h + 'px' });
-async function expand(kind, obj) {
+async function expand(kind, obj) {                                 // sale del objeto y se agranda con un rebotito; luego aparece lo de adentro con un brillo
   const S = SHEETS[kind]; sheet.className = kind; sheet.innerHTML = S.html + '<div class="tit">' + S.t + '</div>'; sheet.dataset.kind = kind;
   sheet.style.transition = 'none'; place(screenRect(obj)); sheet.style.opacity = '0'; sheet.style.display = 'block'; void sheet.offsetWidth;
-  sheet.style.transition = ''; sheet.style.opacity = '1'; place(bigRect(S.ar)); await wait(640);
+  sheet.style.transition = ''; sheet.style.opacity = '1'; place(bigRect(S.ar)); sheet.classList.add('show'); await wait(720);
 }
-async function shrink(obj) { if (sheet.style.display !== 'block') return; place(screenRect(obj)); await wait(330); sheet.style.opacity = '0'; await wait(300); sheet.style.display = 'none'; sheet.innerHTML = ''; }
-const hingeTo = (o, to, ms) => { const h = o.userData.hinge, a0 = h.rotation.z; return tween(ms, k => { h.rotation.z = a0 + (to - a0) * k; }); };
+async function shrink(obj) {                                        // se achica rápido hacia el objeto y desaparece
+  if (sheet.style.display !== 'block') return;
+  sheet.classList.remove('show'); sheet.classList.add('closing'); await wait(120); place(screenRect(obj)); sheet.style.opacity = '0'; await wait(520);
+  sheet.style.display = 'none'; sheet.innerHTML = ''; sheet.className = '';
+}
+const hingeTo = (o, to, ms, e = ease) => { const h = o.userData.hinge, a0 = h.rotation.z; return tween(ms, k => { h.rotation.z = a0 + (to - a0) * k; }, e); };
+async function openBook(o) {                                        // se levanta un poquito, la tapa se abre con rebote y pasan 2 hojitas
+  const y0 = o.position.y; await tween(220, k => { o.position.y = y0 + 0.03 * k; }, outCubic);
+  const lv = o.userData.leaves || [];
+  await Promise.all([hingeTo(o, Math.PI * 0.99, 800, outBack), ...lv.map((l, i) => wait(180 + i * 140).then(() => { const a0 = l.rotation.z; return tween(620, k => { l.rotation.z = a0 + (Math.PI * (0.975 - i * 0.012) - a0) * k; }, outCubic); }))]);
+  await tween(200, k => { o.position.y = y0 + 0.03 * (1 - k); }, outCubic);
+}
+async function closeBook(o) {
+  const lv = o.userData.leaves || [];
+  await Promise.all([...lv.map((l, i) => wait((lv.length - 1 - i) * 90).then(() => { const a0 = l.rotation.z; return tween(420, k => { l.rotation.z = a0 * (1 - k); }, inCubic); })), wait(160).then(() => hingeTo(o, 0, 520, outBack))]);
+}
 const STOPS = [
   { name: '🏫 Mi salón 6B', pf: 1, look: FOCUS.pizarra.look.clone().add(new THREE.Vector3(0, -0.45, 0)), from: FOCUS.corcho.look.clone().lerp(FOCUS.corcho.from, 0.3).setY(FOCUS.corcho.look.y - 0.55) },   // desde el fondo (junto a los lockers), debajo de los cohetes
   { name: '📗 Mi mesa', ...FOCUS.mesa,
-    async enter() { await hingeTo(this.obj, Math.PI * 0.985, 700); await expand('cuaderno', this.obj); },
-    async leave() { await shrink(this.obj); await hingeTo(this.obj, 0, 550); } },
+    async enter() { await openBook(this.obj); await expand('cuaderno', this.obj); },
+    async leave() { await shrink(this.obj); await closeBook(this.obj); } },
   { name: '🎒 Mi locker', ...FOCUS.locker,
-    async enter() { const W = this.obj, b = this.base, o = this.out; await tween(750, k => W.position.lerpVectors(b, o, k)); await hingeTo(this.folder, 1.2, 450); await expand('folder', W); },
-    async leave() { const W = this.obj, b = this.base, o = this.out; await shrink(W); await hingeTo(this.folder, 0, 350); await tween(650, k => W.position.lerpVectors(o, b, k)); } },
+    async enter() { const W = this.obj, b = this.base, o = this.out, f = this.folder, r0 = f.rotation.x;   // sale del locker en arco, se inclina hacia ti y se abre
+      await tween(850, k => { W.position.lerpVectors(b, o, k); W.position.y += Math.sin(Math.PI * k) * 0.08; f.rotation.x = r0 - 0.3 * k; f.rotation.z = Math.sin(k * Math.PI * 2) * 0.06 * (1 - k); }, outBack);
+      await hingeTo(f, 1.25, 600, outBack); await expand('folder', W); },
+    async leave() { const W = this.obj, b = this.base, o = this.out, f = this.folder, r1 = f.rotation.x; await shrink(W); await hingeTo(f, 0, 380, inCubic);
+      await tween(700, k => { W.position.lerpVectors(o, b, k); W.position.y += Math.sin(Math.PI * k) * 0.05; f.rotation.x = r1 + 0.3 * k; }, ease); } },
   { name: '💻 La laptop', ...FOCUS.laptop,
     async enter() { const sc = this.obj.userData.screen.material.color, c0 = new THREE.Color(0x0b1220), c1 = new THREE.Color(0x3b82f6), c2 = new THREE.Color(0xf8fbff), h = this.obj.userData.hinge;
-      await tween(900, k => { h.rotation.x = LID_CLOSED + (LID_OPEN - LID_CLOSED) * k; });          // se abre la tapa
-      await tween(350, k => sc.copy(c0).lerp(c1, k)); await tween(450, k => sc.copy(c1).lerp(c2, k)); await expand('laptop', this.obj.userData.screen); },
+      await tween(1000, k => { h.rotation.x = LID_CLOSED + (LID_OPEN - LID_CLOSED) * k; }, outBack);   // se abre la tapa con rebote
+      await tween(300, k => sc.copy(c0).lerp(c1, k)); await wait(250); await tween(450, k => sc.copy(c1).lerp(c2, k)); await expand('laptop', this.obj.userData.screen); },
     async leave() { const sc = this.obj.userData.screen.material.color, c0 = sc.clone(), c1 = new THREE.Color(0x0b1220); await shrink(this.obj.userData.screen); await tween(300, k => sc.copy(c0).lerp(c1, k));
-      const h = this.obj.userData.hinge; await tween(700, k => { h.rotation.x = LID_OPEN + (LID_CLOSED - LID_OPEN) * k; }); } },   // se apaga y se cierra
+      const h = this.obj.userData.hinge; await tween(650, k => { h.rotation.x = LID_OPEN + (LID_CLOSED - LID_OPEN) * k; }, inCubic); } },   // se apaga y se cierra
   { name: '📌 El corcho', ...FOCUS.corcho },
   { name: '📂 Mesa del profesor', ...FOCUS.docente,
-    async enter() { await hingeTo(this.obj, Math.PI * 0.985, 700); await expand('docente', this.obj); },
-    async leave() { await shrink(this.obj); await hingeTo(this.obj, 0, 550); } },
+    async enter() { await openBook(this.obj); await expand('docente', this.obj); },
+    async leave() { await shrink(this.obj); await closeBook(this.obj); } },
   { name: '📽️ La pizarra', ...FOCUS.pizarra, pf: 1.2,
-    async enter() { const m = this.beam.material; this.scr.material.map = this.onTex; this.scr.material.needsUpdate = true; await tween(500, k => { m.opacity = 0.16 * k; }); await expand('pizarra', this.scr); },
-    async leave() { const m = this.beam.material; await shrink(this.scr); await tween(350, k => { m.opacity = 0.16 * (1 - k); }); this.scr.material.map = this.offTex; this.scr.material.needsUpdate = true; } }
+    async enter() {                                                 // el proyector se prende: el lente brilla, la luz parpadea, el ecran se ilumina y sale el polvito en el haz
+      const bm = this.beam.material, gm = this.glow.material, sm = this.scr.material, dm = this.dust.material, lp = this.spill;
+      sm.map = this.onTex; sm.color.setScalar(0.72); sm.needsUpdate = true;
+      await tween(250, k => { gm.opacity = k; });
+      for (const v of [0.35, 0.05, 0.5, 0.15]) { bm.opacity = v; sm.color.setScalar(0.72 + v * 0.3); await wait(70); }
+      await tween(650, k => { bm.opacity = 0.15 + 0.3 * k; dm.opacity = 0.7 * k; lp.intensity = 0.12 * k; sm.color.setScalar(0.76 + 0.24 * k); }, outCubic);
+      await expand('pizarra', this.scr); },
+    async leave() { const bm = this.beam.material, gm = this.glow.material, sm = this.scr.material, dm = this.dust.material, lp = this.spill; await shrink(this.scr);
+      await tween(450, k => { bm.opacity = 0.45 * (1 - k); dm.opacity = 0.7 * (1 - k); gm.opacity = 1 - k; lp.intensity = 0.12 * (1 - k); }, ease);
+      sm.map = this.offTex; sm.color.setScalar(1); sm.needsUpdate = true; } }
 ];
-const TOUR = { on: true, started: false, i: 0, busy: false, q: 0, pos: new THREE.Vector3(), look: new THREE.Vector3() };
+const TOUR = { on: true, started: false, i: 0, busy: false, q: 0, pos: new THREE.Vector3(), look: new THREE.Vector3(), roll: 0, zoom: 0 };
 const portrait = () => innerWidth < innerHeight;
 const R6B = ROOMINFO['6B'], inRoom = v => { v.x = Math.min(R6B.cx + 3.6, Math.max(R6B.cx - 3.6, v.x)); v.z = Math.min(R6B.cz + 4.1, Math.max(R6B.cz - 4.1, v.z)); return v; };
 const fromOf = st => inRoom(portrait() ? st.look.clone().lerp(st.from, st.pf || 1.55) : st.from.clone());   // en celular parado la cámara se aleja un poco (sin salirse del salón)
-function setFov() { camera.fov = portrait() ? 70 : 55; camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); }
+let baseFov = 55;
+function setFov() { baseFov = portrait() ? 70 : 55; camera.fov = baseFov; camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); }
 addEventListener('resize', () => { setFov(); if (!TOUR.busy) TOUR.pos.copy(fromOf(STOPS[TOUR.i])); if (sheet.style.display === 'block') place(bigRect(SHEETS[sheet.dataset.kind].ar)); });
 const dotsEl = document.getElementById('dots'); STOPS.forEach(() => dotsEl.appendChild(document.createElement('i')));
 function showStop() { document.getElementById('stopTxt').textContent = STOPS[TOUR.i].name; [...dotsEl.children].forEach((d, k) => d.classList.toggle('on', k === TOUR.i)); }
-async function fly(st) {
-  const p0 = TOUR.pos.clone(), l0 = TOUR.look.clone(), p1 = fromOf(st), d = p0.distanceTo(p1), ms = Math.min(1900, 850 + d * 150);
-  await tween(ms, k => { TOUR.pos.lerpVectors(p0, p1, k); TOUR.pos.y += Math.sin(Math.PI * k) * Math.min(0.45, d * 0.08); TOUR.look.lerpVectors(l0, st.look, k); });
+async function fly(st, dir = 1) {                                   // vuelo en arco, con un leve giro hacia el lado del movimiento y un zoom que se asienta al llegar
+  const p0 = TOUR.pos.clone(), l0 = TOUR.look.clone(), p1 = fromOf(st), d = p0.distanceTo(p1), ms = Math.min(2000, 900 + d * 150);
+  await tween(ms, k => { TOUR.pos.lerpVectors(p0, p1, k); TOUR.pos.y += Math.sin(Math.PI * k) * Math.min(0.45, d * 0.08); TOUR.look.lerpVectors(l0, st.look, k);
+    TOUR.roll = Math.sin(Math.PI * k) * 0.035 * dir; TOUR.zoom = Math.sin(Math.PI * k) * 5; });
+  TOUR.roll = 0; TOUR.zoom = 0;
 }
 async function go(dir) {
   if (TOUR.busy) { TOUR.q = dir; return; }
@@ -2062,17 +2132,23 @@ async function go(dir) {
   try {
     const cur = STOPS[TOUR.i]; if (cur.leave) await cur.leave();
     TOUR.i = (TOUR.i + dir + STOPS.length) % STOPS.length; showStop();
-    const st = STOPS[TOUR.i]; await fly(st); if (st.enter) await st.enter();
+    const st = STOPS[TOUR.i]; await fly(st, dir); if (st.enter) await st.enter();
   } finally { TOUR.busy = false; }
   if (TOUR.q) { const q = TOUR.q; TOUR.q = 0; go(q); }
 }
 function tourFrame(t) {                                             // la cámara "respira" un poquito cuando está quieta
   camera.position.copy(TOUR.pos); camera.position.x += Math.sin(t * 0.5) * 0.01; camera.position.y += Math.sin(t * 0.7) * 0.007; camera.lookAt(TOUR.look);
+  if (TOUR.roll) camera.rotateZ(TOUR.roll);
+  const f = baseFov + TOUR.zoom; if (Math.abs(camera.fov - f) > 0.01) { camera.fov = f; camera.updateProjectionMatrix(); }
 }
 setFov(); TOUR.pos.copy(fromOf(STOPS[0])); TOUR.look.copy(STOPS[0].look); showStop();
-document.getElementById('introH').textContent = '🏫 Mi salón 6B';
-document.getElementById('introTxt').textContent = 'Recorre tu salón: tu mesa con tu cuaderno, tu locker con tu folder, la laptop, el corcho, la mesa del profesor y la pizarra.';
-document.getElementById('moliInfo').textContent = firstName() ? '¡Hola ' + firstName() + '! 👋' : '';
+startEl.style.display = 'none'; TOUR.started = true; document.getElementById('tourBar').style.display = 'flex'; musicBtn.style.display = 'block';   // sin texto de inicio: empieza de una
+let firstTap = true;
+addEventListener('pointerdown', () => {                              // al primer toque: música, pantalla completa y horizontal (si el celular lo permite)
+  if (!firstTap) return; firstTap = false; music.start();
+  const de = document.documentElement;
+  if (isTouch0 && de.requestFullscreen && !document.fullscreenElement) de.requestFullscreen().then(() => screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape')).catch(() => {});
+}, true);
 document.getElementById('prevBtn').addEventListener('click', e => { e.stopPropagation(); go(-1); });
 document.getElementById('nextBtn').addEventListener('click', e => { e.stopPropagation(); go(1); });
 addEventListener('keydown', e => { if (!TOUR.started) return; if (e.code === 'ArrowRight') { e.preventDefault(); go(1); } else if (e.code === 'ArrowLeft') { e.preventDefault(); go(-1); } });

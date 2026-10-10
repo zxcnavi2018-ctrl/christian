@@ -119,7 +119,7 @@ function buildWall(ox, oz, rot, lx, lz, axis, len, y0, ops, color, o = {}) {
     if (u1 - u0 < 0.01 || yb - ya < 0.01) return;
     const um = (u0 + u1) / 2, l = u1 - u0;
     const [wx, wz] = lw(ox, oz, rot, axis === 'x' ? lx + um : lx, axis === 'x' ? lz : lz + um);
-    addSolid(wx, y0 + ya, wz, axis === 'x' ? l : t, yb - ya, axis === 'x' ? t : l, rot, glass ? 0xbfdbfe : color, true, glass);
+    addSolid(wx, y0 + ya, wz, axis === 'x' ? l : t, yb - ya, axis === 'x' ? t : l, rot, glass ? 0x7dd3fc : color, true, glass);
   };
   ops = ops.slice().sort((a, b) => a.u - b.u);
   let cur = -len / 2;
@@ -130,7 +130,19 @@ function buildWall(ox, oz, rot, lx, lz, axis, len, y0, ops, color, o = {}) {
     const oy0 = isWin ? 0.9 : 0, oy1 = isWin ? 2.5 : DOOR_H;
     if (oy0 > 0) mk(a, b, 0, oy0);
     if (oy1 < h) mk(a, b, oy1, h);
-    if (isWin) mk(a, b, oy0, oy1, true);
+    if (isWin) {
+      mk(a, b, oy0, oy1, true);
+      // marco de aluminio + travesaños verticales (más notorio que el vidrio solo)
+      const fr = (u0, u1, ya, yb) => {
+        const um = (u0 + u1) / 2, l = u1 - u0, th = t + 0.08;
+        const [wx, wz] = lw(ox, oz, rot, axis === 'x' ? lx + um : lx, axis === 'x' ? lz : lz + um);
+        addSolid(wx, y0 + ya, wz, axis === 'x' ? l : th, yb - ya, axis === 'x' ? th : l, rot, 0x374151, false);
+      };
+      fr(a, b, oy0 - 0.06, oy0 + 0.05); fr(a, b, oy1 - 0.05, oy1 + 0.06);
+      fr(a - 0.04, a + 0.04, oy0, oy1); fr(b - 0.04, b + 0.04, oy0, oy1);
+      const nm = Math.floor((b - a) / 1.6);
+      for (let k = 1; k <= nm; k++) { const um = a + (b - a) * k / (nm + 1); fr(um - 0.03, um + 0.03, oy0, oy1); }
+    }
     else {
       const phi = axis === 'x' ? rot : rot - Math.PI / 2;
       const [hx, hz] = lw(ox, oz, rot, axis === 'x' ? lx + a : lx, axis === 'x' ? lz : lz + a);
@@ -509,9 +521,9 @@ label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
   label('ENTRADA', -18.75, RH + 0.9, 26.3, 0.9, '#fff', 'rgba(22,163,74,.95)');
   room('BAÑO', 'bano', -14.5, 0, 23.5, 4, 5, { door: '-z', roof: true, noOpp: true });
   room('TÓPICO', 'topico', -9.75, 0, 23.5, 5.5, 5, { door: '-z', roof: true, noOpp: true });
-  // áreas verdes al frente (hacia adentro) del baño y tópico
-  grass(3.4, 2.4, -14.6, 18.3); grass(3.6, 2.4, -9.6, 18.3);
-  tree(-14.6, 18.3); tree(-9.6, 18.3);
+  // áreas verdes al frente del muro liso (lado de la calle), junto a la vereda
+  grass(4.2, 1.8, -13.9, 27.3); grass(3.6, 1.8, -9.3, 27.3);
+  tree(-13.9, 27.3); tree(-9.3, 27.3);
 })();
 
 // ===================================================================
@@ -573,7 +585,7 @@ const furnMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
 const hexGeo = new THREE.CylinderGeometry(1, 1, 1, 6);
 buildInstanced(furn.tops, furnMat, hexGeo); buildInstanced(furn.peds, furnMat, new THREE.CylinderGeometry(1, 1, 1, 10));
 buildInstanced(furn.seats, furnMat); buildInstanced(furn.backs, furnMat);
-buildInstanced(glassItems, new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.35, depthWrite: false }));
+buildInstanced(glassItems, new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.5, depthWrite: false }));
 
 // ===================================================================
 //  JUGADOR

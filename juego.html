@@ -7,7 +7,7 @@
 <style>
   html, body { margin: 0; height: 100%; overflow: hidden; background: #000; touch-action: none; font-family: system-ui, sans-serif; user-select: none; -webkit-user-select: none; }
   canvas { display: block; }
-  #vig { position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, rgba(0,0,0,0) 52%, rgba(14,6,24,.5) 100%); }
+  #vig { position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, rgba(0,0,0,0) 52%, rgba(8,12,30,.38) 100%); }
   #cross { position: fixed; top: 50%; left: 50%; width: 6px; height: 6px; margin: -3px; border-radius: 50%; background: rgba(255,255,255,.85); box-shadow: 0 0 2px #000; pointer-events: none; }
   #prompt { position: fixed; bottom: 26%; left: 50%; transform: translateX(-50%); background: rgba(15,23,42,.88); color: #fff; padding: 9px 16px; border-radius: 12px; font-size: 15px; font-weight: 600; display: none; pointer-events: none; white-space: nowrap; }
   #hud { position: fixed; top: 10px; left: 10px; color: #fff; background: rgba(15,23,42,.7); padding: 6px 10px; border-radius: 8px; font-size: 12px; pointer-events: none; }
@@ -51,12 +51,12 @@ const floors = [];      // superficies caminables: {x,z,hw,hd,c,s,y}
 const doors = [];       // puertas interactivas
 
 const isTouch0 = matchMedia('(pointer:coarse)').matches || 'ontouchstart' in window;
-const SKY_HORIZON = 0xb87868;                                          // horizonte rojizo de tarde oscura
+const SKY_HORIZON = 0x7088b2;                                          // horizonte azul claro del anochecer
 const SUN_DIR = new THREE.Vector3(-0.72, 0.30, 0.45).normalize();      // luz baja del oeste (de tarde)
 const SUN_VIS = new THREE.Vector3(-0.30, 0.20, -0.93).normalize();     // sol bajo dibujado en el cielo (visible al aparecer, mirando al norte)
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(SKY_HORIZON);
-scene.fog = new THREE.Fog(SKY_HORIZON, 70, 330);
+scene.fog = new THREE.Fog(SKY_HORIZON, 90, 360);
 const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.05, 500);
 camera.rotation.order = 'YXZ';
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -68,9 +68,9 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
 
 // luz: cielo/suelo + sol cálido con sombras que siguen al jugador
-scene.add(new THREE.HemisphereLight(0x9aa0c8, 0x3a322e, 0.42));
-scene.add(new THREE.AmbientLight(0xc9b8c8, 0.08));
-const sun = new THREE.DirectionalLight(0xff9e64, 0.7);
+scene.add(new THREE.HemisphereLight(0x8da4d6, 0x353a50, 0.5));
+scene.add(new THREE.AmbientLight(0xaab8e0, 0.1));
+const sun = new THREE.DirectionalLight(0xffa878, 0.5);
 sun.castShadow = SHADOWS;
 sun.shadow.mapSize.set(isTouch0 ? 1024 : 2048, isTouch0 ? 1024 : 2048);
 const SH = isTouch0 ? 42 : 55;
@@ -81,9 +81,9 @@ scene.add(sun); scene.add(sun.target);
 // cielo con degradado y disco solar
 const sky = new THREE.Mesh(new THREE.SphereGeometry(450, 32, 16), new THREE.ShaderMaterial({
   side: THREE.BackSide, depthWrite: false,
-  uniforms: { top: { value: new THREE.Color(0x1b2a55) }, mid: { value: new THREE.Color(0x6a5d8c) }, horizon: { value: new THREE.Color(SKY_HORIZON) }, sunDir: { value: SUN_VIS.clone() } },
+  uniforms: { top: { value: new THREE.Color(0x1d3566) }, mid: { value: new THREE.Color(0x35609e) }, horizon: { value: new THREE.Color(SKY_HORIZON) }, sunDir: { value: SUN_VIS.clone() } },
   vertexShader: 'varying vec3 vDir; void main(){ vDir = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
-  fragmentShader: 'uniform vec3 top; uniform vec3 mid; uniform vec3 horizon; uniform vec3 sunDir; varying vec3 vDir; void main(){ vec3 d = normalize(vDir); float h = clamp(d.y, 0.0, 1.0); vec3 col = mix(horizon, mid, smoothstep(0.0, 0.32, h)); col = mix(col, top, smoothstep(0.25, 0.95, h)); float s = max(dot(d, normalize(sunDir)), 0.0); float disc = smoothstep(0.9972, 0.9984, s); col += vec3(1.0, 0.6, 0.32) * disc * 2.4 + vec3(1.0, 0.45, 0.2) * (pow(s, 30.0) * 0.6 + pow(s, 5.0) * 0.26); gl_FragColor = vec4(col, 1.0); }'
+  fragmentShader: 'uniform vec3 top; uniform vec3 mid; uniform vec3 horizon; uniform vec3 sunDir; varying vec3 vDir; void main(){ vec3 d = normalize(vDir); float h = clamp(d.y, 0.0, 1.0); vec3 col = mix(horizon, mid, smoothstep(0.0, 0.3, h)); col = mix(col, top, smoothstep(0.25, 0.95, h)); float s = max(dot(d, normalize(sunDir)), 0.0); float az = max(dot(normalize(vec3(d.x, 0.0, d.z)), normalize(vec3(sunDir.x, 0.0, sunDir.z))), 0.0); col += vec3(1.0, 0.55, 0.28) * pow(az, 6.0) * (1.0 - smoothstep(0.0, 0.22, h)) * 0.4; float disc = smoothstep(0.9972, 0.9984, s); col += vec3(1.0, 0.72, 0.45) * disc * 2.0 + vec3(1.0, 0.55, 0.3) * (pow(s, 30.0) * 0.4 + pow(s, 5.0) * 0.14); gl_FragColor = vec4(col, 1.0); }'
 }));
 sky.renderOrder = -1; scene.add(sky);
 
@@ -100,7 +100,7 @@ const clouds = new THREE.Group(); scene.add(clouds);
   for (let i = 0; i < 40; i++) {
     const grp = new THREE.Group(), n = Math.floor(rnd(6, 10)), sz = rnd(45, 85);
     for (let k = 0; k < n; k++) {
-      const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: cloudTex, color: 0xcf9f98, transparent: true, depthWrite: false, fog: false, opacity: rnd(0.7, 0.9) }));
+      const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: cloudTex, color: 0x93a4c4, transparent: true, depthWrite: false, fog: false, opacity: rnd(0.7, 0.9) }));
       sp.scale.set(sz * rnd(0.8, 1.4), sz * rnd(0.4, 0.65), 1); sp.position.set(rnd(-sz, sz) * 1.2, rnd(-4, 6), rnd(-sz, sz) * 0.5); grp.add(sp);
     }
     let ang, rad, py, px, pz, tries = 0;
@@ -155,7 +155,8 @@ function flat(w, d, x, z, color, y = 0.03, h = 0.06) {
   const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({ color }));
   m.position.set(x, y, z); m.receiveShadow = true; scene.add(m); return m;
 }
-const woodMat = new THREE.MeshLambertMaterial({ color: 0x1b2b57 });   // puertas azul noche
+const woodMat = new THREE.MeshLambertMaterial({ color: 0x1b2b57 });   // puertas de salones: azul noche
+const brownMat = new THREE.MeshLambertMaterial({ color: 0x7b4a24 });  // puertas de la entrada: cafecitas
 const glassDoorMat = new THREE.MeshLambertMaterial({ color: 0x7dd3fc, transparent: true, opacity: 0.45 });
 
 // ---- puertas ----
@@ -476,14 +477,12 @@ function tree(x, z, h = 1.4) {
   addCollider(x, z, 0.4, 0.4, 0, 0, 2);
 }
 function grass(w, d, x, z) { flat(w, d, x, z, 0x5a9a45, 0.03, 0.06); }
-function pine(x, z, h = 2.6) {                          // pino pequeño: tronco + 3 conos
-  const t = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.11, 0.7, 8), new THREE.MeshLambertMaterial({ color: 0x5b3a1e }));
-  t.position.set(x, 0.35, z); t.castShadow = true; scene.add(t);
-  [[0.95, 1.0, 0.55], [0.75, 0.85, 0.5], [0.52, 0.7, 0.45]].forEach(([r, ch, y0], i) => {
-    const c = new THREE.Mesh(new THREE.ConeGeometry(r, ch, 10), new THREE.MeshLambertMaterial({ color: 0x1f6b3a }));
-    c.position.set(x, 0.6 + i * 0.6 + ch / 2, z); c.castShadow = true; scene.add(c);
-  });
-  addCollider(x, z, 0.3, 0.3, 0, 0, h);
+function pine(x, z) {                                    // arbusto en forma de cono (sin tronco visible)
+  const c = new THREE.Mesh(new THREE.ConeGeometry(0.62, 1.5, 16), new THREE.MeshLambertMaterial({ color: 0x2a6b3b }));
+  c.position.set(x, 0.75, z); c.castShadow = true; scene.add(c);
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.66, 0.7, 0.12, 16), new THREE.MeshLambertMaterial({ color: 0x1f4f2c }));
+  base.position.set(x, 0.06, z); scene.add(base);
+  addCollider(x, z, 0.9, 0.9, 0, 0, 1.5);
 }
 // área verde en el centro de la cancha: pasto y dos pinos pequeños
 grass(3.2, 8, -4, -13.5); pine(-4, -15.2); pine(-4, -11.8);
@@ -717,7 +716,7 @@ label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
     addSolid(b.x + b.w / 2, 2.7, Z, b.w - 0.35, 0.9, 0.4, 0, 0xc2c5ca, true);
     if (b.roof) addSolid(b.x + b.w / 2, 3.1, Z, b.w + 0.35, 0.5, 1.6, 0, 0xc2c5ca, false);
     const lwid = (b.w - 0.35) / 2;
-    const mat = woodMat;
+    const mat = brownMat;
     const l1 = makeLeaf(lwid - 0.02, 2.65, b.x + 0.175, 0.03, Z, 0, mat, false);
     const l2 = makeLeaf(lwid - 0.02, 2.65, b.x + b.w - 0.175, 0.03, Z, 0, mat, true);
     const col = addCollider(b.x + b.w / 2, Z, b.w - 0.35, 0.3, 0, 0, 2.7);

@@ -621,7 +621,8 @@ label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
   [wx, wz] = lw(F.x, F.z, F.rot, (XJ + L) / 2, lz);
   floorSlab(wx, wz, L - XJ, 1.8, F.rot, FH);
   lowWallLocal(F.x, F.z, F.rot, -L, XJ - 1.6, lz - 0.8, FH + yo);
-  lowWallLocal(F.x, F.z, F.rot, XJ, L, lz - 0.8, FH);
+  const xT = 8.7;                                                       // parte alta de la escalera frente a 3C
+  lowWallLocal(F.x, F.z, F.rot, XJ, xT - 1.9, lz - 0.8, FH); lowWallLocal(F.x, F.z, F.rot, xT + 0.5, L, lz - 0.8, FH);   // hueco donde llega el descanso
   [wx, wz] = lw(F.x, F.z, F.rot, XJ, lz);
   steps(wx, wz, -c, sn, 4, yo / 4, 0.4, 1.8, FH, true);
   const [ax, az] = lw(F.x, F.z, F.rot, XJ, lz - 0.8), [bx, bz] = lw(F.x, F.z, F.rot, XJ - 1.6, lz - 0.8);   // baranda de fierro del lado exterior de las gradas
@@ -645,6 +646,26 @@ label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
     const [mx, mz] = lw(F.x, F.z, F.rot, lxr, (zt + zb) / 2);
     addCollider(mx, mz, 0.1, Math.abs(zt - zb), F.rot, 0, 1.8);
   });
+  // escalera al piso 2 frente a 3C (mismo estilo que la de D: tramos flotantes, descanso de metal, baranda de fierro)
+  const W = (lx, lz2) => lw(F.x, F.z, F.rot, lx, lz2), run = 0.4, n = 11, rise = FH / n, zs = lz - 1.8;
+  { const [sx, sz] = W(xT + n * run, zs); steps(sx, sz, -c, sn, n, rise, run, 1.8, 0, true); }
+  [0, 9].forEach(i => {
+    const lx = xT + n * run - (i + 0.5) * run, top = (i + 1) * rise - 0.2;
+    [-0.8, 0.8].forEach(k => { const [px, pz] = W(lx, zs + k); addSolid(px, 0, pz, 0.1, top, 0.1, F.rot, iron, false); });
+  });
+  { const k = -0.72, lxa = xT + n * run - 0.5 * run, lxb = xT + 0.5 * run, [ax, az] = W(lxa, zs + k), [bx, bz] = W(lxb, zs + k);
+    slopedBar(ax, rise + 0.95, az, bx, FH + 0.95, bz, 0.05); slopedBar(ax, rise + 0.45, az, bx, FH + 0.45, bz, 0.03);
+    for (let i = 0; i < n; i += 2) { const [px, pz] = W(xT + n * run - (i + 0.5) * run, zs + k); addSolid(px, (i + 1) * rise, pz, 0.04, 0.95, 0.04, F.rot, iron, false); }
+    addSolid(bx, FH, bz, 0.04, 0.95, 0.04, F.rot, iron, false); }
+  { const [lx0, lz0] = W(xT - 0.9, zs); floorSlab(lx0, lz0, 1.8, 1.8, F.rot, FH, 0.12, 0x4b5563); }
+  { const [a1, a2] = W(xT - 1.8, zs - 0.78), [b1, b2] = W(xT, zs - 0.78); ironRail(a1, a2, b1, b2, FH); }
+  { const [a1, a2] = W(xT - 1.68, zs - 0.9), [b1, b2] = W(xT - 1.68, zs + 0.9); ironRail(a1, a2, b1, b2, FH); }
+  // pasto debajo de la escalera
+  { const [gx, gz] = W(xT + n * run / 2, zs); const m = new THREE.Mesh(new THREE.BoxGeometry(n * run, 0.06, 1.6), new THREE.MeshLambertMaterial({ color: 0x5a9a45 })); m.position.set(gx, 0.03, gz); m.rotation.y = F.rot; scene.add(m); }
+  // otra área verde frente a 2D (como las de D), con su cerco
+  { const wl = 8.5, wd = 1.7, lcz = -(F.depth / 2) - 1.6 - 0.4 - wd / 2 - 0.25, lcx = -18;
+    const [gx, gz] = W(lcx, lcz); const m = new THREE.Mesh(new THREE.BoxGeometry(wl, 0.06, wd), new THREE.MeshLambertMaterial({ color: 0x5a9a45 })); m.position.set(gx, 0.03, gz); m.rotation.y = F.rot; m.receiveShadow = true; scene.add(m);
+    window.__fz = { lcx, lcz, wl, wd }; }
 })();
 
 // ---- cercos de las áreas verdes: palitos con soga para que los niños no pisen el pasto ----
@@ -671,6 +692,12 @@ function fenceRect(cx, cz, w, d) {
 const zG = zsD - 1.8;
 grass(8.5, 1.7, -3.1, zG); grass(6, 1.7, 4.6, zG);
 fenceRect(-3.1, zG, 8.5, 1.7); fenceRect(4.6, zG, 6, 1.7);
+(function () {                                                    // cerco del área verde frente a 2D (en el marco de F)
+  const q = window.__fz, m = 0.25, P = (lx, lz) => lw(F.x, F.z, F.rot, lx, lz);
+  const x0 = q.lcx - q.wl / 2 - m, x1 = q.lcx + q.wl / 2 + m, z0 = q.lcz - q.wd / 2 - m, z1 = q.lcz + q.wd / 2 + m;
+  fenceLine(...P(x0, z0), ...P(x1, z0)); fenceLine(...P(x1, z0), ...P(x1, z1)); fenceLine(...P(x1, z1), ...P(x0, z1)); fenceLine(...P(x0, z1), ...P(x0, z0));
+  delete window.__fz;
+})();
 label('ÁREA VERDE', -3.1, 3.0, zG, 1.2, '#fff', 'rgba(22,101,52,.9)');
 
 

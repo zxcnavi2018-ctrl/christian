@@ -63,12 +63,32 @@
   #sheet > * { opacity: 0; transition: opacity .3s; } #sheet.show > * { opacity: 1; transition: opacity .35s .3s; }
   #sheet.show::before { content: ''; position: absolute; top: 0; bottom: 0; left: -40%; width: 30%; z-index: 3; pointer-events: none; background: linear-gradient(100deg, transparent, rgba(255,255,255,.55), transparent); animation: shine 1s .45s ease-out forwards; }
   @keyframes shine { to { left: 120%; } }
-  #title { position: fixed; left: 0; right: 0; top: 14%; z-index: 40; text-align: center; pointer-events: none; padding: 0 24px; transition: opacity .8s ease, filter .8s ease, transform .8s ease; }
-  #title.out { opacity: 0; filter: blur(6px); transform: translateY(-14px) scale(1.04); }
-  #title span { display: inline-block; font: 900 clamp(30px, 6.5vw, 64px)/1.1 "Trebuchet MS", system-ui, sans-serif; color: #fff; letter-spacing: 1px;
-    -webkit-text-stroke: 2px #2b2547; paint-order: stroke fill; text-shadow: 0 4px 0 #2b2547, 0 0 22px rgba(79,143,247,.85), 0 0 44px rgba(255,138,61,.55);
-    opacity: 0; transform: translateY(26px) scale(.5) rotate(-8deg); animation: pop .55s cubic-bezier(.34,1.56,.64,1) forwards; }
-  @keyframes pop { to { opacity: 1; transform: none; } }
+  /* ---- título de escena (como en los videojuegos) ---- */
+  #title { position: fixed; left: 0; right: 0; top: 50%; transform: translateY(-62%); z-index: 40; pointer-events: none; display: none; text-align: center; color: #fff; }
+  #title .band { position: absolute; left: 0; right: 0; top: -34px; bottom: -30px; background: linear-gradient(90deg, transparent, rgba(16,12,40,.62) 22%, rgba(16,12,40,.62) 78%, transparent);
+    transform: scaleY(0); animation: band .55s cubic-bezier(.2,.9,.3,1) forwards; }
+  #title .sub { position: relative; white-space: nowrap; font: 800 clamp(11px, 1.6vw, 15px)/1 "Trebuchet MS", system-ui, sans-serif; letter-spacing: .55em; color: #ffd27a; text-transform: uppercase;
+    opacity: 0; animation: fadeUp .6s .25s ease-out forwards; text-shadow: 0 2px 8px rgba(0,0,0,.6); }
+  #title .main { position: relative; display: inline-block; white-space: nowrap; margin: 8px 0 6px; font: 900 clamp(26px, 5vw, 58px)/1.1 "Trebuchet MS", system-ui, sans-serif; color: #fff;
+    letter-spacing: .06em; opacity: 0; text-shadow: 0 3px 0 #2b2547, 0 0 22px rgba(79,143,247,.95), 0 0 46px rgba(255,138,61,.5); animation: titleIn 1.1s .35s cubic-bezier(.16,.9,.3,1) forwards; overflow: hidden; padding: 0 6px; }
+  #title .deco { position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; }
+  #title .deco i { display: block; height: 2px; width: min(30vw, 260px); background: linear-gradient(90deg, transparent, #ffd27a); transform: scaleX(0); animation: grow .8s .55s cubic-bezier(.2,.9,.3,1) forwards; }
+  #title .deco i.r { background: linear-gradient(90deg, #ffd27a, transparent); }
+  #title .deco i.l { transform-origin: right; } #title .deco i.r { transform-origin: left; }
+  #title .deco b { width: 9px; height: 9px; background: #ffd27a; transform: rotate(45deg) scale(0); animation: gem .5s .8s cubic-bezier(.34,1.56,.64,1) forwards; box-shadow: 0 0 12px #ffd27a; }
+  #title .shine { position: absolute; top: 0; bottom: 0; left: -30%; width: 18%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.35), transparent); animation: sweep 1.2s 1s ease-in-out forwards; }
+  #title.out { animation: titleOut .8s ease-in forwards; }
+  #title.out .main { animation: none; opacity: 1; }
+  @keyframes band { to { transform: scaleY(1); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @keyframes titleIn { 0% { opacity: 0; transform: scale(1.35); filter: blur(10px); } 60% { opacity: 1; filter: blur(0); } 100% { opacity: 1; transform: none; filter: blur(0); } }
+  @keyframes grow { to { transform: scaleX(1); } }
+  @keyframes gem { to { transform: rotate(45deg) scale(1); } }
+  @keyframes sweep { to { left: 115%; } }
+  @keyframes titleOut { to { opacity: 0; filter: blur(8px); transform: translateY(-62%) scale(1.04); } }
+  /* lo que se agranda casi llena la pantalla: las flechas se van a los costados */
+  body.open #tourBar { left: 0; right: 0; bottom: 50%; transform: translateY(50%); justify-content: space-between; padding: 0 8px; pointer-events: none; }
+  body.open #tourBar button { pointer-events: auto; } body.open #stopName { visibility: hidden; }
   #rotate { position: fixed; inset: 0; z-index: 60; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; color: #fff; padding: 24px;
     background: radial-gradient(circle at 30% 20%, rgba(255,138,61,.4), transparent 50%), radial-gradient(circle at 75% 80%, rgba(79,143,247,.5), transparent 55%), #1a1438; }
   #rotate .ph { font-size: 72px; animation: turn 1.8s ease-in-out infinite; } #rotate b { font-size: 24px; } #rotate span { font-size: 15px; color: #cbd5e1; }
@@ -76,7 +96,7 @@
   @media (orientation: portrait) and (max-width: 900px) { #rotate { display: flex; } }
   @media (max-height: 520px) {                                      /* celular acostado: botones más chicos para dejar espacio */
     #tourBar { bottom: 8px; gap: 10px; } #tourBar button { width: 44px; height: 44px; font-size: 18px; box-shadow: 0 3px 0 #c2410c, 0 6px 14px rgba(0,0,0,.3); }
-    #stopName { min-width: 90px; padding: 4px 12px; border-width: 2px; } #hud, #musicBtn { font-size: 10px; padding: 4px 8px; } #title { top: 8%; } }
+    #stopName { min-width: 90px; padding: 4px 12px; border-width: 2px; } #hud, #musicBtn { font-size: 10px; padding: 4px 8px; } }
   .slot { position: absolute; inset: 0; }                         /* aquí se conectará el contenido */
   #sheet.cuaderno { background: #16a34a; border: 4px solid #2b2547; }
   #sheet.cuaderno .pg { position: absolute; top: 14px; bottom: 14px; width: calc(50% - 22px); background: repeating-linear-gradient(#fff 0 27px, #bfdbfe 27px 29px); border: 2px solid #2b2547; }
@@ -2057,26 +2077,27 @@ function screenRect(obj) {                                          // el rectá
   return { x: x0, y: y0, w: Math.max(24, x1 - x0), h: Math.max(24, y1 - y0) };
 }
 const SHEETS = {                                                    // lo que se agranda (en blanco: aquí se conectará el contenido en cada .slot)
-  cuaderno: { t: '📗 Mi cuaderno verde', ar: 1.45, html: '<div class="pg l"><div class="slot" id="slot-cuaderno-izq"></div></div><div class="ring"></div><div class="pg r"><div class="slot" id="slot-cuaderno-der"></div></div>' },
-  folder: { t: '📁 Mi folder · Exit tickets', ar: 0.8, html: '<div class="paper"><div class="slot" id="slot-folder"></div></div>' },
-  laptop: { t: '💻 Laptop', ar: 1.6, html: '<div class="paper"><div class="slot" id="slot-laptop"></div></div>' },
-  docente: { t: '📂 Mis notas', ar: 0.8, html: '<div class="paper"><div class="slot" id="slot-docente"></div></div>' },
-  pizarra: { t: '📽️ Pizarra', ar: 2.36, html: '<div class="paper"><div class="slot" id="slot-pizarra"></div></div>' }
+  cuaderno: { t: '📗 Mi cuaderno verde', ar: [1.3, 2.0], html: '<div class="pg l"><div class="slot" id="slot-cuaderno-izq"></div></div><div class="ring"></div><div class="pg r"><div class="slot" id="slot-cuaderno-der"></div></div>' },
+  folder: { t: '📁 Mi portafolio · Exit tickets', ar: [0.75, 1.7], html: '<div class="paper"><div class="slot" id="slot-folder"></div></div>' },
+  laptop: { t: '💻 Laptop', ar: [1.45, 2.0], html: '<div class="paper"><div class="slot" id="slot-laptop"></div></div>' },
+  docente: { t: '📂 Mis notas', ar: [0.75, 1.7], html: '<div class="paper"><div class="slot" id="slot-docente"></div></div>' },
+  pizarra: { t: '📽️ Pizarra', ar: [1.6, 2.4], html: '<div class="paper"><div class="slot" id="slot-pizarra"></div></div>' }
 };
-function bigRect(ar) {                                              // lo más grande posible: todo el alto libre encima de los botones de abajo
-  const bar = document.getElementById('tourBar'), bt = bar.offsetHeight ? innerHeight - bar.getBoundingClientRect().top + 8 : 80, top = 8;
-  const mw = innerWidth * 0.94, mh = innerHeight - bt - top; let w = Math.min(mw, 1100), h = w / ar; if (h > mh) { h = mh; w = h * ar; }
+function bigRect(ar) {                                              // casi toda la pantalla (las flechas quedan a los costados), con la proporción que mejor quepa
+  const side = 64, top = 8, bottom = 8, mw = innerWidth - side * 2, mh = innerHeight - top - bottom;
+  const r = Math.min(ar[1], Math.max(ar[0], mw / mh)); let w = mw, h = w / r; if (h > mh) { h = mh; w = h * r; }
   return { x: (innerWidth - w) / 2, y: top + (mh - h) / 2, w, h };
 }
 const place = r => Object.assign(sheet.style, { left: r.x + 'px', top: r.y + 'px', width: r.w + 'px', height: r.h + 'px' });
 async function expand(kind, obj) {                                 // sale del objeto y se agranda con un rebotito; luego aparece lo de adentro con un brillo
   const S = SHEETS[kind]; sheet.className = kind; sheet.innerHTML = S.html; sheet.dataset.kind = kind;
-  sheet.style.transition = 'none'; place(screenRect(obj)); sheet.style.opacity = '0'; sheet.style.display = 'block'; void sheet.offsetWidth;
+  await titleGate;
+  sheet.style.transition = 'none'; place(screenRect(obj)); sheet.style.opacity = '0'; sheet.style.display = 'block'; void sheet.offsetWidth; document.body.classList.add('open');            // espera a que el título de la escena empiece a irse
   sheet.style.transition = ''; sheet.style.opacity = '1'; place(bigRect(S.ar)); sheet.classList.add('show'); await wait(720);
 }
 async function shrink(obj) {                                        // se achica rápido hacia el objeto y desaparece
   if (sheet.style.display !== 'block') return;
-  sheet.classList.remove('show'); sheet.classList.add('closing'); await wait(120); place(screenRect(obj)); sheet.style.opacity = '0'; await wait(520);
+  sheet.classList.remove('show'); sheet.classList.add('closing'); document.body.classList.remove('open'); await wait(120); place(screenRect(obj)); sheet.style.opacity = '0'; await wait(520);
   sheet.style.display = 'none'; sheet.innerHTML = ''; sheet.className = '';
 }
 const hingeTo = (o, to, ms, e = ease) => { const h = o.userData.hinge, a0 = h.rotation.z; return tween(ms, k => { h.rotation.z = a0 + (to - a0) * k; }, e); };
@@ -2131,13 +2152,16 @@ let baseFov = 55;
 function setFov() { baseFov = portrait() ? 70 : 55; camera.fov = baseFov; camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); }
 addEventListener('resize', () => { setFov(); if (!TOUR.busy) TOUR.pos.copy(fromOf(STOPS[TOUR.i])); if (sheet.style.display === 'block') place(bigRect(SHEETS[sheet.dataset.kind].ar)); });
 const dotsEl = document.getElementById('dots'); STOPS.forEach(() => dotsEl.appendChild(document.createElement('i')));
-const titleEl = document.getElementById('title'); let titleT = 0;
-function showTitle(text) {                                          // aparece letra por letra, se queda un ratito y se desvanece suave
-  clearTimeout(titleT); titleEl.className = ''; titleEl.innerHTML = '';
-  [...text].forEach((ch, i) => { const sp = document.createElement('span'); sp.textContent = ch === ' ' ? '\u00a0' : ch; sp.style.animationDelay = (i * 0.035) + 's'; titleEl.appendChild(sp); });
-  titleT = setTimeout(() => titleEl.classList.add('out'), 1700 + text.length * 35);
+const titleEl = document.getElementById('title'); let titleT = 0, titleT2 = 0, titleGate = Promise.resolve(), titleOpen = () => {};
+function showTitle(text, n) {                                       // nombre de la escena: franja, "ESCENA n", título grande con líneas doradas; luego se desvanece
+  clearTimeout(titleT); clearTimeout(titleT2);
+  titleEl.className = ''; titleEl.style.display = 'block';
+  titleEl.innerHTML = '<div class="band"></div><div class="sub">Escena ' + n + ' · 6° B</div><div class="main">' + text + '<div class="shine"></div></div><br><div class="deco"><i class="l"></i><b></b><i class="r"></i></div>';
+  titleOpen(); titleGate = new Promise(r => { titleOpen = r; });
+  titleT = setTimeout(() => { titleEl.classList.add('out'); titleOpen(); }, 2300);                  // se queda un ratito y se va
+  titleT2 = setTimeout(() => { titleEl.style.display = 'none'; }, 3150);
 }
-function hideTitle() { clearTimeout(titleT); titleEl.classList.add('out'); }
+function hideTitle() { clearTimeout(titleT); clearTimeout(titleT2); titleOpen(); if (titleEl.style.display === 'block') { titleEl.classList.add('out'); titleT2 = setTimeout(() => { titleEl.style.display = 'none'; }, 800); } }
 function showStop() { [...dotsEl.children].forEach((d, k) => d.classList.toggle('on', k === TOUR.i)); }
 async function fly(st, dir = 1) {                                   // vuelo en arco, con un leve giro hacia el lado del movimiento y un zoom que se asienta al llegar
   const p0 = TOUR.pos.clone(), l0 = TOUR.look.clone(), p1 = fromOf(st), d = p0.distanceTo(p1), ms = Math.min(2000, 900 + d * 150);
@@ -2151,7 +2175,7 @@ async function go(dir) {
   try {
     const cur = STOPS[TOUR.i]; hideTitle(); if (cur.leave) await cur.leave();
     TOUR.i = (TOUR.i + dir + STOPS.length) % STOPS.length; showStop();
-    const st = STOPS[TOUR.i]; await fly(st, dir); if (st.enter) await st.enter(); if (st.title && STOPS[TOUR.i] === st) showTitle(st.title);
+    const st = STOPS[TOUR.i]; await fly(st, dir); if (st.title) showTitle(st.title, TOUR.i); if (st.enter) await st.enter();   // al llegar: el nombre de la escena, mientras el objeto se abre
   } finally { TOUR.busy = false; }
   if (TOUR.q) { const q = TOUR.q; TOUR.q = 0; go(q); }
 }

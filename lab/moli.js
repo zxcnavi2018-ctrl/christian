@@ -13,7 +13,7 @@ const HELP={
  'cadenas.html':['Elige un ecosistema: <b>sierra</b>, <b>mar</b> o <b>selva</b>.','Arrastra cada ser vivo a su lugar, empezando por el <b>productor</b> junto al Sol.','No olvides al <b>descomponedor</b>.','Luego responde <b>«¿Qué pasa si…?»</b>.'],
  'ecosistemas.html':['Elige un lugar del Perú en tu <b>pasaporte</b>.','Mira lo que brilla y decide: ¿<b>tiene vida</b> (biótico) o <b>no tiene vida</b> (abiótico)?','Lee las <b>pistas</b> y elige el tipo: terrestre, acuático o mixto.','Responde la pregunta para <b>pensar</b> y gana el sello.'],
  'agua.html':['Elige un <b>experimento</b> arriba.','Arrastra o toca los objetos para usarlos en la mesa.','Observa qué pasa y lee la explicación.','Cada experimento logrado completa una misión.'],
- 'energia.html':['Sube a los personajes a lo alto y suéltalos.','Mira cómo la energía <b>potencial</b> se convierte en <b>cinética</b>.','Usa las barras de energía para entender qué pasa.'],
+ 'energia.html':['<b>Arrastra al skater</b> hacia arriba por la rampa y suéltalo.','Mira las barras: arriba hay más energía <b>potencial</b>; abajo, más energía <b>cinética</b>.','Prueba <b>con y sin fricción</b> y con distinta masa.','Toca <b>🎯 Reto</b>, predice hasta dónde llegará y comprueba.'],
  'gravedad.html':['Suelta objetos y mira cómo los atrae la <b>gravedad</b>.','Cambia de planeta: la gravedad no es igual en todos.','Prueba con el aire y sin aire.']
 };
 const page=(location.pathname.split('/').pop()||'').toLowerCase(),steps=HELP[page];

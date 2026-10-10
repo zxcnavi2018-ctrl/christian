@@ -438,6 +438,24 @@ function drawLocker26(mine, name) {                             // 13 x 2 locker
   return new THREE.CanvasTexture(c);
 }
 const locker26Tex = drawLocker26(0, '');
+function corkTex() {                                              // corcho con letrero «Ciencia» y la hoja de la unidad
+  const c = document.createElement('canvas'); c.width = 1024; c.height = 300; const g = c.getContext('2d');
+  g.fillStyle = '#c8955a'; g.fillRect(0, 0, 1024, 300);
+  for (let i = 0; i < 2600; i++) { g.fillStyle = ['#a8743e', '#d9a96c', '#b98247', '#8f5f2e'][i % 4]; g.fillRect(Math.random() * 1024, Math.random() * 300, 2 + Math.random() * 3, 2 + Math.random() * 3); }
+  const pin = (x, y, col) => { g.fillStyle = col; g.beginPath(); g.arc(x, y, 7, 0, 6.3); g.fill(); g.fillStyle = 'rgba(255,255,255,.6)'; g.beginPath(); g.arc(x - 2, y - 2, 2.5, 0, 6.3); g.fill(); };
+  g.fillStyle = '#8b5a2b'; g.fillRect(372, 16, 280, 72); g.strokeStyle = '#5b3716'; g.lineWidth = 6; g.strokeRect(372, 16, 280, 72);   // letrero de corcho
+  g.fillStyle = '#fef3c7'; g.font = 'bold 52px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('🔬 Ciencia', 512, 54);
+  pin(386, 30, '#ef4444'); pin(638, 30, '#3b82f6');
+  g.save(); g.translate(512, 196); g.rotate(-0.012);                   // hoja pegada
+  g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(-326, -82, 660, 176); g.fillStyle = '#fffef7'; g.fillRect(-330, -86, 660, 176);
+  g.fillStyle = '#1f2937'; g.textAlign = 'left'; g.font = 'bold 26px sans-serif';
+  g.fillText('La unidad a trabajar es:', -306, -52);
+  g.fillStyle = '#0f766e'; g.font = 'bold 26px sans-serif'; g.fillText('Unidad 7 · Microorganismos en acción', -306, -16);
+  g.fillStyle = '#1f2937'; g.font = 'bold 26px sans-serif'; g.fillText('El propósito de la unidad es:', -306, 26);
+  g.strokeStyle = '#94a3b8'; g.lineWidth = 2; [56, 80].forEach(y => { g.beginPath(); g.moveTo(-306, y); g.lineTo(306, y); g.stroke(); });
+  g.restore(); pin(200, 116, '#22c55e'); pin(824, 116, '#f59e0b');
+  return new THREE.CanvasTexture(c);
+}
 function screenTex(kind) {                                        // lo que el proyector proyecta en el ecran
   const c = document.createElement('canvas'); c.width = 1024; c.height = 440; const g = c.getContext('2d');
   const gr = g.createRadialGradient(512, 220, 40, 512, 220, 560);
@@ -527,16 +545,19 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
     { const [lx, lz] = P(uL - 0.27, Dp / 2 - T), pl = new THREE.Mesh(lockerGeo, new THREE.MeshLambertMaterial({ map: locker26Tex }));
       pl.scale.set(LL, 1.4, 1); pl.position.set(lx, fy + 0.78, lz); pl.rotation.y = Math.atan2(-uvec[0], -uvec[1]); scene.add(pl);
       const th = pl.rotation.y;
+      const cork = new THREE.Mesh(new THREE.PlaneGeometry(LL, 1.22), new THREE.MeshLambertMaterial({ map: corkTex() }));   // mural de corcho encima de los lockers
+      { const [cx2, cz2] = P(Wc / 2 - T - 0.02, Dp / 2 - T); cork.position.set(cx2, fy + 2.2, cz2); cork.rotation.y = pl.rotation.y; scene.add(cork); }
+      boxAt(Wc / 2 - T - 0.01, Dp / 2 - T, 1.56, 0.02, 1.3, LL + 0.1, 0x7c4a21, false);                        // marco de madera
       SALON6[rname] = { plane: pl, LL, fy, x: lx, z: lz, ax: [Math.cos(th), -Math.sin(th)], nrm: [Math.sin(th), Math.cos(th)], rot: th }; }
     // mesa del profesor: junto a la pizarra, pegada a la pared del fondo, con el folder "Mis notas" (para el docente)
-    { const du = -(Wc / 2 - T) + 0.72, ds = Dp - 2 * T - 1.05;                          // el profesor mira a las mesitas; su silla queda contra la pared
-      boxAt(du, ds, 0, 1.2, 0.72, 0.68, 0x8b5a2b, true);                                 // cuerpo de la mesa
-      boxAt(du, ds, 0.72, 1.3, 0.05, 0.76, 0xa16207, false);                             // tablero
-      boxAt(du, ds + 0.62, 0.42, 0.44, 0.05, 0.44, 0x1f2937, false); boxAt(du, ds + 0.84, 0.62, 0.44, 0.42, 0.05, 0x1f2937, false);   // silla del docente (respaldo a la pared)
-      boxAt(du - 0.25, ds, 0.77, 0.32, 0.03, 0.24, 0x0284c7, false);                    // folder azul "Mis notas"
-      boxAt(du + 0.3, ds + 0.05, 0.77, 0.26, 0.06, 0.2, 0x16a34a, false);               // libro
-      { const [tx, tz] = P(du - 0.25, ds); moliTag('Mis notas', tx, fy + 1.45, tz); }
-      const [fx, fz] = P(du, ds - 0.6);
+    { const du = -(Wc / 2 - T) + 1.05, ds = Dp - 2 * T - 1.0;                           // mesa del profesor mirando a las mesitas de los niños; su silla contra la pared de la pizarra
+      boxAt(du, ds, 0, 0.68, 0.72, 1.2, 0x8b5a2b, true);                                 // cuerpo de la mesa
+      boxAt(du, ds, 0.72, 0.76, 0.05, 1.3, 0xa16207, false);                             // tablero
+      boxAt(du - 0.66, ds, 0.42, 0.44, 0.05, 0.44, 0x1f2937, false); boxAt(du - 0.88, ds, 0.62, 0.05, 0.42, 0.44, 0x1f2937, false);   // silla del docente (respaldo hacia la pared)
+      boxAt(du, ds - 0.28, 0.77, 0.24, 0.03, 0.32, 0x0284c7, false);                    // folder azul "Mis notas"
+      boxAt(du + 0.05, ds + 0.32, 0.77, 0.2, 0.06, 0.26, 0x16a34a, false);              // libro
+      { const [tx, tz] = P(du, ds - 0.28); moliTag('Mis notas', tx, fy + 1.45, tz); }
+      const [fx, fz] = P(du + 0.75, ds);
       addUse('Mis notas', fx, fz, fy, () => { if (ME && ME.teacher) openMoli('reg'); else if (ME) openBooks('n'); else toast('🔑 Entra con tu DNI en Molí para ver tus notas'); }, 'Abrir'); }
     // junto a la ventana: mesita rectangular mediana con laptop, parlante y su silla
     { const wu = 0.2, ws = 0.32;
@@ -567,8 +588,9 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
       });
       const [x, z] = P(uu, ss), yR = fy + 2.05;                                       // pita colgando y un cohete de papel "GRUPO n"
       const str = new THREE.Mesh(new THREE.BoxGeometry(0.012, top - 0.06 - (yR + 0.42), 0.012), strMat); str.position.set(x, (top - 0.06 + yR + 0.42) / 2, z); scene.add(str);
-      const rk = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.6), new THREE.MeshLambertMaterial({ map: rocketTex(gi + 1), transparent: true, alphaTest: 0.1, side: THREE.DoubleSide }));   // cohete de papel plano
-      rk.position.set(x, yR + 0.12, z); rk.rotation.y = Math.atan2(uvec[0], uvec[1]); scene.add(rk);
+      const rkMat = new THREE.MeshLambertMaterial({ map: rocketTex(gi + 1), transparent: true, alphaTest: 0.1 });
+      [0, Math.PI].forEach(a => { const rk = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.6), rkMat);   // cohete de papel plano, se lee bien por los dos lados
+        rk.position.set(x, yR + 0.12, z); rk.rotation.y = Math.atan2(uvec[0], uvec[1]) + a; scene.add(rk); });
     });
     // 4 ventiladores colgados en las esquinas, mirando al centro
     const cu = 0.4, cs = (Dp - 2 * T) / 2;
@@ -651,7 +673,13 @@ function room(name, level, cx, fl, cz, w, d, o = {}) {
         if (o.special === '6B') ops.push({ type: 'swin', u: len * 0.18, w: len * 0.45, name: 'Ventana ' + name });   // ventana corrediza al pasillo
         else ops.push({ type: 'window', u: len * 0.18, w: len * 0.45 });
       }
-    } else if (side === opp && !o.noOpp && o.special !== '6B') { ops.push({ type: 'window', u: 0, w: len * 0.7 }); if (closed) fakeWin(isX, sg, 0, len * 0.7); }   // los sextos: al fondo sólo muro
+    } else if (side === opp && !o.noOpp && o.special !== '6B') { ops.push({ type: 'window', u: 0, w: len * 0.7 }); if (closed) fakeWin(isX, sg, 0, len * 0.7); }
+    else if (side === opp && o.special === '6B') {                       // los sextos: al fondo, una fila de ventanitas altas y el letrero «Área de Ciencia»
+      for (let k = 0; k < 6; k++) ops.push({ type: 'window', u: -len / 2 + 0.95 + k * (len - 1.9) / 5, w: 0.9, y0: 2.08 });
+      const lx = isX ? sg * (w / 2 - T - 0.012) : 0, lz = isX ? 0 : sg * (d / 2 - T - 0.012), [px, pz] = lw(cx, cz, rot, lx, lz);
+      const nx = isX ? -sg : 0, nz = isX ? 0 : -sg, nwx = nx * Math.cos(rot) + nz * Math.sin(rot), nwz = -nx * Math.sin(rot) + nz * Math.cos(rot);
+      plaque('Área de Ciencia', px, y0 + 1.72, pz, Math.atan2(nwx, nwz), 1.7, 0.4);
+    }
     (o.extra || []).forEach(e => { if (e.side === side) ops.push({ type: 'door', u: e.u, w: 1.2, name: e.name }); });
     // los muros de extremo van lisos (solo muro, sin ventanas)
     buildWall(cx, cz, rot, isX ? sg * (w / 2 - T / 2) : 0, isX ? 0 : sg * (d / 2 - T / 2), isX ? 'z' : 'x', len, y0, ops, col,
@@ -1415,9 +1443,9 @@ function checkLocker() {                                          // al acercart
   inside(0.05, 0.3, 0.22, -0.07, -0.12, 0x16a34a);                // cuaderno verde
   inside(0.03, 0.32, 0.24, 0.02, -0.11, 0xf59e0b);                // folder de exit tickets
   addUse('Mi locker ' + String(n).padStart(2, '0'), cx + s.nrm[0] * 0.6, cz + s.nrm[1] * 0.6, s.fy, openLocker, 'Abrir');
-  moliTag('Mi locker ' + String(n).padStart(2, '0'), cx + s.nrm[0] * 0.3, s.fy + 1.85, cz + s.nrm[1] * 0.3);
+  moliTag('Mi locker ' + String(n).padStart(2, '0'), cx + s.nrm[0] * 0.45, s.fy + 1.62, cz + s.nrm[1] * 0.45);
   myLocker = { n, glow };
-  toast('🔒 Tu locker es el N° ' + String(n).padStart(2, '0') + ', ' + firstName() + ' (el que brilla)', 5);
+  toast('🔒 Tu locker es el N° ' + String(n).padStart(2, '0') + (firstName() ? ', ' + firstName() : '') + ' (el que brilla)', 5);
 }
 function setUi(on) { uiOpen = on; for (const k in keys) keys[k] = false; joy.x = joy.y = 0; joyId = lookId = null; knob.style.left = knob.style.top = '40px'; if (on && document.exitPointerLock) document.exitPointerLock(); music.duck(on); }
 function openLocker() {

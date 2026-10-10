@@ -1368,7 +1368,7 @@ const inZone6 = (x, z) => ZONE6.some(([x0, x1, z0, z1]) => x >= x0 && x <= x1 &&
 const restricted = () => !!myRoom() && P.zone;                   // se activa al aparecer sentado en su salón
 function seatInRoom(room) {                                       // sentado en una silla de su salón, mirando a su mesa
   const s = SALON6[room]; if (!s || !s.seats || !s.seats.length) return spawnAtRoom(room);
-  const c = s.seats[strHash((ME && ME.key) || room) % s.seats.length];
+  const c = s.seats[Math.floor(Math.random() * s.seats.length)];      // cada vez que se conecta, en cualquier sitio de su salón
   P.x = c.x; P.z = c.z; P.y = s.fy; P.vy = 0; P.yaw = Math.atan2(-(c.tx - c.x), -(c.tz - c.z)); P.pitch = -0.05; P.seated = true; P.zone = true;
   return true;
 }
@@ -1492,9 +1492,18 @@ function updateRoomLamp() {                                        // la luz del
 //  BUCLE
 // ===================================================================
 let last = performance.now();
+// calidad automática: si el celular no llega a ~30 cuadros por segundo, baja la resolución (y la sube si sobra)
+const Q = { pr: renderer.getPixelRatio(), t: 0, n: 0, min: 0.6, max: renderer.getPixelRatio() };
+function autoQuality(dt) {
+  Q.t += dt; Q.n++; if (Q.t < 2.5) return;
+  const fps = Q.n / Q.t; Q.t = 0; Q.n = 0;
+  let pr = Q.pr; if (fps < 28) pr = Math.max(Q.min, pr - 0.15); else if (fps > 52) pr = Math.min(Q.max, pr + 0.1);
+  if (pr !== Q.pr) { Q.pr = pr; renderer.setPixelRatio(pr); renderer.setSize(innerWidth, innerHeight); }
+}
 function loop(now) {
   requestAnimationFrame(loop);
   const dt = (now - last) / 1000; last = now;
+  if (P.started && dt < 1) autoQuality(dt);
   update(P.started && !uiOpen ? dt : 0);
   if (P.started) { checkLocker(); updateRoomLamp(); }
   for (const t of moliTags) t.sp.position.y = t.y + Math.sin(now / 600 + t.ph) * 0.05;

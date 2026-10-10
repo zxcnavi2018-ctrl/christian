@@ -115,6 +115,7 @@ const SUN_DIR = new THREE.Vector3(-0.45, 0.78, 0.35).normalize();      // sol al
 const SUN_VIS = new THREE.Vector3(-0.35, 0.62, -0.70).normalize();     // sol dibujado en el cielo (se ve al aparecer, mirando al norte)
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(SKY_HORIZON);
+scene.fog = new THREE.Fog(SKY_HORIZON, 28, 95);                       // neblina suave: lo lejano se ve borroso
 const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.05, 500);
 camera.rotation.order = 'YXZ';
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -1264,16 +1265,20 @@ function update(dt) {
   let str = (keys['KeyD'] || keys['ArrowRight'] ? 1 : 0) - (keys['KeyA'] || keys['ArrowLeft'] ? 1 : 0) + joy.x;
   const m = Math.hypot(fwd, str); if (m > 1) { fwd /= m; str /= m; }
   if (P.seated && (m > 0.05 || wantJump)) P.seated = false;             // al caminar, se levanta de la silla
-  const sy = Math.sin(P.yaw), cy = Math.cos(P.yaw);
+  const sy = Math.sin(P.yaw), cy = Math.cos(P.yaw), ox = P.x, oz = P.z;
   P.x += (-sy * fwd + cy * str) * speed * dt;
   P.z += (-cy * fwd - sy * str) * speed * dt;
   if (!P.seated) resolve();
+  if (restricted() && !inZone6(P.x, P.z)) {                        // fuera de la zona: se queda donde estaba (deslizando por el borde)
+    if (inZone6(P.x, oz)) P.z = oz; else if (inZone6(ox, P.z)) P.x = ox; else { P.x = ox; P.z = oz; }
+  }
   // vertical
   const g = groundY(P.x, P.z, P.y);
   if (wantJump && P.y <= g + 0.02) P.vy = 6.2;
   wantJump = false;
   P.vy -= 18 * dt; P.y += P.vy * dt;
   if (P.y <= g) { P.y = g; P.vy = 0; }
+  if (restricted() && P.y < FH - 0.05) { P.y = FH; P.vy = 0; }      // dentro de la zona nunca se cae del piso 2
   if (P.y < -30) { P.x = 1; P.z = 35; P.y = 0; }
   // puertas
   for (const d of doors) {
@@ -1351,10 +1356,20 @@ function spawnAtRoom(room) {                                      // frente a la
   P.x = d.x + out[0] * 1.3; P.z = d.z + out[1] * 1.3; P.y = d.y; P.vy = 0; P.yaw = Math.atan2(out[0], out[1]); P.pitch = 0;
   return true;
 }
+// barrera invisible: el alumno con cuenta se queda en la zona de los sextos (piso 2), sin pasar a 7A, 5to ni a la sala de docentes, ni saltar el murito
+const ZONE6 = [
+  [-29, -19.25, -41, 1.7],      // B: 6D, 6C, baños, LAB, 6B y su pasadizo (hasta el límite con 7A / 5A)
+  [-29, -21, 1.7, 3.0],         // fondo del 6B
+  [-19.6, -17.8, -33.05, -31.15], // puente B <-> E
+  [-18, -10, -33.05, -31.15],   // pasadizo de E frente a 6A (antes de la sala de docentes y la escalera)
+  [-18, -9, -41, -33]           // 6A
+];
+const inZone6 = (x, z) => ZONE6.some(([x0, x1, z0, z1]) => x >= x0 && x <= x1 && z >= z0 && z <= z1);
+const restricted = () => !!myRoom() && P.zone;                   // se activa al aparecer sentado en su salón
 function seatInRoom(room) {                                       // sentado en una silla de su salón, mirando a su mesa
   const s = SALON6[room]; if (!s || !s.seats || !s.seats.length) return spawnAtRoom(room);
   const c = s.seats[strHash((ME && ME.key) || room) % s.seats.length];
-  P.x = c.x; P.z = c.z; P.y = s.fy; P.vy = 0; P.yaw = Math.atan2(-(c.tx - c.x), -(c.tz - c.z)); P.pitch = -0.05; P.seated = true;
+  P.x = c.x; P.z = c.z; P.y = s.fy; P.vy = 0; P.yaw = Math.atan2(-(c.tx - c.x), -(c.tz - c.z)); P.pitch = -0.05; P.seated = true; P.zone = true;
   return true;
 }
 function lockerCell(s, n) {                                       // centro del locker n en la pared de lockers

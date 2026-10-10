@@ -126,8 +126,8 @@ function buildWall(ox, oz, rot, lx, lz, axis, len, y0, ops, color, o = {}) {
   for (const op of ops) {
     const a = op.u - op.w / 2, b = op.u + op.w / 2;
     mk(cur, a, 0, h);
-    const isWin = op.type === 'window';
-    const oy0 = isWin ? 0.9 : 0, oy1 = isWin ? 2.5 : DOOR_H;
+    const isWin = op.type === 'window' || op.type === 'fglass', full = op.type === 'fglass';
+    const oy0 = isWin ? (full ? 0 : 0.9) : 0, oy1 = isWin ? (full ? 2.9 : 2.5) : DOOR_H;
     if (oy0 > 0) mk(a, b, 0, oy0);
     if (oy1 < h) mk(a, b, oy1, h);
     if (isWin) {
@@ -138,10 +138,32 @@ function buildWall(ox, oz, rot, lx, lz, axis, len, y0, ops, color, o = {}) {
         const [wx, wz] = lw(ox, oz, rot, axis === 'x' ? lx + um : lx, axis === 'x' ? lz : lz + um);
         addSolid(wx, y0 + ya, wz, axis === 'x' ? l : th, yb - ya, axis === 'x' ? th : l, rot, 0x374151, false);
       };
-      fr(a, b, oy0 - 0.06, oy0 + 0.05); fr(a, b, oy1 - 0.05, oy1 + 0.06);
+      fr(a, b, Math.max(0, oy0 - 0.06), oy0 + 0.05); fr(a, b, oy1 - 0.05, oy1 + 0.06);
       fr(a - 0.04, a + 0.04, oy0, oy1); fr(b - 0.04, b + 0.04, oy0, oy1);
-      const nm = Math.floor((b - a) / 1.6);
+      const nm = Math.floor((b - a) / (full ? 1.2 : 1.6));
       for (let k = 1; k <= nm; k++) { const um = a + (b - a) * k / (nm + 1); fr(um - 0.03, um + 0.03, oy0, oy1); }
+    }
+    else if (op.type === 'sdoor') {
+      // puerta de vidrio corrediza: se desliza a lo largo del muro
+      const n = o.normal || [0, 1];
+      const nw = [n[0] * Math.cos(rot) + n[1] * Math.sin(rot), -n[0] * Math.sin(rot) + n[1] * Math.cos(rot)];
+      const tg = axis === 'x' ? [Math.cos(rot), -Math.sin(rot)] : [Math.sin(rot), Math.cos(rot)];
+      const [cx, cz] = lw(ox, oz, rot, axis === 'x' ? lx + op.u : lx, axis === 'x' ? lz : lz + op.u);
+      const pw = (b - a) - 0.04, hh = DOOR_H - 0.05;
+      const grp = new THREE.Group();
+      grp.position.set(cx + nw[0] * 0.09, y0 + 0.02, cz + nw[1] * 0.09); grp.rotation.y = axis === 'x' ? rot : rot - Math.PI / 2;
+      const pane = new THREE.Mesh(new THREE.BoxGeometry(pw, hh, 0.03), glassDoorMat); pane.position.y = hh / 2; grp.add(pane);
+      const fm = new THREE.MeshLambertMaterial({ color: 0x374151 });
+      [[pw, 0.07, 0, 0.035], [pw, 0.07, 0, hh - 0.035], [0.07, hh, -pw / 2 + 0.035, hh / 2], [0.07, hh, pw / 2 - 0.035, hh / 2]].forEach(([bw, bh, bx, by]) => {
+        const bar = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, 0.05), fm); bar.position.set(bx, by, 0); grp.add(bar);
+      });
+      scene.add(grp);
+      const col = addCollider(cx, cz, axis === 'x' ? b - a : 0.2, axis === 'x' ? 0.2 : b - a, rot, y0, y0 + DOOR_H);
+      registerDoor(op.name || o.name || 'Puerta', cx, cz, y0, [{ slide: true, pivot: grp, bx: grp.position.x, by: grp.position.y, bz: grp.position.z, dx: tg[0], dz: tg[1], dist: pw + 0.05 }], col, 1);
+      if (op.sign && o.name) {
+        const [sx, sz] = lw(ox, oz, rot, axis === 'x' ? lx + op.u + n[0] * 0.15 : lx + n[0] * 0.15, axis === 'x' ? lz + n[1] * 0.15 : lz + op.u + n[1] * 0.15);
+        label(o.name, sx, y0 + 2.55, sz, 0.34, '#ffffff', 'rgba(15,23,42,.85)', 256, 64);
+      }
     }
     else {
       const phi = axis === 'x' ? rot : rot - Math.PI / 2;
@@ -249,8 +271,11 @@ function room(name, level, cx, fl, cz, w, d, o = {}) {
     const len = isX ? d : w;
     const ops = [];
     if (side === door) {
-      ops.push({ type: 'door', u: -len * 0.28, w: 1.2, name: 'Puerta ' + name, sign: true });
-      ops.push({ type: 'window', u: len * 0.18, w: len * 0.45 });
+      if (o.doorOps) o.doorOps.forEach(q => ops.push(q));
+      else {
+        ops.push({ type: 'door', u: -len * 0.28, w: 1.2, name: 'Puerta ' + name, sign: true });
+        ops.push({ type: 'window', u: len * 0.18, w: len * 0.45 });
+      }
     } else if (side === opp && !o.noOpp) ops.push({ type: 'window', u: 0, w: len * 0.7 });
     (o.extra || []).forEach(e => { if (e.side === side) ops.push({ type: 'door', u: e.u, w: 1.2, name: e.name }); });
     if ((o.endWin || []).includes(side) && !ops.length) ops.push({ type: 'window', u: 0, w: len * 0.5 });   // muro de extremo expuesto
@@ -498,32 +523,32 @@ label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
 })();
 
 // ===================================================================
-//  PABELLÓN C: lobby en L (a ras del frente z=26), entrada, baño, tópico (por dentro del colegio)
+//  PABELLÓN C: Welcome Lobby (a la altura de la sala de docentes, fachada de vidrios), entrada por dentro,
+//  baño (delgado) y enfermería con vidrios corredizos
 // ===================================================================
 (function () {
   const wc = 0xf8fafc;
-  // lobby principal (x -30..-17, z 13.5..21) + brazo hasta el frente (x -30..-21, z 21..26)
-  buildWall(0, 0, 0, -23.5, 13.6, 'x', 13, 0, [{ type: 'gdoor', u: 0, w: 2.0, name: 'Lobby (hacia el patio)' }, { type: 'window', u: -4.1, w: 3.4 }, { type: 'window', u: 4.1, w: 3.4 }], wc, { normal: [0, -1] });
-  buildWall(0, 0, 0, -29.9, 19.75, 'z', 12.5, 0, [{ type: 'window', u: -3.25, w: 3.6 }, { type: 'window', u: 3.75, w: 3 }], wc);
-  buildWall(0, 0, 0, -17.1, 17.25, 'z', 7.5, 0, [{ type: 'window', u: 0, w: 4 }], wc);
-  buildWall(0, 0, 0, -18.75, 20.9, 'x', 4.5, 0, [], wc);
-  buildWall(0, 0, 0, -21.1, 23.5, 'z', 5, 0, [{ type: 'gdoor', u: 1.0, w: 1.6, name: 'Lobby (desde la entrada)' }, { type: 'window', u: -1.2, w: 1.6 }], wc, { normal: [1, 0] });
-  buildWall(0, 0, 0, -25.5, 25.9, 'x', 9, 0, [{ type: 'gdoor', u: -2.1, w: 1.6, name: 'Lobby (calle)' }, { type: 'window', u: 0.5, w: 2.4 }, { type: 'gdoor', u: 3.1, w: 1.6, name: 'Lobby (calle)' }], wc, { normal: [0, 1] });
-  addSolid(-23.5, 0, 17.25, 13, 0.04, 7.5, 0, 0xe7e5e4, false);
-  addSolid(-25.5, 0, 23.5, 9, 0.04, 5, 0, 0xe7e5e4, false);
-  addSolid(-23.5, RH, 17.25, 13, 0.2, 7.5, 0, 0x94a3b8, false);
-  addSolid(-25.5, RH, 23.5, 9, 0.2, 5, 0, 0x94a3b8, false);
-  label('LOBBY', -23.5, RH + 1.0, 17.25, 1.6, '#fff', 'rgba(100,116,139,.95)');
-  label('PABELLÓN C', -23.5, RH + 2.4, 17.25, 2.4, '#fff', 'rgba(100,116,139,.95)');
-  // entrada techada (abierta a la calle), baño y tópico: puertas y ventanas hacia adentro, muro liso hacia la calle
+  // lobby: x -29..-21 (alineado con B), z 13.5..26 (a ras del frente)
+  buildWall(0, 0, 0, -25, 13.6, 'x', 8, 0, [{ type: 'gdoor', u: 0, w: 2.0, name: 'Lobby (hacia el patio)' }, { type: 'window', u: -2.7, w: 1.6 }, { type: 'window', u: 2.7, w: 1.6 }], wc, { normal: [0, -1] });
+  buildWall(0, 0, 0, -28.9, 19.75, 'z', 12.5, 0, [{ type: 'window', u: -3, w: 3.5 }, { type: 'window', u: 3.5, w: 3.5 }], wc);
+  buildWall(0, 0, 0, -21.1, 19.75, 'z', 12.5, 0, [{ type: 'window', u: -3.6, w: 3.2 }, { type: 'gdoor', u: 3.6, w: 1.6, name: 'Lobby (desde la entrada)' }], wc, { normal: [1, 0] });
+  // fachada de vidrios hacia la calle, con puertas de vidrio
+  buildWall(0, 0, 0, -25, 25.9, 'x', 8, 0, [
+    { type: 'fglass', u: -2.8, w: 2.4 }, { type: 'gdoor', u: -0.85, w: 1.3, name: 'Lobby (calle)' },
+    { type: 'gdoor', u: 0.5, w: 1.4, name: 'Lobby (calle)' }, { type: 'fglass', u: 2.6, w: 2.8 }], wc, { normal: [0, 1] });
+  addSolid(-25, 0, 19.75, 8, 0.04, 12.5, 0, 0xe7e5e4, false);
+  addSolid(-25, RH, 19.75, 8, 0.2, 12.5, 0, 0x94a3b8, false);
+  label('WELCOME LOBBY', -25, RH + 1.0, 19.75, 1.4, '#fff', 'rgba(100,116,139,.95)');
+  label('PABELLÓN C', -25, RH + 2.4, 19.75, 2.4, '#fff', 'rgba(100,116,139,.95)');
+  // entrada: por dentro del colegio (abierta hacia el patio, muro liso hacia la calle)
+  buildWall(0, 0, 0, -18.75, 25.9, 'x', 4.5, 0, [], wc);
   addSolid(-18.75, RH, 23.5, 4.5, 0.2, 5, 0, 0xe2e8f0, false);
   addSolid(-18.75, 0, 23.5, 4.5, 0.04, 5, 0, 0xe7e5e4, false);
-  label('ENTRADA', -18.75, RH + 0.9, 26.3, 0.9, '#fff', 'rgba(22,163,74,.95)');
-  room('BAÑO', 'bano', -14.5, 0, 23.5, 4, 5, { door: '-z', roof: true, noOpp: true });
-  room('TÓPICO', 'topico', -9.75, 0, 23.5, 5.5, 5, { door: '-z', roof: true, noOpp: true });
-  // áreas verdes al frente del muro liso (lado de la calle), junto a la vereda
-  grass(4.2, 1.8, -13.9, 27.3); grass(3.6, 1.8, -9.3, 27.3);
-  tree(-13.9, 27.3); tree(-9.3, 27.3);
+  label('ENTRADA', -18.75, RH + 0.7, 20.8, 0.9, '#fff', 'rgba(22,163,74,.95)');
+  // baño (más delgado) y enfermería (vidrios corredizos): puertas y ventanas hacia adentro, muro liso hacia la calle
+  room('BAÑO', 'bano', -15.1, 0, 23.5, 2.8, 5, { door: '-z', roof: true, noOpp: true });
+  room('ENFERMERÍA', 'topico', -10.35, 0, 23.5, 6.7, 5, { door: '-z', roof: true, noOpp: true,
+    doorOps: [{ type: 'sdoor', u: -1.6, w: 2.0, name: 'Enfermería', sign: true }, { type: 'fglass', u: 1.4, w: 3.8 }] });
 })();
 
 // ===================================================================
@@ -536,7 +561,7 @@ label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
     buildWall(0, 0, 0, (x0 + x1) / 2, (z0 + z1) / 2, horiz ? 'x' : 'z', len, 0, [], wm, { T: 0.4, h: hh });
   };
   seg(-58, -60, -58, 26); seg(-58, -60, 52, -60); seg(52, -60, 52, 26);
-  seg(-58, 26, -30, 26); seg(-16.5, 26, -6.5, 26); seg(8.55, 26, 52, 26);
+  seg(-58, 26, -29, 26); seg(8.55, 26, 52, 26);
   buildWall(0, 0, 0, -6.475, 29.9, 'z', 9, 0, [], wm, { T: 0.6, h: 3.6 });       // muro que sale hacia la calle junto a la puerta 1
   const Z = 26, bays = [
     { n: 'Puerta 1', x: -6, w: 2.8, roof: true }, { n: 'Puerta 2', x: -2.75, w: 2.8, roof: true },
@@ -669,7 +694,10 @@ function update(dt) {
     if (Math.abs(d.angle - d.target) > 0.002) {
       d.angle += (d.target - d.angle) * Math.min(1, dt * 9);
       if (Math.abs(d.angle - d.target) <= 0.002) d.angle = d.target;
-      d.leaves.forEach(l => { l.pivot.rotation.y = l.base + l.sgn * d.angle; });
+      d.leaves.forEach(l => {
+        if (l.slide) { const k = d.angle / d.max; l.pivot.position.set(l.bx + l.dx * l.dist * k, l.by, l.bz + l.dz * l.dist * k); }
+        else l.pivot.rotation.y = l.base + l.sgn * d.angle;
+      });
       if (d.angle === 0 && !d.open) d.col.on = true;
     }
   }

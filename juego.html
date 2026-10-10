@@ -387,6 +387,11 @@ function lowWallGaps(x, z0, z1, y, gaps) {                        // murito vert
   gaps.slice().sort((a, b) => a[0] - b[0]).forEach(g => { lowWall(x, cur, x, g[0], y); cur = g[1]; });
   lowWall(x, cur, x, z1, y);
 }
+function lowWallGaps2(x0, x1, z, y, gaps) {                       // murito horizontal con huecos
+  let cur = x0;
+  gaps.slice().sort((a, b) => a[0] - b[0]).forEach(g => { lowWall(cur, z, g[0], z, y); cur = g[1]; });
+  lowWall(cur, z, x1, z, y);
+}
 function lowWallLocal(ox, oz, rot, lx0, lx1, lz, y0) {   // murito en marco local (pabellón F)
   buildWall(ox, oz, rot, (lx0 + lx1) / 2, lz, 'x', Math.abs(lx1 - lx0), y0, [], 0x1f3366, { T: 0.2, h: 1.0 });
 }
@@ -514,29 +519,31 @@ D_COLS.forEach((col, k) => col.forEach((r, f) => {
 label('PABELLÓN D', -5.7, 3 * FH + 1.2, D.zc, 3, '#fff', 'rgba(244,114,22,.9)');
 const dN = D.zc - D.depth / 2;                    // borde norte de D (z = 1.9)
 const zsD = dN - 0.9;                             // eje del pasadizo (z = 1.0)
+const xTopD = D.xc[0] - D.sw / 2;                 // x = -14.7 (extremo oeste del pasadizo: aquí nace el puentecito)
+const xTopS = xTopD + 5.0;                        // x = -9.7  (parte alta de la escalera, 5 m más atrás)
 [1, 2].forEach(f => {
   floorSlab(-5.7, zsD, 18, 1.8, 0, f * FH);
-  lowWall(-14.7, dN - 1.8, 3.3, dN - 1.8, f * FH);
+  if (f === 1) lowWallGaps2(-14.7, 3.3, dN - 1.8, f * FH, [[xTopS - 0.7, xTopS + 0.5]]);    // hueco donde llega la escalera
+  else lowWall(-14.7, dN - 1.8, 3.3, dN - 1.8, f * FH);
   if (f === 2) lowWall(3.3, dN - 1.8, 3.3, dN, f * FH);                  // el piso 2 sigue hacia el puente a F
 });
-// escalera de D: tramos flotantes (columnas de fierro) paralela a la cara norte, sube hacia el puente + descanso
-const xTopD = D.xc[0] - D.sw / 2;                 // x = -14.7
+// escalera de D: tramos flotantes (columnas de fierro), 5 m más atrás; al subir sigue el murito del pasadizo
 (function () {
   const run = 0.4, n = 11, rise = FH / n, zst = zsD - 1.8, iron = 0x1f2937;
-  steps(xTopD + n * run, zst, -1, 0, n, rise, run, 1.8, 0, true);
+  steps(xTopS + n * run, zst, -1, 0, n, rise, run, 1.8, 0, true);
   [0, 9].forEach(i => {                                                  // solo los soportes de los extremos
-    const x = xTopD + n * run - (i + 0.5) * run, top = (i + 1) * rise - 0.2;
+    const x = xTopS + n * run - (i + 0.5) * run, top = (i + 1) * rise - 0.2;
     [-0.8, 0.8].forEach(k => addSolid(x, 0, zst + k, 0.1, top, 0.1, 0, iron, false));
   });
-  // barandas de fierro a ambos lados, siguiendo la pendiente de la escalera
-  const xa = xTopD + n * run - 0.5 * run, xb = xTopD + 0.5 * run;
-  [-0.72, 0.72].forEach(k => {
+  // baranda de fierro del lado exterior, siguiendo la pendiente (del lado del pasadizo va el murito)
+  const xa = xTopS + n * run - 0.5 * run, xb = xTopS + 0.5 * run;
+  [-0.72].forEach(k => {
     slopedBar(xa, rise + 0.95, zst + k, xb, FH + 0.95, zst + k, 0.05);
     slopedBar(xa, rise + 0.45, zst + k, xb, FH + 0.45, zst + k, 0.03);
-    for (let i = 0; i < n; i += 2) addSolid(xTopD + n * run - (i + 0.5) * run, (i + 1) * rise, zst + k, 0.04, 0.95, 0.04, 0, iron, false);
+    for (let i = 0; i < n; i += 2) addSolid(xTopS + n * run - (i + 0.5) * run, (i + 1) * rise, zst + k, 0.04, 0.95, 0.04, 0, iron, false);
     addSolid(xb, FH, zst + k, 0.04, 0.95, 0.04, 0, iron, false);
   });
-  grass(n * run, 1.6, xTopD + n * run / 2, zst);                       // área verde debajo de la escalera
+  grass(n * run, 1.6, xTopS + n * run / 2, zst);                       // área verde debajo de la escalera
 })();
 
 // ===================================================================
@@ -628,7 +635,7 @@ label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
 // ---- puente (B <-> descanso de la escalera de D), en diagonal, baranda de fierro y sin techo ----
 (function () {
   const P1 = { x: bFace + 1.8, z: bz };
-  const P2 = { x: xTopD + 0.5, z: zsD - 1.1 };            // sin descanso: llega directo al pasadizo de D y a la escalera
+  const P2 = { x: xTopD, z: zsD };                         // nace en el extremo oeste del pasadizo de D
   const len = Math.hypot(P2.x - P1.x, P2.z - P1.z), ang = Math.atan2(-(P2.z - P1.z), P2.x - P1.x);
   const mx = (P1.x + P2.x) / 2, mz = (P1.z + P2.z) / 2;
   addSolid(mx, FH - 0.204, mz, len, 0.2, 2.2, ang, 0xc6c5c1, false);      // visual 4 mm más abajo: evita parpadeo con los escalones

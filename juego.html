@@ -129,7 +129,7 @@ function addCollider(x, z, sx, sz, rot, y0, y1) {
   const o = { x, z, hw: sx / 2, hd: sz / 2, c: Math.cos(rot), s: Math.sin(rot), R: Math.hypot(sx, sz) / 2, y0, y1, on: true };
   colliders.push(o); return o;
 }
-function floorSlab(x, z, w, d, rot, yTop, th = 0.2, color = 0xb4b3ae) {
+function floorSlab(x, z, w, d, rot, yTop, th = 0.2, color = 0xc6c5c1) {
   addSolid(x, yTop - th, z, w, th, d, rot, color, false);
   floors.push({ x, z, hw: w / 2, hd: d / 2, c: Math.cos(rot), s: Math.sin(rot), y: yTop });
 }
@@ -147,7 +147,7 @@ function flat(w, d, x, z, color, y = 0.03, h = 0.06) {
   const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({ color }));
   m.position.set(x, y, z); m.receiveShadow = true; scene.add(m); return m;
 }
-const woodMat = new THREE.MeshLambertMaterial({ color: 0x2b5ea7 });   // puertas azules
+const woodMat = new THREE.MeshLambertMaterial({ color: 0x1b2b57 });   // puertas azul noche
 const glassDoorMat = new THREE.MeshLambertMaterial({ color: 0x7dd3fc, transparent: true, opacity: 0.45 });
 
 // ---- puertas ----
@@ -350,12 +350,12 @@ function room(name, level, cx, fl, cz, w, d, o = {}) {
     buildWall(cx, cz, rot, isX ? sg * (w / 2 - T / 2) : 0, isX ? 0 : sg * (d / 2 - T / 2), isX ? 'z' : 'x', len, y0, ops, col,
       { normal: isX ? [sg, 0] : [0, sg], name });
   }
-  if (fl > 0) floorSlab(cx, cz, w, d, rot, y0, 0.2, 0xb4b3ae);
+  if (fl > 0) floorSlab(cx, cz, w, d, rot, y0, 0.2, 0xc6c5c1);
   else if (yo > 0) {                                          // planta baja sobre zócalo
     addSolid(cx, 0, cz, w, yo, d, rot, 0xd6d3d1, true);
     floors.push({ x: cx, z: cz, hw: w / 2, hd: d / 2, c: Math.cos(rot), s: Math.sin(rot), y: yo });
   }
-  else { addSolid(cx, 0, cz, w, 0.04, d, rot, 0xb7b5af, false); }
+  else { addSolid(cx, 0, cz, w, 0.04, d, rot, 0xc6c5c1, false); }
   if (o.roof) addSolid(cx, y0 + RH, cz, w, 0.2, d, rot, 0x94a3b8, false);
   const kind = o.kind || ((level === 'inicial' || level === 'primaria' || level === 'secundaria') ? 'class' : level);
   furnish(kind, cx, cz, rot, y0, w, d, door, o.mlRole);
@@ -374,7 +374,7 @@ function steps(x0, z0, dx, dz, n, rise, run, w, yBase, thin) {   // (x0,z0) = ar
 function lowWall(x0, z0, x1, z1, y0, h = 1.0) {
   const horiz = Math.abs(z1 - z0) < 1e-6, len = horiz ? Math.abs(x1 - x0) : Math.abs(z1 - z0);
   if (len < 0.05) return;
-  buildWall(0, 0, 0, (x0 + x1) / 2, (z0 + z1) / 2, horiz ? 'x' : 'z', len, y0, [], 0x3d6cb3, { T: 0.2, h });
+  buildWall(0, 0, 0, (x0 + x1) / 2, (z0 + z1) / 2, horiz ? 'x' : 'z', len, y0, [], 0x1f3366, { T: 0.2, h });
 }
 function lowWallGaps(x, z0, z1, y, gaps) {                        // murito vertical con huecos
   let cur = z0;
@@ -382,7 +382,7 @@ function lowWallGaps(x, z0, z1, y, gaps) {                        // murito vert
   lowWall(x, cur, x, z1, y);
 }
 function lowWallLocal(ox, oz, rot, lx0, lx1, lz, y0) {   // murito en marco local (pabellón F)
-  buildWall(ox, oz, rot, (lx0 + lx1) / 2, lz, 'x', Math.abs(lx1 - lx0), y0, [], 0x3d6cb3, { T: 0.2, h: 1.0 });
+  buildWall(ox, oz, rot, (lx0 + lx1) / 2, lz, 'x', Math.abs(lx1 - lx0), y0, [], 0x1f3366, { T: 0.2, h: 1.0 });
 }
 // baranda de fierro (postes + 2 barras) con colisión invisible
 const ironMat = new THREE.MeshLambertMaterial({ color: 0x1f2937 });
@@ -411,12 +411,12 @@ function ironRail(x0, z0, x1, z1, y) {
 //  SUELO, CALLE, PATIO, CANCHA, ÁREA VERDE
 // ===================================================================
 (function ground() {
-  const g = new THREE.Mesh(new THREE.PlaneGeometry(600, 600), new THREE.MeshLambertMaterial({ map: concreteTex('#8d8c87', 200) }));
+  const g = new THREE.Mesh(new THREE.PlaneGeometry(600, 600), new THREE.MeshLambertMaterial({ map: concreteTex('#bdbdbb', 200) }));
   g.rotation.x = -Math.PI / 2; g.receiveShadow = true; scene.add(g);
   // vereda exterior: gris de vereda con juntas de losas de 1.5 m
   const sw = (function () {
     const n = 256, c = document.createElement('canvas'); c.width = c.height = n;
-    const g = c.getContext('2d'); g.fillStyle = '#939392'; g.fillRect(0, 0, n, n);
+    const g = c.getContext('2d'); g.fillStyle = '#c2c2c0'; g.fillRect(0, 0, n, n);
     for (let i = 0; i < 2200; i++) { g.fillStyle = (Math.random() < 0.5 ? 'rgba(255,255,255,' : 'rgba(0,0,0,') + (Math.random() * 0.08) + ')'; g.fillRect(Math.random() * n, Math.random() * n, 1 + Math.random() * 3, 1 + Math.random() * 3); }
     g.fillStyle = 'rgba(0,0,0,0.38)'; g.fillRect(0, n - 3, n, 3); g.fillRect(n - 3, 0, 3, n);
     const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 4; t.repeat.set(300 / 1.5, 8 / 1.5); return t;
@@ -430,7 +430,7 @@ function ironRail(x0, z0, x1, z1, y) {
   const patio = [[-21, -1.7], [10.12, -1.7], [51.6, -21.2], [51.6, -59.6], [-21, -59.6]];
   const sh = new THREE.Shape(patio.map(([x, z]) => new THREE.Vector2(x, -z)));
   sh.holes.push(new THREE.Path([[-18, -33], [18, -33], [18, -41], [-18, -41]].map(([x, z]) => new THREE.Vector2(x, -z))));   // el pabellón E
-  const pm = new THREE.Mesh(new THREE.ShapeGeometry(sh), new THREE.MeshLambertMaterial({ map: concreteTex('#b0aea8', 1 / 3), side: THREE.DoubleSide }));
+  const pm = new THREE.Mesh(new THREE.ShapeGeometry(sh), new THREE.MeshLambertMaterial({ map: concreteTex('#c6c6c4', 1 / 3), side: THREE.DoubleSide }));
   pm.rotation.x = -Math.PI / 2; pm.position.y = 0.03; pm.receiveShadow = true; scene.add(pm);
   const cxp = patio.reduce((q, p) => q + p[0], 0) / patio.length, czp = patio.reduce((q, p) => q + p[1], 0) / patio.length;
   patio.forEach((p, i) => {
@@ -524,7 +524,7 @@ const xTopD = D.xc[0] - D.sw / 2;                 // x = -14.7
   });
   // barandas de fierro a ambos lados, siguiendo la pendiente de la escalera
   const xa = xTopD + n * run - 0.5 * run, xb = xTopD + 0.5 * run;
-  [-0.88, 0.88].forEach(k => {
+  [-0.72, 0.72].forEach(k => {
     slopedBar(xa, rise + 0.95, zst + k, xb, FH + 0.95, zst + k, 0.05);
     slopedBar(xa, rise + 0.45, zst + k, xb, FH + 0.45, zst + k, 0.03);
     for (let i = 0; i < n; i += 2) addSolid(xTopD + n * run - (i + 0.5) * run, (i + 1) * rise, zst + k, 0.04, 0.95, 0.04, 0, iron, false);
@@ -551,8 +551,8 @@ label('PABELLÓN E', 0, 3 * FH + 1.2, E.zc, 3, '#fff', 'rgba(244,114,22,.9)');
   lowWall(-18, eS + 1.8, 18, eS + 1.8, f * FH);
   lowWall(18, eS, 18, eS + 1.8, f * FH);
   // puente corto B <-> E (une el pasadizo de B con el de E, a la altura de la puerta 6D)
-  floorSlab(-18.6, eS + 0.9, 1.5, 1.8, 0, f * FH, 0.2, 0xb4b3ae);
-  ironRail(-19.3, eS, -17.9, eS, f * FH); ironRail(-19.3, eS + 1.8, -17.9, eS + 1.8, f * FH);
+  floorSlab(-18.6, eS + 0.9, 1.5, 1.8, 0, f * FH, 0.2, 0xc6c5c1);
+  ironRail(-19.3, eS + 0.18, -17.9, eS + 0.18, f * FH); ironRail(-19.3, eS + 1.62, -17.9, eS + 1.62, f * FH);
 });
 label('PUENTE B ↔ E', -18.6, FH + 2.0, eS + 0.9, 1.0, '#111', 'rgba(250,204,21,.95)');
 
@@ -607,7 +607,7 @@ label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
   floorSlab((xs + xt) / 2, z, xt - xs, 1.8, 0, FH);                      // tramo plano (nivel de D)
   steps(xt, z, 1, 0, 3, rise, run, 1.8, FH, true);                        // 3 escalones cortos hasta el nivel de F
   floorSlab(6.25, z, 0.7, 1.8, 0, FH + F.yo);                             // llega al pasadizo de F
-  [-0.88, 0.88].forEach(k => {
+  [-0.72, 0.72].forEach(k => {
     ironRail(xs, z + k, xt, z + k, FH);                                   // baranda tramo plano
     slopedBar(xt, FH + 0.95, z + k, xe, FH + F.yo + 0.95, z + k, 0.05);    // baranda que sigue los escalones
     slopedBar(xt, FH + 0.45, z + k, xe, FH + F.yo + 0.45, z + k, 0.03);
@@ -625,10 +625,10 @@ label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
   const P2 = { x: xTopD + 0.5, z: zsD - 1.1 };            // sin descanso: llega directo al pasadizo de D y a la escalera
   const len = Math.hypot(P2.x - P1.x, P2.z - P1.z), ang = Math.atan2(-(P2.z - P1.z), P2.x - P1.x);
   const mx = (P1.x + P2.x) / 2, mz = (P1.z + P2.z) / 2;
-  addSolid(mx, FH - 0.204, mz, len, 0.2, 2.2, ang, 0xb4b3ae, false);      // visual 4 mm más abajo: evita parpadeo con los escalones
+  addSolid(mx, FH - 0.204, mz, len, 0.2, 2.2, ang, 0xc6c5c1, false);      // visual 4 mm más abajo: evita parpadeo con los escalones
   floors.push({ x: mx, z: mz, hw: len / 2, hd: 1.1, c: Math.cos(ang), s: Math.sin(ang), y: FH });
   [-1, 1].forEach(k => {
-    const [ax, az] = lw(mx, mz, ang, -len / 2 + 1.1, k * 1.1), [bx, bz2] = lw(mx, mz, ang, len / 2 - 1.7, k * 1.1);   // sin invadir pasadizo ni descanso
+    const [ax, az] = lw(mx, mz, ang, -len / 2 + 1.1, k * 0.92), [bx, bz2] = lw(mx, mz, ang, len / 2 - 1.7, k * 0.92);   // sin invadir pasadizo ni descanso
     ironRail(ax, az, bx, bz2, FH);
   });
   label('PUENTE', mx, FH + 2.0, mz, 1.0, '#111', 'rgba(250,204,21,.95)');
@@ -648,14 +648,14 @@ label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
   buildWall(0, 0, 0, -25, 25.9, 'x', 8, 0, [
     { type: 'fglass', u: -2.8, w: 2.4 }, { type: 'gdoor', u: -0.85, w: 1.3, name: 'Lobby (calle)' },
     { type: 'gdoor', u: 0.5, w: 1.4, name: 'Lobby (calle)' }, { type: 'fglass', u: 2.6, w: 2.8 }], wc, { normal: [0, 1] });
-  addSolid(-25, 0, 19.75, 8, 0.04, 12.5, 0, 0xb7b5af, false);
+  addSolid(-25, 0, 19.75, 8, 0.04, 12.5, 0, 0xc6c5c1, false);
   addSolid(-25, RH, 19.75, 8, 0.2, 12.5, 0, 0x94a3b8, false);
   label('WELCOME LOBBY', -25, RH + 1.0, 19.75, 1.4, '#fff', 'rgba(100,116,139,.95)');
   label('PABELLÓN C', -25, RH + 2.4, 19.75, 2.4, '#fff', 'rgba(100,116,139,.95)');
   // entrada: por dentro del colegio (abierta hacia el patio, muro liso hacia la calle)
   buildWall(0, 0, 0, -18.75, 25.9, 'x', 4.5, 0, [], wc);
   addSolid(-18.75, RH, 23.5, 4.5, 0.2, 5, 0, 0xc2c5ca, false);
-  addSolid(-18.75, 0, 23.5, 4.5, 0.04, 5, 0, 0xb7b5af, false);
+  addSolid(-18.75, 0, 23.5, 4.5, 0.04, 5, 0, 0xc6c5c1, false);
   label('ENTRADA', -18.75, RH + 0.7, 20.8, 0.9, '#fff', 'rgba(22,163,74,.95)');
   // baño (más delgado) y enfermería (vidrios corredizos): puertas y ventanas hacia adentro, muro liso hacia la calle
   room('BAÑO', 'bano', -15.1, 0, 23.5, 2.8, 5, { door: '-z', roof: true, noOpp: true });

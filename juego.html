@@ -274,11 +274,13 @@ function room(name, level, cx, fl, cz, w, d, o = {}) {
       if (o.doorOps) o.doorOps.forEach(q => ops.push(q));
       else {
         ops.push({ type: 'door', u: -len * 0.28, w: 1.2, name: 'Puerta ' + name, sign: true });
-        ops.push({ type: 'window', u: len * 0.18, w: len * 0.45 });
+        ops.push({ type: 'window', u: len * 0.2, w: len * 0.55 });
+        const lw0 = 0.22 * len - 1.0;                                            // ventanita al otro lado de la puerta
+        if (lw0 >= 0.7) ops.push({ type: 'window', u: (-0.5 * len + 0.2 + (-0.28 * len - 0.8)) / 2, w: lw0 });
       }
-    } else if (side === opp && !o.noOpp) ops.push({ type: 'window', u: 0, w: len * 0.7 });
+    } else if (side === opp && !o.noOpp) ops.push({ type: 'window', u: 0, w: len * 0.88 });
     (o.extra || []).forEach(e => { if (e.side === side) ops.push({ type: 'door', u: e.u, w: 1.2, name: e.name }); });
-    if ((o.endWin || []).includes(side) && !ops.length) ops.push({ type: 'window', u: 0, w: len * 0.5 });   // muro de extremo expuesto
+    if ((o.endWin || []).includes(side) && !ops.length) ops.push({ type: 'window', u: 0, w: len * 0.7 });   // muro de extremo expuesto
     buildWall(cx, cz, rot, isX ? sg * (w / 2 - T / 2) : 0, isX ? 0 : sg * (d / 2 - T / 2), isX ? 'z' : 'x', len, y0, ops, col,
       { normal: isX ? [sg, 0] : [0, sg], name });
   }

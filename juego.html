@@ -19,6 +19,7 @@
   .btn { position: fixed; width: 78px; height: 78px; border-radius: 50%; border: 0; color: #fff; font-weight: 700; font-size: 14px; display: none; touch-action: none; }
   #useBtn { right: 22px; bottom: 40px; background: rgba(37,99,235,.9); }
   #jumpBtn { right: 110px; bottom: 110px; width: 62px; height: 62px; background: rgba(71,85,105,.85); }
+  #musicBtn { position: fixed; top: 10px; right: 10px; background: rgba(15,23,42,.7); color: #fff; border: 1px solid rgba(255,255,255,.25); border-radius: 8px; padding: 6px 10px; font-size: 12px; z-index: 5; display: none; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
@@ -29,6 +30,7 @@
 <div id="joy"><div id="knob"></div></div>
 <button class="btn" id="useBtn">ABRIR</button>
 <button class="btn" id="jumpBtn">SALTAR</button>
+<button id="musicBtn">🎵 Música: sí</button>
 <div id="start">
   <h1>Innova Schools Tacna</h1>
   <p>Apareces afuera, frente a las puertas del colegio. Acércate y ábrelas para entrar. Puedes subir escaleras, cruzar el puente y entrar a todas las aulas.</p>
@@ -246,7 +248,7 @@ function buildWall(ox, oz, rot, lx, lz, axis, len, y0, ops, color, o = {}) {
       };
       fr(a, b, Math.max(0, oy0 - 0.06), oy0 + 0.05); fr(a, b, oy1 - 0.05, oy1 + 0.06);
       fr(a - 0.04, a + 0.04, oy0, oy1); fr(b - 0.04, b + 0.04, oy0, oy1);
-      const nm = Math.floor((b - a) / (full ? 1.2 : 1.6));
+      const nm = op.type === 'swin' ? 1 : Math.floor((b - a) / (full ? 1.2 : 1.6));     // corrediza: sólo el parante del medio, la mitad que se abre queda libre
       for (let k = 1; k <= nm; k++) { const um = a + (b - a) * k / (nm + 1); fr(um - 0.03, um + 0.03, oy0, oy1); }
     }
     else if (op.type === 'sdoor') {
@@ -318,6 +320,16 @@ const lockerTex = (function () {
   return new THREE.CanvasTexture(c);
 })();
 const lockerMat = new THREE.MeshLambertMaterial({ map: lockerTex });
+function rocketTex(n) {                                           // cohete de papel plano con "GRUPO n"
+  const c = document.createElement('canvas'); c.width = 256; c.height = 512; const g = c.getContext('2d');
+  const col = ['#ef4444', '#3b82f6', '#22c55e', '#f59e0b', '#a855f7'][(n - 1) % 5];
+  g.fillStyle = col; g.beginPath(); g.moveTo(128, 10); g.quadraticCurveTo(205, 90, 196, 200); g.lineTo(60, 200); g.quadraticCurveTo(51, 90, 128, 10); g.fill();
+  g.fillStyle = '#fefce8'; g.fillRect(60, 196, 136, 220); g.strokeStyle = '#1f2937'; g.lineWidth = 6; g.strokeRect(60, 196, 136, 220);
+  g.fillStyle = col; g.beginPath(); g.moveTo(60, 330); g.lineTo(14, 470); g.lineTo(60, 416); g.fill(); g.beginPath(); g.moveTo(196, 330); g.lineTo(242, 470); g.lineTo(196, 416); g.fill();
+  g.fillStyle = '#fb923c'; g.beginPath(); g.moveTo(84, 416); g.lineTo(128, 500); g.lineTo(172, 416); g.fill();
+  g.fillStyle = '#111827'; g.textAlign = 'center'; g.font = 'bold 34px sans-serif'; g.fillText('GRUPO', 128, 262); g.font = 'bold 96px sans-serif'; g.fillText(String(n), 128, 360);
+  return new THREE.CanvasTexture(c);
+}
 const locker26Tex = (function () {                                  // 13 x 2 lockers vacíos con etiqueta numerada
   const c = document.createElement('canvas'); c.width = 1560; c.height = 300;
   const g = c.getContext('2d'), cols = 13, rows = 2, cw = c.width / cols, ch = c.height / rows;
@@ -370,7 +382,7 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
       const [tx, tz] = P(uu, ss);
       for (let k = 0; k < 6; k++) {                                  // el hexágono son 6 mesitas iguales, cada una con su pata
         const tb = k * Math.PI / 3 + Math.PI / 6, bx = Math.sin(tb), bz = Math.cos(tb);
-        furn.tops.push({ x: tx + bx * 0.025, y: fy + 0.72, z: tz + bz * 0.025, sx: 0.83, sy: 0.07, sz: 0.83, rot: k * Math.PI / 3, color: 0xe7c9a0 });
+        furn.tops.push({ x: tx + bx * 0.025, y: fy + 0.72, z: tz + bz * 0.025, sx: 0.83, sy: 0.07, sz: 0.83, rot: k * Math.PI / 3, color: 0xeeebe3 });   // blanco paloma
         furn.peds.push({ x: tx + bx * 0.5, y: fy + 0.36, z: tz + bz * 0.5, sx: 0.03, sy: 0.72, sz: 0.03, rot: 0, color: 0x8a8f98 });
       }
       addCollider(tx, tz, 1.5, 1.5, 0, fy, fy + 0.8);
@@ -409,11 +421,8 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
       });
       const [x, z] = P(uu, ss), yR = fy + 2.05;                                       // pita colgando y un cohete de papel "GRUPO n"
       const str = new THREE.Mesh(new THREE.BoxGeometry(0.012, top - 0.06 - (yR + 0.42), 0.012), strMat); str.position.set(x, (top - 0.06 + yR + 0.42) / 2, z); scene.add(str);
-      const body = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.3, 12), new THREE.MeshLambertMaterial({ color: 0xffffff })); body.position.set(x, yR + 0.15, z); scene.add(body);
-      const nose = new THREE.Mesh(new THREE.ConeGeometry(0.075, 0.13, 12), new THREE.MeshLambertMaterial({ color: 0xef4444 })); nose.position.set(x, yR + 0.365, z); scene.add(nose);
-      [0, 1, 2].forEach(k => { const f2 = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.1, 0.01), new THREE.MeshLambertMaterial({ color: 0x2563eb })); const a = k * 2.094;
-        f2.position.set(x + Math.cos(a) * 0.09, yR + 0.04, z + Math.sin(a) * 0.09); f2.rotation.y = -a; scene.add(f2); });
-      label('GRUPO ' + (gi + 1), x, yR - 0.12, z, 0.32, '#111827', 'rgba(255,255,255,.95)', 256, 64);
+      const rk = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.6), new THREE.MeshLambertMaterial({ map: rocketTex(gi + 1), transparent: true, alphaTest: 0.1, side: THREE.DoubleSide }));   // cohete de papel plano
+      rk.position.set(x, yR + 0.12, z); rk.rotation.y = Math.atan2(uvec[0], uvec[1]); scene.add(rk);
     });
     // 4 ventiladores colgados en las esquinas, mirando al centro
     const cu = 0.4, cs = (Dp - 2 * T) / 2;
@@ -882,12 +891,14 @@ label('ÁREA VERDE', -1.6, 3.0, zG, 1.2, '#fff', 'rgba(22,101,52,.9)');
   const P2 = { x: xTopD, z: zsD };                         // nace en el extremo oeste del pasadizo de D
   const len = Math.hypot(P2.x - P1.x, P2.z - P1.z), ang = Math.atan2(-(P2.z - P1.z), P2.x - P1.x);
   const mx = (P1.x + P2.x) / 2, mz = (P1.z + P2.z) / 2;
-  addSolid(mx, FH - 0.204, mz, len, 0.2, 2.2, ang, 0xc6c5c1, false);      // visual 4 mm más abajo: evita parpadeo con los escalones
-  floors.push({ x: mx, z: mz, hw: len / 2, hd: 1.1, c: Math.cos(ang), s: Math.sin(ang), y: FH });
+  const ext = 1.2;                                                        // el piso entra 1,2 m en cada pasadizo: sin huecos en las puntas diagonales
+  addSolid(mx, FH - 0.204, mz, len + 2 * ext, 0.2, 2.2, ang, 0xc6c5c1, false);      // visual 4 mm más abajo: evita parpadeo con los escalones
+  floors.push({ x: mx, z: mz, hw: len / 2 + ext, hd: 1.1, c: Math.cos(ang), s: Math.sin(ang), y: FH });
   [-1, 1].forEach(k => {
     const [ax, az] = lw(mx, mz, ang, -len / 2 + 1.1, k * 0.92), [bx, bz2] = lw(mx, mz, ang, len / 2 - 1.7, k * 0.92);   // sin invadir pasadizo ni descanso
     ironRail(ax, az, bx, bz2, FH);
   });
+  floorSlab(P2.x - 0.45, dN + 0.6, 0.9, 1.2, 0, FH - 0.004);              // rincón entre el puente y la pared de D (sin hueco)
   label('PUENTE', mx, FH + 2.0, mz, 1.0, '#111', 'rgba(250,204,21,.95)');
 })();
 
@@ -1041,7 +1052,11 @@ function buildInstanced(items, material, geo, cast = true) {
 }
 buildInstanced(solidItems, new THREE.MeshLambertMaterial({ color: 0xffffff }));
 const furnMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
-const hexGeo = new THREE.CylinderGeometry(1, 1, 1, 1, 1, false, 0, Math.PI / 3);   // una mesita (1/6 del hexágono)
+const hexGeo = (function () {                                     // una mesita: trapecio (1/6 del hexágono sin la punta; al centro queda un mini hexágono vacío)
+  const ri = 0.3, pt = (r, t) => new THREE.Vector2(r * Math.sin(t), r * Math.cos(t)), a = Math.PI / 3;
+  const g = new THREE.ExtrudeGeometry(new THREE.Shape([pt(ri, 0), pt(1, 0), pt(1, a), pt(ri, a)]), { depth: 1, bevelEnabled: false });
+  g.rotateX(Math.PI / 2); g.translate(0, 0.5, 0); return g;
+})();
 buildInstanced(furn.tops, furnMat, hexGeo); buildInstanced(furn.peds, furnMat, new THREE.CylinderGeometry(1, 1, 1, 10));
 buildInstanced(furn.seats, furnMat); buildInstanced(furn.backs, furnMat); buildInstanced(furn.legs, furnMat, undefined, false); buildInstanced(furn.lapB, furnMat, undefined, false); buildInstanced(furn.lapS, furnMat, undefined, false);
 buildInstanced(glassItems, new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.5, depthWrite: false }), undefined, false);
@@ -1150,8 +1165,39 @@ function update(dt) {
 const isTouch = matchMedia('(pointer:coarse)').matches || 'ontouchstart' in window;
 document.getElementById(isTouch ? 'helpPc' : 'helpTouch').style.display = 'none';
 const startEl = document.getElementById('start');
+// ---- música de fondo suave y educativa (sintetizada, pasa por un compresor): acordes tranquilos + notas de xilófono ----
+const music = (function () {
+  let ctx = null, master = null, on = true, step = 0;
+  const chords = [[60, 64, 67, 72], [57, 60, 64, 69], [53, 57, 60, 65], [55, 59, 62, 67]];   // Do  Lam  Fa  Sol
+  const penta = [72, 74, 76, 79, 81, 84], hz = m => 440 * Math.pow(2, (m - 69) / 12);
+  function note(m, t, dur, vol, type) {
+    const o = ctx.createOscillator(), g = ctx.createGain(); o.type = type; o.frequency.value = hz(m);
+    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + (type === 'sine' ? 0.6 : 0.01)); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.05);
+  }
+  function tick() {
+    if (!on || ctx.state !== 'running') return;
+    const t = ctx.currentTime + 0.05, ch = chords[Math.floor(step / 8) % 4];
+    if (step % 8 === 0) ch.forEach(m => note(m - 12, t, 4.2, 0.05, 'sine'));
+    if (step % 2 === 0 || Math.random() < 0.25) note(Math.random() < 0.6 ? ch[step % 4] + 12 : penta[(step * 3 + 1) % penta.length], t, 1.1, 0.045, 'triangle');
+    step++;
+  }
+  return {
+    start() {
+      if (ctx) return; try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; }
+      const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -24; comp.ratio.value = 4;
+      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2600;
+      master = ctx.createGain(); master.gain.value = 0.55; master.connect(lp); lp.connect(comp); comp.connect(ctx.destination);
+      setInterval(tick, 520);
+    },
+    toggle() { on = !on; if (master) master.gain.setTargetAtTime(on ? 0.55 : 0, ctx.currentTime, 0.2); return on; }
+  };
+})();
+const musicBtn = document.getElementById('musicBtn');
+musicBtn.addEventListener('click', () => { musicBtn.textContent = '🎵 Música: ' + (music.toggle() ? 'sí' : 'no'); });
 document.getElementById('go').addEventListener('click', () => {
   startEl.style.display = 'none'; P.started = true;
+  musicBtn.style.display = 'block'; music.start();
   if (isTouch) { for (const id of ['joy', 'useBtn', 'jumpBtn']) document.getElementById(id).style.display = 'block'; }
   else renderer.domElement.requestPointerLock && renderer.domElement.requestPointerLock();
 });

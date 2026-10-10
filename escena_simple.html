@@ -216,6 +216,21 @@ walkway(A.xc[0], A.zc + A.depth / 2 + 0.9, 0, 0, 6, 0, 1, +1);
 walkway(F.x, F.z, 0, -(F.depth / 2 + 0.9), 27.5, F.rot, 1, -1);
 walkway(F.x, F.z, 8.25, -(F.depth / 2 + 0.9), 11, F.rot, 2, -1);
 
+// ================= ESCALERA lado D: esquina norte de D, junto al puente =================
+(function stairsD() {
+  const n = 11, rise = FH / n, run = 0.29, x = -13.6;
+  const zTop = D.zc - D.depth / 2;                       // borde norte de D (inicio del pasadizo)
+  for (let i = 0; i < n; i++) {
+    const h = (i + 1) * rise;
+    const st = new THREE.Mesh(new THREE.BoxGeometry(1.8, h, run), new THREE.MeshLambertMaterial({ color: 0x94a3b8 }));
+    st.position.set(x, h / 2, zTop - n * run + (i + 0.5) * run);
+    scene.add(st);
+  }
+  const r = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, n * run), railMat);
+  r.position.set(x - 0.9, FH * 0.5 + 0.9, zTop - n * run / 2); scene.add(r);
+  label('ESCALERA', x, FH + 1.6, zTop - 1.5, 1.2, '#111', 'rgba(250,204,21,.95)');
+})();
+
 // ================= ENLACE CORTO: 7B (F, piso 2) <-> ML (D, piso 2) =================
 (function linkF() {
   const x1 = D.xc[1] + D.sw / 2, x2 = 8.0, z = 7.5;        // de la cara derecha de D hasta la cara de F

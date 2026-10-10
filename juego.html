@@ -59,19 +59,20 @@ camera.rotation.order = 'YXZ';
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(innerWidth, innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-renderer.shadowMap.enabled = true;
+const SHADOWS = !isTouch0 || /[?&]sombras/.test(location.search);       // en celulares van desactivadas (manchas negras); ?sombras las activa
+renderer.shadowMap.enabled = SHADOWS;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
 
 // luz: cielo/suelo + sol cálido con sombras que siguen al jugador
-scene.add(new THREE.HemisphereLight(0xbcd8ff, 0x8a8478, 0.7));
-scene.add(new THREE.AmbientLight(0xffffff, 0.18));
-const sun = new THREE.DirectionalLight(0xfff0d8, 0.95);
-sun.castShadow = true;
+scene.add(new THREE.HemisphereLight(0xbcd8ff, 0x8a8478, 0.5));
+scene.add(new THREE.AmbientLight(0xffffff, 0.12));
+const sun = new THREE.DirectionalLight(0xfff0d8, 0.75);
+sun.castShadow = SHADOWS;
 sun.shadow.mapSize.set(isTouch0 ? 1024 : 2048, isTouch0 ? 1024 : 2048);
 const SH = isTouch0 ? 42 : 55;
 Object.assign(sun.shadow.camera, { left: -SH, right: SH, top: SH, bottom: -SH, near: 1, far: 300 });
-sun.shadow.bias = -0.0005; sun.shadow.normalBias = 0.04;
+sun.shadow.bias = -0.0008; sun.shadow.normalBias = 0.07;
 scene.add(sun); scene.add(sun.target);
 
 // cielo con degradado y disco solar
@@ -269,18 +270,19 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role) {
   const P = (u, sd) => lw(cx, cz, rot, isX ? sg * (w / 2 - T - sd) : u, isX ? u : sg * (d / 2 - T - sd));
   const boxAt = (u, sd, y0, du, h, ds, color, collide) => { const [x, z] = P(u, sd); addSolid(x, fy + y0, z, du, h, ds, rotU, color, collide); };
   const svec = isX ? R(-sg, 0) : R(0, -sg);
-  const teach = () => {
-    // pizarra grande en la pared del lado de la puerta
-    boxAt(-Wc / 2 + T + 0.14, Dp / 2 - T, 0.8, 0.04, 1.4, 5.6, 0x374151, false);
-    boxAt(-Wc / 2 + T + 0.17, Dp / 2 - T, 0.88, 0.04, 1.24, 5.4, 0xf8fafc, false);
+  const teach = (sgn = -1) => {                                      // sgn = -1: pizarra en el extremo -u; +1: en el extremo +u
+    const e = (dist) => sgn * (Wc / 2 - T - dist);
+    // pizarra grande
+    boxAt(e(0.14), Dp / 2 - T, 0.8, 0.04, 1.4, 5.6, 0x374151, false);
+    boxAt(e(0.17), Dp / 2 - T, 0.88, 0.04, 1.24, 5.4, 0xf8fafc, false);
     // ecran colgado en la pizarra: estuche arriba + lienzo bajado
-    boxAt(-Wc / 2 + T + 0.27, Dp / 2 - T, 2.45, 0.12, 0.12, 3.6, 0x374151, false);
-    boxAt(-Wc / 2 + T + 0.25, Dp / 2 - T, 1.0, 0.03, 1.45, 3.4, 0xd6d3c8, false);
-    boxAt(-Wc / 2 + T + 0.25, Dp / 2 - T, 0.97, 0.05, 0.04, 3.4, 0x111827, false);
+    boxAt(e(0.27), Dp / 2 - T, 2.45, 0.12, 0.12, 3.6, 0x374151, false);
+    boxAt(e(0.25), Dp / 2 - T, 1.0, 0.03, 1.45, 3.4, 0xd6d3c8, false);
+    boxAt(e(0.25), Dp / 2 - T, 0.97, 0.05, 0.04, 3.4, 0x111827, false);
     // proyector colgado del techo, al centro y un poco adelante, apuntando a la pizarra
-    boxAt(-0.8, Dp / 2 - T, 2.56, 0.04, 0.44, 0.04, 0x6b7280, false);
-    boxAt(-0.8, Dp / 2 - T, 2.40, 0.42, 0.15, 0.32, 0xe5e7eb, false);
-    boxAt(-0.8 - 0.25, Dp / 2 - T, 2.43, 0.08, 0.09, 0.09, 0x111827, false);
+    boxAt(sgn * 0.8, Dp / 2 - T, 2.56, 0.04, 0.44, 0.04, 0x6b7280, false);
+    boxAt(sgn * 0.8, Dp / 2 - T, 2.40, 0.42, 0.15, 0.32, 0xe5e7eb, false);
+    boxAt(sgn * (0.8 + 0.25), Dp / 2 - T, 2.43, 0.08, 0.09, 0.09, 0x111827, false);
   };
   const lockers = () => {                                           // lockers (cubículos) al fondo
     boxAt(Wc / 2 - T - 0.225, Dp / 2 - T, 0, 0.45, 1.4, Dp - 1.2, 0xb08968, true);
@@ -311,7 +313,7 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role) {
   if (kind === 'class') {
     teach(); lockers(); clusters(false);                              // pizarra grande + ecran + proyector; lockers al fondo
   } else if (kind === 'ml') {                                         // media lab: salón gigante (2 módulos unidos), mesas en roseta con laptops
-    if (role !== 'second') teach();                                   // el media lab no lleva lockers
+    teach(role === 'second' ? 1 : -1);                                // una pizarra con ecran y proyector en cada extremo; sin lockers
     clusters(true);
   } else if (kind === 'lab') {
     teach();
@@ -601,12 +603,20 @@ label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
 
 // ---- puente corto D <-> F: del pasadizo de D (piso 2) al extremo del pasadizo de F, junto a la puerta de 7B ----
 (function () {
-  const xs = 3.3, xe = 5.9, z = dN - 0.9, rise = F.yo / 3;               // z = 1.0 (eje del pasadizo de D)
-  floorSlab((xs + 4.7) / 2, z, 4.7 - xs, 1.8, 0, FH);                    // tramo plano (nivel de D)
-  steps(4.7, z, 1, 0, 3, rise, 0.4, 1.8, FH, true);                       // 3 escalones cortos hasta el nivel de F
+  const xs = 3.3, xt = 4.7, xe = 5.9, z = dN - 0.9, rise = F.yo / 3, run = 0.4, iron = 0x1f2937;
+  floorSlab((xs + xt) / 2, z, xt - xs, 1.8, 0, FH);                      // tramo plano (nivel de D)
+  steps(xt, z, 1, 0, 3, rise, run, 1.8, FH, true);                        // 3 escalones cortos hasta el nivel de F
   floorSlab(6.25, z, 0.7, 1.8, 0, FH + F.yo);                             // llega al pasadizo de F
-  ironRail(xs, z - 0.9, 5.9, z - 0.9, FH); ironRail(xs, z + 0.9, 5.9, z + 0.9, FH);
-  label('PUENTE D ↔ F', 4.6, FH + 2.2, z, 1.0, '#111', 'rgba(250,204,21,.95)');
+  [-0.88, 0.88].forEach(k => {
+    ironRail(xs, z + k, xt, z + k, FH);                                   // baranda tramo plano
+    slopedBar(xt, FH + 0.95, z + k, xe, FH + F.yo + 0.95, z + k, 0.05);    // baranda que sigue los escalones
+    slopedBar(xt, FH + 0.45, z + k, xe, FH + F.yo + 0.45, z + k, 0.03);
+    for (let i = 0; i < 3; i++) addSolid(xt + (i + 0.5) * run, FH + (i + 1) * rise, z + k, 0.04, 0.95, 0.04, 0, iron, false);
+    addSolid(xt, FH, z + k, 0.04, 0.95, 0.04, 0, iron, false);
+    addCollider((xt + xe) / 2, z + k * 1.0, xe - xt, 0.1, 0, FH, FH + 1.7);   // evita caerse por el costado
+    ironRail(xe, z + k, 6.55, z + k, FH + F.yo);                          // baranda sobre el descanso
+  });
+  label('PUENTE D ↔ F', 4.6, FH + 2.4, z, 1.0, '#111', 'rgba(250,204,21,.95)');
 })();
 
 // ---- puente (B <-> descanso de la escalera de D), en diagonal, baranda de fierro y sin techo ----
@@ -615,7 +625,8 @@ label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
   const P2 = { x: xTopD + 0.5, z: zsD - 1.1 };            // sin descanso: llega directo al pasadizo de D y a la escalera
   const len = Math.hypot(P2.x - P1.x, P2.z - P1.z), ang = Math.atan2(-(P2.z - P1.z), P2.x - P1.x);
   const mx = (P1.x + P2.x) / 2, mz = (P1.z + P2.z) / 2;
-  floorSlab(mx, mz, len, 2.2, ang, FH, 0.2, 0xb4b3ae);
+  addSolid(mx, FH - 0.204, mz, len, 0.2, 2.2, ang, 0xb4b3ae, false);      // visual 4 mm más abajo: evita parpadeo con los escalones
+  floors.push({ x: mx, z: mz, hw: len / 2, hd: 1.1, c: Math.cos(ang), s: Math.sin(ang), y: FH });
   [-1, 1].forEach(k => {
     const [ax, az] = lw(mx, mz, ang, -len / 2 + 1.1, k * 1.1), [bx, bz2] = lw(mx, mz, ang, len / 2 - 1.7, k * 1.1);   // sin invadir pasadizo ni descanso
     ironRail(ax, az, bx, bz2, FH);

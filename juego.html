@@ -296,7 +296,10 @@ function buildWall(ox, oz, rot, lx, lz, axis, len, y0, ops, color, o = {}) {
 
 // ---- mobiliario (instancias) ----
 const furn = { tops: [], peds: [], seats: [], backs: [], legs: [], lapB: [], lapS: [] };
-const spinners = [];                                               // aspas de ventiladores (giran en el bucle)
+const spinners = [];                                               // aspas de ventiladores (giran en el bucle si están prendidos)
+function addSwitch(name, x, z, y, fn) {                            // interruptor que se usa con ABRIR / E (empieza prendido)
+  doors.push({ name, x, z, y, leaves: [], col: { on: false }, angle: 0, target: 0, max: 0, open: true, sw: fn });
+}
 function chair(x, z, ox, oz, yaw, fy) {                            // silla naranja: asiento + respaldo (hacia afuera: ox, oz) + 4 patas gris medio
   furn.seats.push({ x, y: fy + 0.45, z, sx: 0.42, sy: 0.05, sz: 0.42, rot: yaw, color: 0xf97316 });
   furn.backs.push({ x: x + ox * 0.2, y: fy + 0.68, z: z + oz * 0.2, sx: 0.42, sy: 0.4, sz: 0.05, rot: yaw, color: 0xea580c });
@@ -331,7 +334,7 @@ const locker26Tex = (function () {                                  // 13 x 2 lo
 })();
 const lockerGeo = new THREE.PlaneGeometry(1, 1);
 
-function furnish(kind, cx, cz, rot, fy, w, d, door, role) {
+function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
   const sg = door[0] === '+' ? 1 : -1, isX = door[1] === 'x';
   const Wc = isX ? d : w, Dp = isX ? w : d;
   const c = Math.cos(rot), sn = Math.sin(rot);
@@ -365,8 +368,11 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role) {
   const clusters = (laptops, spots) => {                            // hexágonos (rosetas) de 6 integrantes (por defecto 6 grupos)
     for (const [uu, ss] of (spots || [[-0.7, 1.4], [-0.7, 3.8], [-0.7, 6.2], [2.0, 1.4], [2.0, 3.8], [2.0, 6.2]])) {
       const [tx, tz] = P(uu, ss);
-      furn.tops.push({ x: tx, y: fy + 0.72, z: tz, sx: 0.85, sy: 0.07, sz: 0.85, rot: 0, color: 0xe7c9a0 });
-      furn.peds.push({ x: tx, y: fy + 0.36, z: tz, sx: 0.22, sy: 0.72, sz: 0.22, rot: 0, color: 0x6b7280 });
+      for (let k = 0; k < 6; k++) {                                  // el hexágono son 6 mesitas iguales, cada una con su pata
+        const tb = k * Math.PI / 3 + Math.PI / 6, bx = Math.sin(tb), bz = Math.cos(tb);
+        furn.tops.push({ x: tx + bx * 0.025, y: fy + 0.72, z: tz + bz * 0.025, sx: 0.83, sy: 0.07, sz: 0.83, rot: k * Math.PI / 3, color: 0xe7c9a0 });
+        furn.peds.push({ x: tx + bx * 0.5, y: fy + 0.36, z: tz + bz * 0.5, sx: 0.03, sy: 0.72, sz: 0.03, rot: 0, color: 0x8a8f98 });
+      }
       addCollider(tx, tz, 1.5, 1.5, 0, fy, fy + 0.8);
       for (let k = 0; k < 6; k++) {
         const th = k * Math.PI / 3 + Math.PI / 6;
@@ -380,7 +386,7 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role) {
       }
     }
   };
-  if (kind === 'class' && role === '6B') {                          // 6B con más detalle
+  if (kind === 'class' && role === '6B') {                          // sextos (6A-6D): con más detalle
     teach();
     // 26 lockers grandes, vacíos y ordenados (13 x 2), cada uno con su etiqueta
     const LL = Dp - 2 * T - 0.4, uL = Wc / 2 - T - 0.26;
@@ -391,6 +397,10 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role) {
     const G5 = [[-1.5, 1.6], [2.25, 1.6], [-1.5, 6.0], [2.25, 6.0], [0.4, 3.8]];
     clusters(false, G5);
     const tubeMat = new THREE.MeshBasicMaterial({ color: 0xf8fafc }), strMat = new THREE.MeshLambertMaterial({ color: 0xe5e7eb });
+    { const [lx, lz] = P(0.4, (Dp - 2 * T) / 2), lamp = new THREE.PointLight(0xfff4e0, 0.55, 8, 1.5); lamp.position.set(lx, fy + RH - 0.4, lz); scene.add(lamp);
+      boxAt(-Wc / 2 + T + 0.9, 0.02, 1.25, 0.09, 0.13, 0.03, 0xf8fafc, false);              // interruptor de luz junto a la puerta, por dentro
+      const [sx, sz] = P(-Wc / 2 + T + 0.9, 0.35);
+      addSwitch('Luces ' + rname, sx, sz, fy, on => { tubeMat.color.setHex(on ? 0xf8fafc : 0x9ca3af); lamp.intensity = on ? 0.55 : 0; }); }
     G5.forEach(([uu, ss], gi) => {
       const top = fy + RH - 0.04;
       if (gi < 4) [-0.35, 0.35].forEach(d2 => {                                   // 2 focos largos encima de cada grupo (el del centro no)
@@ -415,7 +425,10 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role) {
       const motor = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.16, 12), dark); motor.rotation.x = Math.PI / 2; motor.position.z = -0.08; g.add(motor);
       const blades = new THREE.Group(); g.add(blades);
       [0, 1, 2].forEach(k => { const bl = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.22, 0.01), gray); bl.position.set(Math.cos(k * 2.094 + 1.57) * 0.12, Math.sin(k * 2.094 + 1.57) * 0.12, 0); bl.rotation.z = k * 2.094; blades.add(bl); });
-      spinners.push(blades);
+      const fan = { b: blades, on: true }; spinners.push(fan);
+      const cord = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.8, 0.01), dark); cord.position.set(0, -0.45, -0.08); g.add(cord);   // cordón colgando
+      const knob = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 6), new THREE.MeshLambertMaterial({ color: 0xef4444 })); knob.position.set(0, -0.86, -0.08); g.add(knob);
+      addSwitch('Ventilador ' + rname, x, z, fy, on => { fan.on = on; });
       const arm = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, 0.3), dark); arm.position.z = -0.3; g.add(arm);
     });
   } else if (kind === 'class') {
@@ -467,9 +480,10 @@ function room(name, level, cx, fl, cz, w, d, o = {}) {
       if (o.doorOps) o.doorOps.forEach(q => ops.push(q));
       else {
         ops.push({ type: 'door', u: -len * 0.28, w: 1.2, name: 'Puerta ' + name, sign: true });
-        ops.push({ type: 'window', u: len * 0.18, w: len * 0.45 });
+        if (o.special === '6B') ops.push({ type: 'swin', u: len * 0.18, w: len * 0.45, name: 'Ventana ' + name });   // ventana corrediza al pasillo
+        else ops.push({ type: 'window', u: len * 0.18, w: len * 0.45 });
       }
-    } else if (side === opp && !o.noOpp) ops.push({ type: 'window', u: 0, w: len * 0.7 });
+    } else if (side === opp && !o.noOpp && o.special !== '6B') ops.push({ type: 'window', u: 0, w: len * 0.7 });   // los sextos: al fondo sólo muro
     (o.extra || []).forEach(e => { if (e.side === side) ops.push({ type: 'door', u: e.u, w: 1.2, name: e.name }); });
     // los muros de extremo van lisos (solo muro, sin ventanas)
     buildWall(cx, cz, rot, isX ? sg * (w / 2 - T / 2) : 0, isX ? 0 : sg * (d / 2 - T / 2), isX ? 'z' : 'x', len, y0, ops, col,
@@ -483,7 +497,7 @@ function room(name, level, cx, fl, cz, w, d, o = {}) {
   else { addSolid(cx, Math.min(yo, 0), cz, w, 0.04, d, rot, 0xc6c5c1, false); }
   if (o.roof) { addSolid(cx, y0 + RH, cz, w, 0.2, d, rot, 0x94a3b8, false); roofs.push({ x: cx, z: cz, hw: w / 2, hd: d / 2, c: Math.cos(rot), s: Math.sin(rot), y: y0 + RH + 0.2 }); }
   const kind = o.kind || ((level === 'inicial' || level === 'primaria' || level === 'secundaria') ? 'class' : level);
-  furnish(kind, cx, cz, rot, y0, w, d, door, o.mlRole || o.special);
+  furnish(kind, cx, cz, rot, y0, w, d, door, o.mlRole || o.special, name);
 }
 
 function steps(x0, z0, dx, dz, n, rise, run, w, yBase, thin) {   // (x0,z0) = arranque, (dx,dz) = dirección unitaria
@@ -600,8 +614,8 @@ B_ROWS.forEach((row, f) => { let zc0 = B.z0; row.forEach((r, i) => {
   room(r[0], r[1], B.x, f, zc, B.depth, sw, { door: '+x', roof: f === 2,
     kind: isML ? 'ml' : (r[1] === 'bano' ? 'banos' : undefined), mlRole: isML ? (second ? 'second' : 'first') : undefined, skipWall: isML ? (second ? '-z' : '+z') : undefined,
     doorOps: r[1] === 'bano' ? [{ type: 'door', u: 0.3, w: 1.2, name: 'Puerta ' + r[0], sign: true }]
-      : r[0] === '6B' ? [{ type: 'door', u: -sw * 0.28, w: 1.2, name: 'Puerta 6B', sign: true }, { type: 'swin', u: sw * 0.18, w: sw * 0.45, name: 'Ventana 6B' }] : undefined,
-    noOpp: r[1] === 'bano' || r[0] === '6B', special: r[0] === '6B' ? '6B' : undefined });
+      : undefined,
+    noOpp: r[1] === 'bano', special: /^6[A-D]$/.test(r[0]) ? '6B' : undefined });   // 6B, 6C y 6D con el mismo diseño
 }); });
 label('PABELLÓN B', B.x, 3 * FH + 1.2, B.z0 + B.len / 2, 3, '#fff', 'rgba(0,114,206,.9)');
 // pasadizos de B (pisos 2 y 3) con murito de la altura de la baranda
@@ -670,7 +684,7 @@ const E_SLOTS = [
   [['1A','primaria'], ['6A','primaria'], ['10A','secundaria']]
 ];
 E_SLOTS.forEach((col, k) => col.forEach((r, f) => {
-  room(r[0], r[1], E.xc[k], f, E.zc, E.sw, E.depth, { door: '+z', roof: f === 2, endWin: k === 0 ? ['+x'] : k === 3 ? ['-x'] : [] });
+  room(r[0], r[1], E.xc[k], f, E.zc, E.sw, E.depth, { door: '+z', roof: f === 2, endWin: k === 0 ? ['+x'] : k === 3 ? ['-x'] : [], special: r[0] === '6A' ? '6B' : undefined });   // 6A igual que 6B
 }));
 label('PABELLÓN E', 0, 3 * FH + 1.2, E.zc, 3, '#fff', 'rgba(244,114,22,.9)');
 [1, 2].forEach(f => {
@@ -1027,7 +1041,7 @@ function buildInstanced(items, material, geo, cast = true) {
 }
 buildInstanced(solidItems, new THREE.MeshLambertMaterial({ color: 0xffffff }));
 const furnMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
-const hexGeo = new THREE.CylinderGeometry(1, 1, 1, 6);
+const hexGeo = new THREE.CylinderGeometry(1, 1, 1, 1, 1, false, 0, Math.PI / 3);   // una mesita (1/6 del hexágono)
 buildInstanced(furn.tops, furnMat, hexGeo); buildInstanced(furn.peds, furnMat, new THREE.CylinderGeometry(1, 1, 1, 10));
 buildInstanced(furn.seats, furnMat); buildInstanced(furn.backs, furnMat); buildInstanced(furn.legs, furnMat, undefined, false); buildInstanced(furn.lapB, furnMat, undefined, false); buildInstanced(furn.lapS, furnMat, undefined, false);
 buildInstanced(glassItems, new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.5, depthWrite: false }), undefined, false);
@@ -1086,6 +1100,7 @@ function nearestDoor() {
   return best;
 }
 function toggle(d) {
+  if (d.sw) { d.open = !d.open; d.sw(d.open); return; }             // interruptor: prende / apaga
   d.open = !d.open; d.target = d.open ? d.max : 0;
   if (d.open) d.col.on = false;
 }
@@ -1122,7 +1137,7 @@ function update(dt) {
     }
   }
   const nd = nearestDoor();
-  if (nd) { promptEl.style.display = 'block'; promptEl.textContent = (nd.open ? 'Cerrar' : 'Abrir') + ' · ' + nd.name + (isTouch ? '' : '  [E]'); }
+  if (nd) { promptEl.style.display = 'block'; promptEl.textContent = (nd.sw ? (nd.open ? 'Apagar' : 'Prender') : (nd.open ? 'Cerrar' : 'Abrir')) + ' · ' + nd.name + (isTouch ? '' : '  [E]'); }
   else promptEl.style.display = 'none';
   if (wantUse) { if (nd) toggle(nd); wantUse = false; }
   camera.position.set(P.x, P.y + 1.6, P.z);
@@ -1192,7 +1207,7 @@ function loop(now) {
   requestAnimationFrame(loop);
   const dt = (now - last) / 1000; last = now;
   update(P.started ? dt : 0);
-  sky.position.copy(camera.position); const tNow = now / 1000; spinners.forEach(b => { b.rotation.z += Math.min(dt, 0.05) * 14; });
+  sky.position.copy(camera.position); const tNow = now / 1000; spinners.forEach(f => { if (f.on) f.b.rotation.z += Math.min(dt, 0.05) * 14; });
   sun.position.set(P.x + SUN_DIR.x * 120, SUN_DIR.y * 120, P.z + SUN_DIR.z * 120); sun.target.position.set(P.x, 0, P.z);
   clouds.children.forEach(g => { g.position.x += g.userData.v * Math.min(dt, 0.1); if (g.position.x > 440) g.position.x = -440; });
   renderer.render(scene, camera);

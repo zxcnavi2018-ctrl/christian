@@ -47,6 +47,7 @@
   .bk-notes.bk7 { background: linear-gradient(160deg, #0ea5e9, #1e3a8a); } .bk-notes.bk8 { background: linear-gradient(160deg, #f59e0b, #b45309); }
   #bookClose { margin-top: 22px; background: #334155; color: #fff; border: 0; border-radius: 12px; padding: 11px 28px; font-size: 15px; font-weight: 700; }
   #lockerClose { width: 100%; background: #334155; color: #fff; border: 0; border-radius: 12px; padding: 11px; font-size: 15px; font-weight: 700; }
+  #rainBtn { position: fixed; top: 82px; right: 10px; background: rgba(15,23,42,.7); color: #fff; border: 1px solid rgba(255,255,255,.25); border-radius: 8px; padding: 6px 10px; font-size: 12px; z-index: 5; display: none; }
   #musicBtn { position: fixed; top: 10px; right: 10px; background: rgba(15,23,42,.7); color: #fff; border: 1px solid rgba(255,255,255,.25); border-radius: 8px; padding: 6px 10px; font-size: 12px; z-index: 5; display: none; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -59,6 +60,7 @@
 <button class="btn" id="useBtn">ABRIR</button>
 <button class="btn" id="jumpBtn">SALTAR</button>
 <button id="musicBtn">🎵 Música: sí</button>
+<button id="rainBtn">🌧️ Lluvia: sí</button>
 <button id="moliChip"></button>
 <button id="backMoli">← Molí</button>
 <div id="toast"></div>
@@ -1468,7 +1470,7 @@ refreshChip();
 musicBtn.addEventListener('click', () => { musicBtn.textContent = '🎵 Música: ' + (music.toggle() ? 'sí' : 'no'); });
 document.getElementById('go').addEventListener('click', () => {
   startEl.style.display = 'none'; P.started = true;
-  musicBtn.style.display = 'block'; music.start(); chipEl.style.display = 'block'; backMoli.style.display = 'block';
+  musicBtn.style.display = 'block'; rainBtn.style.display = 'block'; music.start(); chipEl.style.display = 'block'; backMoli.style.display = 'block';
   refreshChip(); if (myRoom() && seatInRoom(myRoom())) toast('🪑 ¡Hola ' + firstName() + '! Estás sentado en tu salón ' + myRoom() + '. Camina para levantarte y ve a los lockers.', 5);
   if (isTouch) { for (const id of ['joy', 'useBtn', 'jumpBtn']) document.getElementById(id).style.display = 'block'; }
   else renderer.domElement.requestPointerLock && renderer.domElement.requestPointerLock();
@@ -1517,6 +1519,84 @@ addEventListener('touchend', e => {
 addEventListener('touchcancel', () => { joyId = lookId = null; joy.x = joy.y = 0; });
 addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
 
+// ===================================================================
+//  LLUVIA: gotas alrededor del jugador; no caen bajo techos ni pasadizos
+// ===================================================================
+let rainOn = true;
+const RG = { x0: -64, z0: -66, w: 124, h: 96 }, roofTop = new Float32Array(RG.w * RG.h).fill(-1);
+(function () {                                                    // altura del techo más alto sobre cada celda de 1 m
+  const surf = floors.filter(f => f.y >= 2.2).concat(roofs);
+  for (let iz = 0; iz < RG.h; iz++) for (let ix = 0; ix < RG.w; ix++) {
+    const x = RG.x0 + ix + 0.5, z = RG.z0 + iz + 0.5; let top = -1;
+    for (const f of surf) { if (f.y <= top) continue; const dx = x - f.x, dz = z - f.z, lx = dx * f.c - dz * f.s, lz = dx * f.s + dz * f.c; if (Math.abs(lx) <= f.hw && Math.abs(lz) <= f.hd) top = f.y; }
+    roofTop[iz * RG.w + ix] = top;
+  }
+})();
+const RAIN_N = isTouch0 ? 700 : 1500, RAIN_R = 22, RAIN_H = 22, RAIN_V = 14, RAIN_W = 1.2;
+const rainXYZ = new Float32Array(RAIN_N * 3), rainPos = new Float32Array(RAIN_N * 6);
+for (let i = 0; i < RAIN_N; i++) { rainXYZ[i * 3] = (Math.random() * 2 - 1) * RAIN_R; rainXYZ[i * 3 + 1] = Math.random() * RAIN_H; rainXYZ[i * 3 + 2] = (Math.random() * 2 - 1) * RAIN_R; }
+const rainGeo = new THREE.BufferGeometry(); rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPos, 3));
+const rain = new THREE.LineSegments(rainGeo, new THREE.LineBasicMaterial({ color: 0xc7d7ee, transparent: true, opacity: 0.45, depthWrite: false })); rain.frustumCulled = false; scene.add(rain);
+function updateRain(dt) {
+  rain.visible = rainOn; if (!rainOn) return;
+  const wrap = (v, c) => c + ((v - c + RAIN_R) % (2 * RAIN_R) + 2 * RAIN_R) % (2 * RAIN_R) - RAIN_R;
+  for (let i = 0; i < RAIN_N; i++) {
+    let x = rainXYZ[i * 3] + RAIN_W * dt, y = rainXYZ[i * 3 + 1] - RAIN_V * dt, z = rainXYZ[i * 3 + 2];
+    if (y < -1) y += RAIN_H; x = wrap(x, P.x); z = wrap(z, P.z);
+    rainXYZ[i * 3] = x; rainXYZ[i * 3 + 1] = y; rainXYZ[i * 3 + 2] = z;
+    const ix = Math.floor(x - RG.x0), iz = Math.floor(z - RG.z0), o = i * 6;
+    if (ix >= 0 && ix < RG.w && iz >= 0 && iz < RG.h && y < roofTop[iz * RG.w + ix]) { rainPos[o + 1] = rainPos[o + 4] = -100; continue; }   // bajo techo: no se ve
+    rainPos[o] = x; rainPos[o + 1] = y; rainPos[o + 2] = z; rainPos[o + 3] = x - RAIN_W * 0.04; rainPos[o + 4] = y + 0.6; rainPos[o + 5] = z;
+  }
+  rainGeo.attributes.position.needsUpdate = true;
+}
+const rainBtn = document.getElementById('rainBtn'), skyTop = sky.material.uniforms.top.value.clone(), skyMid = sky.material.uniforms.mid.value.clone();
+function setRain(on) {                                            // con lluvia el cielo se pone un poco gris
+  rainOn = on; rainBtn.textContent = '🌧️ Lluvia: ' + (on ? 'sí' : 'no');
+  sky.material.uniforms.top.value.copy(skyTop).lerp(new THREE.Color(0x8a9bb0), on ? 0.55 : 0);
+  sky.material.uniforms.mid.value.copy(skyMid).lerp(new THREE.Color(0xb3c0cf), on ? 0.55 : 0);
+  clouds.children.forEach(c => c.material.color.setHex(on ? 0xc4ccd6 : 0xffffff));
+}
+rainBtn.addEventListener('click', () => setRain(!rainOn)); setRain(true);
+
+// ===================================================================
+//  ESTUDIANTES en el patio (polo blanco y buzo celeste): caminan, juegan o están parados. Se ven a lo lejos, sin detalle
+// ===================================================================
+const kids = [];
+const KID_PARTS = [                                               // [ancho, alto, fondo, y, color]
+  [0.3, 0.42, 0.18, 0.21, 0x7dd3fc],     // pantalón del buzo (celeste)
+  [0.36, 0.42, 0.22, 0.63, 0xf8fafc],    // polo blanco
+  [0.24, 0.24, 0.24, 0.98, 0xe0b48f],    // cabeza
+  [0.26, 0.08, 0.26, 1.12, 0x2b2118]     // pelo
+];
+const kidMeshes = KID_PARTS.map(([w, h, d, , c]) => { const m = new THREE.InstancedMesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({ color: c }), 40); m.frustumCulled = false; scene.add(m); return m; });
+const armMesh = new THREE.InstancedMesh(new THREE.BoxGeometry(0.08, 0.36, 0.08), new THREE.MeshLambertMaterial({ color: 0x7dd3fc }), 80); armMesh.frustumCulled = false; scene.add(armMesh);
+(function () {
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const add = (k) => { k.ph = Math.random() * 6; k.s = rnd(0.85, 1.05); kids.push(k); };
+  for (let i = 0; i < 8; i++) add({ mode: 'walk', cx: rnd(-10, 6), cz: rnd(-19, -8), r: rnd(3, 7), w: rnd(0.12, 0.22) * (Math.random() < 0.5 ? -1 : 1) });   // caminan en la cancha
+  for (let i = 0; i < 6; i++) add({ mode: 'play', cx: -2 + Math.cos(i) * 2.5, cz: -13 + Math.sin(i * 1.7) * 3, r: rnd(1.2, 2.5), w: rnd(0.6, 1.0) });      // juegan (corren y saltan)
+  for (let i = 0; i < 6; i++) add({ mode: 'stand', x: rnd(-14, 10), z: rnd(-22, -5), yaw: rnd(0, 6.3) });                                               // parados conversando
+  for (let i = 0; i < 6; i++) add({ mode: 'walk', cx: rnd(26, 40), cz: rnd(-48, -32), r: rnd(3, 6), w: rnd(0.12, 0.2) });                               // patio de abajo
+  for (let i = 0; i < 4; i++) add({ mode: 'stand', x: rnd(24, 42), z: rnd(-50, -30), yaw: rnd(0, 6.3) });
+})();
+const kM = new THREE.Matrix4(), kQ = new THREE.Quaternion(), kE = new THREE.Euler(), kV = new THREE.Vector3(), kS = new THREE.Vector3();
+function updateKids(t) {
+  kids.forEach((k, i) => {
+    let x, z, yaw, hop = 0, swing = 0;
+    if (k.mode === 'stand') { x = k.x; z = k.z; yaw = k.yaw + Math.sin(t * 0.4 + k.ph) * 0.4; }
+    else { const a = t * k.w + k.ph; x = k.cx + Math.cos(a) * k.r; z = k.cz + Math.sin(a) * k.r; yaw = Math.atan2(-Math.sin(a) * Math.sign(k.w), Math.cos(a) * Math.sign(k.w)); swing = Math.sin(t * (k.mode === 'play' ? 11 : 6) + k.ph) * 0.5;
+      if (k.mode === 'play') hop = Math.max(0, Math.sin(t * 5 + k.ph)) * 0.25; }
+    const gy = groundY(x, z, 0.5) + hop;
+    KID_PARTS.forEach(([, , , py], j) => { kE.set(0, yaw, 0); kQ.setFromEuler(kE); kV.set(x, gy + py * k.s, z); kS.set(k.s, k.s, k.s); kM.compose(kV, kQ, kS); kidMeshes[j].setMatrixAt(i, kM); });
+    [-1, 1].forEach((sd, j) => {                                     // brazos que se balancean
+      kE.set(swing * sd, yaw, 0, 'YXZ'); kQ.setFromEuler(kE);
+      kV.set(x + Math.cos(yaw) * 0.22 * sd * k.s, gy + 0.66 * k.s, z - Math.sin(yaw) * 0.22 * sd * k.s); kS.set(k.s, k.s, k.s); kM.compose(kV, kQ, kS); armMesh.setMatrixAt(i * 2 + j, kM);
+    });
+  });
+  kidMeshes.forEach(m => { m.count = kids.length; m.instanceMatrix.needsUpdate = true; }); armMesh.count = kids.length * 2; armMesh.instanceMatrix.needsUpdate = true;
+}
+
 const roomLamp = new THREE.PointLight(0xfff4e0, 0, 8, 1.5); scene.add(roomLamp);
 function updateRoomLamp() {                                        // la luz del salón donde está el jugador
   let best = null, bd = 30;
@@ -1545,6 +1625,7 @@ function loop(now) {
   if (myLocker) myLocker.glow.material.opacity = 0.25 + 0.2 * Math.sin(now / 300);
   sky.position.copy(camera.position); const tNow = now / 1000; spinners.forEach(f => { if (f.on) f.b.rotation.z += Math.min(dt, 0.05) * 14; });
   sun.position.set(P.x + SUN_DIR.x * 120, SUN_DIR.y * 120, P.z + SUN_DIR.z * 120); sun.target.position.set(P.x, 0, P.z);
+  updateRain(Math.min(dt, 0.05)); updateKids(now / 1000);
   clouds.children.forEach(g => { g.position.x += g.userData.v * Math.min(dt, 0.1); if (g.position.x > 440) g.position.x = -440; });
   renderer.render(scene, camera);
 }

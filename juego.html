@@ -436,7 +436,6 @@ const xTopD = D.xc[0] - D.sw / 2;                 // x = -14.7
     [-0.8, 0.8].forEach(k => addSolid(x, 0, zst + k, 0.1, top, 0.1, 0, iron, false));
   });
   floorSlab(xTopD - 0.9, zsD, 1.8, 5.4, 0, FH);
-  [[xTopD - 1.7, zsD - 2.5], [xTopD - 0.1, zsD - 2.5], [xTopD - 1.7, zsD + 2.5], [xTopD - 0.1, zsD + 2.5]].forEach(([x, z]) => addSolid(x, 0, z, 0.12, FH - 0.2, 0.12, 0, iron, false));
   // barandas de fierro a ambos lados, siguiendo la pendiente de la escalera
   const xa = xTopD + n * run - 0.5 * run, xb = xTopD + 0.5 * run;
   [-0.88, 0.88].forEach(k => {

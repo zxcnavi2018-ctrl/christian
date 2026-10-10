@@ -9,6 +9,7 @@
   canvas { display: block; }
   #vig { position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, rgba(0,0,0,0) 52%, rgba(8,12,30,.38) 100%); }
   #rainBtn { position: fixed; top: 10px; right: 10px; background: rgba(15,23,42,.7); color: #fff; border: 1px solid rgba(255,255,255,.25); border-radius: 8px; padding: 6px 10px; font-size: 12px; z-index: 5; }
+  #fogBtn { position: fixed; top: 46px; right: 10px; background: rgba(15,23,42,.7); color: #fff; border: 1px solid rgba(255,255,255,.25); border-radius: 8px; padding: 6px 10px; font-size: 12px; z-index: 5; }
   #cross { position: fixed; top: 50%; left: 50%; width: 6px; height: 6px; margin: -3px; border-radius: 50%; background: rgba(255,255,255,.85); box-shadow: 0 0 2px #000; pointer-events: none; }
   #prompt { position: fixed; bottom: 26%; left: 50%; transform: translateX(-50%); background: rgba(15,23,42,.88); color: #fff; padding: 9px 16px; border-radius: 12px; font-size: 15px; font-weight: 600; display: none; pointer-events: none; white-space: nowrap; }
   #hud { position: fixed; top: 10px; left: 10px; color: #fff; background: rgba(15,23,42,.7); padding: 6px 10px; border-radius: 8px; font-size: 12px; pointer-events: none; }
@@ -30,6 +31,7 @@
 <div id="prompt"></div>
 <div id="hud">Innova Schools Tacna</div>
 <button id="rainBtn">Lluvia: sí</button>
+<button id="fogBtn">Neblina: sí</button>
 <div id="joy"><div id="knob"></div></div>
 <button class="btn" id="useBtn">ABRIR</button>
 <button class="btn" id="jumpBtn">SALTAR</button>
@@ -54,7 +56,7 @@ const doors = [];       // puertas interactivas
 const roofs = [];       // techos (losas superiores) para la lluvia
 
 const isTouch0 = matchMedia('(pointer:coarse)').matches || 'ontouchstart' in window;
-const SKY_HORIZON = 0x7088b2;                                          // horizonte azul claro del anochecer
+const SKY_HORIZON = 0x8895ae;                                          // horizonte azul grisáceo (se funde con la neblina)
 const SUN_DIR = new THREE.Vector3(-0.72, 0.30, 0.45).normalize();      // luz baja del oeste (de tarde)
 const SUN_VIS = new THREE.Vector3(-0.30, 0.20, -0.93).normalize();     // sol bajo dibujado en el cielo (visible al aparecer, mirando al norte)
 const scene = new THREE.Scene();
@@ -834,6 +836,31 @@ function toggleRain() { rainOn = !rainOn; rainBtn.textContent = 'Lluvia: ' + (ra
 rainBtn.addEventListener('click', toggleRain);
 
 // ===================================================================
+//  NEBLINA: bruma espesa a distancia + neblina baja que se desplaza sobre el piso
+// ===================================================================
+let fogOn = true;
+const mist = new THREE.Group(); scene.add(mist);
+(function () {
+  const c = document.createElement('canvas'); c.width = c.height = 128;
+  const g = c.getContext('2d'), gr = g.createRadialGradient(64, 64, 2, 64, 64, 62);
+  gr.addColorStop(0, 'rgba(200,210,225,0.9)'); gr.addColorStop(0.55, 'rgba(190,200,218,0.35)'); gr.addColorStop(1, 'rgba(180,190,210,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, 128, 128);
+  const tex = new THREE.CanvasTexture(c), N = isTouch0 ? 16 : 40;
+  for (let i = 0; i < N; i++) {
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, fog: false, opacity: 0.18 + Math.random() * 0.1 }));
+    const sz = 24 + Math.random() * 18; sp.scale.set(sz, sz * 0.4, 1);
+    sp.position.set(-70 + Math.random() * 130, 1.2 + Math.random() * 2.6, -70 + Math.random() * 115); sp.userData.v = 0.3 + Math.random() * 0.6; mist.add(sp);
+  }
+})();
+const fogBtn = document.getElementById('fogBtn');
+function applyFog() {
+  scene.fog.near = fogOn ? 5 : 90; scene.fog.far = fogOn ? 82 : 360; mist.visible = fogOn;
+  fogBtn.textContent = 'Neblina: ' + (fogOn ? 'sí' : 'no');
+}
+function toggleFog() { fogOn = !fogOn; applyFog(); }
+fogBtn.addEventListener('click', toggleFog); applyFog();
+
+// ===================================================================
 //  INSTANCIAS (todo el muro/piso en pocos draw calls)
 // ===================================================================
 function buildInstanced(items, material, geo, cast = true) {
@@ -963,7 +990,7 @@ document.getElementById('go').addEventListener('click', () => {
   else renderer.domElement.requestPointerLock && renderer.domElement.requestPointerLock();
 });
 renderer.domElement.addEventListener('click', () => { if (!isTouch && P.started) renderer.domElement.requestPointerLock && renderer.domElement.requestPointerLock(); });
-addEventListener('keydown', e => { keys[e.code] = true; if (e.code === 'KeyE') wantUse = true; if (e.code === 'KeyR') toggleRain(); if (e.code === 'Space') { wantJump = true; e.preventDefault(); } });
+addEventListener('keydown', e => { keys[e.code] = true; if (e.code === 'KeyE') wantUse = true; if (e.code === 'KeyR') toggleRain(); if (e.code === 'KeyN') toggleFog(); if (e.code === 'Space') { wantJump = true; e.preventDefault(); } });
 addEventListener('keyup', e => { keys[e.code] = false; });
 addEventListener('mousemove', e => {
   if (document.pointerLockElement !== renderer.domElement) return;
@@ -983,6 +1010,7 @@ addEventListener('touchstart', e => {
   for (const t of e.changedTouches) {
     if (inEl(joyEl, t) && joyId === null) { joyId = t.identifier; joyMove(t); }
     else if (inEl(rainBtn, t)) { /* botón de lluvia: lo atiende su click */ }
+    else if (inEl(fogBtn, t)) { /* botón de neblina: lo atiende su click */ }
     else if (inEl(document.getElementById('useBtn'), t)) wantUse = true;
     else if (inEl(document.getElementById('jumpBtn'), t)) wantJump = true;
     else if (lookId === null) { lookId = t.identifier; lastX = t.clientX; lastY = t.clientY; }
@@ -1018,6 +1046,7 @@ function loop(now) {
   updateRain(Math.min(dt, 0.05));
   sky.position.copy(camera.position); const tNow = now / 1000; updateLamps(tNow); updateLampLights(tNow);
   sun.position.set(P.x + SUN_DIR.x * 120, SUN_DIR.y * 120, P.z + SUN_DIR.z * 120); sun.target.position.set(P.x, 0, P.z);
+  mist.children.forEach(m => { m.position.x += m.userData.v * Math.min(dt, 0.1); if (m.position.x > 62) m.position.x = -72; });
   clouds.children.forEach(g => { g.position.x += g.userData.v * Math.min(dt, 0.1); if (g.position.x > 440) g.position.x = -440; });
   renderer.render(scene, camera);
 }

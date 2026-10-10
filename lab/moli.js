@@ -14,7 +14,7 @@ const HELP={
  'ecosistemas.html':['Elige un lugar del Perú en tu <b>pasaporte</b>.','Mira lo que brilla y decide: ¿<b>tiene vida</b> (biótico) o <b>no tiene vida</b> (abiótico)?','Lee las <b>pistas</b> y elige el tipo: terrestre, acuático o mixto.','Responde la pregunta para <b>pensar</b> y gana el sello.'],
  'agua.html':['Elige un <b>experimento</b> arriba.','Arrastra o toca los objetos para usarlos en la mesa.','Observa qué pasa y lee la explicación.','Cada experimento logrado completa una misión.'],
  'energia.html':['<b>Arrastra al skater</b> hacia arriba por la rampa y suéltalo.','Mira las barras: arriba hay más energía <b>potencial</b>; abajo, más energía <b>cinética</b>.','Prueba <b>con y sin fricción</b> y con distinta masa.','Toca <b>🎯 Reto</b>, predice hasta dónde llegará y comprueba.'],
- 'gravedad.html':['Suelta objetos y mira cómo los atrae la <b>gravedad</b>.','Cambia de planeta: la gravedad no es igual en todos.','Prueba con el aire y sin aire.']
+ 'gravedad.html':['Elige un experimento arriba: <b>caída libre</b>, <b>planetas</b> u <b>órbita</b>.','En caída libre, suelta dos objetos <b>con aire</b> y <b>sin aire</b>: ¿cuál llega primero?','Salta en distintos planetas y mira la <b>báscula</b>.','Lanza la bala cada vez más rápido hasta ponerla en <b>órbita</b>.']
 };
 const page=(location.pathname.split('/').pop()||'').toLowerCase(),steps=HELP[page];
 const col=document.createElement('div');col.className='moli-col';p.parentNode.insertBefore(col,p);col.appendChild(p);

@@ -129,17 +129,17 @@ label('PABELLÓN B', B.x, 3 * FH + 1.2, B.z0 + 3.5 * B.sw, 3, '#fff', 'rgba(0,11
 // pasadizos (corredores) pegados a B en pisos 2 y 3 + escalera
 const bFace = B.x + B.depth / 2;                // x = -21
 const railMat = new THREE.MeshLambertMaterial({ color: 0x334155 });
-[1, 2].forEach(f => {
-  flat(1.8, 13, bFace + 0.9, 0.5, 0xa8b3c4, f * FH - 0.1, 0.2);        // z de -6 a 7
-  const r = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 13), railMat);
-  r.position.set(bFace + 1.75, f * FH + 1.0, 0.5); scene.add(r);
-});
 (function stairs() {
   const n = 11, rise = FH / n, run = 0.29;
   for (let i = 0; i < n; i++) {
     const h = (i + 1) * rise;
     const st = new THREE.Mesh(new THREE.BoxGeometry(1.8, h, run), new THREE.MeshLambertMaterial({ color: 0x94a3b8 }));
     st.position.set(bFace + 0.9, h / 2, 10.2 - (i + 0.5) * run);
+    scene.add(st);
+  }
+  for (let i = 0; i < n; i++) {   // segundo tramo: piso 2 -> piso 3
+    const st = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.2, run), new THREE.MeshLambertMaterial({ color: 0xcbd5e1 }));
+    st.position.set(bFace + 0.9, FH + (i + 1) * rise - 0.1, 7 + (i + 0.5) * run);
     scene.add(st);
   }
   label('ESCALERA', bFace + 0.9, FH + 1.4, 9.5, 1.2, '#111', 'rgba(250,204,21,.95)');
@@ -190,6 +190,31 @@ F_ROWS.forEach((row, f) => row.forEach((r, i) => {
   room(r[0], r[1], F.x + lx * Math.cos(F.rot), f, F.z - lx * Math.sin(F.rot), F.sw - 0.15, F.depth - 0.2, { rot: F.rot, side: 'z' });
 }));
 label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
+
+// ================= PASADIZOS (pisos 2 y 3) =================
+// walkway: losa de 1.8 m de ancho + baranda. lx/lz = centro local respecto a (ox, oz), rot = giro del pabellón,
+// outer = lado de la baranda (+1 / -1 sobre el eje local z)
+function walkway(ox, oz, lx, lz, len, rot, floor, outer) {
+  const c = Math.cos(rot), sn = Math.sin(rot);
+  const wx = ox + lx * c + lz * sn, wz = oz - lx * sn + lz * c;
+  const slab = new THREE.Mesh(new THREE.BoxGeometry(len, 0.2, 1.8), new THREE.MeshLambertMaterial({ color: 0xa8b3c4 }));
+  slab.position.set(wx, floor * FH - 0.1, wz); slab.rotation.y = rot; scene.add(slab);
+  const ro = outer * 0.87;
+  const rail = new THREE.Mesh(new THREE.BoxGeometry(len, 0.06, 0.06), new THREE.MeshLambertMaterial({ color: 0x334155 }));
+  rail.position.set(wx + ro * sn, floor * FH + 1.0, wz + ro * c); rail.rotation.y = rot; scene.add(rail);
+}
+// B: cara hacia el patio (+x). Piso 2 hasta la escalera (z=7), piso 3 hasta z=12
+walkway(bFace + 0.9, -11.5, 0, 0, 37, Math.PI / 2, 1, +1);
+walkway(bFace + 0.9, -9, 0, 0, 42, Math.PI / 2, 2, +1);
+// D: cara hacia el patio (-z)
+[1, 2].forEach(f => walkway(-8.7, D.zc - D.depth / 2 - 0.9, 0, 0, 12, 0, f, -1));
+// E: cara hacia el patio (+z)
+[1, 2].forEach(f => walkway(0, E.zc + E.depth / 2 + 0.9, 0, 0, 24, 0, f, +1));
+// A: frente al 5C (piso 2)
+walkway(A.xc[0], A.zc + A.depth / 2 + 0.9, 0, 0, 6, 0, 1, +1);
+// F: cara hacia el patio (-z local). Piso 2 completo, piso 3 solo frente a 4A y 4B
+walkway(F.x, F.z, 0, -(F.depth / 2 + 0.9), 27.5, F.rot, 1, -1);
+walkway(F.x, F.z, 8.25, -(F.depth / 2 + 0.9), 11, F.rot, 2, -1);
 
 // ================= PABELLÓN C: lobby en L con puertas de vidrio =================
 room('', 'lab', -24, 0, 17.25, 14, 7.5);          // cuerpo principal x -31..-17, z 13.5..21

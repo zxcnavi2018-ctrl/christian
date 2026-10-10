@@ -185,7 +185,7 @@ const TOON_GRAD = (function () {                                       // 3 band
 })();
 const toon = (color, o = {}) => new THREE.MeshToonMaterial(Object.assign({ color, gradientMap: TOON_GRAD }, o));
 const INK = '#2b2547';                                                 // color de la tinta (contornos y líneas de los dibujos)
-const animHooks = [];                                                  // cosas que se mueven solas (cohetes, banderines, polvito de luz)
+const animHooks = [];                                                  // cosas que se mueven solas (cohetes y polvito de luz)
 function rrect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
 
 // cielo con degradado y disco solar
@@ -338,7 +338,7 @@ function buildWall(ox, oz, rot, lx, lz, axis, len, y0, ops, color, o = {}) {
         const grp = new THREE.Group();
         grp.position.set(cx - nw[0] * 0.06, y0 + oy0, cz - nw[1] * 0.06); grp.rotation.y = axis === 'x' ? rot : rot - Math.PI / 2;
         const pane = new THREE.Mesh(new THREE.BoxGeometry(hw2 - 0.02, oy1 - oy0 - 0.02, 0.03), glassDoorMat); pane.position.y = (oy1 - oy0) / 2; grp.add(pane);
-        const fm = new THREE.MeshLambertMaterial({ color: 0x374151 }), ph = oy1 - oy0;
+        const fm = new THREE.MeshLambertMaterial({ color: 0xa7b0bb }), ph = oy1 - oy0;
         [[hw2, 0.05, 0, 0.025], [hw2, 0.05, 0, ph - 0.025], [0.05, ph, -hw2 / 2 + 0.025, ph / 2], [0.05, ph, hw2 / 2 - 0.025, ph / 2]].forEach(([bw, bh, bx, by]) => {
           const bar = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, 0.04), fm); bar.position.set(bx, by, 0); grp.add(bar);
         });
@@ -350,7 +350,7 @@ function buildWall(ox, oz, rot, lx, lz, axis, len, y0, ops, color, o = {}) {
       const fr = (u0, u1, ya, yb) => {
         const um = (u0 + u1) / 2, l = u1 - u0, th = t + 0.08;
         const [wx, wz] = lw(ox, oz, rot, axis === 'x' ? lx + um : lx, axis === 'x' ? lz : lz + um);
-        addSolid(wx, y0 + ya, wz, axis === 'x' ? l : th, yb - ya, axis === 'x' ? th : l, rot, 0x374151, false);
+        addSolid(wx, y0 + ya, wz, axis === 'x' ? l : th, yb - ya, axis === 'x' ? th : l, rot, 0xa7b0bb, false);   // marco de aluminio
       };
       fr(a, b, Math.max(0, oy0 - 0.06), oy0 + 0.05); fr(a, b, oy1 - 0.05, oy1 + 0.06);
       fr(a - 0.04, a + 0.04, oy0, oy1); fr(b - 0.04, b + 0.04, oy0, oy1);
@@ -367,7 +367,7 @@ function buildWall(ox, oz, rot, lx, lz, axis, len, y0, ops, color, o = {}) {
       const grp = new THREE.Group();
       grp.position.set(cx + nw[0] * 0.09, y0 + 0.02, cz + nw[1] * 0.09); grp.rotation.y = axis === 'x' ? rot : rot - Math.PI / 2;
       const pane = new THREE.Mesh(new THREE.BoxGeometry(pw, hh, 0.03), glassDoorMat); pane.position.y = hh / 2; grp.add(pane);
-      const fm = new THREE.MeshLambertMaterial({ color: 0x374151 });
+      const fm = new THREE.MeshLambertMaterial({ color: 0xa7b0bb });
       [[pw, 0.07, 0, 0.035], [pw, 0.07, 0, hh - 0.035], [0.07, hh, -pw / 2 + 0.035, hh / 2], [0.07, hh, pw / 2 - 0.035, hh / 2]].forEach(([bw, bh, bx, by]) => {
         const bar = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, 0.05), fm); bar.position.set(bx, by, 0); grp.add(bar);
       });
@@ -492,13 +492,14 @@ function makeBookLike(col, label, paperCol, w, d, th) {            // tapa de at
 }
 const makeNotebook = () => makeBookLike(0x16a34a, 'MI CUADERNO', 0xf8fafc, 0.21, 0.29, 0.014);
 const makeFolder = (col, paper, label) => makeBookLike(col, label, paper, 0.24, 0.32, 0.01);
+const LID_CLOSED = Math.PI / 2 - 0.015, LID_OPEN = -0.28;
 function makeLaptop() {                                            // base con teclado + tapa con bisagra; la pantalla se prende
   const g = new THREE.Group(), body = toon(0x9ca3af), dark = toon(0x374151);
   const kb = (function () { const c = document.createElement('canvas'); c.width = 256; c.height = 180; const x = c.getContext('2d'); x.fillStyle = '#9ca3af'; x.fillRect(0, 0, 256, 180);
     x.fillStyle = '#1f2937'; for (let r = 0; r < 5; r++) for (let q = 0; q < 13; q++) x.fillRect(14 + q * 18, 14 + r * 18, 14, 14); x.fillRect(60, 14 + 5 * 18, 136, 12);
     x.fillStyle = '#b8bec8'; x.fillRect(88, 128, 80, 44); x.strokeStyle = '#6b7280'; x.lineWidth = 2; x.strokeRect(88, 128, 80, 44); return new THREE.CanvasTexture(c); })();
   const base = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.018, 0.24), [body, body, toon(0xffffff, { map: kb }), body, body, body]); base.position.y = 0.009; g.add(base);
-  const hinge = new THREE.Group(); hinge.position.set(0, 0.018, -0.12); hinge.rotation.x = -0.28; g.add(hinge);
+  const hinge = new THREE.Group(); hinge.position.set(0, 0.018, -0.12); hinge.rotation.x = LID_CLOSED; g.add(hinge);   // empieza cerrada
   const lid = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.23, 0.012), body); lid.position.set(0, 0.115, -0.006); hinge.add(lid);
   const bez = new THREE.Mesh(new THREE.PlaneGeometry(0.32, 0.205), new THREE.MeshBasicMaterial({ color: 0x111827 })); bez.position.set(0, 0.116, 0.0005); hinge.add(bez);
   const scr = new THREE.Mesh(new THREE.PlaneGeometry(0.296, 0.18), new THREE.MeshBasicMaterial({ color: 0x0b1220 })); scr.position.set(0, 0.118, 0.001); hinge.add(scr);
@@ -690,11 +691,11 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
           put(ac, yc + h / 2 - 0.02, -0.26, w, 0.02, 0.48, dim(col, 0.66));                      // techo del hueco (en sombra)
           put(ac, yc - h / 2, -0.26, w, 0.02, 0.48, HEX(col));                                    // piso del hueco (con luz)
         }
-        for (let q = 0; q <= 13; q++) put(-LL / 2 + q * cwl, fy + 0.07, -0.03, 0.05, 1.42, 0.06, 0xeef2f7);   // marco: parantes
-        [0, 0.7, 1.4].forEach(dy => put(0, fy + 0.07 + dy - 0.025 + (dy ? 0 : 0.025), -0.03, LL + 0.05, 0.05, 0.06, 0xeef2f7));   // marco: travesaños
-        put(0, fy + 1.49, -0.27, LL + 0.1, 0.04, 0.56, 0xeef2f7);                                   // tapa de arriba
-        put(0, fy, -0.27, LL + 0.05, 0.07, 0.5, 0x64748b);                                          // zócalo
-        put(-LL / 2 - 0.035, fy, -0.27, 0.02, 1.53, 0.54, 0xeef2f7); put(LL / 2 + 0.035, fy, -0.27, 0.02, 1.53, 0.54, 0xeef2f7);   // laterales
+        for (let q = 0; q <= 13; q++) put(-LL / 2 + q * cwl, fy + 0.07, -0.03, 0.05, 1.42, 0.06, 0x8b5a2b);   // marco: parantes
+        [0, 0.7, 1.4].forEach(dy => put(0, fy + 0.07 + dy - 0.025 + (dy ? 0 : 0.025), -0.03, LL + 0.05, 0.05, 0.06, 0x8b5a2b));   // marco: travesaños
+        put(0, fy + 1.49, -0.27, LL + 0.1, 0.04, 0.56, 0x9a6634);                                   // tapa de arriba
+        put(0, fy, -0.27, LL + 0.05, 0.07, 0.5, 0x5c3a1e);                                          // zócalo
+        put(-LL / 2 - 0.035, fy, -0.27, 0.02, 1.53, 0.54, 0x8b5a2b); put(LL / 2 + 0.035, fy, -0.27, 0.02, 1.53, 0.54, 0x8b5a2b);   // laterales
       }
       const th = pl.rotation.y;
       const cork = new THREE.Mesh(new THREE.PlaneGeometry(LL, 1.22), new THREE.MeshLambertMaterial({ map: corkTex(LL), polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));   // mural de corcho encima de los lockers
@@ -718,7 +719,7 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
     // junto a la ventana: mesita rectangular mediana con laptop, parlante y su silla
     { const wu = 0.2, ws = 0.32;
       boxAt(wu, ws, 0, 1.0, 0.7, 0.52, 0xd6d3d1, true); boxAt(wu, ws, 0.7, 1.08, 0.04, 0.58, 0xf5f5f4, false);
-      { const [lx2, lz2] = P(wu - 0.12, ws + 0.02), lp = makeLaptop(); lp.position.set(lx2, fy + 0.72, lz2); lp.rotation.y = Math.atan2(svec[0], svec[1]); scene.add(lp);
+      { const [lx2, lz2] = P(wu - 0.12, ws + 0.02), lp = makeLaptop(); lp.position.set(lx2, fy + 0.74, lz2); lp.rotation.y = Math.atan2(svec[0], svec[1]); scene.add(lp);
         const [cx3, cz3] = P(wu - 0.12, ws + 0.85); F6.laptop = { obj: lp, look: new THREE.Vector3(lx2, fy + 0.86, lz2), from: new THREE.Vector3(cx3, fy + 1.25, cz3) }; }
       boxAt(wu + 0.32, ws - 0.02, 0.74, 0.14, 0.22, 0.14, 0x1f2937, false);              // parlante
       boxAt(wu + 0.32, ws + 0.055, 0.81, 0.08, 0.08, 0.01, 0x6b7280, false);
@@ -830,7 +831,7 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
 
 // ---- aula hueca con puerta y ventanas grandes ----
 function room(name, level, cx, fl, cz, w, d, o = {}) {
-  const rot = o.rot || 0, door = o.door || '+x', yo = o.yo || 0, y0 = fl * FH + yo, col = name === '6B' ? 0xf3ebdc : 0xc9cbce;   // paredes en gris (el 6B en crema, estilo anime)
+  const rot = o.rot || 0, door = o.door || '+x', yo = o.yo || 0, y0 = fl * FH + yo, col = name === '6B' ? 0xd3d6da : 0xc9cbce;   // paredes en gris claro
   const opp = (door[0] === '+' ? '-' : '+') + door[1];
   ROOMINFO[name] = { cx, cz, y0 };
   const kind = o.kind || ((level === 'inicial' || level === 'primaria' || level === 'secundaria') ? 'class' : level);
@@ -1894,7 +1895,7 @@ requestAnimationFrame(loop);
 })();
 // ===================================================================
 //  ESTILO ANIME: sombreado por bandas, contornos de tinta, piso de madera, techo de baldosas,
-//  polvito de luz flotando, banderines y cohetes que se balancean con el aire de los ventiladores
+//  polvito de luz flotando y cohetes que se balancean con el aire de los ventiladores
 // ===================================================================
 function inkMat(boxMode) {                                         // contorno "casco invertido": la cara de atrás, un poquito inflada, en tinta
   const m = new THREE.MeshBasicMaterial({ color: INK, side: THREE.BackSide });
@@ -1933,10 +1934,10 @@ function addInk(o) {
   { const v = new THREE.Vector3(), only6B = (arr, f) => { const k = arr.filter(o => { f(o).getWorldPosition(v); return in6B(v.x, v.y, v.z); }); arr.length = 0; k.forEach(o => arr.push(o)); };
     only6B(spinners, f => f.head); only6B(rockets, r => r.piv); }        // sólo los ventiladores y cohetes del 6B (los otros sextos ya no están)
   // luces: más claras y cálidas; una luz principal sin sombra para que se noten las bandas del cel shading
-  scene.children.forEach(o => { if (o.isHemisphereLight) { o.color.setHex(0xffffff); o.groundColor.setHex(0xe4ded4); o.intensity = 0.4; } else if (o.isAmbientLight) o.intensity = 0.1; });
+  scene.children.forEach(o => { if (o.isHemisphereLight) { o.color.setHex(0xffffff); o.groundColor.setHex(0xdcdfe3); o.intensity = 0.4; } else if (o.isAmbientLight) o.intensity = 0.1; });
   renderer.shadowMap.enabled = false; sun.castShadow = false; sun.intensity = 0.28;   // sin sombras del sol (dejaban una franja dentada arriba de las paredes): igual en PC y celular
-  const key = new THREE.DirectionalLight(0xfff4e2, 0.32); key.position.set(R6.cx + 6, FY + 9, R6.cz + 4); key.target.position.set(R6.cx, FY, R6.cz); scene.add(key); scene.add(key.target);
-  roomLamp.color.setHex(0xfff0d8);
+  const key = new THREE.DirectionalLight(0xffffff, 0.32); key.position.set(R6.cx + 6, FY + 9, R6.cz + 4); key.target.position.set(R6.cx, FY, R6.cz); scene.add(key); scene.add(key.target);
+  roomLamp.color.setHex(0xf4f8ff);
   // todo lo Lambert pasa a Toon (los materiales compartidos siguen compartidos)
   const swap = new Map(), conv = m => {
     if (!m || !m.isMeshLambertMaterial) return m; if (swap.has(m)) return swap.get(m);
@@ -1946,18 +1947,14 @@ function addInk(o) {
   const all = []; scene.traverse(o => { if (o.isMesh) all.push(o); });
   all.forEach(o => { o.material = Array.isArray(o.material) ? o.material.map(conv) : conv(o.material); });
   all.forEach(addInk);                                                // contornos de tinta en todo lo que tiene volumen
-  // piso de madera clara (tablones)
+  // piso de losetas gris claro (no tan clarito), con juntas finas y pintitas
   const wood = (function () {
-    const c = document.createElement('canvas'); c.width = c.height = 512; const g = c.getContext('2d'), pal = ['#ecc895', '#e4bd86', '#f1d1a1', '#ddb47c', '#e9c38e'];
-    const n = 8, h = 512 / n;
-    for (let i = 0; i < n; i++) {
-      let x = -((i * 173) % 300);
-      while (x < 512) { const len = 220 + ((i * 37 + x) % 140); g.fillStyle = pal[(i * 3 + Math.abs(x)) % pal.length]; g.fillRect(x, i * h, len, h);
-        for (let k = 0; k < 6; k++) { g.fillStyle = 'rgba(150,95,45,' + (0.06 + Math.random() * 0.08) + ')'; g.fillRect(x + Math.random() * len, i * h + 6 + Math.random() * (h - 12), 30 + Math.random() * 90, 1.5); }
-        g.fillStyle = 'rgba(120,75,35,.55)'; g.fillRect(x + len - 2, i * h, 2, h); x += len; }
-      g.fillStyle = 'rgba(120,75,35,.6)'; g.fillRect(0, i * h + h - 2, 512, 2); g.fillStyle = 'rgba(255,240,215,.35)'; g.fillRect(0, i * h, 512, 2);
-    }
-    const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8; t.repeat.set((X1 - X0) / 1.6, (Z1 - Z0) / 1.6); return t;
+    const c = document.createElement('canvas'); c.width = c.height = 512; const g = c.getContext('2d'), tones = ['#91969c', '#8d9298', '#959aa0', '#8f949a'];
+    for (let i = 0; i < 2; i++) for (let j = 0; j < 2; j++) { g.fillStyle = tones[i * 2 + j]; g.fillRect(i * 256, j * 256, 256, 256); }
+    for (let k = 0; k < 5000; k++) { g.fillStyle = Math.random() < 0.5 ? 'rgba(255,255,255,' + Math.random() * 0.18 + ')' : 'rgba(60,64,70,' + Math.random() * 0.14 + ')'; g.fillRect(Math.random() * 512, Math.random() * 512, 1 + Math.random() * 2, 1 + Math.random() * 2); }
+    g.fillStyle = '#6c7279'; [0, 256].forEach(v => { g.fillRect(v, 0, 3, 512); g.fillRect(0, v, 512, 3); });
+    g.fillStyle = 'rgba(255,255,255,.25)'; [3, 259].forEach(v => { g.fillRect(v, 0, 1, 512); g.fillRect(0, v, 512, 1); });
+    const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8; t.repeat.set((X1 - X0) / 1.2, (Z1 - Z0) / 1.2); return t;
   })();
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(X1 - X0, Z1 - Z0), toon(0xffffff, { map: wood, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
   floor.rotation.x = -Math.PI / 2; floor.rotation.z = Math.PI / 2; floor.position.set(R6.cx, FY + 0.004, R6.cz); floor.receiveShadow = true; scene.add(floor);
@@ -2034,9 +2031,11 @@ const STOPS = [
     async enter() { const W = this.obj, b = this.base, o = this.out; await tween(750, k => W.position.lerpVectors(b, o, k)); await hingeTo(this.folder, 1.2, 450); await expand('folder', W); },
     async leave() { const W = this.obj, b = this.base, o = this.out; await shrink(W); await hingeTo(this.folder, 0, 350); await tween(650, k => W.position.lerpVectors(o, b, k)); } },
   { name: '💻 La laptop', ...FOCUS.laptop,
-    async enter() { const sc = this.obj.userData.screen.material.color, c0 = new THREE.Color(0x0b1220), c1 = new THREE.Color(0x3b82f6), c2 = new THREE.Color(0xf8fbff);
+    async enter() { const sc = this.obj.userData.screen.material.color, c0 = new THREE.Color(0x0b1220), c1 = new THREE.Color(0x3b82f6), c2 = new THREE.Color(0xf8fbff), h = this.obj.userData.hinge;
+      await tween(900, k => { h.rotation.x = LID_CLOSED + (LID_OPEN - LID_CLOSED) * k; });          // se abre la tapa
       await tween(350, k => sc.copy(c0).lerp(c1, k)); await tween(450, k => sc.copy(c1).lerp(c2, k)); await expand('laptop', this.obj.userData.screen); },
-    async leave() { const sc = this.obj.userData.screen.material.color, c0 = sc.clone(), c1 = new THREE.Color(0x0b1220); await shrink(this.obj.userData.screen); await tween(300, k => sc.copy(c0).lerp(c1, k)); } },
+    async leave() { const sc = this.obj.userData.screen.material.color, c0 = sc.clone(), c1 = new THREE.Color(0x0b1220); await shrink(this.obj.userData.screen); await tween(300, k => sc.copy(c0).lerp(c1, k));
+      const h = this.obj.userData.hinge; await tween(700, k => { h.rotation.x = LID_OPEN + (LID_CLOSED - LID_OPEN) * k; }); } },   // se apaga y se cierra
   { name: '📌 El corcho', ...FOCUS.corcho },
   { name: '📂 Mesa del profesor', ...FOCUS.docente,
     async enter() { await hingeTo(this.obj, Math.PI * 0.985, 700); await expand('docente', this.obj); },

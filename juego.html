@@ -48,9 +48,9 @@ const colliders = [];   // OBB: {x,z,hw,hd,c,s,R,y0,y1,on}
 const floors = [];      // superficies caminables: {x,z,hw,hd,c,s,y}
 const doors = [];       // puertas interactivas
 const roofs = [];       // techos (losas superiores) para la lluvia
-const F = { x: 28.36, z: -4.09, rot: 0.44, sw: 9, depth: 8, yo: 0 };   // pabellón F (diagonal); 2D, 3A y 3B al nivel del patio
-// DESNIVEL: desde la esquina de 2A (pabellón E) hasta el límite 3B|3C de F bajan 5 gradas; 3C, 3D y el patio de ese lado quedan más abajo
-const DROP = 0.75;
+const F = { x: 28.36, z: -4.09, rot: 0.44, sw: 9, depth: 8, yo: 0.6 };   // pabellón F (diagonal): planta baja al nivel del patio; sus pisos de arriba van 0,6 m más altos que D (3 graditas en el puente D-F)
+// DESNIVEL: desde la esquina de 2A (pabellón E) hasta el límite 3B|3C de F bajan 6 gradas; 3C, 3D y el patio de ese lado quedan más abajo
+const DROP = 0.9;
 const LOW = [[18, -31.2], lw(F.x, F.z, F.rot, 4.5, -4), lw(F.x, F.z, F.rot, 4.5, 4), lw(F.x, F.z, F.rot, 22.5, 4),
   [51.8, lw(F.x, F.z, F.rot, 22.5, 4)[1]], [51.8, -59.8], [18, -59.8]];
 function inPoly(x, z, poly) {
@@ -215,12 +215,29 @@ function buildWall(ox, oz, rot, lx, lz, axis, len, y0, ops, color, o = {}) {
   for (const op of ops) {
     const a = op.u - op.w / 2, b = op.u + op.w / 2;
     mk(cur, a, 0, h);
-    const isWin = op.type === 'window' || op.type === 'fglass', full = op.type === 'fglass';
+    const isWin = op.type === 'window' || op.type === 'fglass' || op.type === 'swin', full = op.type === 'fglass';
     const oy0 = isWin ? (full ? 0 : (op.y0 ?? 0.9)) : 0, oy1 = isWin ? (full ? 2.9 : 2.5) : DOOR_H;
     if (oy0 > 0) mk(a, b, 0, oy0);
     if (oy1 < h) mk(a, b, oy1, h);
     if (isWin) {
-      mk(a, b, oy0, oy1, true);
+      if (op.type === 'swin') {                                         // ventana corrediza: una hoja fija y otra que se abre / cierra
+        const um = (a + b) / 2, hw2 = um - a, uc = (a + um) / 2;
+        mk(um, b, oy0, oy1, true);
+        const n = o.normal || [0, 1];
+        const nw = [n[0] * Math.cos(rot) + n[1] * Math.sin(rot), -n[0] * Math.sin(rot) + n[1] * Math.cos(rot)];
+        const tg = axis === 'x' ? [Math.cos(rot), -Math.sin(rot)] : [Math.sin(rot), Math.cos(rot)];
+        const [cx, cz] = lw(ox, oz, rot, axis === 'x' ? lx + uc : lx, axis === 'x' ? lz : lz + uc);
+        const grp = new THREE.Group();
+        grp.position.set(cx - nw[0] * 0.06, y0 + oy0, cz - nw[1] * 0.06); grp.rotation.y = axis === 'x' ? rot : rot - Math.PI / 2;
+        const pane = new THREE.Mesh(new THREE.BoxGeometry(hw2 - 0.02, oy1 - oy0 - 0.02, 0.03), glassDoorMat); pane.position.y = (oy1 - oy0) / 2; grp.add(pane);
+        const fm = new THREE.MeshLambertMaterial({ color: 0x374151 }), ph = oy1 - oy0;
+        [[hw2, 0.05, 0, 0.025], [hw2, 0.05, 0, ph - 0.025], [0.05, ph, -hw2 / 2 + 0.025, ph / 2], [0.05, ph, hw2 / 2 - 0.025, ph / 2]].forEach(([bw, bh, bx, by]) => {
+          const bar = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, 0.04), fm); bar.position.set(bx, by, 0); grp.add(bar);
+        });
+        scene.add(grp);
+        const col = addCollider(cx, cz, axis === 'x' ? hw2 : 0.2, axis === 'x' ? 0.2 : hw2, rot, y0 + oy0, y0 + oy1);
+        registerDoor(op.name || 'Ventana', cx, cz, y0, [{ slide: true, pivot: grp, bx: grp.position.x, by: grp.position.y, bz: grp.position.z, dx: tg[0], dz: tg[1], dist: hw2 - 0.05 }], col, 1);
+      } else mk(a, b, oy0, oy1, true);
       // marco de aluminio + travesaños verticales (más notorio que el vidrio solo)
       const fr = (u0, u1, ya, yb) => {
         const um = (u0 + u1) / 2, l = u1 - u0, th = t + 0.08;
@@ -278,7 +295,14 @@ function buildWall(ox, oz, rot, lx, lz, axis, len, y0, ops, color, o = {}) {
 }
 
 // ---- mobiliario (instancias) ----
-const furn = { tops: [], peds: [], seats: [], backs: [], lapB: [], lapS: [] };
+const furn = { tops: [], peds: [], seats: [], backs: [], legs: [], lapB: [], lapS: [] };
+const spinners = [];                                               // aspas de ventiladores (giran en el bucle)
+function chair(x, z, ox, oz, yaw, fy) {                            // silla naranja: asiento + respaldo (hacia afuera: ox, oz) + 4 patas gris medio
+  furn.seats.push({ x, y: fy + 0.45, z, sx: 0.42, sy: 0.05, sz: 0.42, rot: yaw, color: 0xf97316 });
+  furn.backs.push({ x: x + ox * 0.2, y: fy + 0.68, z: z + oz * 0.2, sx: 0.42, sy: 0.4, sz: 0.05, rot: yaw, color: 0xea580c });
+  const px = oz, pz = -ox;
+  for (const a of [-0.17, 0.17]) for (const b of [-0.17, 0.17]) furn.legs.push({ x: x + ox * a + px * b, y: fy + 0.215, z: z + oz * a + pz * b, sx: 0.035, sy: 0.43, sz: 0.035, rot: yaw, color: 0x8a8f98 });
+}
 const lockerTex = (function () {
   const c = document.createElement('canvas'); c.width = 1024; c.height = 256;
   const g = c.getContext('2d');
@@ -291,6 +315,20 @@ const lockerTex = (function () {
   return new THREE.CanvasTexture(c);
 })();
 const lockerMat = new THREE.MeshLambertMaterial({ map: lockerTex });
+const locker26Tex = (function () {                                  // 13 x 2 lockers vacíos con etiqueta numerada
+  const c = document.createElement('canvas'); c.width = 1560; c.height = 300;
+  const g = c.getContext('2d'), cols = 13, rows = 2, cw = c.width / cols, ch = c.height / rows;
+  g.fillStyle = '#c8a27a'; g.fillRect(0, 0, c.width, c.height);
+  for (let r = 0; r < rows; r++) for (let q = 0; q < cols; q++) {
+    const x = q * cw, y = r * ch, n = r * cols + q + 1;
+    g.fillStyle = '#4a3527'; g.fillRect(x + 8, y + 8, cw - 16, ch - 16);                       // hueco vacío
+    g.fillStyle = 'rgba(0,0,0,0.25)'; g.fillRect(x + 8, y + 8, cw - 16, 10);
+    g.fillStyle = '#ffffff'; g.fillRect(x + 22, y + 18, cw - 44, 38);                           // etiqueta
+    g.strokeStyle = '#1f2937'; g.lineWidth = 2; g.strokeRect(x + 22, y + 18, cw - 44, 38);
+    g.fillStyle = '#111827'; g.font = 'bold 28px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(String(n).padStart(2, '0'), x + cw / 2, y + 38);
+  }
+  return new THREE.CanvasTexture(c);
+})();
 const lockerGeo = new THREE.PlaneGeometry(1, 1);
 
 function furnish(kind, cx, cz, rot, fy, w, d, door, role) {
@@ -324,8 +362,8 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role) {
     pl.scale.set(Dp - 1.2, 1.2, 1); pl.position.set(lx, fy + 0.75, lz);
     pl.rotation.y = Math.atan2(-uvec[0], -uvec[1]); scene.add(pl);
   };
-  const clusters = (laptops) => {                                   // 6 hexágonos (rosetas) de 6 integrantes
-    for (const uu of [-0.7, 2.0]) for (const ss of [1.4, 3.8, 6.2]) {
+  const clusters = (laptops, spots) => {                            // hexágonos (rosetas) de 6 integrantes (por defecto 6 grupos)
+    for (const [uu, ss] of (spots || [[-0.7, 1.4], [-0.7, 3.8], [-0.7, 6.2], [2.0, 1.4], [2.0, 3.8], [2.0, 6.2]])) {
       const [tx, tz] = P(uu, ss);
       furn.tops.push({ x: tx, y: fy + 0.72, z: tz, sx: 0.85, sy: 0.07, sz: 0.85, rot: 0, color: 0xe7c9a0 });
       furn.peds.push({ x: tx, y: fy + 0.36, z: tz, sx: 0.22, sy: 0.72, sz: 0.22, rot: 0, color: 0x6b7280 });
@@ -334,8 +372,7 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role) {
         const th = k * Math.PI / 3 + Math.PI / 6;
         const o = [Math.cos(th) * uvec[0] + Math.sin(th) * svec[0], Math.cos(th) * uvec[1] + Math.sin(th) * svec[1]];
         const yaw = Math.atan2(o[0], o[1]);
-        furn.seats.push({ x: tx + o[0] * 1.05, y: fy + 0.45, z: tz + o[1] * 1.05, sx: 0.42, sy: 0.05, sz: 0.42, rot: yaw, color: 0x2563eb });
-        furn.backs.push({ x: tx + o[0] * 1.25, y: fy + 0.68, z: tz + o[1] * 1.25, sx: 0.42, sy: 0.4, sz: 0.05, rot: yaw, color: 0x1e40af });
+        chair(tx + o[0] * 1.05, tz + o[1] * 1.05, o[0], o[1], yaw, fy);
         if (laptops) {                                                // laptop frente a cada silla: base + pantalla hacia el centro
           furn.lapB.push({ x: tx + o[0] * 0.58, y: fy + 0.775, z: tz + o[1] * 0.58, sx: 0.34, sy: 0.02, sz: 0.24, rot: yaw, color: 0x374151 });
           furn.lapS.push({ x: tx + o[0] * 0.47, y: fy + 0.89, z: tz + o[1] * 0.47, sx: 0.34, sy: 0.22, sz: 0.015, rot: yaw, color: 0x0f172a });
@@ -343,7 +380,45 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role) {
       }
     }
   };
-  if (kind === 'class') {
+  if (kind === 'class' && role === '6B') {                          // 6B con más detalle
+    teach();
+    // 26 lockers grandes, vacíos y ordenados (13 x 2), cada uno con su etiqueta
+    const LL = Dp - 2 * T - 0.4, uL = Wc / 2 - T - 0.26;
+    boxAt(uL, Dp / 2 - T, 0, 0.52, 1.5, LL, 0xc8a27a, true);
+    { const [lx, lz] = P(uL - 0.27, Dp / 2 - T), pl = new THREE.Mesh(lockerGeo, new THREE.MeshLambertMaterial({ map: locker26Tex }));
+      pl.scale.set(LL, 1.4, 1); pl.position.set(lx, fy + 0.78, lz); pl.rotation.y = Math.atan2(-uvec[0], -uvec[1]); scene.add(pl); }
+    // 5 grupos: dos a cada lado (adelante y atrás) y uno al centro
+    const G5 = [[-1.5, 1.6], [2.25, 1.6], [-1.5, 6.0], [2.25, 6.0], [0.4, 3.8]];
+    clusters(false, G5);
+    const tubeMat = new THREE.MeshBasicMaterial({ color: 0xf8fafc }), strMat = new THREE.MeshLambertMaterial({ color: 0xe5e7eb });
+    G5.forEach(([uu, ss], gi) => {
+      const top = fy + RH - 0.04;
+      if (gi < 4) [-0.35, 0.35].forEach(d2 => {                                   // 2 focos largos encima de cada grupo (el del centro no)
+        const [x, z] = P(uu, ss + d2), t = new THREE.Mesh(new THREE.BoxGeometry(1.25, 0.05, 0.12), tubeMat);
+        t.position.set(x, top - 0.03, z); t.rotation.y = rotU; scene.add(t);
+      });
+      const [x, z] = P(uu, ss), yR = fy + 2.05;                                       // pita colgando y un cohete de papel "GRUPO n"
+      const str = new THREE.Mesh(new THREE.BoxGeometry(0.012, top - 0.06 - (yR + 0.42), 0.012), strMat); str.position.set(x, (top - 0.06 + yR + 0.42) / 2, z); scene.add(str);
+      const body = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.3, 12), new THREE.MeshLambertMaterial({ color: 0xffffff })); body.position.set(x, yR + 0.15, z); scene.add(body);
+      const nose = new THREE.Mesh(new THREE.ConeGeometry(0.075, 0.13, 12), new THREE.MeshLambertMaterial({ color: 0xef4444 })); nose.position.set(x, yR + 0.365, z); scene.add(nose);
+      [0, 1, 2].forEach(k => { const f2 = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.1, 0.01), new THREE.MeshLambertMaterial({ color: 0x2563eb })); const a = k * 2.094;
+        f2.position.set(x + Math.cos(a) * 0.09, yR + 0.04, z + Math.sin(a) * 0.09); f2.rotation.y = -a; scene.add(f2); });
+      label('GRUPO ' + (gi + 1), x, yR - 0.12, z, 0.32, '#111827', 'rgba(255,255,255,.95)', 256, 64);
+    });
+    // 4 ventiladores colgados en las esquinas, mirando al centro
+    const cu = 0.4, cs = (Dp - 2 * T) / 2;
+    [[-1, 0.35], [-1, Dp - 2 * T - 0.35], [1, 0.35], [1, Dp - 2 * T - 0.35]].forEach(([su, sd]) => {
+      const uu = su * (Wc / 2 - T - (su > 0 ? 0.75 : 0.35)), [x, z] = P(uu, sd), [mx, mz] = P(cu, cs);
+      const g = new THREE.Group(); g.position.set(x, fy + 2.45, z); g.rotation.y = Math.atan2(mx - x, mz - z); g.rotation.order = 'YXZ'; g.rotation.x = 0.35; scene.add(g);
+      const gray = new THREE.MeshLambertMaterial({ color: 0x9ca3af }), dark = new THREE.MeshLambertMaterial({ color: 0x374151 });
+      const guard = new THREE.Mesh(new THREE.TorusGeometry(0.26, 0.012, 6, 24), gray); g.add(guard);
+      const motor = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.16, 12), dark); motor.rotation.x = Math.PI / 2; motor.position.z = -0.08; g.add(motor);
+      const blades = new THREE.Group(); g.add(blades);
+      [0, 1, 2].forEach(k => { const bl = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.22, 0.01), gray); bl.position.set(Math.cos(k * 2.094 + 1.57) * 0.12, Math.sin(k * 2.094 + 1.57) * 0.12, 0); bl.rotation.z = k * 2.094; blades.add(bl); });
+      spinners.push(blades);
+      const arm = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, 0.3), dark); arm.position.z = -0.3; g.add(arm);
+    });
+  } else if (kind === 'class') {
     teach(); lockers(); clusters(false);                              // pizarra grande + ecran + proyector; lockers al fondo
   } else if (kind === 'ml') {                                         // media lab: salón gigante (2 módulos unidos), mesas en roseta con laptops
     teach(role === 'second' ? 1 : -1);                                // una pizarra con ecran y proyector en cada extremo; sin lockers
@@ -356,8 +431,7 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role) {
       for (const sd of [-1, 1]) for (const du of [-0.8, 0, 0.8]) {
         const o = [sd * svec[0], sd * svec[1]], yaw = Math.atan2(o[0], o[1]);
         const [qx, qz] = P(uu + du, ss + sd * 0.78);
-        furn.seats.push({ x: qx, y: fy + 0.45, z: qz, sx: 0.42, sy: 0.05, sz: 0.42, rot: yaw, color: 0x2563eb });
-        furn.backs.push({ x: qx + o[0] * 0.2, y: fy + 0.68, z: qz + o[1] * 0.2, sx: 0.42, sy: 0.4, sz: 0.05, rot: yaw, color: 0x1e40af });
+        chair(qx, qz, o[0], o[1], yaw, fy);
       }
     }
   } else if (kind === 'banos') {                                      // baño: lavatorios con espejo en un costado, 3 cubículos con inodoro al fondo
@@ -409,7 +483,7 @@ function room(name, level, cx, fl, cz, w, d, o = {}) {
   else { addSolid(cx, Math.min(yo, 0), cz, w, 0.04, d, rot, 0xc6c5c1, false); }
   if (o.roof) { addSolid(cx, y0 + RH, cz, w, 0.2, d, rot, 0x94a3b8, false); roofs.push({ x: cx, z: cz, hw: w / 2, hd: d / 2, c: Math.cos(rot), s: Math.sin(rot), y: y0 + RH + 0.2 }); }
   const kind = o.kind || ((level === 'inicial' || level === 'primaria' || level === 'secundaria') ? 'class' : level);
-  furnish(kind, cx, cz, rot, y0, w, d, door, o.mlRole);
+  furnish(kind, cx, cz, rot, y0, w, d, door, o.mlRole || o.special);
 }
 
 function steps(x0, z0, dx, dz, n, rise, run, w, yBase, thin) {   // (x0,z0) = arranque, (dx,dz) = dirección unitaria
@@ -497,7 +571,7 @@ function ironRail(x0, z0, x1, z1, y) {
   pm.rotation.x = -Math.PI / 2; pm.position.y = 0.03; pm.receiveShadow = true; scene.add(pm);
   label('PATIO', 4, 0.6, -28, 1.6, '#fff', 'rgba(71,85,105,.9)');
   // cancha de losa 4 veces más grande (2x2): 33 x 20 m, cubre el patio
-  const cx0 = -20.4, cx1 = 12.4, cz0 = -23.5, cz1 = -3.5, ccx = (cx0 + cx1) / 2, ccz = (cz0 + cz1) / 2;
+  const cx0 = -16.4, cx1 = 12.4, cz0 = -23.5, cz1 = -3.5, ccx = (cx0 + cx1) / 2, ccz = (cz0 + cz1) / 2;
   flat(cx1 - cx0, cz1 - cz0, ccx, ccz, 0xc3c6ca, 0.06, 0.06);               // gris plomo claro (color del piso)
   const lineMat = new THREE.LineBasicMaterial({ color: 0xffffff });
   const pts = [[cx0 + 0.6, cz0 + 0.6], [cx1 - 0.6, cz0 + 0.6], [cx1 - 0.6, cz1 - 0.6], [cx0 + 0.6, cz1 - 0.6]].map(p => new THREE.Vector3(p[0], 0.1, p[1]));
@@ -511,6 +585,7 @@ function grass(w, d, x, z) { flat(w, d, x, z, 0x5a9a45, 0.03, 0.06); }
 // ===================================================================
 const E = { zc: -37, xc: [13.5, 4.5, -4.5, -13.5], sw: 9, depth: 8 };
 const eS = E.zc + 4;                              // cara de E hacia el patio (z = -33)
+const E_xT = -9.9, E_xB = E_xT - 11 * 0.4;         // escalera de E: parte alta (junto a Docentes/6A) y pie
 const B = { x: -25, z0: -59, depth: 8, len: 71 };   // 71 m: 7 aulas de 9 m + baños (2 x 4 m) entre 6C y LAB
 const bFace = B.x + B.depth / 2;                 // x = -21
 const BV = ['BAÑO VARÓN', 'bano', 4], BM = ['BAÑO MUJER', 'bano', 4];     // varón junto a 6C, mujer junto al laboratorio
@@ -524,8 +599,9 @@ B_ROWS.forEach((row, f) => { let zc0 = B.z0; row.forEach((r, i) => {
   const isML = r[0] === 'ML', second = isML && row[i - 1][0] === 'ML';        // los dos media lab son un solo salón gigante
   room(r[0], r[1], B.x, f, zc, B.depth, sw, { door: '+x', roof: f === 2,
     kind: isML ? 'ml' : (r[1] === 'bano' ? 'banos' : undefined), mlRole: isML ? (second ? 'second' : 'first') : undefined, skipWall: isML ? (second ? '-z' : '+z') : undefined,
-    doorOps: r[1] === 'bano' ? [{ type: 'door', u: 0.3, w: 1.2, name: 'Puerta ' + r[0], sign: true }] : undefined,
-    noOpp: r[1] === 'bano' });
+    doorOps: r[1] === 'bano' ? [{ type: 'door', u: 0.3, w: 1.2, name: 'Puerta ' + r[0], sign: true }]
+      : r[0] === '6B' ? [{ type: 'door', u: -sw * 0.28, w: 1.2, name: 'Puerta 6B', sign: true }, { type: 'swin', u: sw * 0.18, w: sw * 0.45, name: 'Ventana 6B' }] : undefined,
+    noOpp: r[1] === 'bano' || r[0] === '6B', special: r[0] === '6B' ? '6B' : undefined });
 }); });
 label('PABELLÓN B', B.x, 3 * FH + 1.2, B.z0 + B.len / 2, 3, '#fff', 'rgba(0,114,206,.9)');
 // pasadizos de B (pisos 2 y 3) con murito de la altura de la baranda
@@ -558,7 +634,7 @@ const xTopD = D.xc[0] - D.sw / 2;                 // x = -14.7 (extremo oeste de
 const xTopS = xTopD + 2.5;                        // x = -12.2 (parte alta de la escalera: a la altura de la puerta de 2B)
 [1, 2].forEach(f => {
   floorSlab(-5.7, zsD, 18, 1.8, 0, f * FH);
-  if (f === 1) lowWallGaps2(-14.7, 3.3, dN - 1.8, f * FH, [[xTopS - 1.9, xTopS + 0.5]]);    // hueco donde llega la escalera (por el descanso)
+  if (f === 1) lowWallGaps2(-14.7, 3.3, dN - 1.8, f * FH, [[-14.8, xTopS + 0.5]]);          // hueco donde llega la escalera (por el descanso, que llega hasta la punta)
   else lowWall(-14.7, dN - 1.8, 3.3, dN - 1.8, f * FH);
   if (f === 2) lowWall(3.3, dN - 1.8, 3.3, dN, f * FH);                  // el piso 2 sigue hacia el puente a F
 });
@@ -578,9 +654,9 @@ const xTopS = xTopD + 2.5;                        // x = -12.2 (parte alta de la
     for (let i = 0; i < n; i += 2) addSolid(xTopS + n * run - (i + 0.5) * run, (i + 1) * rise, zst + k, 0.04, 0.95, 0.04, 0, iron, false);
     addSolid(xb, FH, zst + k, 0.04, 0.95, 0.04, 0, iron, false);
   });
-  floorSlab(xTopS - 0.9, zst, 1.8, 1.8, 0, FH, 0.12, 0x4b5563);       // descanso cuadrado de metal que une escalera y pasadizo
-  ironRail(xTopS - 1.8, zst - 0.78, xTopS, zst - 0.78, FH);            // baranda norte
-  ironRail(xTopS - 1.68, zst - 0.9, xTopS - 1.68, zst + 0.9, FH);      // baranda oeste
+  floorSlab((xTopS + xTopD) / 2, zst, xTopS - xTopD, 1.8, 0, FH, 0.12, 0x4b5563);   // descanso de metal que une escalera, pasadizo y puente (sin murito suelto)
+  ironRail(xTopD, zst - 0.78, xTopS, zst - 0.78, FH);                  // baranda norte
+  ironRail(xTopD + 0.12, zst - 0.9, xTopD + 0.12, zst + 0.9, FH);      // baranda oeste
   grass(n * run, 1.6, xTopS + n * run / 2, zst);                       // área verde debajo de la escalera
 })();
 
@@ -599,13 +675,32 @@ E_SLOTS.forEach((col, k) => col.forEach((r, f) => {
 label('PABELLÓN E', 0, 3 * FH + 1.2, E.zc, 3, '#fff', 'rgba(244,114,22,.9)');
 [1, 2].forEach(f => {
   floorSlab(0, eS + 0.9, 36, 1.8, 0, f * FH);
-  lowWall(-18, eS + 1.8, 18, eS + 1.8, f * FH);
+  lowWallGaps2(-18, 18, eS + 1.8, f * FH, f === 1 ? [[E_xT - 0.1, E_xT + 1.9], [E_xB - 1.9, E_xB + 0.1]] : [[E_xT - 0.1, E_xT + 1.9]]);   // huecos de los descansos de la escalera
   lowWall(18, eS, 18, eS + 1.8, f * FH);
   // puente corto B <-> E (une el pasadizo de B con el de E, a la altura de la puerta 6D)
   floorSlab(-18.6, eS + 0.9, 1.5, 1.8, 0, f * FH, 0.2, 0xc6c5c1);
   ironRail(-19.3, eS + 0.18, -17.9, eS + 0.18, f * FH); ironRail(-19.3, eS + 1.62, -17.9, eS + 1.62, f * FH);
 });
 label('PUENTE B ↔ E', -18.6, FH + 2.0, eS + 0.9, 1.0, '#111', 'rgba(250,204,21,.95)');
+// escalera de E entre la sala de docentes y 6A (piso 2) y, por la misma ruta encima, al piso 3 (estilo de la de D)
+(function () {
+  const zs = eS + 2.7, run = 0.4, n = 11, r = FH / n, iron = 0x1f2937;
+  [0, 1].forEach(t => {                                                    // t = 0: patio -> piso 2 ; t = 1: piso 2 -> piso 3
+    const yb = t * FH, yt = (t + 1) * FH;
+    steps(E_xB, zs, 1, 0, n, r, run, 1.8, yb, true);
+    floorSlab(E_xT + 0.9, zs, 1.8, 1.8, 0, yt, 0.12, 0x4b5563);                                  // descanso de arriba
+    ironRail(E_xT, zs + 0.78, E_xT + 1.8, zs + 0.78, yt); ironRail(E_xT + 1.68, zs - 0.9, E_xT + 1.68, zs + 0.9, yt);
+    slopedBar(E_xB + 0.5 * run, yb + r + 0.95, zs + 0.72, E_xT - 0.5 * run, yt + 0.95, zs + 0.72, 0.05);
+    slopedBar(E_xB + 0.5 * run, yb + r + 0.45, zs + 0.72, E_xT - 0.5 * run, yt + 0.45, zs + 0.72, 0.03);
+    for (let i = 0; i < n; i += 2) addSolid(E_xB + (i + 0.5) * run, yb + (i + 1) * r, zs + 0.72, 0.04, 0.95, 0.04, 0, iron, false);
+    addCollider((E_xB + E_xT) / 2, zs + 0.72, n * run, 0.1, 0, yb, yt + 1.1);
+    if (t === 1) {                                                          // descanso de abajo del segundo tramo (piso 2)
+      floorSlab(E_xB - 0.9, zs, 1.8, 1.8, 0, FH, 0.12, 0x4b5563);
+      ironRail(E_xB - 1.8, zs + 0.78, E_xB, zs + 0.78, FH); ironRail(E_xB - 1.68, zs - 0.9, E_xB - 1.68, zs + 0.9, FH);
+    } else [1, n - 2].forEach(i => [-0.8, 0.8].forEach(k => addSolid(E_xB + (i + 0.5) * run, 0, zs + k, 0.1, (i + 1) * r - 0.2, 0.1, 0, iron, false)));
+  });
+  grass(n * run, 1.6, (E_xB + E_xT) / 2, zs);
+})();
 
 // ===================================================================
 //  PABELLÓN A
@@ -624,31 +719,32 @@ lowWall(A.xc[0] - 4.5, A.zc + 5.8, A.xc[0] + 4.5, A.zc + 5.8, FH);
 const F_ROWS = [
   [['2D','primaria'], ['3A','primaria'], ['3B','primaria'], ['3C','primaria'], ['3D','primaria']],
   [['7B','secundaria'], ['7C','secundaria'], ['7D','secundaria'], ['8A','secundaria'], ['8B','secundaria']],
-  [null, null, null, ['4A','primaria'], ['4B','primaria']]
+  [['4E','primaria'], ['4D','primaria'], ['4C','primaria'], ['4A','primaria'], ['4B','primaria']]   // piso 3 completo (4C-4E: nombres provisionales)
 ];
 F_ROWS.forEach((row, f) => row.forEach((r, i) => {
   if (!r) return;
   const lx = (i - 2) * F.sw;
   const [wx, wz] = lw(F.x, F.z, F.rot, lx, 0);
   const extra = [];
-  room(r[0], r[1], wx, f, wz, F.sw, F.depth, { rot: F.rot, yo: i >= 3 && f === 0 ? -DROP : 0, h: i >= 3 && f === 0 ? RH + DROP : undefined, door: '-z', roof: i < 3 ? f === 1 : f === 2, extra, endWin: i === 0 ? ['-x'] : i === 4 ? ['+x'] : [] });
+  room(r[0], r[1], wx, f, wz, F.sw, F.depth, { rot: F.rot, yo: f > 0 ? F.yo : (i >= 3 ? -DROP : 0), h: f === 0 ? RH + F.yo + (i >= 3 ? DROP : 0) : undefined, door: '-z', roof: f === 2, extra, endWin: i === 0 ? ['-x'] : i === 4 ? ['+x'] : [] });
 }));
 label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
 (function () {
-  const lz = -(F.depth / 2 + 0.9), L = 2.5 * F.sw, c = Math.cos(F.rot), sn = Math.sin(F.rot), iron = 0x1f2937, hi = FH, lo = FH;
+  const lz = -(F.depth / 2 + 0.9), L = 2.5 * F.sw, c = Math.cos(F.rot), sn = Math.sin(F.rot), iron = 0x1f2937, Y2 = FH + F.yo, Y3 = 2 * FH + F.yo, hi = Y2, lo = Y2;
   // pasadizo del piso 2 parejo (3C y 3D son más altos por dentro, así no hay gradas arriba)
   let [wx, wz] = lw(F.x, F.z, F.rot, 0, lz);
   floorSlab(wx, wz, 2 * L, 1.8, F.rot, hi);
   const xT = 8.2;                                                       // parte alta de la escalera frente a 3C
-  const xB = xT + 13 * 0.4;                                             // pie del tramo al piso 3 (descanso en el piso 2)
+  const xB = xT + 15 * 0.4;                                             // pie del tramo al piso 3 (descanso en el piso 2)
   lowWallLocal(F.x, F.z, F.rot, -L, xT - 1.9, lz - 0.8, hi); lowWallLocal(F.x, F.z, F.rot, xT + 0.5, xB - 0.1, lz - 0.8, hi); lowWallLocal(F.x, F.z, F.rot, xB + 1.9, L, lz - 0.8, hi);   // huecos de los descansos
-  [wx, wz] = lw(F.x, F.z, F.rot, 13.5, lz);
-  floorSlab(wx, wz, 18, 1.8, F.rot, 2 * FH);
-  lowWallLocal(F.x, F.z, F.rot, 4.5, xT - 1.9, lz - 0.8, 2 * FH); lowWallLocal(F.x, F.z, F.rot, xT + 0.5, 22.5, lz - 0.8, 2 * FH);   // hueco donde llega el tramo al piso 3
+  [wx, wz] = lw(F.x, F.z, F.rot, 0, lz);
+  floorSlab(wx, wz, 2 * L, 1.8, F.rot, Y3);                                // pasadizo del piso 3 a lo largo de todo F
+  lowWallLocal(F.x, F.z, F.rot, -L, xT - 1.9, lz - 0.8, Y3); lowWallLocal(F.x, F.z, F.rot, xT + 0.5, L, lz - 0.8, Y3);
+  [-L + 0.1, L - 0.1].forEach(ex => buildWall(F.x, F.z, F.rot, ex, lz, 'z', 1.8, Y3, [], 0x1f3366, { T: 0.2, h: 1.0 }));   // murito en las puntas del piso 3   // hueco donde llega el tramo al piso 3
   // escalera al piso 2 frente a 3C (mismo estilo que la de D: tramos flotantes, descanso de metal, baranda de fierro)
-  const W = (lx, lz2) => lw(F.x, F.z, F.rot, lx, lz2), run = 0.4, n = 13, y0 = -DROP, rise = (FH - y0) / n, zs = lz - 1.8;   // del patio de abajo al piso 2
+  const W = (lx, lz2) => lw(F.x, F.z, F.rot, lx, lz2), run = 0.4, n = 15, y0 = -DROP, rise = (Y2 - y0) / n, zs = lz - 1.8;   // del patio de abajo al piso 2
   { const [sx, sz] = W(xT + n * run, zs); steps(sx, sz, -c, sn, n, rise, run, 1.8, y0, true); }
-  [0, 11].forEach(i => {
+  [0, 13].forEach(i => {
     const lx = xT + n * run - (i + 0.5) * run, top = (i + 1) * rise - 0.2;
     [-0.8, 0.8].forEach(k => { const [px, pz] = W(lx, zs + k); addSolid(px, y0, pz, 0.1, top, 0.1, F.rot, iron, false); });
   });
@@ -661,18 +757,18 @@ label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
   { const [a1, a2] = W(xT - 1.68, zs - 0.9), [b1, b2] = W(xT - 1.68, zs + 0.9); ironRail(a1, a2, b1, b2, lo); }
   // segundo tramo, por la misma ruta encima del primero: del piso 2 (descanso en xB) al piso 3 (descanso en xT)
   { const r2 = FH / n;
-    { const [sx, sz] = W(xB, zs); steps(sx, sz, -c, sn, n, r2, run, 1.8, FH, true); }
-    { const [p0, p1] = W(xB + 0.9, zs); floorSlab(p0, p1, 1.8, 1.8, F.rot, FH, 0.12, 0x4b5563); }          // descanso de abajo (piso 2)
-    { const [a1, a2] = W(xB, zs - 0.78), [b1, b2] = W(xB + 1.8, zs - 0.78); ironRail(a1, a2, b1, b2, FH); }
-    { const [a1, a2] = W(xB + 1.68, zs - 0.9), [b1, b2] = W(xB + 1.68, zs + 0.9); ironRail(a1, a2, b1, b2, FH); }
-    { const [p0, p1] = W(xT - 0.9, zs); floorSlab(p0, p1, 1.8, 1.8, F.rot, 2 * FH, 0.12, 0x4b5563); }       // descanso de arriba (piso 3)
-    { const [a1, a2] = W(xT - 1.8, zs - 0.78), [b1, b2] = W(xT, zs - 0.78); ironRail(a1, a2, b1, b2, 2 * FH); }
-    { const [a1, a2] = W(xT - 1.68, zs - 0.9), [b1, b2] = W(xT - 1.68, zs + 0.9); ironRail(a1, a2, b1, b2, 2 * FH); }
+    { const [sx, sz] = W(xB, zs); steps(sx, sz, -c, sn, n, r2, run, 1.8, Y2, true); }
+    { const [p0, p1] = W(xB + 0.9, zs); floorSlab(p0, p1, 1.8, 1.8, F.rot, Y2, 0.12, 0x4b5563); }          // descanso de abajo (piso 2)
+    { const [a1, a2] = W(xB, zs - 0.78), [b1, b2] = W(xB + 1.8, zs - 0.78); ironRail(a1, a2, b1, b2, Y2); }
+    { const [a1, a2] = W(xB + 1.68, zs - 0.9), [b1, b2] = W(xB + 1.68, zs + 0.9); ironRail(a1, a2, b1, b2, Y2); }
+    { const [p0, p1] = W(xT - 0.9, zs); floorSlab(p0, p1, 1.8, 1.8, F.rot, Y3, 0.12, 0x4b5563); }       // descanso de arriba (piso 3)
+    { const [a1, a2] = W(xT - 1.8, zs - 0.78), [b1, b2] = W(xT, zs - 0.78); ironRail(a1, a2, b1, b2, Y3); }
+    { const [a1, a2] = W(xT - 1.68, zs - 0.9), [b1, b2] = W(xT - 1.68, zs + 0.9); ironRail(a1, a2, b1, b2, Y3); }
     const k = -0.72, [ax, az] = W(xB - 0.5 * run, zs + k), [bx, bz] = W(xT + 0.5 * run, zs + k);
-    slopedBar(ax, FH + r2 + 0.95, az, bx, 2 * FH + 0.95, bz, 0.05); slopedBar(ax, FH + r2 + 0.45, az, bx, 2 * FH + 0.45, bz, 0.03);
-    for (let i = 0; i < n; i += 2) { const [px, pz] = W(xB - (i + 0.5) * run, zs + k); addSolid(px, FH + (i + 1) * r2, pz, 0.04, 0.95, 0.04, F.rot, iron, false); }
-    addSolid(bx, 2 * FH, bz, 0.04, 0.95, 0.04, F.rot, iron, false);
-    addCollider((ax + bx) / 2, (az + bz) / 2, n * run, 0.1, F.rot, FH, 2 * FH + 1.1);                          // no caerse por el lado de afuera
+    slopedBar(ax, Y2 + r2 + 0.95, az, bx, Y3 + 0.95, bz, 0.05); slopedBar(ax, Y2 + r2 + 0.45, az, bx, Y3 + 0.45, bz, 0.03);
+    for (let i = 0; i < n; i += 2) { const [px, pz] = W(xB - (i + 0.5) * run, zs + k); addSolid(px, Y2 + (i + 1) * r2, pz, 0.04, 0.95, 0.04, F.rot, iron, false); }
+    addSolid(bx, Y3, bz, 0.04, 0.95, 0.04, F.rot, iron, false);
+    addCollider((ax + bx) / 2, (az + bz) / 2, n * run, 0.1, F.rot, Y2, Y3 + 1.1);                          // no caerse por el lado de afuera
   }
   // pasto debajo de la escalera
   { const [gx, gz] = W(xT + n * run / 2, zs); const m = new THREE.Mesh(new THREE.BoxGeometry(n * run, 0.06, 1.6), new THREE.MeshLambertMaterial({ color: 0x5a9a45 })); m.position.set(gx, y0 + 0.04, gz); m.rotation.y = F.rot; scene.add(m); }
@@ -682,9 +778,9 @@ label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
     window.__fz = { lcx, lcz, wl, wd }; }
 })();
 
-// ---- DESNIVEL del patio: 5 gradas de la esquina de 2A (E) al límite 3B|3C de F, con 2 barandales; muros donde el suelo baja ----
+// ---- DESNIVEL del patio: 6 gradas de la esquina de 2A (E) al límite 3B|3C de F, con 2 barandales; muros donde el suelo baja ----
 (function () {
-  const A = LOW[0], B2 = LOW[1], iron = 0x1f2937, run = 0.4, nst = 4, rise = DROP / 5;
+  const A = LOW[0], B2 = LOW[1], iron = 0x1f2937, run = 0.4, nst = 5, rise = DROP / 6;   // 6 gradas (5 peldaños + el piso de abajo)
   const dx = B2[0] - A[0], dz = B2[1] - A[1], Lf = Math.hypot(dx, dz), ux = dx / Lf, uz = dz / Lf;
   const nx = uz, nz = -ux;                                         // normal hacia el lado de abajo (este)
   const len = Lf - 2.4, ang = Math.atan2(-uz, ux), c = Math.cos(ang), s = Math.sin(ang);   // se recorta junto a F para no meterse en 3B
@@ -693,6 +789,8 @@ label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
     addSolid(x, -DROP, z, len, top + DROP, run, ang, 0xd6d3d1, false);
     floors.push({ x, z, hw: len / 2, hd: run / 2, c, s, y: top });
   }
+  { const x = A[0] + ux * len / 2 + nx * 0.02, z = A[1] + uz * len / 2 + nz * 0.02;      // cara del primer escalón (tapa el borde del patio de arriba)
+    addSolid(x, -DROP, z, len, DROP, 0.04, ang, 0xc9cbce, false); }
   [1 / 3, 2 / 3].forEach(t => {                                     // 2 barandales que bajan por las gradas
     const px = A[0] + ux * len * t, pz = A[1] + uz * len * t, qx = px + nx * nst * run, qz = pz + nz * nst * run;
     slopedBar(px, 0.95, pz, qx, -DROP + 0.95, qz, 0.05); slopedBar(px, 0.45, pz, qx, -DROP + 0.45, qz, 0.03);
@@ -732,15 +830,18 @@ function fenceRect(cx, cz, w, d) {
 }
 // área verde a la altura de la escalera de D (en línea con ella, hacia el este), con su cerco
 const zG = zsD - 1.8;
-grass(8.5, 1.7, -3.1, zG);
-fenceRect(-3.1, zG, 8.5, 1.7);
+grass(8.5, 1.7, -1.6, zG);
+[-20.5, -13.5, -6.5].forEach(z => grass(1.7, 5.5, -18, z));                      // tres áreas verdes frente a B (baños, BgB, BgA)
+label('ÁREA VERDE', -18, 2.6, -13.5, 1.0, '#fff', 'rgba(22,101,52,.9)');
+fenceRect(-1.6, zG, 8.5, 1.7);
+[-20.5, -13.5, -6.5].forEach(z => fenceRect(-18, z, 1.7, 5.5));
 (function () {                                                    // cerco del área verde frente a 2D (en el marco de F)
   const q = window.__fz, m = 0.25, P = (lx, lz) => lw(F.x, F.z, F.rot, lx, lz);
   const x0 = q.lcx - q.wl / 2 - m, x1 = q.lcx + q.wl / 2 + m, z0 = q.lcz - q.wd / 2 - m, z1 = q.lcz + q.wd / 2 + m;
   fenceLine(...P(x0, z0), ...P(x1, z0)); fenceLine(...P(x1, z0), ...P(x1, z1)); fenceLine(...P(x1, z1), ...P(x0, z1)); fenceLine(...P(x0, z1), ...P(x0, z0));
   delete window.__fz;
 })();
-label('ÁREA VERDE', -3.1, 3.0, zG, 1.2, '#fff', 'rgba(22,101,52,.9)');
+label('ÁREA VERDE', -1.6, 3.0, zG, 1.2, '#fff', 'rgba(22,101,52,.9)');
 
 
 // ---- puente corto D <-> F: del pasadizo de D (piso 2) al extremo del pasadizo de F, junto a la puerta de 7B ----
@@ -859,28 +960,28 @@ label('ÁREA VERDE', -3.1, 3.0, zG, 1.2, '#fff', 'rgba(22,101,52,.9)');
   cr(0, eS + 0.9, 36, 1.8, 0, 2 * FH);                                            // E (piso 3)
   cr(A.xc[0], A.zc + 4.9, 9, 1.8, 0, FH);                                         // A (piso 2)
   const lzF = -(F.depth / 2 + 0.9);
-  let [fx, fz] = lw(F.x, F.z, F.rot, -9, lzF); cr(fx, fz, 27, 1.8, F.rot, FH);               // F piso 2, frente a 7B-7D
-  [fx, fz] = lw(F.x, F.z, F.rot, 13.5, lzF); cr(fx, fz, 18, 1.8, F.rot, 2 * FH);    // F piso 3
+  const [fx, fz] = lw(F.x, F.z, F.rot, 0, lzF); cr(fx, fz, 45, 1.8, F.rot, 2 * FH + F.yo);    // F piso 3 (todo el largo)
 })();
 
 // ===================================================================
-//  TOLDOS celestes: del murito del piso 3 de E (desde 10A) al murito del media lab de D, dos paños lado a lado, sin postes
+//  TOLDOS celestes: desde 10A (pabellón E) hasta el media lab de D, dos paños lado a lado, sin postes ni focos
 // ===================================================================
 (function () {
-  const yE = 2 * FH + 1.0, zN = eS + 1.8, zS = dN - 1.8, S = 1.3;          // altura y bordes (murito de E / murito de D)
+  const yN = 2 * FH + RH + 0.2, yS = 2 * FH + 1.0, zN = eS + 1.8, zS = dN - 1.8, S = 1.2;   // alto junto al techo de E, baja hasta el murito del media lab de D
   const mat = new THREE.MeshLambertMaterial({ color: 0x87ceeb, emissive: 0x1d4f6b, side: THREE.DoubleSide, transparent: true, opacity: 0.93 });
   const sail = (xa, xb) => {
-    const g = new THREE.PlaneGeometry(xb - xa, zS - zN, 36, 30); g.rotateX(-Math.PI / 2);
+    const g = new THREE.PlaneGeometry(xb - xa, zS - zN, 30, 30); g.rotateX(-Math.PI / 2);
     const pos = g.attributes.position;
     for (let k = 0; k < pos.count; k++) {
       const x = (xa + xb) / 2 + pos.getX(k), z = (zN + zS) / 2 + pos.getZ(k), u = (x - xa) / (xb - xa), v = (z - zN) / (zS - zN);
-      const y = yE - S * Math.sin(Math.PI * u) * Math.sin(Math.PI * v) + 0.04 * Math.sin(x * 0.9 + z * 0.6) * Math.sin(Math.PI * u) * Math.sin(Math.PI * v);   // se hunde al centro por su peso
-      pos.setXYZ(k, x, y, z);
+      const bag = Math.sin(Math.PI * u) * Math.sin(Math.PI * v);
+      pos.setXYZ(k, x, yN + (yS - yN) * v - S * bag + 0.04 * Math.sin(x * 0.9 + z * 0.6) * bag, z);   // inclinado y hundido al centro por su peso
     }
     g.computeVertexNormals();
     const m = new THREE.Mesh(g, mat); m.castShadow = true; scene.add(m);
   };
-  sail(bFace + 1.7, -3); sail(-3, 12.4);
+  const x0 = E.xc[3] - E.sw / 2, x1 = D.xc[1] + D.sw / 2, xm = (x0 + x1) / 2;   // de 10A al final del media lab
+  sail(x0, xm); sail(xm, x1);
 })();
 
 // ===================================================================
@@ -898,7 +999,7 @@ lampRow(-16, eS + 0.9, 16, eS + 0.9, YG); lampRow(-16, eS + 0.9, 16, eS + 0.9, Y
 lampRow(A.xc[0] - 3, A.zc + 4.9, A.xc[0] + 3, A.zc + 4.9, YG);                                                                // A
 for (let lx = -19; lx <= 19; lx += 6) {                                                                                       // F
   const [fx, fz] = lw(F.x, F.z, F.rot, lx, -(F.depth / 2 + 0.9));
-  lamps.push([fx, FH - 0.23, fz]); if (lx >= 5) lamps.push([fx, 2 * FH - 0.23, fz]);
+  lamps.push([fx, FH + F.yo - 0.23, fz]); lamps.push([fx, 2 * FH + F.yo - 0.23, fz]);
 }
 [-4.6, -1.35, 1.9].forEach(x => [21.3, 23.9].forEach(z => lamps.push([x, 3.5, z])));                                          // techito de las puertas
 [15, 19, 23].forEach(z => lamps.push([-25, RH - 0.1, z]));                                                                    // lobby
@@ -928,7 +1029,7 @@ buildInstanced(solidItems, new THREE.MeshLambertMaterial({ color: 0xffffff }));
 const furnMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
 const hexGeo = new THREE.CylinderGeometry(1, 1, 1, 6);
 buildInstanced(furn.tops, furnMat, hexGeo); buildInstanced(furn.peds, furnMat, new THREE.CylinderGeometry(1, 1, 1, 10));
-buildInstanced(furn.seats, furnMat); buildInstanced(furn.backs, furnMat); buildInstanced(furn.lapB, furnMat, undefined, false); buildInstanced(furn.lapS, furnMat, undefined, false);
+buildInstanced(furn.seats, furnMat); buildInstanced(furn.backs, furnMat); buildInstanced(furn.legs, furnMat, undefined, false); buildInstanced(furn.lapB, furnMat, undefined, false); buildInstanced(furn.lapS, furnMat, undefined, false);
 buildInstanced(glassItems, new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.5, depthWrite: false }), undefined, false);
 
 // ===================================================================
@@ -1091,7 +1192,7 @@ function loop(now) {
   requestAnimationFrame(loop);
   const dt = (now - last) / 1000; last = now;
   update(P.started ? dt : 0);
-  sky.position.copy(camera.position); const tNow = now / 1000;
+  sky.position.copy(camera.position); const tNow = now / 1000; spinners.forEach(b => { b.rotation.z += Math.min(dt, 0.05) * 14; });
   sun.position.set(P.x + SUN_DIR.x * 120, SUN_DIR.y * 120, P.z + SUN_DIR.z * 120); sun.target.position.set(P.x, 0, P.z);
   clouds.children.forEach(g => { g.position.x += g.userData.v * Math.min(dt, 0.1); if (g.position.x > 440) g.position.x = -440; });
   renderer.render(scene, camera);

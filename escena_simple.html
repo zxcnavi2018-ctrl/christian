@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Innova Tacna - Pabellones B C D</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #0b0f19; font-family: system-ui, sans-serif; }
+  #hud { position: absolute; top: 10px; left: 10px; color: #fff; background: rgba(15,23,42,.85); padding: 10px 14px; border-radius: 10px; font-size: 13px; line-height: 1.5; }
+  #hud b { font-size: 14px; }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+  #btns { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; }
+  #btns button { background: #1e293b; color: #fff; border: 1px solid #475569; border-radius: 8px; padding: 8px 12px; font-size: 13px; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+<div id="hud">
+  <b>Innova Schools Tacna 2026</b><br>
+  Pabellones B · C · D<br>
+  <span class="dot" style="background:#0072CE"></span>Inicial
+  <span class="dot" style="background:#F37021"></span>Primaria
+  <span class="dot" style="background:#78BE20"></span>Secundaria
+  <span class="dot" style="background:#94A3B8"></span>ML / Lab
+</div>
+<div id="btns">
+  <button onclick="view('iso')">Isométrica</button>
+  <button onclick="view('puente')">Puente 2.º piso</button>
+  <button onclick="view('planta')">Planta</button>
+</div>
+
+<script>
+const COL = { inicial: 0x0072CE, primaria: 0xF37021, secundaria: 0x78BE20, lab: 0x94A3B8 };
+const FH = 3.2;      // alto de piso
+const RH = 3.0;      // alto del salón
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x90c2f9);
+const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 500);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+document.body.appendChild(renderer.domElement);
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.maxPolarAngle = Math.PI / 2 - 0.02;
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+const sun = new THREE.DirectionalLight(0xffffff, 0.8);
+sun.position.set(30, 60, 40);
+scene.add(sun);
+
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshLambertMaterial({ color: 0x9a9a94 }));
+ground.rotation.x = -Math.PI / 2;
+scene.add(ground);
+
+function label(text, x, y, z, scale = 2.2, color = '#ffffff', bg = 'rgba(15,23,42,.8)') {
+  const c = document.createElement('canvas');
+  c.width = 512; c.height = 128;
+  const g = c.getContext('2d');
+  g.fillStyle = bg; g.fillRect(0, 0, 512, 128);
+  g.fillStyle = color; g.font = "bold 76px sans-serif";
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText(text, 256, 66);
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c) }));
+  s.position.set(x, y, z);
+  s.scale.set(scale * 2, scale * 0.5, 1);
+  scene.add(s);
+}
+
+function room(name, level, x, floor, z, w, d) {
+  const m = new THREE.Mesh(
+    new THREE.BoxGeometry(w, RH, d),
+    new THREE.MeshLambertMaterial({ color: COL[level] })
+  );
+  m.position.set(x, floor * FH + RH / 2, z);
+  scene.add(m);
+  const e = new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry), new THREE.LineBasicMaterial({ color: 0x1e293b }));
+  e.position.copy(m.position);
+  scene.add(e);
+  label(name, x + w / 2 + 0.05, m.position.y, z, 2.4);
+}
+
+// ---------- Pabellón B (3 pisos, 7 módulos a lo largo de Z) ----------
+const B = { x: -21.8, z0: -23.85, sw: 4.77, depth: 4 };
+const B_ROWS = [
+  [['KA','inicial'], ['PkB','inicial'], ['PkA','inicial'], ['BgC','inicial'], ['BgB','inicial'], ['BgA','inicial'], null],
+  [['5B','primaria'], ['5A','primaria'], ['6D','primaria'], ['6C','primaria'], ['LAB','lab'], ['6B','primaria'], ['7A','secundaria']],
+  [['9D','secundaria'], ['9C','secundaria'], ['9B','secundaria'], ['9A','secundaria'], ['8C','secundaria'], ['ML','lab'], ['ML','lab']]
+];
+B_ROWS.forEach((row, f) => row.forEach((r, i) => {
+  if (!r) return;
+  room(r[0], r[1], B.x, f, B.z0 + (i + 0.5) * B.sw, B.sw - 0.15, B.depth - 0.2);
+}));
+['I', 'II', 'III'].forEach((n, f) => label(n, B.x, f * FH + RH / 2, B.z0 - 2.2, 1.0, '#fde047'));
+label('PABELLÓN B', B.x, 3 * FH + 1.2, B.z0 + 3.5 * B.sw, 3, '#fff', 'rgba(0,114,206,.9)');
+
+// ---------- Pabellón D (3 pisos, 2 módulos a lo largo de X) ----------
+const D = { zc: 4.8, xc: [-1.2, -5.4], sw: 4.25, depth: 4 };
+const D_COLS = [
+  [['2C','primaria'], ['ML','lab'], ['ML','lab']],      // módulo hacia el ingreso lateral (X+)
+  [['2B','primaria'], ['ML','lab'], ['ML','lab']]       // módulo hacia B (X-), de aquí sale el puente
+];
+D_COLS.forEach((col, k) => col.forEach((r, f) => {
+  room(r[0], r[1], D.xc[k], f, D.zc, D.sw - 0.15, D.depth - 0.2);
+}));
+['I', 'II', 'III'].forEach((n, f) => label(n, D.xc[0], f * FH + RH / 2, D.zc + 3.2, 1.0, '#fde047'));
+label('PABELLÓN D', D.xc[0] - 2, 3 * FH + 1.2, D.zc, 3, '#fff', 'rgba(244,114,22,.9)');
+
+// ---------- Pabellón C (Welcome Lobby, 1 piso) ----------
+const C = { x: -36.9, z: 16.6 };
+room('LOBBY', 'lab', C.x, 0, C.z, 8, 7);
+label('PABELLÓN C', C.x, FH + 1.2, C.z, 3, '#fff', 'rgba(100,116,139,.95)');
+
+// ---------- Puente: ML 216 (D, piso 2) -> entre 6B y 7A (B, piso 2) ----------
+const bz = B.z0 + 6 * B.sw;                    // límite entre módulo 6B y 7A
+const bx1 = B.x + B.depth / 2;                  // cara de B hacia D
+const bx2 = D.xc[1] - D.sw / 2;                 // cara de D hacia B
+const bridge = new THREE.Mesh(
+  new THREE.BoxGeometry(bx2 - bx1, 2.6, 2.2),
+  new THREE.MeshLambertMaterial({ color: 0xfacc15, transparent: true, opacity: 0.85 })
+);
+bridge.position.set((bx1 + bx2) / 2, FH + 1.4, bz);
+scene.add(bridge);
+const be = new THREE.LineSegments(new THREE.EdgesGeometry(bridge.geometry), new THREE.LineBasicMaterial({ color: 0x713f12 }));
+be.position.copy(bridge.position);
+scene.add(be);
+label("PUENTE 2.º PISO", bridge.position.x, FH + 3.6, bz, 2.6, '#111', 'rgba(250,204,21,.95)');
+label("entre 6B y 7A", (bx1 + bx2) / 2, FH + 5.4, bz, 2.4, '#fff', 'rgba(15,23,42,.85)');
+
+// ---------- Ingreso ----------
+label('INGRESO', -9, 2.4, 22, 3, '#fff', 'rgba(22,163,74,.95)');
+
+// ---------- Cámaras ----------
+const presets = {
+  iso:    { p: [30, 38, 38],  t: [-18, 3, 2] },
+  puente: { p: [-6, 14, 20],  t: [-14, 4.5, 4.8] },
+  planta: { p: [-18, 85, 3],  t: [-18, 0, 2] }
+};
+function view(k) {
+  camera.position.set(...presets[k].p);
+  controls.target.set(...presets[k].t);
+  controls.update();
+}
+view('iso');
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+(function loop() { requestAnimationFrame(loop); controls.update(); renderer.render(scene, camera); })();
+</script>
+</body>
+</html>

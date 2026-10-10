@@ -472,26 +472,12 @@ function ironRail(x0, z0, x1, z1, y) {
   scene.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), lineMat));
   label('CANCHA DE LOSA', ccx, 0.7, ccz, 1.8, '#fff', 'rgba(30,41,59,.9)');
 })();
-function tree(x, z, h = 1.4) {
-  const t = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.15, h, 8), new THREE.MeshLambertMaterial({ color: 0x78350f }));
-  t.position.set(x, h / 2, z); t.castShadow = true; scene.add(t);
-  const c = new THREE.Mesh(new THREE.SphereGeometry(0.85, 12, 10), new THREE.MeshLambertMaterial({ color: 0x2e7d32 }));
-  c.position.set(x, h + 0.6, z); c.castShadow = true; scene.add(c);
-  addCollider(x, z, 0.4, 0.4, 0, 0, 2);
-}
 function grass(w, d, x, z) { flat(w, d, x, z, 0x5a9a45, 0.03, 0.06); }
-function pine(x, z) {                                    // arbusto en forma de cono (sin tronco visible)
-  const c = new THREE.Mesh(new THREE.ConeGeometry(0.62, 1.5, 16), new THREE.MeshLambertMaterial({ color: 0x2a6b3b }));
-  c.position.set(x, 0.75, z); c.castShadow = true; scene.add(c);
-  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.66, 0.7, 0.12, 16), new THREE.MeshLambertMaterial({ color: 0x1f4f2c }));
-  base.position.set(x, 0.06, z); scene.add(base);
-  addCollider(x, z, 0.9, 0.9, 0, 0, 1.5);
-}
 // área verde en el centro de la cancha: pasto y dos pinos pequeños
-grass(3.2, 8, -4, -13.5); pine(-4, -15.2); pine(-4, -11.8);
+grass(3.2, 8, -4, -13.5);
 label('ÁREA VERDE', -4, 3.6, -13.5, 1.2, '#fff', 'rgba(22,101,52,.9)');
 // dos rectángulos verdes delgados, cerca del patio, frente a B
-[[-10.75], [0]].forEach(([x]) => { grass(8.5, 1.7, x, -25.3); tree(x, -25.3); });
+[[-10.75], [0]].forEach(([x]) => { grass(8.5, 1.7, x, -25.3); });
 label('ÁREA VERDE', -5.4, 3.4, -25.3, 1.2, '#fff', 'rgba(22,101,52,.9)');
 
 // ===================================================================

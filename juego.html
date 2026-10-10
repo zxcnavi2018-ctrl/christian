@@ -103,6 +103,10 @@ function registerDoor(name, x, z, y, leaves, col, max) {
   const d = { name, x, z, y, leaves, col, angle: 0, target: 0, max, open: false };
   doors.push(d); return d;
 }
+function openNow(d) {                                    // deja la puerta abierta de entrada
+  d.open = true; d.angle = d.target = d.max; d.col.on = false;
+  d.leaves.forEach(l => { if (!l.slide) l.pivot.rotation.y = l.base + l.sgn * d.angle; });
+}
 function makeLeaf(pw, h, hx, y, hz, base, mat, neg = false) {
   const g = new THREE.BoxGeometry(pw, h, 0.06);
   g.translate((neg ? -1 : 1) * (pw / 2 + 0.02), h / 2, 0);
@@ -349,6 +353,7 @@ function ironRail(x0, z0, x1, z1, y) {
   flat(300, 14, 0, 41, 0x374151, 0.02, 0.04);         // calle
   for (let x = -100; x < 100; x += 6) flat(3, 0.3, x, 41, 0xfacc15, 0.05, 0.02);
   // patio más ancho y largo, con borde azulito en todo el perímetro (el lado derecho sigue la cara del pabellón F)
+  // patio hasta el fondo, con borde azulito en todo el perímetro (el lado derecho sigue la cara del pabellón F)
   const patio = [[-21, -1.7], [10.12, -1.7], [51.6, -21.2], [51.6, -59.6], [-21, -59.6]];
   const sh = new THREE.Shape(patio.map(([x, z]) => new THREE.Vector2(x, -z)));
   sh.holes.push(new THREE.Path([[-18, -33], [18, -33], [18, -41], [-18, -41]].map(([x, z]) => new THREE.Vector2(x, -z))));   // el pabellón E
@@ -362,12 +367,17 @@ function ironRail(x0, z0, x1, z1, y) {
     const m = new THREE.Mesh(new THREE.BoxGeometry(L, 0.05, 0.5), new THREE.MeshLambertMaterial({ color: 0x60a5fa }));
     m.position.set(mx + nx * 0.25, 0.06, mz + nz * 0.25); m.rotation.y = Math.atan2(-dz, dx); scene.add(m);
   });
-  label('PATIO', 4, 0.6, -24, 1.6, '#fff', 'rgba(71,85,105,.9)');
-  flat(16.5, 10, -4.25, -8.5, 0x64748b, 0.06, 0.06);  // cancha de losa
-  const pts = [[-12.5, -13.5], [4, -13.5], [4, -3.5], [-12.5, -3.5]].map(p => new THREE.Vector3(p[0], 0.1, p[1]));
-  scene.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0xffffff })));
-  scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-4.25, 0.1, -13.5), new THREE.Vector3(-4.25, 0.1, -3.5)]), new THREE.LineBasicMaterial({ color: 0xffffff })));
-  label('CANCHA DE LOSA', -4.25, 0.7, -8.5, 1.6, '#fff', 'rgba(30,41,59,.9)');
+  label('PATIO', 4, 0.6, -28, 1.6, '#fff', 'rgba(71,85,105,.9)');
+  // cancha de losa 4 veces más grande (2x2): 33 x 20 m, cubre el patio
+  const cx0 = -20.4, cx1 = 12.4, cz0 = -23.5, cz1 = -3.5, ccx = (cx0 + cx1) / 2, ccz = (cz0 + cz1) / 2;
+  flat(cx1 - cx0, cz1 - cz0, ccx, ccz, 0x64748b, 0.06, 0.06);
+  const lineMat = new THREE.LineBasicMaterial({ color: 0xffffff });
+  const pts = [[cx0 + 0.6, cz0 + 0.6], [cx1 - 0.6, cz0 + 0.6], [cx1 - 0.6, cz1 - 0.6], [cx0 + 0.6, cz1 - 0.6]].map(p => new THREE.Vector3(p[0], 0.1, p[1]));
+  scene.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), lineMat));
+  scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(ccx, 0.1, cz0 + 0.6), new THREE.Vector3(ccx, 0.1, cz1 - 0.6)]), lineMat));
+  const circ = new THREE.Mesh(new THREE.RingGeometry(2.9, 3.0, 40), new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide }));
+  circ.rotation.x = -Math.PI / 2; circ.position.set(ccx, 0.1, ccz); scene.add(circ);
+  label('CANCHA DE LOSA', ccx, 0.7, ccz, 1.8, '#fff', 'rgba(30,41,59,.9)');
 })();
 function tree(x, z, h = 1.4) {
   const t = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.15, h, 8), new THREE.MeshLambertMaterial({ color: 0x78350f }));
@@ -378,8 +388,8 @@ function tree(x, z, h = 1.4) {
 }
 function grass(w, d, x, z) { flat(w, d, x, z, 0x4ade80, 0.03, 0.06); }
 // dos rectángulos verdes delgados, cerca del patio, frente a B
-[[-11.2], [-5.2]].forEach(([z]) => { grass(1.7, 4.4, -13.75, z); tree(-13.75, z); });
-label('ÁREA VERDE', -13.75, 3.4, -8.2, 1.2, '#fff', 'rgba(22,101,52,.9)');
+[[-10.75], [0]].forEach(([x]) => { grass(8.5, 1.7, x, -25.3); tree(x, -25.3); });
+label('ÁREA VERDE', -5.4, 3.4, -25.3, 1.2, '#fff', 'rgba(22,101,52,.9)');
 
 // ===================================================================
 //  PABELLÓN B  (3 pisos, 7 aulas de 9 x 8 m a lo largo de Z)
@@ -431,11 +441,10 @@ const xTopD = D.xc[0] - D.sw / 2;                 // x = -14.7
 (function () {
   const run = 0.4, n = 11, rise = FH / n, zst = zsD - 1.8, iron = 0x1f2937;
   steps(xTopD + n * run, zst, -1, 0, n, rise, run, 1.8, 0, true);
-  [0, 3, 6, 9].forEach(i => {
+  [0, 9].forEach(i => {                                                  // solo los soportes de los extremos
     const x = xTopD + n * run - (i + 0.5) * run, top = (i + 1) * rise - 0.2;
     [-0.8, 0.8].forEach(k => addSolid(x, 0, zst + k, 0.1, top, 0.1, 0, iron, false));
   });
-  floorSlab(xTopD - 0.9, zsD, 1.8, 5.4, 0, FH);
   // barandas de fierro a ambos lados, siguiendo la pendiente de la escalera
   const xa = xTopD + n * run - 0.5 * run, xb = xTopD + 0.5 * run;
   [-0.88, 0.88].forEach(k => {
@@ -444,11 +453,6 @@ const xTopD = D.xc[0] - D.sw / 2;                 // x = -14.7
     for (let i = 0; i < n; i += 2) addSolid(xTopD + n * run - (i + 0.5) * run, (i + 1) * rise, zst + k, 0.04, 0.95, 0.04, 0, iron, false);
     addSolid(xb, FH, zst + k, 0.04, 0.95, 0.04, 0, iron, false);
   });
-  // barandas del descanso (abierto donde llega el puente y donde sube la escalera)
-  ironRail(xTopD - 1.8, zsD - 2.7, xTopD, zsD - 2.7, FH);
-  ironRail(xTopD - 1.8, zsD + 2.7, xTopD, zsD + 2.7, FH);
-  ironRail(xTopD - 1.8, zsD - 2.7, xTopD - 1.8, zsD - 2.0, FH);
-  ironRail(xTopD - 1.8, zsD + 1.0, xTopD - 1.8, zsD + 2.7, FH);
   grass(n * run, 1.6, xTopD + n * run / 2, zst);                       // área verde debajo de la escalera
 })();
 
@@ -534,12 +538,12 @@ label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
 // ---- puente (B <-> descanso de la escalera de D), en diagonal, baranda de fierro y sin techo ----
 (function () {
   const P1 = { x: bFace + 1.8, z: bz };
-  const P2 = { x: xTopD - 0.9, z: zsD - 1.4 };
+  const P2 = { x: xTopD + 0.5, z: zsD - 1.1 };            // sin descanso: llega directo al pasadizo de D y a la escalera
   const len = Math.hypot(P2.x - P1.x, P2.z - P1.z), ang = Math.atan2(-(P2.z - P1.z), P2.x - P1.x);
   const mx = (P1.x + P2.x) / 2, mz = (P1.z + P2.z) / 2;
   floorSlab(mx, mz, len, 2.2, ang, FH, 0.2, 0xcbd5e1);
   [-1, 1].forEach(k => {
-    const [ax, az] = lw(mx, mz, ang, -len / 2 + 1.1, k * 1.1), [bx, bz2] = lw(mx, mz, ang, len / 2 - 1.3, k * 1.1);   // sin invadir pasadizo ni descanso
+    const [ax, az] = lw(mx, mz, ang, -len / 2 + 1.1, k * 1.1), [bx, bz2] = lw(mx, mz, ang, len / 2 - 1.7, k * 1.1);   // sin invadir pasadizo ni descanso
     ironRail(ax, az, bx, bz2, FH);
   });
   label('PUENTE', mx, FH + 2.0, mz, 1.0, '#111', 'rgba(250,204,21,.95)');
@@ -599,17 +603,18 @@ label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
     const l1 = makeLeaf(lwid - 0.02, 2.65, b.x + 0.175, 0.03, Z, 0, mat, false);
     const l2 = makeLeaf(lwid - 0.02, 2.65, b.x + b.w - 0.175, 0.03, Z, 0, mat, true);
     const col = addCollider(b.x + b.w / 2, Z, b.w - 0.35, 0.3, 0, 0, 2.7);
-    registerDoor(b.n, b.x + b.w / 2, Z, 0, [{ pivot: l1, base: 0, sgn: -1 }, { pivot: l2, base: 0, sgn: 1 }], col, Math.PI / 2.2);
+    openNow(registerDoor(b.n, b.x + b.w / 2, Z, 0, [{ pivot: l1, base: 0, sgn: -1 }, { pivot: l2, base: 0, sgn: 1 }], col, Math.PI / 2.2));
     label(b.n.charAt(7), b.x + b.w / 2, 3.25, Z + 0.75, 0.55, '#fff', 'rgba(15,23,42,.9)', 128, 128);
   });
   // techito sobre las puertas 1, 2 y 3, por DENTRO del colegio: losa chica sostenida por fierros (sombra al entrar)
-  const iron = 0x1f2937, cx0 = -6.2, cx1 = 3.5, cz0 = 23.5, cz1 = 25.4, ytop = 3.0 + 0.7;
+  const iron = 0x1f2937, cx0 = -6.3, cx1 = 3.6, cz0 = 19.9, cz1 = 25.4, ytop = 3.0 + 0.7;
   addSolid((cx0 + cx1) / 2, ytop - 0.08, (cz0 + cz1) / 2, cx1 - cx0, 0.08, cz1 - cz0, 0, 0xd1d5db, false);
   addSolid((cx0 + cx1) / 2, ytop - 0.2, cz0, cx1 - cx0, 0.04, 0.05, 0, iron, false);          // perfil de fierro del borde
   [-6.1, -2.975, 0.275, 3.4].forEach(px => {
     addSolid(px, 0, cz0 + 0.05, 0.07, ytop - 0.08, 0.07, 0, iron, false);                      // poste
     addCollider(px, cz0 + 0.05, 0.12, 0.12, 0, 0, ytop);
-    addSolid(px, ytop - 0.55, (cz0 + cz1) / 2, 0.04, 0.04, Math.hypot(cz1 - cz0, 0.5), 0, iron, false);   // tirante hacia la fachada
+    addSolid(px, ytop - 0.2, (cz0 + cz1) / 2, 0.05, 0.05, cz1 - cz0, 0, iron, false);                  // viga de fierro hacia la fachada
+    addSolid(px, ytop - 0.6, (cz0 + cz1) / 2 + 0.6, 0.04, 0.04, Math.hypot(cz1 - cz0 - 1.2, 0.5), 0, iron, false);   // tirante
   });
   label('INGRESO', 1, 5.4, Z + 1.2, 1.4, '#fff', 'rgba(22,163,74,.95)');
 })();

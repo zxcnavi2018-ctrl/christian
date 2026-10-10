@@ -33,7 +33,7 @@
 </div>
 
 <script>
-const COL = { inicial: 0x0072CE, primaria: 0xF37021, secundaria: 0x78BE20, lab: 0x94A3B8, prof: 0xf8fafc };
+const COL = { inicial: 0x0072CE, primaria: 0xF37021, secundaria: 0x78BE20, lab: 0x94A3B8, prof: 0xf8fafc, topico: 0xf87171, bano: 0x38bdf8 };
 const FH = 3.2;      // alto de piso
 const RH = 3.0;      // alto del salón
 
@@ -108,10 +108,28 @@ D_COLS.forEach((col, k) => col.forEach((r, f) => {
 ['I', 'II', 'III'].forEach((n, f) => label(n, D.xc[0], f * FH + RH / 2, D.zc + 3.2, 1.0, '#fde047'));
 label('PABELLÓN D', D.xc[0] - 2, 3 * FH + 1.2, D.zc, 3, '#fff', 'rgba(244,114,22,.9)');
 
-// ---------- Pabellón C (Welcome Lobby, 1 piso) ----------
-const C = { x: -36.9, z: 16.6 };
-room('LOBBY', 'lab', C.x, 0, C.z, 8, 7);
-label('PABELLÓN C', C.x, FH + 1.2, C.z, 3, '#fff', 'rgba(100,116,139,.95)');
+// ---------- Pabellón C: Tópico | Baño | Entrada | Lobby (1 piso) ----------
+// Alineado con la sala de docentes de B, pero adelantado: queda un pasadizo libre entre B y C
+const C = { zc: 16.5, depth: 7 };
+const cParts = [
+  { n: 'TÓPICO', level: 'topico', w: 4.5, x: -32.75 },
+  { n: 'BAÑO',   level: 'bano',   w: 2.5, x: -29.25 },
+  { n: 'ENTRADA', level: null,    w: 3.0, x: -26.5 },
+  { n: 'LOBBY',  level: 'lab',    w: 8.0, x: -21.0 }
+];
+cParts.forEach(p => {
+  if (p.level) { room(p.n, p.level, p.x, 0, C.zc, p.w - 0.1, C.depth - 0.2); return; }
+  // entrada: solo techo y dos muros laterales (se puede pasar)
+  const mat = new THREE.MeshLambertMaterial({ color: 0xe2e8f0 });
+  const roof = new THREE.Mesh(new THREE.BoxGeometry(p.w, 0.4, C.depth - 0.2), mat);
+  roof.position.set(p.x, RH - 0.2, C.zc); scene.add(roof);
+  [-1, 1].forEach(k => {
+    const w = new THREE.Mesh(new THREE.BoxGeometry(p.w, RH, 0.3), mat);
+    w.position.set(p.x, RH / 2, C.zc + k * (C.depth / 2 - 0.25)); scene.add(w);
+  });
+  label(p.n, p.x, RH + 0.8, C.zc, 1.6, '#fff', 'rgba(22,163,74,.95)');
+});
+label('PABELLÓN C', -26.5, FH + 2.2, C.zc, 3, '#fff', 'rgba(100,116,139,.95)');
 
 // ---------- Puente: ML 216 (D, piso 2) -> entre 6B y 7A (B, piso 2) ----------
 const bz = B.z0 + 6 * B.sw;                    // límite entre módulo 6B y 7A
@@ -142,20 +160,20 @@ let doorsOpen = false, doorAngle = 0;
   const wallMat = new THREE.MeshLambertMaterial({ color: 0xe2e8f0 });
   const wood = new THREE.MeshLambertMaterial({ color: 0x854d0e });
   const dark = new THREE.MeshLambertMaterial({ color: 0x1e293b });
-  const logo = new THREE.Mesh(new THREE.BoxGeometry(6, 3.8, 0.6), wallMat);
-  logo.position.set(-4, 1.9, 0); g.add(logo);
+  const logo = new THREE.Mesh(new THREE.BoxGeometry(13, 3.8, 0.6), wallMat);
+  logo.position.set(-6.5, 1.9, 0); g.add(logo);
   const bays = [
-    { n: '1 Principal', w: 1.8, d: 1.10, roof: true },
-    { n: '2', w: 1.5, d: 0.95, roof: true },
-    { n: '3', w: 1.5, d: 0.95, roof: true },
-    { n: '4 Sin techo', w: 2.2, d: 1.80, roof: false }
+    { n: '1 Principal', w: 2.8, roof: true },
+    { n: '2', w: 2.8, roof: true },
+    { n: '3', w: 2.8, roof: true },
+    { n: '4 Sin techo', w: 4.6, roof: false }
   ];
   let cx = 0;
   bays.forEach((b, i) => {
     const bg = new THREE.Group(); bg.position.x = cx;
     [0, b.w].forEach(px => { const c = new THREE.Mesh(new THREE.BoxGeometry(0.35, 3.6, 1.2), wallMat); c.position.set(px, 1.8, 0); bg.add(c); });
     if (b.roof) { const r = new THREE.Mesh(new THREE.BoxGeometry(b.w + 0.35, 0.5, 1.6), wallMat); r.position.set(b.w / 2, 3.35, 0); bg.add(r); }
-    const lw = b.d / 2;
+    const lw = (b.w - 0.35) / 2;
     const mk = (px, dir) => {
       const pv = new THREE.Group(); pv.position.set(px, 1.4, 0);
       const leaf = new THREE.Mesh(new THREE.BoxGeometry(lw, 2.6, 0.1), i < 3 ? wood : new THREE.MeshLambertMaterial({ color: 0xffffff }));
@@ -171,7 +189,7 @@ let doorsOpen = false, doorAngle = 0;
   // etiquetas
   bays.forEach((b, i) => {
     const bx = -6 + bays.slice(0, i).reduce((a, q) => a + q.w + 0.45, 0) + b.w / 2;
-    label(b.n + ' · ' + b.d.toFixed(2).replace('.', ',') + ' m', bx, 4.6, 22.8, 0.9, '#fff', 'rgba(15,23,42,.9)');
+    label(b.n, bx, 4.6, 22.8, 1.4, '#fff', 'rgba(15,23,42,.9)');
   });
 })();
 function toggleDoors() {

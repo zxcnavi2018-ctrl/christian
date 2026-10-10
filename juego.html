@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Innova Tacna - Recorrido</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #000; touch-action: none; font-family: system-ui, sans-serif; user-select: none; -webkit-user-select: none; }
+  canvas { display: block; }
+  #cross { position: fixed; top: 50%; left: 50%; width: 6px; height: 6px; margin: -3px; border-radius: 50%; background: rgba(255,255,255,.85); box-shadow: 0 0 2px #000; pointer-events: none; }
+  #prompt { position: fixed; bottom: 26%; left: 50%; transform: translateX(-50%); background: rgba(15,23,42,.88); color: #fff; padding: 9px 16px; border-radius: 12px; font-size: 15px; font-weight: 600; display: none; pointer-events: none; white-space: nowrap; }
+  #hud { position: fixed; top: 10px; left: 10px; color: #fff; background: rgba(15,23,42,.7); padding: 6px 10px; border-radius: 8px; font-size: 12px; pointer-events: none; }
+  #start { position: fixed; inset: 0; background: rgba(2,6,23,.88); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; z-index: 10; }
+  #start h1 { margin: 0 0 8px; font-size: 24px; }
+  #start p { margin: 4px 0; font-size: 14px; color: #cbd5e1; max-width: 420px; line-height: 1.5; }
+  #start button { margin-top: 18px; background: #2563eb; color: #fff; border: 0; border-radius: 12px; padding: 14px 34px; font-size: 18px; font-weight: 700; }
+  #joy { position: fixed; left: 22px; bottom: 26px; width: 130px; height: 130px; border-radius: 50%; background: rgba(255,255,255,.12); border: 2px solid rgba(255,255,255,.35); display: none; touch-action: none; }
+  #knob { position: absolute; left: 40px; top: 40px; width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,.5); }
+  .btn { position: fixed; width: 78px; height: 78px; border-radius: 50%; border: 0; color: #fff; font-weight: 700; font-size: 14px; display: none; touch-action: none; }
+  #useBtn { right: 22px; bottom: 40px; background: rgba(37,99,235,.9); }
+  #jumpBtn { right: 110px; bottom: 110px; width: 62px; height: 62px; background: rgba(71,85,105,.85); }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+<div id="cross"></div>
+<div id="prompt"></div>
+<div id="hud">Innova Schools Tacna</div>
+<div id="joy"><div id="knob"></div></div>
+<button class="btn" id="useBtn">ABRIR</button>
+<button class="btn" id="jumpBtn">SALTAR</button>
+<div id="start">
+  <h1>Innova Schools Tacna</h1>
+  <p>Apareces afuera, frente a las puertas del colegio. Acércate y ábrelas para entrar. Puedes subir escaleras, cruzar el puente y entrar a todas las aulas.</p>
+  <p id="helpPc"><b>PC:</b> clic para mirar · W A S D mover · Shift correr · Espacio saltar · <b>E</b> abrir/cerrar puertas</p>
+  <p id="helpTouch"><b>Celular:</b> joystick izquierdo para caminar · arrastra el dedo en la derecha para mirar · botón <b>ABRIR</b> junto a una puerta</p>
+  <button id="go">JUGAR</button>
+</div>
+
+<script>
+// ===================================================================
+//  CONSTANTES Y ESTADO
+// ===================================================================
+const FH = 3.2, RH = 3.0, T = 0.2, DOOR_H = 2.1;
+const COL = { inicial: 0x0072CE, primaria: 0xF37021, secundaria: 0x78BE20, lab: 0x94A3B8, prof: 0xf1f5f9, topico: 0xf87171, bano: 0x38bdf8 };
+const solidItems = [], glassItems = [];
+const colliders = [];   // OBB: {x,z,hw,hd,c,s,R,y0,y1,on}
+const floors = [];      // superficies caminables: {x,z,hw,hd,c,s,y}
+const doors = [];       // puertas interactivas
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x90c2f9);
+scene.fog = new THREE.Fog(0x90c2f9, 80, 260);
+const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.05, 500);
+camera.rotation.order = 'YXZ';
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+document.body.appendChild(renderer.domElement);
+scene.add(new THREE.AmbientLight(0xffffff, 0.85));
+const sun = new THREE.DirectionalLight(0xffffff, 0.7);
+sun.position.set(30, 60, 40);
+scene.add(sun);
+
+// ===================================================================
+//  HELPERS DE GEOMETRÍA
+// ===================================================================
+function lw(ox, oz, rot, lx, lz) {            // local -> mundo (giro Y)
+  const c = Math.cos(rot), s = Math.sin(rot);
+  return [ox + lx * c + lz * s, oz - lx * s + lz * c];
+}
+function addSolid(x, y0, z, sx, sy, sz, rot, color, collide = true, glass = false) {
+  (glass ? glassItems : solidItems).push({ x, y: y0 + sy / 2, z, sx, sy, sz, rot, color });
+  if (collide) colliders.push({ x, z, hw: sx / 2, hd: sz / 2, c: Math.cos(rot), s: Math.sin(rot), R: Math.hypot(sx, sz) / 2, y0, y1: y0 + sy, on: true });
+}
+function addCollider(x, z, sx, sz, rot, y0, y1) {
+  const o = { x, z, hw: sx / 2, hd: sz / 2, c: Math.cos(rot), s: Math.sin(rot), R: Math.hypot(sx, sz) / 2, y0, y1, on: true };
+  colliders.push(o); return o;
+}
+function floorSlab(x, z, w, d, rot, yTop, th = 0.2, color = 0xcbd5e1) {
+  addSolid(x, yTop - th, z, w, th, d, rot, color, false);
+  floors.push({ x, z, hw: w / 2, hd: d / 2, c: Math.cos(rot), s: Math.sin(rot), y: yTop });
+}
+function label(text, x, y, z, scale = 2.2, color = '#ffffff', bg = 'rgba(15,23,42,.8)', w = 512, h = 128) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const g = c.getContext('2d');
+  g.fillStyle = bg; g.fillRect(0, 0, w, h);
+  g.fillStyle = color; g.font = 'bold ' + Math.round(h * 0.6) + 'px sans-serif';
+  g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(text, w / 2, h / 2 + 3);
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c) }));
+  s.position.set(x, y, z); s.scale.set(scale * (w / h) / 2, scale / 2, 1);
+  scene.add(s); return s;
+}
+function flat(w, d, x, z, color, y = 0.03, h = 0.06) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({ color }));
+  m.position.set(x, y, z); scene.add(m); return m;
+}
+const woodMat = new THREE.MeshLambertMaterial({ color: 0x854d0e });
+const glassDoorMat = new THREE.MeshLambertMaterial({ color: 0x7dd3fc, transparent: true, opacity: 0.45 });
+
+// ---- puertas ----
+function registerDoor(name, x, z, y, leaves, col, max) {
+  const d = { name, x, z, y, leaves, col, angle: 0, target: 0, max, open: false };
+  doors.push(d); return d;
+}
+function makeLeaf(pw, h, hx, y, hz, base, mat, neg = false) {
+  const g = new THREE.BoxGeometry(pw, h, 0.06);
+  g.translate((neg ? -1 : 1) * (pw / 2 + 0.02), h / 2, 0);
+  const m = new THREE.Mesh(g, mat);
+  const p = new THREE.Group(); p.position.set(hx, y, hz); p.rotation.y = base; p.add(m); scene.add(p);
+  return p;
+}
+
+// ---- muro con vanos ----
+// axis 'x': corre a lo largo del eje local x; 'z': a lo largo del eje local z
+function buildWall(ox, oz, rot, lx, lz, axis, len, y0, ops, color, o = {}) {
+  const t = o.T || T, h = o.h || RH;
+  const mk = (u0, u1, ya, yb, glass) => {
+    if (u1 - u0 < 0.01 || yb - ya < 0.01) return;
+    const um = (u0 + u1) / 2, l = u1 - u0;
+    const [wx, wz] = lw(ox, oz, rot, axis === 'x' ? lx + um : lx, axis === 'x' ? lz : lz + um);
+    addSolid(wx, y0 + ya, wz, axis === 'x' ? l : t, yb - ya, axis === 'x' ? t : l, rot, glass ? 0xbfdbfe : color, true, glass);
+  };
+  ops = ops.slice().sort((a, b) => a.u - b.u);
+  let cur = -len / 2;
+  for (const op of ops) {
+    const a = op.u - op.w / 2, b = op.u + op.w / 2;
+    mk(cur, a, 0, h);
+    const isWin = op.type === 'window';
+    const oy0 = isWin ? 0.9 : 0, oy1 = isWin ? 2.5 : DOOR_H;
+    if (oy0 > 0) mk(a, b, 0, oy0);
+    if (oy1 < h) mk(a, b, oy1, h);
+    if (isWin) mk(a, b, oy0, oy1, true);
+    else {
+      const phi = axis === 'x' ? rot : rot - Math.PI / 2;
+      const [hx, hz] = lw(ox, oz, rot, axis === 'x' ? lx + a : lx, axis === 'x' ? lz : lz + a);
+      const [cx, cz] = lw(ox, oz, rot, axis === 'x' ? lx + op.u : lx, axis === 'x' ? lz : lz + op.u);
+      const pw = b - a - 0.04;
+      const glass = op.type === 'gdoor';
+      const leaf = makeLeaf(pw, DOOR_H - 0.05, hx, y0 + 0.02, hz, phi, glass ? glassDoorMat : woodMat);
+      const col = addCollider(cx, cz, axis === 'x' ? b - a : 0.2, axis === 'x' ? 0.2 : b - a, rot, y0, y0 + DOOR_H);
+      // sentido de giro: hacia afuera de la pared
+      const n = o.normal || [0, 1];
+      const nw = [n[0] * Math.cos(rot) + n[1] * Math.sin(rot), -n[0] * Math.sin(rot) + n[1] * Math.cos(rot)];
+      const dir = ((-Math.sin(phi)) * nw[0] + (-Math.cos(phi)) * nw[1]) >= 0 ? 1 : -1;
+      registerDoor(op.name || o.name || 'Puerta', cx, cz, y0, [{ pivot: leaf, base: phi, sgn: dir }], col, Math.PI / 2);
+      if (op.sign && o.name) {
+        const [sx, sz] = lw(ox, oz, rot, axis === 'x' ? lx + op.u + n[0] * 0.15 : lx + n[0] * 0.15, axis === 'x' ? lz + n[1] * 0.15 : lz + op.u + n[1] * 0.15);
+        label(o.name, sx, y0 + 2.55, sz, 0.34, '#ffffff', 'rgba(15,23,42,.85)', 256, 64);
+      }
+    }
+    cur = b;
+  }
+  mk(cur, len / 2, 0, h);
+}
+
+// ---- aula hueca con puerta y ventanas grandes ----
+function room(name, level, cx, fl, cz, w, d, o = {}) {
+  const rot = o.rot || 0, door = o.door || '+x', y0 = fl * FH, col = COL[level];
+  const opp = (door[0] === '+' ? '-' : '+') + door[1];
+  for (const side of ['+x', '-x', '+z', '-z']) {
+    const sg = side[0] === '+' ? 1 : -1, isX = side[1] === 'x';
+    const len = isX ? d : w;
+    const ops = [];
+    if (side === door) {
+      ops.push({ type: 'door', u: -len * 0.28, w: 1.2, name: 'Puerta ' + name, sign: true });
+      ops.push({ type: 'window', u: len * 0.18, w: len * 0.45 });
+    } else if (side === opp) ops.push({ type: 'window', u: 0, w: len * 0.7 });
+    (o.extra || []).forEach(e => { if (e.side === side) ops.push({ type: 'door', u: e.u, w: 1.2, name: e.name }); });
+    buildWall(cx, cz, rot, isX ? sg * (w / 2 - T / 2) : 0, isX ? 0 : sg * (d / 2 - T / 2), isX ? 'z' : 'x', len, y0, ops, col,
+      { normal: isX ? [sg, 0] : [0, sg], name });
+  }
+  if (fl > 0) floorSlab(cx, cz, w, d, rot, y0, 0.2, 0xcbd5e1);
+  else { addSolid(cx, 0, cz, w, 0.04, d, rot, 0xe7e5e4, false); }
+  if (o.roof) addSolid(cx, y0 + RH, cz, w, 0.2, d, rot, 0x94a3b8, false);
+}
+
+function steps(x0, z0, dx, dz, n, rise, run, w, yBase, thin) {   // (x0,z0) = arranque, (dx,dz) = dirección
+  for (let i = 0; i < n; i++) {
+    const top = yBase + (i + 1) * rise;
+    const x = x0 + dx * (i + 0.5) * run, z = z0 + dz * (i + 0.5) * run;
+    const sx = dx !== 0 ? run : w, sz = dx !== 0 ? w : run;
+    addSolid(x, thin ? top - 0.2 : 0, z, sx, thin ? 0.2 : top, sz, 0, 0x94a3b8, false);
+    floors.push({ x, z, hw: sx / 2, hd: sz / 2, c: 1, s: 0, y: top });
+  }
+}
+function rail(x, y, z, sx, sz, rot = 0) {
+  addSolid(x, y, z, sx, 0.06, sz, rot, 0x334155, false);
+}
+
+// ===================================================================
+//  SUELO, CALLE, PATIO, CANCHA, ÁREA VERDE
+// ===================================================================
+(function ground() {
+  const g = new THREE.Mesh(new THREE.PlaneGeometry(600, 600), new THREE.MeshLambertMaterial({ color: 0x9a9a94 }));
+  g.rotation.x = -Math.PI / 2; scene.add(g);
+  flat(300, 6, 0, 37, 0xcbd5e1, 0.02, 0.04);          // vereda
+  flat(300, 14, 0, 47, 0x374151, 0.02, 0.04);         // calle
+  for (let x = -100; x < 100; x += 6) flat(3, 0.3, x, 47, 0xfacc15, 0.05, 0.02);
+  flat(48, 29.5, 5, -1.75, 0xb3ae9f, 0.02, 0.04);     // patio
+  label('PATIO', -4, 0.6, -13, 1.6, '#fff', 'rgba(71,85,105,.9)');
+  flat(16.5, 10, -4.25, -5, 0x64748b, 0.06, 0.06);    // cancha de losa
+  const pts = [[-12.5, -10], [4, -10], [4, 0], [-12.5, 0]].map(p => new THREE.Vector3(p[0], 0.1, p[1]));
+  scene.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0xffffff })));
+  scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-4.25, 0.1, -10), new THREE.Vector3(-4.25, 0.1, 0)]), new THREE.LineBasicMaterial({ color: 0xffffff })));
+  label('CANCHA DE LOSA', -4.25, 0.7, -5, 1.6, '#fff', 'rgba(30,41,59,.9)');
+  flat(3.2, 11, -17, -3.5, 0x4ade80, 0.03, 0.06);     // área verde
+  [-8, -4, 0].forEach(z => {
+    const t = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 1.4, 8), new THREE.MeshLambertMaterial({ color: 0x78350f }));
+    t.position.set(-17, 0.7, z); scene.add(t);
+    const c = new THREE.Mesh(new THREE.SphereGeometry(0.9, 12, 10), new THREE.MeshLambertMaterial({ color: 0x15803d }));
+    c.position.set(-17, 2.0, z); scene.add(c);
+    addCollider(-17, z, 0.4, 0.4, 0, 0, 2);
+  });
+  label('ÁREA VERDE', -17, 3.6, -3.5, 1.4, '#fff', 'rgba(22,101,52,.9)');
+})();
+
+// ===================================================================
+//  PABELLÓN B  (3 pisos, 7 módulos a lo largo de Z)
+// ===================================================================
+const B = { x: -24, z0: -30, sw: 6, depth: 6 };
+const bFace = B.x + B.depth / 2;                 // x = -21
+const B_ROWS = [
+  [['KA','inicial'], ['PkB','inicial'], ['PkA','inicial'], ['BgC','inicial'], ['BgB','inicial'], ['BgA','inicial'], ['Docentes','prof']],
+  [['5B','primaria'], ['5A','primaria'], ['6D','primaria'], ['6C','primaria'], ['LAB','lab'], ['6B','primaria'], ['7A','secundaria']],
+  [['9D','secundaria'], ['9C','secundaria'], ['9B','secundaria'], ['9A','secundaria'], ['8C','secundaria'], ['ML','lab'], ['ML','lab']]
+];
+B_ROWS.forEach((row, f) => row.forEach((r, i) => {
+  room(r[0], r[1], B.x, f, B.z0 + (i + 0.5) * B.sw, B.depth, B.sw, { door: '+x', roof: f === 2 });
+}));
+label('PABELLÓN B', B.x, 3 * FH + 1.2, B.z0 + 3.5 * B.sw, 3, '#fff', 'rgba(0,114,206,.9)');
+// pasadizos de B
+floorSlab(bFace + 0.9, -11.5, 1.8, 37, 0, FH);            // piso 2 (z -30..7)
+floorSlab(bFace + 0.9, -9, 1.8, 42, 0, 2 * FH);           // piso 3 (z -30..12)
+floorSlab(bFace + 2.7, 6.0, 1.8, 2.0, 0, FH);             // descanso piso 2 (junto al puente)
+floorSlab(bFace + 2.7, 11.1, 1.8, 1.8, 0, 2 * FH);        // descanso piso 3
+rail(bFace + 1.75, FH + 1.0, -11.5, 0.06, 37); rail(bFace + 1.75, 2 * FH + 1.0, -9, 0.06, 42);
+// escalera de B: tramo 1 (suelo -> piso 2) y tramo 2 (piso 2 -> piso 3)
+steps(bFace + 0.9, 10.2, 0, -1, 11, FH / 11, 0.29, 1.8, 0, false);
+steps(bFace + 2.7, 7.0, 0, 1, 11, FH / 11, 0.29, 1.8, FH, true);
+
+// ===================================================================
+//  PABELLÓN D  (3 pisos, 2 módulos de 9 m a lo largo de X)
+// ===================================================================
+const D = { zc: 7.9, xc: [-10.2, -1.2], sw: 9, depth: 6 };
+const D_COLS = [
+  [['2B','primaria'], ['ML','lab'], ['ML','lab']],
+  [['2C','primaria'], ['ML','lab'], ['ML','lab']]
+];
+D_COLS.forEach((col, k) => col.forEach((r, f) => {
+  const extra = (k === 1 && f === 1) ? [{ side: '+x', u: -0.4, name: 'Enlace a 7B' }] : [];
+  room(r[0], r[1], D.xc[k], f, D.zc, D.sw, D.depth, { door: '-z', roof: f === 2, extra });
+}));
+label('PABELLÓN D', -5.7, 3 * FH + 1.2, D.zc, 3, '#fff', 'rgba(244,114,22,.9)');
+[1, 2].forEach(f => {
+  floorSlab(-5.7, D.zc - 3.9, 18, 1.8, 0, f * FH);
+  rail(-5.7, f * FH + 1.0, D.zc - 4.75, 18, 0.06);
+});
+// escalera de D (paralela a la cara norte, sube hacia el puente) + descanso
+(function () {
+  const run = 0.4, n = 11, xTop = D.xc[0] - D.sw / 2, zs = D.zc - 3.9;
+  steps(xTop + n * run, zs - 1.8, -1, 0, n, FH / n, run, 1.8, 0, false);
+  floorSlab(xTop - 0.9, zs, 1.8, 5.4, 0, FH);
+  rail(xTop + n * run / 2, FH * 0.5 + 0.9, zs - 2.7, n * run, 0.06);
+})();
+
+// ===================================================================
+//  PABELLÓN E  (frente a B, al otro lado del patio)
+// ===================================================================
+const E = { zc: -20, xc: [9, 3, -3, -9], sw: 6, depth: 6 };
+const E_SLOTS = [
+  [['2A','primaria'], ['4D','primaria'], ['10D','secundaria']],
+  [['1C','primaria'], ['4C','primaria'], ['10C','secundaria']],
+  [['1B','primaria'], ['Docentes','prof'], ['10B','secundaria']],
+  [['1A','primaria'], ['6A','primaria'], ['10A','secundaria']]
+];
+E_SLOTS.forEach((col, k) => col.forEach((r, f) => {
+  room(r[0], r[1], E.xc[k], f, E.zc, E.sw, E.depth, { door: '+z', roof: f === 2 });
+}));
+label('PABELLÓN E', 0, 3 * FH + 1.2, E.zc, 3, '#fff', 'rgba(244,114,22,.9)');
+[1, 2].forEach(f => floorSlab(0, E.zc + 3.9, 24, 1.8, 0, f * FH));
+
+// ===================================================================
+//  PABELLÓN A
+// ===================================================================
+const A = { zc: -14.7, xc: [-38.5, -44.5] };
+room('KB', 'inicial', A.xc[0], 0, A.zc, 6, 6, { door: '+z' });
+room('5C', 'primaria', A.xc[0], 1, A.zc, 6, 6, { door: '+z', roof: true });
+room('KC', 'inicial', A.xc[1], 0, A.zc, 6, 6, { door: '+z', roof: true });
+label('PABELLÓN A', -41.5, 2 * FH + 1.2, A.zc, 3, '#fff', 'rgba(0,114,206,.9)');
+floorSlab(A.xc[0], A.zc + 3.9, 6, 1.8, 0, FH);
+
+// ===================================================================
+//  PABELLÓN F  (diagonal)
+// ===================================================================
+const F = { x: 20.4, z: 1.67, rot: 0.44, sw: 5.5, depth: 6 };
+const F_ROWS = [
+  [['2D','primaria'], ['3A','primaria'], ['3B','primaria'], ['3C','primaria'], ['3D','primaria']],
+  [['7B','secundaria'], ['7C','secundaria'], ['7D','secundaria'], ['8A','secundaria'], ['8B','secundaria']],
+  [null, null, null, ['4A','primaria'], ['4B','primaria']]
+];
+F_ROWS.forEach((row, f) => row.forEach((r, i) => {
+  if (!r) return;
+  const lx = (i - 2) * F.sw;
+  const [wx, wz] = lw(F.x, F.z, F.rot, lx, 0);
+  const extra = (i === 0 && f === 1) ? [{ side: '-x', u: 0, name: 'Enlace a ML' }] : [];
+  room(r[0], r[1], wx, f, wz, F.sw, F.depth, { rot: F.rot, door: '-z', roof: i < 3 ? f === 1 : f === 2, extra });
+}));
+label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
+(function () {
+  const lz = -(F.depth / 2 + 0.9);
+  let [wx, wz] = lw(F.x, F.z, F.rot, 0, lz);
+  floorSlab(wx, wz, 27.5, 1.8, F.rot, FH);
+  [wx, wz] = lw(F.x, F.z, F.rot, 8.25, lz);
+  floorSlab(wx, wz, 11, 1.8, F.rot, 2 * FH);
+})();
+
+// ---- enlace corto 7B <-> ML (D piso 2 -> F piso 2) ----
+(function () {
+  const x1 = D.xc[1] + D.sw / 2, x2 = 7.95, z = 7.5;
+  floorSlab((x1 + x2) / 2, z, x2 - x1, 1.8, 0, FH, 0.2, 0xfacc15);
+  rail((x1 + x2) / 2, FH + 1.0, z - 0.85, x2 - x1, 0.06); rail((x1 + x2) / 2, FH + 1.0, z + 0.85, x2 - x1, 0.06);
+  label('7B ↔ ML', (x1 + x2) / 2, FH + 2.2, z, 1.0, '#111', 'rgba(250,204,21,.95)');
+})();
+
+// ---- puente (B <-> descanso de la escalera de D), en diagonal ----
+(function () {
+  const P1 = { x: bFace + 1.8, z: B.z0 + 6 * B.sw };
+  const P2 = { x: D.xc[0] - D.sw / 2 - 0.9, z: D.zc - D.depth / 2 - 0.8 };
+  const len = Math.hypot(P2.x - P1.x, P2.z - P1.z), ang = Math.atan2(-(P2.z - P1.z), P2.x - P1.x);
+  const mx = (P1.x + P2.x) / 2, mz = (P1.z + P2.z) / 2;
+  floorSlab(mx, mz, len, 2.2, ang, FH, 0.2, 0xfacc15);
+  // paredes de vidrio amarillo a los lados + techo
+  [-1, 1].forEach(k => {
+    const [px, pz] = lw(mx, mz, ang, 0, k * 1.05);
+    addSolid(px, FH, pz, len, 2.4, 0.1, ang, 0xfde047, true, true);
+  });
+  addSolid(mx, FH + 2.4, mz, len, 0.2, 2.2, ang, 0xeab308, false);
+  label('PUENTE', mx, FH + 3.6, mz, 1.2, '#111', 'rgba(250,204,21,.95)');
+})();
+
+// ===================================================================
+//  PABELLÓN C: lobby en L, entrada, baño, tópico
+// ===================================================================
+(function () {
+  const wc = 0xe5e7eb;
+  // lobby principal (x -30..-17, z 13.5..21) + brazo (x -30..-21, z 21..33)
+  buildWall(0, 0, 0, -23.5, 13.6, 'x', 13, 0, [{ type: 'gdoor', u: 0, w: 2.0, name: 'Lobby (hacia el patio)' }, { type: 'window', u: -4.1, w: 3.4 }, { type: 'window', u: 4.1, w: 3.4 }], wc, { normal: [0, -1] });
+  buildWall(0, 0, 0, -29.9, 23.25, 'z', 19.5, 0, [{ type: 'window', u: -6, w: 3.6 }, { type: 'window', u: 3.75, w: 4 }], wc);
+  buildWall(0, 0, 0, -17.1, 17.25, 'z', 7.5, 0, [{ type: 'window', u: 0, w: 4 }], wc);
+  buildWall(0, 0, 0, -19, 20.9, 'x', 4, 0, [], wc);
+  buildWall(0, 0, 0, -21.1, 27, 'z', 12, 0, [{ type: 'gdoor', u: 2.5, w: 1.6, name: 'Lobby (desde la entrada)' }, { type: 'window', u: -3, w: 3 }], wc, { normal: [1, 0] });
+  buildWall(0, 0, 0, -25.5, 32.9, 'x', 9, 0, [{ type: 'gdoor', u: -2.1, w: 1.6, name: 'Lobby (calle)' }, { type: 'window', u: 0.5, w: 2.4 }, { type: 'gdoor', u: 3.1, w: 1.6, name: 'Lobby (calle)' }], wc, { normal: [0, 1] });
+  addSolid(-23.5, 0, 17.25, 13, 0.04, 7.5, 0, 0xe7e5e4, false);
+  addSolid(-25.5, 0, 27, 9, 0.04, 12, 0, 0xe7e5e4, false);
+  addSolid(-23.5, RH, 17.25, 13, 0.2, 7.5, 0, 0x94a3b8, false);
+  addSolid(-25.5, RH, 27, 9, 0.2, 12, 0, 0x94a3b8, false);
+  label('LOBBY', -23.5, RH + 1.0, 17.25, 1.6, '#fff', 'rgba(100,116,139,.95)');
+  label('PABELLÓN C', -23.5, RH + 2.4, 17.25, 2.4, '#fff', 'rgba(100,116,139,.95)');
+  // entrada (techada, abierta a la calle), baño y tópico
+  addSolid(-18.75, RH, 30, 4.5, 0.2, 7, 0, 0xe2e8f0, false);
+  addSolid(-18.75, 0, 30, 4.5, 0.04, 7, 0, 0xe7e5e4, false);
+  label('ENTRADA', -18.75, RH + 0.9, 33.3, 0.9, '#fff', 'rgba(22,163,74,.95)');
+  room('BAÑO', 'bano', -14.5, 0, 30, 4, 7, { door: '+z', roof: true });
+  room('TÓPICO', 'topico', -9.75, 0, 30, 5.5, 7, { door: '+z', roof: true });
+})();
+
+// ===================================================================
+//  PERÍMETRO + FACHADA DE INGRESO (4 puertas dobles)
+// ===================================================================
+(function () {
+  const wm = 0xe5e7eb, hh = 2.6;
+  const seg = (x0, z0, x1, z1) => {
+    const horiz = z0 === z1, len = horiz ? Math.abs(x1 - x0) : Math.abs(z1 - z0);
+    buildWall(0, 0, 0, (x0 + x1) / 2, (z0 + z1) / 2, horiz ? 'x' : 'z', len, 0, [], wm, { T: 0.4, h: hh });
+  };
+  seg(-52, -34, -52, 26); seg(-52, -34, 38, -34); seg(38, -34, 38, 26);
+  seg(-52, 26, -30, 26); seg(-21, 26, -6.5, 26); seg(8.55, 26, 38, 26);
+  buildWall(0, 0, 0, -6.475, 29.9, 'z', 9, 0, [], wm, { T: 0.6, h: 3.6 });       // muro que sale hacia la calle junto a la puerta 1
+  const Z = 26, bays = [
+    { n: 'Puerta 1', x: -6, w: 2.8, roof: true }, { n: 'Puerta 2', x: -2.75, w: 2.8, roof: true },
+    { n: 'Puerta 3', x: 0.5, w: 2.8, roof: true }, { n: 'Puerta 4 (portón)', x: 3.75, w: 4.6, roof: false }
+  ];
+  bays.forEach((b, i) => {
+    [b.x, b.x + b.w].forEach(px => addSolid(px, 0, Z, 0.35, 3.6, 1.2, 0, 0xe2e8f0, true));
+    addSolid(b.x + b.w / 2, 2.7, Z, b.w - 0.35, 0.9, 0.4, 0, 0xe2e8f0, true);
+    if (b.roof) addSolid(b.x + b.w / 2, 3.1, Z, b.w + 0.35, 0.5, 1.6, 0, 0xe2e8f0, false);
+    const lwid = (b.w - 0.35) / 2;
+    const mat = i < 3 ? woodMat : new THREE.MeshLambertMaterial({ color: 0xffffff });
+    const l1 = makeLeaf(lwid - 0.02, 2.65, b.x + 0.175, 0.03, Z, 0, mat, false);
+    const l2 = makeLeaf(lwid - 0.02, 2.65, b.x + b.w - 0.175, 0.03, Z, 0, mat, true);
+    const col = addCollider(b.x + b.w / 2, Z, b.w - 0.35, 0.3, 0, 0, 2.7);
+    registerDoor(b.n, b.x + b.w / 2, Z, 0, [{ pivot: l1, base: 0, sgn: -1 }, { pivot: l2, base: 0, sgn: 1 }], col, Math.PI / 2.2);
+    label(b.n.charAt(7), b.x + b.w / 2, 4.5, Z + 0.9, 0.9, '#fff', 'rgba(15,23,42,.9)', 128, 128);
+  });
+  label('INGRESO', 1, 5.8, Z + 1.2, 1.4, '#fff', 'rgba(22,163,74,.95)');
+})();
+
+// ===================================================================
+//  INSTANCIAS (todo el muro/piso en pocos draw calls)
+// ===================================================================
+function buildInstanced(items, material) {
+  if (!items.length) return;
+  const m = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), material, items.length);
+  const dummy = new THREE.Object3D(), col = new THREE.Color();
+  items.forEach((it, i) => {
+    dummy.position.set(it.x, it.y, it.z); dummy.rotation.set(0, it.rot, 0); dummy.scale.set(it.sx, it.sy, it.sz);
+    dummy.updateMatrix(); m.setMatrixAt(i, dummy.matrix); col.setHex(it.color); m.setColorAt(i, col);
+  });
+  m.instanceMatrix.needsUpdate = true; if (m.instanceColor) m.instanceColor.needsUpdate = true;
+  m.frustumCulled = false; scene.add(m);
+}
+buildInstanced(solidItems, new THREE.MeshLambertMaterial({ color: 0xffffff }));
+buildInstanced(glassItems, new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.35, depthWrite: false }));
+
+// ===================================================================
+//  JUGADOR
+// ===================================================================
+const P = { x: 1, y: 0, z: 36, vy: 0, yaw: 0, pitch: 0, r: 0.38, started: false };
+const keys = {}, joy = { x: 0, y: 0 };
+let wantUse = false, wantJump = false;
+
+function groundY(x, z, y) {
+  let best = 0;
+  for (const f of floors) {
+    if (f.y <= best || f.y > y + 0.6) continue;
+    const dx = x - f.x, dz = z - f.z;
+    const lx = dx * f.c - dz * f.s, lz = dx * f.s + dz * f.c;
+    if (Math.abs(lx) <= f.hw && Math.abs(lz) <= f.hd) best = f.y;
+  }
+  return best;
+}
+function resolve() {
+  for (let it = 0; it < 3; it++) {
+    for (const o of colliders) {
+      if (!o.on || o.y1 < P.y + 0.35 || o.y0 > P.y + 1.7) continue;
+      const dx = P.x - o.x, dz = P.z - o.z;
+      const rr = o.R + P.r;
+      if (dx * dx + dz * dz > rr * rr) continue;
+      const lx = dx * o.c - dz * o.s, lz = dx * o.s + dz * o.c;
+      const cx = Math.max(-o.hw, Math.min(o.hw, lx)), cz = Math.max(-o.hd, Math.min(o.hd, lz));
+      let ex = lx - cx, ez = lz - cz;
+      const d2 = ex * ex + ez * ez;
+      if (d2 >= P.r * P.r) continue;
+      let px, pz;
+      if (d2 > 1e-9) { const d = Math.sqrt(d2), k = (P.r - d) / d; px = ex * k; pz = ez * k; }
+      else {
+        const penX = o.hw - Math.abs(lx), penZ = o.hd - Math.abs(lz);
+        if (penX < penZ) { px = (lx >= 0 ? 1 : -1) * (penX + P.r); pz = 0; } else { px = 0; pz = (lz >= 0 ? 1 : -1) * (penZ + P.r); }
+      }
+      P.x += px * o.c + pz * o.s;      // local -> mundo
+      P.z += -px * o.s + pz * o.c;
+    }
+  }
+}
+function nearestDoor() {
+  const fx = -Math.sin(P.yaw), fz = -Math.cos(P.yaw);
+  let best = null, bd = 1e9;
+  for (const d of doors) {
+    if (Math.abs(d.y - P.y) > 1.5) continue;
+    const dx = d.x - P.x, dz = d.z - P.z, dist = Math.hypot(dx, dz);
+    if (dist > 2.9) continue;
+    const dot = (dx * fx + dz * fz) / (dist || 1);
+    if (dist > 1.4 && dot < 0.35) continue;
+    if (dist < bd) { bd = dist; best = d; }
+  }
+  return best;
+}
+function toggle(d) {
+  d.open = !d.open; d.target = d.open ? d.max : 0;
+  if (d.open) d.col.on = false;
+}
+const promptEl = document.getElementById('prompt');
+
+function update(dt) {
+  dt = Math.min(dt, 0.03);
+  const run = keys['ShiftLeft'] || keys['ShiftRight'];
+  const speed = run ? 7.5 : 4.6;
+  let fwd = (keys['KeyW'] || keys['ArrowUp'] ? 1 : 0) - (keys['KeyS'] || keys['ArrowDown'] ? 1 : 0) + joy.y;
+  let str = (keys['KeyD'] || keys['ArrowRight'] ? 1 : 0) - (keys['KeyA'] || keys['ArrowLeft'] ? 1 : 0) + joy.x;
+  const m = Math.hypot(fwd, str); if (m > 1) { fwd /= m; str /= m; }
+  const sy = Math.sin(P.yaw), cy = Math.cos(P.yaw);
+  P.x += (-sy * fwd + cy * str) * speed * dt;
+  P.z += (-cy * fwd - sy * str) * speed * dt;
+  resolve();
+  // vertical
+  const g = groundY(P.x, P.z, P.y);
+  if (wantJump && P.y <= g + 0.02) P.vy = 6.2;
+  wantJump = false;
+  P.vy -= 18 * dt; P.y += P.vy * dt;
+  if (P.y <= g) { P.y = g; P.vy = 0; }
+  if (P.y < -30) { P.x = 1; P.z = 36; P.y = 0; }
+  // puertas
+  for (const d of doors) {
+    if (Math.abs(d.angle - d.target) > 0.002) {
+      d.angle += (d.target - d.angle) * Math.min(1, dt * 9);
+      if (Math.abs(d.angle - d.target) <= 0.002) d.angle = d.target;
+      d.leaves.forEach(l => { l.pivot.rotation.y = l.base + l.sgn * d.angle; });
+      if (d.angle === 0 && !d.open) d.col.on = true;
+    }
+  }
+  const nd = nearestDoor();
+  if (nd) { promptEl.style.display = 'block'; promptEl.textContent = (nd.open ? 'Cerrar' : 'Abrir') + ' · ' + nd.name + (isTouch ? '' : '  [E]'); }
+  else promptEl.style.display = 'none';
+  if (wantUse) { if (nd) toggle(nd); wantUse = false; }
+  camera.position.set(P.x, P.y + 1.6, P.z);
+  camera.rotation.set(P.pitch, P.yaw, 0);
+}
+
+// ===================================================================
+//  CONTROLES (PC + celular)
+// ===================================================================
+const isTouch = matchMedia('(pointer:coarse)').matches || 'ontouchstart' in window;
+document.getElementById(isTouch ? 'helpPc' : 'helpTouch').style.display = 'none';
+const startEl = document.getElementById('start');
+document.getElementById('go').addEventListener('click', () => {
+  startEl.style.display = 'none'; P.started = true;
+  if (isTouch) { for (const id of ['joy', 'useBtn', 'jumpBtn']) document.getElementById(id).style.display = 'block'; }
+  else renderer.domElement.requestPointerLock && renderer.domElement.requestPointerLock();
+});
+renderer.domElement.addEventListener('click', () => { if (!isTouch && P.started) renderer.domElement.requestPointerLock && renderer.domElement.requestPointerLock(); });
+addEventListener('keydown', e => { keys[e.code] = true; if (e.code === 'KeyE') wantUse = true; if (e.code === 'Space') { wantJump = true; e.preventDefault(); } });
+addEventListener('keyup', e => { keys[e.code] = false; });
+addEventListener('mousemove', e => {
+  if (document.pointerLockElement !== renderer.domElement) return;
+  P.yaw -= e.movementX * 0.0024; P.pitch = Math.max(-1.4, Math.min(1.4, P.pitch - e.movementY * 0.0024));
+});
+// joystick táctil + mirar con el dedo
+const joyEl = document.getElementById('joy'), knob = document.getElementById('knob');
+let joyId = null, lookId = null, lastX = 0, lastY = 0;
+function joyMove(t) {
+  const r = joyEl.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  let dx = (t.clientX - cx) / 55, dy = (t.clientY - cy) / 55; const m = Math.hypot(dx, dy); if (m > 1) { dx /= m; dy /= m; }
+  joy.x = dx; joy.y = -dy; knob.style.left = (40 + dx * 40) + 'px'; knob.style.top = (40 + dy * 40) + 'px';
+}
+function inEl(el, t) { const r = el.getBoundingClientRect(); return t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom; }
+addEventListener('touchstart', e => {
+  if (!P.started) return;
+  for (const t of e.changedTouches) {
+    if (inEl(joyEl, t) && joyId === null) { joyId = t.identifier; joyMove(t); }
+    else if (inEl(document.getElementById('useBtn'), t)) wantUse = true;
+    else if (inEl(document.getElementById('jumpBtn'), t)) wantJump = true;
+    else if (lookId === null) { lookId = t.identifier; lastX = t.clientX; lastY = t.clientY; }
+  }
+}, { passive: false });
+addEventListener('touchmove', e => {
+  if (!P.started) return; e.preventDefault();
+  for (const t of e.changedTouches) {
+    if (t.identifier === joyId) joyMove(t);
+    else if (t.identifier === lookId) {
+      P.yaw -= (t.clientX - lastX) * 0.006; P.pitch = Math.max(-1.4, Math.min(1.4, P.pitch - (t.clientY - lastY) * 0.006));
+      lastX = t.clientX; lastY = t.clientY;
+    }
+  }
+}, { passive: false });
+addEventListener('touchend', e => {
+  for (const t of e.changedTouches) {
+    if (t.identifier === joyId) { joyId = null; joy.x = joy.y = 0; knob.style.left = '40px'; knob.style.top = '40px'; }
+    if (t.identifier === lookId) lookId = null;
+  }
+});
+addEventListener('touchcancel', () => { joyId = lookId = null; joy.x = joy.y = 0; });
+addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+
+// ===================================================================
+//  BUCLE
+// ===================================================================
+let last = performance.now();
+function loop(now) {
+  requestAnimationFrame(loop);
+  const dt = (now - last) / 1000; last = now;
+  update(P.started ? dt : 0);
+  renderer.render(scene, camera);
+}
+camera.position.set(P.x, P.y + 1.6, P.z);
+requestAnimationFrame(loop);
+window.G = { P, update, doors, colliders, floors, camera, renderer, scene, toggle, nearestDoor, keys, joy };
+</script>
+</body>
+</html>

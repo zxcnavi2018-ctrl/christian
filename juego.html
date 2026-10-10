@@ -48,6 +48,20 @@ const colliders = [];   // OBB: {x,z,hw,hd,c,s,R,y0,y1,on}
 const floors = [];      // superficies caminables: {x,z,hw,hd,c,s,y}
 const doors = [];       // puertas interactivas
 const roofs = [];       // techos (losas superiores) para la lluvia
+const F = { x: 28.36, z: -4.09, rot: 0.44, sw: 9, depth: 8, yo: 0 };   // pabellón F (diagonal); 2D y 3A al nivel del patio
+// DESNIVEL: desde la esquina de E hasta el límite 3A|3B de F bajan 5 gradas; 3B, 3C, 3D y el patio de ese lado quedan más abajo
+const DROP = 0.75;
+const LOW = [[18, -31.2], lw(F.x, F.z, F.rot, -4.5, -4), lw(F.x, F.z, F.rot, -4.5, 4), lw(F.x, F.z, F.rot, 22.5, 4),
+  [51.8, lw(F.x, F.z, F.rot, 22.5, 4)[1]], [51.8, -59.8], [18, -59.8]];
+function inPoly(x, z, poly) {
+  let ins = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [xi, zi] = poly[i], [xj, zj] = poly[j];
+    if ((zi > z) !== (zj > z) && x < (xj - xi) * (z - zi) / (zj - zi) + xi) ins = !ins;
+  }
+  return ins;
+}
+const baseAt = (x, z) => inPoly(x, z, LOW) ? -DROP : 0;
 
 const isTouch0 = matchMedia('(pointer:coarse)').matches || 'ontouchstart' in window;
 const SKY_HORIZON = 0xcfe8ff;                                          // horizonte celeste claro
@@ -389,10 +403,10 @@ function room(name, level, cx, fl, cz, w, d, o = {}) {
   }
   if (fl > 0) floorSlab(cx, cz, w, d, rot, y0, 0.2, 0xc6c5c1);
   else if (yo > 0) {                                          // planta baja sobre zócalo
-    addSolid(cx, 0, cz, w, yo, d, rot, 0xd6d3d1, true);
+    addSolid(cx, 0, cz, w, yo, d, rot, 0xd6d3d1, false);         // sin colisión: se sube de un paso por la puerta
     floors.push({ x: cx, z: cz, hw: w / 2, hd: d / 2, c: Math.cos(rot), s: Math.sin(rot), y: yo });
   }
-  else { addSolid(cx, 0, cz, w, 0.04, d, rot, 0xc6c5c1, false); }
+  else { addSolid(cx, Math.min(yo, 0), cz, w, 0.04, d, rot, 0xc6c5c1, false); }
   if (o.roof) { addSolid(cx, y0 + RH, cz, w, 0.2, d, rot, 0x94a3b8, false); roofs.push({ x: cx, z: cz, hw: w / 2, hd: d / 2, c: Math.cos(rot), s: Math.sin(rot), y: y0 + RH + 0.2 }); }
   const kind = o.kind || ((level === 'inicial' || level === 'primaria' || level === 'secundaria') ? 'class' : level);
   furnish(kind, cx, cz, rot, y0, w, d, door, o.mlRole);
@@ -453,8 +467,13 @@ function ironRail(x0, z0, x1, z1, y) {
 //  SUELO, CALLE, PATIO, CANCHA, ÁREA VERDE
 // ===================================================================
 (function ground() {
-  const g = new THREE.Mesh(new THREE.PlaneGeometry(600, 600), new THREE.MeshLambertMaterial({ map: concreteTex('#bdbdbb', 200) }));
+  const V2 = ([x, z]) => new THREE.Vector2(x, -z);
+  const gs = new THREE.Shape([[-300, -300], [300, -300], [300, 300], [-300, 300]].map(V2));
+  gs.holes.push(new THREE.Path(LOW.map(V2)));                                       // hueco donde el suelo baja
+  const g = new THREE.Mesh(new THREE.ShapeGeometry(gs), new THREE.MeshLambertMaterial({ map: concreteTex('#bdbdbb', 1 / 3), side: THREE.DoubleSide }));
   g.rotation.x = -Math.PI / 2; g.receiveShadow = true; scene.add(g);
+  const lowM = new THREE.Mesh(new THREE.ShapeGeometry(new THREE.Shape(LOW.map(V2))), new THREE.MeshLambertMaterial({ map: concreteTex('#c6c6c4', 1 / 3), side: THREE.DoubleSide }));
+  lowM.rotation.x = -Math.PI / 2; lowM.position.y = -DROP + 0.03; lowM.receiveShadow = true; scene.add(lowM);   // patio de abajo
   // vereda exterior: gris de vereda con juntas de losas de 1.5 m
   const sw = (function () {
     const n = 256, c = document.createElement('canvas'); c.width = c.height = n;
@@ -468,9 +487,12 @@ function ironRail(x0, z0, x1, z1, y) {
   flat(300, 14, 0, 41, 0x3f4146, 0.02, 0.04);         // calle
   for (let x = -100; x < 100; x += 6) flat(3, 0.3, x, 41, 0xfacc15, 0.05, 0.02);
   // patio hasta el fondo, sin borde (el lado derecho sigue la cara del pabellón F)
-  const patio = [[-21, -1.7], [10.12, -1.7], [51.6, -21.2], [51.6, -59.6], [-21, -59.6]];
-  const sh = new THREE.Shape(patio.map(([x, z]) => new THREE.Vector2(x, -z)));
-  sh.holes.push(new THREE.Path([[-18, -33], [18, -33], [18, -41], [-18, -41]].map(([x, z]) => new THREE.Vector2(x, -z))));   // el pabellón E
+  // patio de arriba: termina en la línea de gradas (de la esquina de E al límite 3A|3B de F); E queda como entrante
+  const A = LOW[0], Bq = LOW[1], e0 = [10.12, -1.7], e1 = [51.6, -21.2];
+  const tq = ((Bq[0] - A[0]) * (A[1] - e0[1]) - (Bq[1] - A[1]) * (A[0] - e0[0])) / ((Bq[0] - A[0]) * (e1[1] - e0[1]) - (Bq[1] - A[1]) * (e1[0] - e0[0]));
+  const Q = [e0[0] + (e1[0] - e0[0]) * tq, e0[1] + (e1[1] - e0[1]) * tq];
+  const patio = [[-21, -1.7], e0, Q, A, [18, -33], [-18, -33], [-18, -41], [18, -41], [18, -59.6], [-21, -59.6]];
+  const sh = new THREE.Shape(patio.map(V2));
   const pm = new THREE.Mesh(new THREE.ShapeGeometry(sh), new THREE.MeshLambertMaterial({ map: concreteTex('#c6c6c4', 1 / 3), side: THREE.DoubleSide }));
   pm.rotation.x = -Math.PI / 2; pm.position.y = 0.03; pm.receiveShadow = true; scene.add(pm);
   label('PATIO', 4, 0.6, -28, 1.6, '#fff', 'rgba(71,85,105,.9)');
@@ -599,7 +621,6 @@ lowWall(A.xc[0] - 4.5, A.zc + 5.8, A.xc[0] + 4.5, A.zc + 5.8, FH);
 // ===================================================================
 //  PABELLÓN F  (diagonal)
 // ===================================================================
-const F = { x: 28.36, z: -4.09, rot: 0.44, sw: 9, depth: 8, yo: 0.6 };   // 2D, 3A y 3B van más altos (yo); 3C y 3D quedan al nivel del suelo, más abajo
 const F_ROWS = [
   [['2D','primaria'], ['3A','primaria'], ['3B','primaria'], ['3C','primaria'], ['3D','primaria']],
   [['7B','secundaria'], ['7C','secundaria'], ['7D','secundaria'], ['8A','secundaria'], ['8B','secundaria']],
@@ -610,62 +631,75 @@ F_ROWS.forEach((row, f) => row.forEach((r, i) => {
   const lx = (i - 2) * F.sw;
   const [wx, wz] = lw(F.x, F.z, F.rot, lx, 0);
   const extra = [];
-  room(r[0], r[1], wx, f, wz, F.sw, F.depth, { rot: F.rot, yo: i < 3 ? F.yo : 0, door: '-z', roof: i < 3 ? f === 1 : f === 2, extra, endWin: i === 0 ? ['-x'] : i === 4 ? ['+x'] : [] });
+  room(r[0], r[1], wx, f, wz, F.sw, F.depth, { rot: F.rot, yo: i < 2 ? 0 : -DROP, door: '-z', roof: i < 3 ? f === 1 : f === 2, extra, endWin: i === 0 ? ['-x'] : i === 4 ? ['+x'] : [] });
 }));
 label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
 (function () {
-  const lz = -(F.depth / 2 + 0.9), L = 2.5 * F.sw, yo = F.yo, XJ = 4.5, c = Math.cos(F.rot), sn = Math.sin(F.rot), iron = 0x1f2937;   // XJ: límite entre 3B y 3C
-  // pasadizo del piso 2: alto frente a 7B-7D, baja con 4 gradas al nivel de 8A-8B
-  let [wx, wz] = lw(F.x, F.z, F.rot, (-L + XJ - 1.6) / 2, lz);
-  floorSlab(wx, wz, XJ - 1.6 + L, 1.8, F.rot, FH + yo);
-  [wx, wz] = lw(F.x, F.z, F.rot, (XJ + L) / 2, lz);
-  floorSlab(wx, wz, L - XJ, 1.8, F.rot, FH);
-  lowWallLocal(F.x, F.z, F.rot, -L, XJ - 1.6, lz - 0.8, FH + yo);
+  const lz = -(F.depth / 2 + 0.9), L = 2.5 * F.sw, XJ = -4.5, c = Math.cos(F.rot), sn = Math.sin(F.rot), iron = 0x1f2937, hi = FH, lo = FH - DROP;   // XJ: límite entre 3A y 3B
+  // pasadizo del piso 2: frente a 7B-7C al nivel de D; desde 7D baja con 5 gradas
+  let [wx, wz] = lw(F.x, F.z, F.rot, (-L + XJ) / 2, lz);
+  floorSlab(wx, wz, XJ + L, 1.8, F.rot, hi);
+  [wx, wz] = lw(F.x, F.z, F.rot, (XJ + 2 + L) / 2, lz);
+  floorSlab(wx, wz, L - XJ - 2, 1.8, F.rot, lo);
+  [wx, wz] = lw(F.x, F.z, F.rot, XJ + 2, lz);
+  steps(wx, wz, -c, sn, 5, DROP / 5, 0.4, 1.8, lo, true);
   const xT = 8.7;                                                       // parte alta de la escalera frente a 3C
-  lowWallLocal(F.x, F.z, F.rot, XJ, xT - 1.9, lz - 0.8, FH); lowWallLocal(F.x, F.z, F.rot, xT + 0.5, L, lz - 0.8, FH);   // hueco donde llega el descanso
-  [wx, wz] = lw(F.x, F.z, F.rot, XJ, lz);
-  steps(wx, wz, -c, sn, 4, yo / 4, 0.4, 1.8, FH, true);
-  const [ax, az] = lw(F.x, F.z, F.rot, XJ, lz - 0.8), [bx, bz] = lw(F.x, F.z, F.rot, XJ - 1.6, lz - 0.8);   // baranda de fierro del lado exterior de las gradas
-  slopedBar(ax, FH + 0.95, az, bx, FH + yo + 0.95, bz, 0.05); slopedBar(ax, FH + 0.45, az, bx, FH + yo + 0.45, bz, 0.03);
-  addCollider((ax + bx) / 2, (az + bz) / 2, 1.6, 0.1, F.rot, FH, FH + yo + 1.7);
+  lowWallLocal(F.x, F.z, F.rot, -L, XJ, lz - 0.8, hi);
+  lowWallLocal(F.x, F.z, F.rot, XJ + 2, xT - 1.9, lz - 0.8, lo); lowWallLocal(F.x, F.z, F.rot, xT + 0.5, L, lz - 0.8, lo);   // hueco donde llega el descanso
+  const [ax, az] = lw(F.x, F.z, F.rot, XJ + 2, lz - 0.8), [bx, bz] = lw(F.x, F.z, F.rot, XJ, lz - 0.8);   // baranda de fierro del lado exterior de las gradas
+  slopedBar(ax, lo + 0.95, az, bx, hi + 0.95, bz, 0.05); slopedBar(ax, lo + 0.45, az, bx, hi + 0.45, bz, 0.03);
+  addCollider((ax + bx) / 2, (az + bz) / 2, 2.0, 0.1, F.rot, lo, hi + 1.7);
   [wx, wz] = lw(F.x, F.z, F.rot, 13.5, lz);
-  floorSlab(wx, wz, 18, 1.8, F.rot, 2 * FH);
-  lowWallLocal(F.x, F.z, F.rot, 4.5, 22.5, lz - 0.8, 2 * FH);
-  // escalera larga de 4 gradas frente a 2D, 3A y 3B (hacia abajo, al patio), con 2 barandales entre salones
-  for (let k = 1; k <= 4; k++) {
-    const top = k * (yo / 4), lzc = -(F.depth / 2) - 0.2 - 0.4 * (4 - k);
-    const [gx, gz] = lw(F.x, F.z, F.rot, (-L + XJ) / 2, lzc);
-    addSolid(gx, 0, gz, L + XJ, top, 0.4, F.rot, 0xd6d3d1, false);
-    floors.push({ x: gx, z: gz, hw: (L + XJ) / 2, hd: 0.2, c, s: sn, y: top });
-  }
-  const zt = -(F.depth / 2) - 0.15, zb = -(F.depth / 2) - 1.5;
-  [-13.5, -4.5].forEach(lxr => {
-    const [tx, tz] = lw(F.x, F.z, F.rot, lxr, zt), [ux, uz] = lw(F.x, F.z, F.rot, lxr, zb);
-    slopedBar(ux, 0.15 + 0.95, uz, tx, yo + 0.95, tz, 0.05); slopedBar(ux, 0.15 + 0.45, uz, tx, yo + 0.45, tz, 0.03);
-    addSolid(ux, 0, uz, 0.05, 1.1, 0.05, 0, iron, false); addSolid(tx, yo, tz, 0.05, 0.95, 0.05, 0, iron, false);
-    const [mx, mz] = lw(F.x, F.z, F.rot, lxr, (zt + zb) / 2);
-    addCollider(mx, mz, 0.1, Math.abs(zt - zb), F.rot, 0, 1.8);
-  });
+  floorSlab(wx, wz, 18, 1.8, F.rot, 2 * FH - DROP);
+  lowWallLocal(F.x, F.z, F.rot, 4.5, 22.5, lz - 0.8, 2 * FH - DROP);
   // escalera al piso 2 frente a 3C (mismo estilo que la de D: tramos flotantes, descanso de metal, baranda de fierro)
-  const W = (lx, lz2) => lw(F.x, F.z, F.rot, lx, lz2), run = 0.4, n = 11, rise = FH / n, zs = lz - 1.8;
-  { const [sx, sz] = W(xT + n * run, zs); steps(sx, sz, -c, sn, n, rise, run, 1.8, 0, true); }
+  const W = (lx, lz2) => lw(F.x, F.z, F.rot, lx, lz2), run = 0.4, n = 11, rise = FH / n, zs = lz - 1.8, y0 = -DROP;
+  { const [sx, sz] = W(xT + n * run, zs); steps(sx, sz, -c, sn, n, rise, run, 1.8, y0, true); }
   [0, 9].forEach(i => {
     const lx = xT + n * run - (i + 0.5) * run, top = (i + 1) * rise - 0.2;
-    [-0.8, 0.8].forEach(k => { const [px, pz] = W(lx, zs + k); addSolid(px, 0, pz, 0.1, top, 0.1, F.rot, iron, false); });
+    [-0.8, 0.8].forEach(k => { const [px, pz] = W(lx, zs + k); addSolid(px, y0, pz, 0.1, top, 0.1, F.rot, iron, false); });
   });
   { const k = -0.72, lxa = xT + n * run - 0.5 * run, lxb = xT + 0.5 * run, [ax, az] = W(lxa, zs + k), [bx, bz] = W(lxb, zs + k);
-    slopedBar(ax, rise + 0.95, az, bx, FH + 0.95, bz, 0.05); slopedBar(ax, rise + 0.45, az, bx, FH + 0.45, bz, 0.03);
-    for (let i = 0; i < n; i += 2) { const [px, pz] = W(xT + n * run - (i + 0.5) * run, zs + k); addSolid(px, (i + 1) * rise, pz, 0.04, 0.95, 0.04, F.rot, iron, false); }
-    addSolid(bx, FH, bz, 0.04, 0.95, 0.04, F.rot, iron, false); }
-  { const [lx0, lz0] = W(xT - 0.9, zs); floorSlab(lx0, lz0, 1.8, 1.8, F.rot, FH, 0.12, 0x4b5563); }
-  { const [a1, a2] = W(xT - 1.8, zs - 0.78), [b1, b2] = W(xT, zs - 0.78); ironRail(a1, a2, b1, b2, FH); }
-  { const [a1, a2] = W(xT - 1.68, zs - 0.9), [b1, b2] = W(xT - 1.68, zs + 0.9); ironRail(a1, a2, b1, b2, FH); }
+    slopedBar(ax, y0 + rise + 0.95, az, bx, lo + 0.95, bz, 0.05); slopedBar(ax, y0 + rise + 0.45, az, bx, lo + 0.45, bz, 0.03);
+    for (let i = 0; i < n; i += 2) { const [px, pz] = W(xT + n * run - (i + 0.5) * run, zs + k); addSolid(px, y0 + (i + 1) * rise, pz, 0.04, 0.95, 0.04, F.rot, iron, false); }
+    addSolid(bx, lo, bz, 0.04, 0.95, 0.04, F.rot, iron, false); }
+  { const [lx0, lz0] = W(xT - 0.9, zs); floorSlab(lx0, lz0, 1.8, 1.8, F.rot, lo, 0.12, 0x4b5563); }
+  { const [a1, a2] = W(xT - 1.8, zs - 0.78), [b1, b2] = W(xT, zs - 0.78); ironRail(a1, a2, b1, b2, lo); }
+  { const [a1, a2] = W(xT - 1.68, zs - 0.9), [b1, b2] = W(xT - 1.68, zs + 0.9); ironRail(a1, a2, b1, b2, lo); }
   // pasto debajo de la escalera
-  { const [gx, gz] = W(xT + n * run / 2, zs); const m = new THREE.Mesh(new THREE.BoxGeometry(n * run, 0.06, 1.6), new THREE.MeshLambertMaterial({ color: 0x5a9a45 })); m.position.set(gx, 0.03, gz); m.rotation.y = F.rot; scene.add(m); }
+  { const [gx, gz] = W(xT + n * run / 2, zs); const m = new THREE.Mesh(new THREE.BoxGeometry(n * run, 0.06, 1.6), new THREE.MeshLambertMaterial({ color: 0x5a9a45 })); m.position.set(gx, y0 + 0.04, gz); m.rotation.y = F.rot; scene.add(m); }
   // otra área verde frente a 2D (como las de D), con su cerco
-  { const wl = 8.5, wd = 1.7, lcz = -(F.depth / 2) - 1.6 - 0.4 - wd / 2 - 0.25, lcx = -18;
+  { const wl = 5.2, wd = 1.4, lcz = -(F.depth / 2) - 1.6 - 0.2 - wd / 2 - 0.25, lcx = -19.5;   // corta, para no pisar la línea de la cancha
     const [gx, gz] = W(lcx, lcz); const m = new THREE.Mesh(new THREE.BoxGeometry(wl, 0.06, wd), new THREE.MeshLambertMaterial({ color: 0x5a9a45 })); m.position.set(gx, 0.03, gz); m.rotation.y = F.rot; m.receiveShadow = true; scene.add(m);
     window.__fz = { lcx, lcz, wl, wd }; }
+})();
+
+// ---- DESNIVEL del patio: 5 gradas de la esquina de E al límite 3A|3B de F, con 2 barandales; muros donde el suelo baja ----
+(function () {
+  const A = LOW[0], B2 = LOW[1], iron = 0x1f2937, run = 0.4, nst = 4, rise = DROP / 5;
+  const dx = B2[0] - A[0], dz = B2[1] - A[1], Lf = Math.hypot(dx, dz), ux = dx / Lf, uz = dz / Lf;
+  const nx = uz, nz = -ux;                                         // normal hacia el lado de abajo (este)
+  const len = Lf - 2.4, ang = Math.atan2(-uz, ux), c = Math.cos(ang), s = Math.sin(ang);   // se recorta junto a F para no meterse en 3B
+  for (let k = 1; k <= nst; k++) {
+    const off = (k - 0.5) * run, top = -k * rise, x = A[0] + ux * len / 2 + nx * off, z = A[1] + uz * len / 2 + nz * off;
+    addSolid(x, -DROP, z, len, top + DROP, run, ang, 0xd6d3d1, false);
+    floors.push({ x, z, hw: len / 2, hd: run / 2, c, s, y: top });
+  }
+  [1 / 3, 2 / 3].forEach(t => {                                     // 2 barandales que bajan por las gradas
+    const px = A[0] + ux * len * t, pz = A[1] + uz * len * t, qx = px + nx * nst * run, qz = pz + nz * nst * run;
+    slopedBar(px, 0.95, pz, qx, -DROP + 0.95, qz, 0.05); slopedBar(px, 0.45, pz, qx, -DROP + 0.45, qz, 0.03);
+    addSolid(px, 0, pz, 0.05, 1.0, 0.05, 0, iron, false); addSolid(qx, -DROP, qz, 0.05, 1.0, 0.05, 0, iron, false);
+    addCollider((px + qx) / 2, (pz + qz) / 2, 0.1, nst * run, ang, -DROP, 1.0);
+  });
+  // caras del desnivel (donde no hay gradas ni pared de salón): se ven desde abajo y no dejan subir
+  const face = (x0, z0, x1, z1) => {
+    const L = Math.hypot(x1 - x0, z1 - z0), a = Math.atan2(-(z1 - z0), x1 - x0), mx = (x0 + x1) / 2, mz = (z0 + z1) / 2;
+    addSolid(mx, -DROP, mz, L, DROP, 0.2, a, 0xbfc1c4, false); addCollider(mx, mz, L, 0.2, a, -DROP, 0);
+  };
+  face(18.1, -59.8, 18.1, -31.2);                                     // a lo largo de E y del fondo
+  face(LOW[3][0], LOW[3][1], LOW[4][0], LOW[4][1]);                   // detrás del extremo de F
+  face(51.9, LOW[4][1], 51.9, -59.9); face(18, -59.9, 51.9, -59.9);   // bajo el muro perimetral
+  { const P = lw(F.x, F.z, F.rot, -4.5, -4), Q2 = [A[0] + ux * len, A[1] + uz * len]; face(Q2[0], Q2[1], P[0], P[1]); }   // tramo corto sin gradas junto a F
 })();
 
 // ---- cercos de las áreas verdes: palitos con soga para que los niños no pisen el pasto ----
@@ -688,10 +722,10 @@ function fenceRect(cx, cz, w, d) {
   fenceLine(x0 - m, z0 - m, x1 + m, z0 - m); fenceLine(x1 + m, z0 - m, x1 + m, z1 + m);
   fenceLine(x1 + m, z1 + m, x0 - m, z1 + m); fenceLine(x0 - m, z1 + m, x0 - m, z0 - m);
 }
-// dos áreas verdes a la altura de la escalera de D (en línea con ella, hacia el este), cada una con su cerco
+// área verde a la altura de la escalera de D (en línea con ella, hacia el este), con su cerco
 const zG = zsD - 1.8;
-grass(8.5, 1.7, -3.1, zG); grass(6, 1.7, 4.6, zG);
-fenceRect(-3.1, zG, 8.5, 1.7); fenceRect(4.6, zG, 6, 1.7);
+grass(8.5, 1.7, -3.1, zG);
+fenceRect(-3.1, zG, 8.5, 1.7);
 (function () {                                                    // cerco del área verde frente a 2D (en el marco de F)
   const q = window.__fz, m = 0.25, P = (lx, lz) => lw(F.x, F.z, F.rot, lx, lz);
   const x0 = q.lcx - q.wl / 2 - m, x1 = q.lcx + q.wl / 2 + m, z0 = q.lcz - q.wd / 2 - m, z1 = q.lcz + q.wd / 2 + m;
@@ -817,36 +851,9 @@ label('ÁREA VERDE', -3.1, 3.0, zG, 1.2, '#fff', 'rgba(22,101,52,.9)');
   cr(0, eS + 0.9, 36, 1.8, 0, 2 * FH);                                            // E (piso 3)
   cr(A.xc[0], A.zc + 4.9, 9, 1.8, 0, FH);                                         // A (piso 2)
   const lzF = -(F.depth / 2 + 0.9);
-  let [fx, fz] = lw(F.x, F.z, F.rot, -9, lzF); cr(fx, fz, 27, 1.8, F.rot, FH + F.yo);      // F piso 2, frente a 7B-7D (la parte alta)
-  [fx, fz] = lw(F.x, F.z, F.rot, 13.5, lzF); cr(fx, fz, 18, 1.8, F.rot, 2 * FH);    // F piso 3
-})();
-
-// ===================================================================
-//  TOLDOS (mantos de sombra): del murito del piso 3 de B hasta postes al otro lado de la cancha, y otro de punta a punta desde el murito de D
-// ===================================================================
-(function () {
-  const yE = 2 * FH + 1.0;                                         // altura del murito del piso 3
-  const x0 = bFace + 1.7, x1 = 12.7, z0 = -31.0, z1 = -3.0, w1 = x1 - x0, d1 = z1 - z0, S1 = 1.6;
-  const sag1 = (x, z) => { const u = (x - x0) / w1, v = (z - z0) / d1; return S1 * (1 - (2 * u - 1) ** 2) * (0.55 + 0.45 * (1 - (2 * v - 1) ** 2)); };
-  const wave = (x, z) => 0.05 * Math.sin(x * 0.9 + z * 0.6) * Math.sin(z * 0.7);          // pliegues de la tela
-  const mat = new THREE.MeshLambertMaterial({ color: 0xe9c46a, emissive: 0x4a3c18, side: THREE.DoubleSide, transparent: true, opacity: 0.95 });
-  const sheet = (xa, xb, za, zb, yFn) => {
-    const g = new THREE.PlaneGeometry(xb - xa, zb - za, 44, 22); g.rotateX(-Math.PI / 2);
-    const pos = g.attributes.position;
-    for (let k = 0; k < pos.count; k++) {
-      const x = (xa + xb) / 2 + pos.getX(k), z = (za + zb) / 2 + pos.getZ(k);
-      pos.setXYZ(k, x, yFn(x, z) + wave(x, z), z);
-    }
-    g.computeVertexNormals();
-    const m = new THREE.Mesh(g, mat); m.castShadow = true; scene.add(m); return m;
-  };
-  sheet(x0, x1, z0, z1, (x, z) => yE - sag1(x, z));                   // toldo grande sobre la cancha (se hunde por el centro)
-  // toldo de punta a punta del pasadizo de D: continúa el grande hacia el murito de D
-  const dz0 = dN - 1.8, dxa = -14.7, dxb = 3.3;
-  sheet(dxa, dxb, z1, dz0, (x, z) => { const t = (z1 - z) / (z1 - dz0) * -1 + 0, e = yE - sag1(x, z1), a = Math.min(1, Math.max(0, (z - z1) / (dz0 - z1))); return e + (yE - e) * a - 0.25 * Math.sin(Math.PI * a); });
-  // postes de fierro en el lado este
-  const iron = 0x1f2937;
-  [-31.0, -24.0, -17.0, -10.0, -3.2].forEach(z => { addSolid(x1, 0, z, 0.22, yE + 0.15, 0.22, 0, iron, true); addSolid(x1 - 0.4, yE - 0.05, z, 0.8, 0.06, 0.06, 0, iron, false); });
+  let [fx, fz] = lw(F.x, F.z, F.rot, -13.5, lzF); cr(fx, fz, 18, 1.8, F.rot, FH);            // F piso 2, frente a 7B-7C
+  [fx, fz] = lw(F.x, F.z, F.rot, 0, lzF); cr(fx, fz, 9, 1.8, F.rot, FH - DROP);                   // F piso 2, frente a 7D (más abajo)
+  [fx, fz] = lw(F.x, F.z, F.rot, 13.5, lzF); cr(fx, fz, 18, 1.8, F.rot, 2 * FH - DROP);    // F piso 3
 })();
 
 // ===================================================================
@@ -864,7 +871,7 @@ lampRow(-16, eS + 0.9, 16, eS + 0.9, YG); lampRow(-16, eS + 0.9, 16, eS + 0.9, Y
 lampRow(A.xc[0] - 3, A.zc + 4.9, A.xc[0] + 3, A.zc + 4.9, YG);                                                                // A
 for (let lx = -19; lx <= 19; lx += 6) {                                                                                       // F
   const [fx, fz] = lw(F.x, F.z, F.rot, lx, -(F.depth / 2 + 0.9));
-  lamps.push([fx, FH + (lx < 4.5 ? F.yo : 0) - 0.23, fz]); if (lx >= 5) lamps.push([fx, 2 * FH - 0.23, fz]);
+  lamps.push([fx, FH + (lx < -4.5 ? 0 : -DROP) - 0.23, fz]); if (lx >= 5) lamps.push([fx, 2 * FH - DROP - 0.23, fz]);
 }
 [-4.6, -1.35, 1.9].forEach(x => [21.3, 23.9].forEach(z => lamps.push([x, 3.5, z])));                                          // techito de las puertas
 [15, 19, 23].forEach(z => lamps.push([-25, RH - 0.1, z]));                                                                    // lobby
@@ -905,7 +912,7 @@ const keys = {}, joy = { x: 0, y: 0 };
 let wantUse = false, wantJump = false;
 
 function groundY(x, z, y) {
-  let best = 0;
+  let best = baseAt(x, z);
   for (const f of floors) {
     if (f.y <= best || f.y > y + 0.6) continue;
     const dx = x - f.x, dz = z - f.z;

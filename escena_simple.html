@@ -108,28 +108,31 @@ D_COLS.forEach((col, k) => col.forEach((r, f) => {
 ['I', 'II', 'III'].forEach((n, f) => label(n, D.xc[0], f * FH + RH / 2, D.zc + 3.2, 1.0, '#fde047'));
 label('PABELLÓN D', D.xc[0] - 2, 3 * FH + 1.2, D.zc, 3, '#fff', 'rgba(244,114,22,.9)');
 
-// ---------- Pabellón C: Tópico | Baño | Entrada | Lobby (1 piso) ----------
-// Alineado con la sala de docentes de B, pero adelantado: queda un pasadizo libre entre B y C
-const C = { zc: 16.5, depth: 7 };
+// ---------- Pabellón C ----------
+// Lobby (1 piso), a la altura de la sala de docentes de B
+const C = { zc: 14.5, depth: 7 };
+room('LOBBY', 'lab', -21.0, 0, C.zc, 7.9, C.depth - 0.2);
+label('PABELLÓN C', -21.0, FH + 1.2, C.zc, 3, '#fff', 'rgba(100,116,139,.95)');
+
+// Fila de servicios en el espacio junto al muro: Entrada (cerca al lobby) | Baño (centro) | Tópico (junto al muro)
+const SZ = { zc: 26.0, depth: 7 };
 const cParts = [
-  { n: 'TÓPICO', level: 'topico', w: 4.5, x: -32.75 },
-  { n: 'BAÑO',   level: 'bano',   w: 2.5, x: -29.25 },
-  { n: 'ENTRADA', level: null,    w: 3.0, x: -26.5 },
-  { n: 'LOBBY',  level: 'lab',    w: 8.0, x: -21.0 }
+  { n: 'ENTRADA', level: null,    w: 4.5, x: -18.75 },
+  { n: 'BAÑO',    level: 'bano',   w: 4.0, x: -14.5 },
+  { n: 'TÓPICO',  level: 'topico', w: 5.5, x: -9.75 }
 ];
-cParts.forEach(p => {
-  if (p.level) { room(p.n, p.level, p.x, 0, C.zc, p.w - 0.1, C.depth - 0.2); return; }
+cParts.forEach(q => {
+  if (q.level) { room(q.n, q.level, q.x, 0, SZ.zc, q.w - 0.1, SZ.depth - 0.2); return; }
   // entrada: solo techo y dos muros laterales (se puede pasar)
   const mat = new THREE.MeshLambertMaterial({ color: 0xe2e8f0 });
-  const roof = new THREE.Mesh(new THREE.BoxGeometry(p.w, 0.4, C.depth - 0.2), mat);
-  roof.position.set(p.x, RH - 0.2, C.zc); scene.add(roof);
+  const roof = new THREE.Mesh(new THREE.BoxGeometry(q.w, 0.4, SZ.depth - 0.2), mat);
+  roof.position.set(q.x, RH - 0.2, SZ.zc); scene.add(roof);
   [-1, 1].forEach(k => {
-    const w = new THREE.Mesh(new THREE.BoxGeometry(p.w, RH, 0.3), mat);
-    w.position.set(p.x, RH / 2, C.zc + k * (C.depth / 2 - 0.25)); scene.add(w);
+    const w = new THREE.Mesh(new THREE.BoxGeometry(q.w, RH, 0.3), mat);
+    w.position.set(q.x, RH / 2, SZ.zc + k * (SZ.depth / 2 - 0.25)); scene.add(w);
   });
-  label(p.n, p.x, RH + 0.8, C.zc, 1.6, '#fff', 'rgba(22,163,74,.95)');
+  label(q.n, q.x, RH + 0.8, SZ.zc, 1.6, '#fff', 'rgba(22,163,74,.95)');
 });
-label('PABELLÓN C', -26.5, FH + 2.2, C.zc, 3, '#fff', 'rgba(100,116,139,.95)');
 
 // ---------- Puente: ML 216 (D, piso 2) -> entre 6B y 7A (B, piso 2) ----------
 const bz = B.z0 + 6 * B.sw;                    // límite entre módulo 6B y 7A
@@ -160,8 +163,8 @@ let doorsOpen = false, doorAngle = 0;
   const wallMat = new THREE.MeshLambertMaterial({ color: 0xe2e8f0 });
   const wood = new THREE.MeshLambertMaterial({ color: 0x854d0e });
   const dark = new THREE.MeshLambertMaterial({ color: 0x1e293b });
-  const logo = new THREE.Mesh(new THREE.BoxGeometry(0.6, 3.8, 13), wallMat);
-  logo.position.set(-0.475, 1.9, 5.9); g.add(logo);
+  const logo = new THREE.Mesh(new THREE.BoxGeometry(0.6, 3.8, 9), wallMat);
+  logo.position.set(-0.475, 1.9, 3.9); g.add(logo);
   const bays = [
     { n: '1 Principal', w: 2.8, roof: true },
     { n: '2', w: 2.8, roof: true },

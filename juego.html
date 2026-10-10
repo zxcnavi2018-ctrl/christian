@@ -857,7 +857,7 @@ buildInstanced(glassItems, new THREE.MeshLambertMaterial({ color: 0xffffff, tran
 // ===================================================================
 //  JUGADOR
 // ===================================================================
-const P = { x: 1, y: 0, z: 31, vy: 0, yaw: 0, pitch: 0, r: 0.38, started: false };
+const P = { x: 1, y: 0, z: 35, vy: 0, yaw: 0, pitch: 0, r: 0.38, started: false };
 const keys = {}, joy = { x: 0, y: 0 };
 let wantUse = false, wantJump = false;
 
@@ -930,7 +930,7 @@ function update(dt) {
   wantJump = false;
   P.vy -= 18 * dt; P.y += P.vy * dt;
   if (P.y <= g) { P.y = g; P.vy = 0; }
-  if (P.y < -30) { P.x = 1; P.z = 31; P.y = 0; }
+  if (P.y < -30) { P.x = 1; P.z = 35; P.y = 0; }
   // puertas
   for (const d of doors) {
     if (Math.abs(d.angle - d.target) > 0.002) {

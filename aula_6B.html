@@ -545,9 +545,9 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
     { const [lx, lz] = P(uL - 0.27, Dp / 2 - T), pl = new THREE.Mesh(lockerGeo, new THREE.MeshLambertMaterial({ map: locker26Tex }));
       pl.scale.set(LL, 1.4, 1); pl.position.set(lx, fy + 0.78, lz); pl.rotation.y = Math.atan2(-uvec[0], -uvec[1]); scene.add(pl);
       const th = pl.rotation.y;
-      const cork = new THREE.Mesh(new THREE.PlaneGeometry(LL, 1.22), new THREE.MeshLambertMaterial({ map: corkTex() }));   // mural de corcho encima de los lockers
-      { const [cx2, cz2] = P(Wc / 2 - T - 0.02, Dp / 2 - T); cork.position.set(cx2, fy + 2.2, cz2); cork.rotation.y = pl.rotation.y; scene.add(cork); }
-      boxAt(Wc / 2 - T - 0.01, Dp / 2 - T, 1.56, 0.02, 1.3, LL + 0.1, 0x7c4a21, false);                        // marco de madera
+      const cork = new THREE.Mesh(new THREE.PlaneGeometry(LL, 1.22), new THREE.MeshLambertMaterial({ map: corkTex(), polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));   // mural de corcho encima de los lockers
+      { const [cx2, cz2] = P(Wc / 2 - T - 0.045, Dp / 2 - T); cork.position.set(cx2, fy + 2.2, cz2); cork.rotation.y = pl.rotation.y; scene.add(cork); }
+      boxAt(Wc / 2 - T - 0.01, Dp / 2 - T, 1.56, 0.02, 1.3, LL + 0.1, 0x7c4a21, false);   // (el corcho va 2,5 cm delante: sin parpadeo)                        // marco de madera
       SALON6[rname] = { plane: pl, LL, fy, x: lx, z: lz, ax: [Math.cos(th), -Math.sin(th)], nrm: [Math.sin(th), Math.cos(th)], rot: th }; }
     // mesa del profesor: junto a la pizarra, pegada a la pared del fondo, con el folder "Mis notas" (para el docente)
     { const du = -(Wc / 2 - T) + 1.05, ds = Dp - 2 * T - 1.0;                           // mesa del profesor mirando a las mesitas de los niños; su silla contra la pared de la pizarra

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Innova Tacna - Pabellones B C D</title>
+<title>Innova Tacna - Maqueta 3D</title>
 <style>
   html, body { margin: 0; height: 100%; overflow: hidden; background: #0b0f19; font-family: system-ui, sans-serif; }
   #hud { position: absolute; top: 10px; left: 10px; color: #fff; background: rgba(15,23,42,.85); padding: 10px 14px; border-radius: 10px; font-size: 13px; line-height: 1.5; }
@@ -18,7 +18,7 @@
 <body>
 <div id="hud">
   <b>Innova Schools Tacna 2026</b><br>
-  Pabellones B · C · D<br>
+  Pabellones A · B · C · D · E · F<br>
   <span class="dot" style="background:#0072CE"></span>Inicial
   <span class="dot" style="background:#F37021"></span>Primaria
   <span class="dot" style="background:#78BE20"></span>Secundaria
@@ -39,7 +39,7 @@ const RH = 3.0;      // alto del salón
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x90c2f9);
-const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 500);
+const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 600);
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(innerWidth, innerHeight);
 document.body.appendChild(renderer.domElement);
@@ -51,7 +51,7 @@ const sun = new THREE.DirectionalLight(0xffffff, 0.8);
 sun.position.set(30, 60, 40);
 scene.add(sun);
 
-const ground = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshLambertMaterial({ color: 0x9a9a94 }));
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), new THREE.MeshLambertMaterial({ color: 0x9a9a94 }));
 ground.rotation.x = -Math.PI / 2;
 scene.add(ground);
 
@@ -60,7 +60,7 @@ function label(text, x, y, z, scale = 2.2, color = '#ffffff', bg = 'rgba(15,23,4
   c.width = 512; c.height = 128;
   const g = c.getContext('2d');
   g.fillStyle = bg; g.fillRect(0, 0, 512, 128);
-  g.fillStyle = color; g.font = "bold 76px sans-serif";
+  g.fillStyle = color; g.font = 'bold 76px sans-serif';
   g.textAlign = 'center'; g.textBaseline = 'middle';
   g.fillText(text, 256, 66);
   const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c) }));
@@ -69,61 +69,158 @@ function label(text, x, y, z, scale = 2.2, color = '#ffffff', bg = 'rgba(15,23,4
   scene.add(s);
 }
 
-function room(name, level, x, floor, z, w, d) {
-  const m = new THREE.Mesh(
-    new THREE.BoxGeometry(w, RH, d),
-    new THREE.MeshLambertMaterial({ color: COL[level] })
-  );
-  m.position.set(x, floor * FH + RH / 2, z);
+function flat(w, d, x, z, color, y = 0.05, h = 0.1) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({ color }));
+  m.position.set(x, y, z);
   scene.add(m);
-  const e = new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry), new THREE.LineBasicMaterial({ color: 0x1e293b }));
-  e.position.copy(m.position);
-  scene.add(e);
-  label(name, x + w / 2 + 0.05, m.position.y, z, 2.4);
+  return m;
 }
 
-// ---------- Pabellón B (3 pisos, 7 módulos a lo largo de Z) ----------
-const B = { x: -21.8, z0: -23.85, sw: 4.77, depth: 4 };
+// rot: giro en Y. side: cara donde va la etiqueta ('x' o 'z' local)
+function room(name, level, cx, floor, cz, w, d, o = {}) {
+  const rot = o.rot || 0;
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, RH, d), new THREE.MeshLambertMaterial({ color: COL[level] }));
+  m.position.set(cx, floor * FH + RH / 2, cz);
+  m.rotation.y = rot;
+  scene.add(m);
+  const e = new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry), new THREE.LineBasicMaterial({ color: 0x1e293b }));
+  e.position.copy(m.position); e.rotation.y = rot;
+  scene.add(e);
+  if (name) {
+    const lx = o.side === 'z' ? 0 : w / 2 + 0.05, lz = o.side === 'z' ? d / 2 + 0.05 : 0;
+    label(name, cx + lx * Math.cos(rot) + lz * Math.sin(rot), m.position.y, cz - lx * Math.sin(rot) + lz * Math.cos(rot), 2.6);
+  }
+}
+
+// ================= PATIO (centro), CANCHA y ÁREA VERDE =================
+flat(32, 29.5, -3, -1.75, 0xb3ae9f, 0.02, 0.04);                       // patio
+label('PATIO', -4, 0.4, -13, 3, '#fff', 'rgba(71,85,105,.9)');
+// cancha de losa
+flat(18.5, 10, -3.25, -5, 0x64748b, 0.06, 0.1);
+(function courtLines() {
+  const pts = [[-12.5, -10], [6, -10], [6, 0], [-12.5, 0]].map(p => new THREE.Vector3(p[0], 0.13, p[1]));
+  scene.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0xffffff })));
+  scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-3.25, 0.13, -10), new THREE.Vector3(-3.25, 0.13, 0)]), new THREE.LineBasicMaterial({ color: 0xffffff })));
+})();
+label('CANCHA DE LOSA', -3.25, 1.2, -5, 3.4, '#fff', 'rgba(30,41,59,.9)');
+// área verde pequeña
+flat(3.2, 11, -17, -3.5, 0x4ade80, 0.06, 0.12);
+[-8, -4, 0].forEach(z => {
+  const t = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 1.4, 8), new THREE.MeshLambertMaterial({ color: 0x78350f }));
+  t.position.set(-17, 0.8, z); scene.add(t);
+  const c = new THREE.Mesh(new THREE.SphereGeometry(0.9, 12, 10), new THREE.MeshLambertMaterial({ color: 0x15803d }));
+  c.position.set(-17, 2.1, z); scene.add(c);
+});
+label('ÁREA VERDE', -17, 4, -3.5, 2.4, '#fff', 'rgba(22,101,52,.9)');
+
+// ================= PABELLÓN B (3 pisos, 7 módulos a lo largo de Z) =================
+const B = { x: -24, z0: -30, sw: 6, depth: 6 };
 const B_ROWS = [
   [['KA','inicial'], ['PkB','inicial'], ['PkA','inicial'], ['BgC','inicial'], ['BgB','inicial'], ['BgA','inicial'], ['Docentes','prof']],
   [['5B','primaria'], ['5A','primaria'], ['6D','primaria'], ['6C','primaria'], ['LAB','lab'], ['6B','primaria'], ['7A','secundaria']],
   [['9D','secundaria'], ['9C','secundaria'], ['9B','secundaria'], ['9A','secundaria'], ['8C','secundaria'], ['ML','lab'], ['ML','lab']]
 ];
 B_ROWS.forEach((row, f) => row.forEach((r, i) => {
-  if (!r) return;
   room(r[0], r[1], B.x, f, B.z0 + (i + 0.5) * B.sw, B.sw - 0.15, B.depth - 0.2);
 }));
-['I', 'II', 'III'].forEach((n, f) => label(n, B.x, f * FH + RH / 2, B.z0 - 2.2, 1.0, '#fde047'));
+['I', 'II', 'III'].forEach((n, f) => label(n, B.x, f * FH + RH / 2, B.z0 - 2.5, 1.0, '#fde047'));
 label('PABELLÓN B', B.x, 3 * FH + 1.2, B.z0 + 3.5 * B.sw, 3, '#fff', 'rgba(0,114,206,.9)');
 
-// ---------- Pabellón D (3 pisos, 2 módulos a lo largo de X) ----------
-const D = { zc: 4.8, xc: [-1.2, -5.4], sw: 4.25, depth: 4 };
+// pasadizos (corredores) pegados a B en pisos 2 y 3 + escalera
+const bFace = B.x + B.depth / 2;                // x = -21
+const railMat = new THREE.MeshLambertMaterial({ color: 0x334155 });
+[1, 2].forEach(f => {
+  flat(1.8, 13, bFace + 0.9, 0.5, 0xa8b3c4, f * FH - 0.1, 0.2);        // z de -6 a 7
+  const r = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 13), railMat);
+  r.position.set(bFace + 1.75, f * FH + 1.0, 0.5); scene.add(r);
+});
+(function stairs() {
+  const n = 11, rise = FH / n, run = 0.29;
+  for (let i = 0; i < n; i++) {
+    const h = (i + 1) * rise;
+    const st = new THREE.Mesh(new THREE.BoxGeometry(1.8, h, run), new THREE.MeshLambertMaterial({ color: 0x94a3b8 }));
+    st.position.set(bFace + 0.9, h / 2, 10.2 - (i + 0.5) * run);
+    scene.add(st);
+  }
+  label('ESCALERA', bFace + 0.9, FH + 1.4, 9.5, 1.2, '#111', 'rgba(250,204,21,.95)');
+})();
+
+// ================= PABELLÓN D (3 pisos, 2 módulos a lo largo de X) =================
+const D = { zc: 6, xc: [-11.7, -5.7], sw: 6, depth: 6 };
 const D_COLS = [
-  [['2C','primaria'], ['ML','lab'], ['ML','lab']],      // módulo hacia el ingreso lateral (X+)
-  [['2B','primaria'], ['ML','lab'], ['ML','lab']]       // módulo hacia B (X-), de aquí sale el puente
+  [['2B','primaria'], ['ML','lab'], ['ML','lab']],      // módulo hacia B (de aquí sale el puente)
+  [['2C','primaria'], ['ML','lab'], ['ML','lab']]
 ];
 D_COLS.forEach((col, k) => col.forEach((r, f) => {
-  room(r[0], r[1], D.xc[k], f, D.zc, D.sw - 0.15, D.depth - 0.2);
+  room(r[0], r[1], D.xc[k], f, D.zc, D.sw - 0.15, D.depth - 0.2, { side: 'z' });
 }));
-['I', 'II', 'III'].forEach((n, f) => label(n, D.xc[0], f * FH + RH / 2, D.zc + 3.2, 1.0, '#fde047'));
-label('PABELLÓN D', D.xc[0] - 2, 3 * FH + 1.2, D.zc, 3, '#fff', 'rgba(244,114,22,.9)');
+['I', 'II', 'III'].forEach((n, f) => label(n, D.xc[1] + 3.8, f * FH + RH / 2, D.zc, 1.0, '#fde047'));
+label('PABELLÓN D', -8.7, 3 * FH + 1.2, D.zc, 3, '#fff', 'rgba(244,114,22,.9)');
 
-// ---------- Pabellón C ----------
-// Lobby (1 piso), a la altura de la sala de docentes de B
-const C = { zc: 14.5, depth: 7 };
-room('LOBBY', 'lab', -21.0, 0, C.zc, 7.9, C.depth - 0.2);
-label('PABELLÓN C', -21.0, FH + 1.2, C.zc, 3, '#fff', 'rgba(100,116,139,.95)');
+// ================= PABELLÓN E (frente a B, al otro lado del patio) =================
+const E = { zc: -20, xc: [9, 3, -3, -9], sw: 6, depth: 6 };
+const E_SLOTS = [
+  [['2A','primaria'], ['4D','primaria'], ['10D','secundaria']],
+  [['1C','primaria'], ['4C','primaria'], ['10C','secundaria']],
+  [['1B','primaria'], ['Docentes','prof'], ['10B','secundaria']],
+  [['1A','primaria'], ['6A','primaria'], ['10A','secundaria']]
+];
+E_SLOTS.forEach((col, k) => col.forEach((r, f) => {
+  room(r[0], r[1], E.xc[k], f, E.zc, E.sw - 0.15, E.depth - 0.2, { side: 'z' });
+}));
+label('PABELLÓN E', 0, 3 * FH + 1.2, E.zc, 3, '#fff', 'rgba(244,114,22,.9)');
 
-// Fila de servicios en el espacio junto al muro: Entrada (cerca al lobby) | Baño (centro) | Tópico (junto al muro)
-const SZ = { zc: 26.0, depth: 7 };
+// ================= PABELLÓN A (atrás, a la izquierda de B) =================
+const A = { zc: -14.7, xc: [-38.5, -44.5], sw: 6, depth: 6 };
+room('KB', 'inicial', A.xc[0], 0, A.zc, 5.85, 5.8, { side: 'z' });
+room('5C', 'primaria', A.xc[0], 1, A.zc, 5.85, 5.8, { side: 'z' });
+room('KC', 'inicial', A.xc[1], 0, A.zc, 5.85, 5.8, { side: 'z' });
+label('PABELLÓN A', -41.5, 2 * FH + 1.2, A.zc, 3, '#fff', 'rgba(0,114,206,.9)');
+
+// ================= PABELLÓN F (diagonal, lado derecho) =================
+const F = { x: 21.3, z: -2.3, rot: 0.849, sw: 5.5, depth: 6 };
+const F_ROWS = [
+  [['2D','primaria'], ['3A','primaria'], ['3B','primaria'], ['3C','primaria'], ['3D','primaria']],
+  [['7B','secundaria'], ['7C','secundaria'], ['7D','secundaria'], ['8A','secundaria'], ['8B','secundaria']],
+  [null, null, null, ['4A','primaria'], ['4B','primaria']]
+];
+F_ROWS.forEach((row, f) => row.forEach((r, i) => {
+  if (!r) return;
+  const lx = (i - 2) * F.sw;
+  room(r[0], r[1], F.x + lx * Math.cos(F.rot), f, F.z - lx * Math.sin(F.rot), F.sw - 0.15, F.depth - 0.2, { rot: F.rot, side: 'z' });
+}));
+label('PABELLÓN F', F.x, 3 * FH + 1.2, F.z, 3, '#fff', 'rgba(120,190,32,.9)');
+
+// ================= PABELLÓN C: lobby en L con puertas de vidrio =================
+room('', 'lab', -24, 0, 17.25, 14, 7.5);          // cuerpo principal x -31..-17, z 13.5..21
+room('', 'lab', -25.5, 0, 27, 9, 12);             // brazo hacia la fila de servicios x -30..-21, z 21..33
+label('LOBBY', -24, RH + 0.8, 17.25, 3, '#fff', 'rgba(100,116,139,.95)');
+label('PABELLÓN C', -24, FH + 2.4, 17.25, 3, '#fff', 'rgba(100,116,139,.95)');
+(function glass() {
+  const gm = new THREE.MeshLambertMaterial({ color: 0x7dd3fc, transparent: true, opacity: 0.4 });
+  const frame = new THREE.MeshLambertMaterial({ color: 0x0f172a });
+  // frente del brazo (hacia la calle)
+  for (let i = 0; i < 3; i++) {
+    const x = -28.5 + i * 3;
+    const p = new THREE.Mesh(new THREE.BoxGeometry(2.8, 2.4, 0.08), gm); p.position.set(x, 1.3, 33.06); scene.add(p);
+    const f = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2.4, 0.12), frame); f.position.set(x + 1.45, 1.3, 33.06); scene.add(f);
+  }
+  // lado hacia la entrada
+  for (let i = 0; i < 2; i++) {
+    const z = 28 + i * 2.5;
+    const p = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.4, 2.3), gm); p.position.set(-20.96, 1.3, z); scene.add(p);
+  }
+})();
+
+// fila de servicios junto al muro: Entrada (cerca al lobby) | Baño (centro) | Tópico (junto al muro)
+const SZ = { zc: 30, depth: 7 };
 const cParts = [
   { n: 'ENTRADA', level: null,    w: 4.5, x: -18.75 },
   { n: 'BAÑO',    level: 'bano',   w: 4.0, x: -14.5 },
   { n: 'TÓPICO',  level: 'topico', w: 5.5, x: -9.75 }
 ];
 cParts.forEach(q => {
-  if (q.level) { room(q.n, q.level, q.x, 0, SZ.zc, q.w - 0.1, SZ.depth - 0.2); return; }
-  // entrada: solo techo y dos muros laterales (se puede pasar)
+  if (q.level) { room(q.n, q.level, q.x, 0, SZ.zc, q.w - 0.1, SZ.depth - 0.2, { side: 'z' }); return; }
   const mat = new THREE.MeshLambertMaterial({ color: 0xe2e8f0 });
   const roof = new THREE.Mesh(new THREE.BoxGeometry(q.w, 0.4, SZ.depth - 0.2), mat);
   roof.position.set(q.x, RH - 0.2, SZ.zc); scene.add(roof);
@@ -134,32 +231,27 @@ cParts.forEach(q => {
   label(q.n, q.x, RH + 0.8, SZ.zc, 1.6, '#fff', 'rgba(22,163,74,.95)');
 });
 
-// ---------- Puente: ML 216 (D, piso 2) -> entre 6B y 7A (B, piso 2) ----------
-const bz = B.z0 + 6 * B.sw;                    // límite entre módulo 6B y 7A
-const bx1 = B.x + B.depth / 2;                  // cara de B hacia D
-const bx2 = D.xc[1] - D.sw / 2;                 // cara de D hacia B
-const bridge = new THREE.Mesh(
-  new THREE.BoxGeometry(bx2 - bx1, 2.6, 2.2),
-  new THREE.MeshLambertMaterial({ color: 0xfacc15, transparent: true, opacity: 0.85 })
-);
+// ================= PUENTE: ML (D, piso 2) -> corredor de B, entre 6B y 7A =================
+const bz = B.z0 + 6 * B.sw;                    // límite entre 6B y 7A (z = 6)
+const bx1 = bFace + 1.8;                        // borde exterior del corredor
+const bx2 = D.xc[0] - D.sw / 2;                 // cara de D hacia B
+const bridge = new THREE.Mesh(new THREE.BoxGeometry(bx2 - bx1, 2.6, 2.2), new THREE.MeshLambertMaterial({ color: 0xfacc15, transparent: true, opacity: 0.85 }));
 bridge.position.set((bx1 + bx2) / 2, FH + 1.4, bz);
 scene.add(bridge);
 const be = new THREE.LineSegments(new THREE.EdgesGeometry(bridge.geometry), new THREE.LineBasicMaterial({ color: 0x713f12 }));
-be.position.copy(bridge.position);
-scene.add(be);
-label("PUENTE 2.º PISO", bridge.position.x, FH + 3.6, bz, 2.6, '#111', 'rgba(250,204,21,.95)');
-label("entre 6B y 7A", (bx1 + bx2) / 2, FH + 5.4, bz, 2.4, '#fff', 'rgba(15,23,42,.85)');
+be.position.copy(bridge.position); scene.add(be);
+label('PUENTE', bridge.position.x, FH + 4.4, bz, 1.8, '#111', 'rgba(250,204,21,.95)');
+label('entre 6B y 7A', bridge.position.x, FH + 5.6, bz, 2.0, '#fff', 'rgba(15,23,42,.85)');
 
-// ---------- Ingreso ----------
-label('INGRESO', -9, 6.4, 22, 2, '#fff', 'rgba(22,163,74,.95)');
-
+// ================= INGRESO =================
+label('INGRESO', -9, 6.4, 26, 2, '#fff', 'rgba(22,163,74,.95)');
 
 // ---------- Puertas del ingreso (4 bahías, todas dobles) ----------
 const pivots = [];
 let doorsOpen = false, doorAngle = 0;
 (function buildDoors() {
   const g = new THREE.Group();
-  g.position.set(-6, 0, 22);
+  g.position.set(-6, 0, 26);
   const wallMat = new THREE.MeshLambertMaterial({ color: 0xe2e8f0 });
   const wood = new THREE.MeshLambertMaterial({ color: 0x854d0e });
   const dark = new THREE.MeshLambertMaterial({ color: 0x1e293b });
@@ -192,7 +284,7 @@ let doorsOpen = false, doorAngle = 0;
   // etiquetas
   bays.forEach((b, i) => {
     const bx = -6 + bays.slice(0, i).reduce((a, q) => a + q.w + 0.45, 0) + b.w / 2;
-    label(b.n, bx, 4.6, 22.8, 1.4, '#fff', 'rgba(15,23,42,.9)');
+    label(b.n, bx, 4.6, 26.8, 1.4, '#fff', 'rgba(15,23,42,.9)');
   });
 })();
 function toggleDoors() {
@@ -200,12 +292,13 @@ function toggleDoors() {
   document.getElementById('doorBtn').textContent = doorsOpen ? 'Cerrar puertas' : 'Abrir puertas';
 }
 
+
 // ---------- Cámaras ----------
 const presets = {
-  iso:    { p: [30, 38, 38],  t: [-18, 3, 2] },
-  puente: { p: [-6, 14, 20],  t: [-14, 4.5, 4.8] },
-  puertas: { p: [-24, 14, 44], t: [-6, 2, 24] },
-  planta: { p: [-18, 85, 3],  t: [-18, 0, 2] }
+  iso:    { p: [50, 62, 78],  t: [-8, 0, 3] },
+  puente: { p: [-8, 12, 24],  t: [-17, 4, 6] },
+  puertas:{ p: [0, 9, 56],    t: [0, 2, 26] },
+  planta: { p: [-8, 130, 3],  t: [-8, 0, 2] }
 };
 function view(k) {
   camera.position.set(...presets[k].p);
@@ -221,7 +314,8 @@ addEventListener('resize', () => {
 });
 (function loop() { requestAnimationFrame(loop);
   doorAngle += ((doorsOpen ? Math.PI / 2.2 : 0) - doorAngle) * 0.08;
-  pivots.forEach(q => { q.l.rotation.y = -doorAngle; q.r.rotation.y = doorAngle; }); controls.update(); renderer.render(scene, camera); })();
+  pivots.forEach(q => { q.l.rotation.y = -doorAngle; q.r.rotation.y = doorAngle; });
+  controls.update(); renderer.render(scene, camera); })();
 </script>
 </body>
 </html>

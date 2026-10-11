@@ -47,6 +47,7 @@
   .bk-notes.bk7 { background: linear-gradient(160deg, #0ea5e9, #1e3a8a); } .bk-notes.bk8 { background: linear-gradient(160deg, #f59e0b, #b45309); }
   #bookClose { margin-top: 22px; background: #334155; color: #fff; border: 0; border-radius: 12px; padding: 11px 28px; font-size: 15px; font-weight: 700; }
   #lockerClose { width: 100%; background: #334155; color: #fff; border: 0; border-radius: 12px; padding: 11px; font-size: 15px; font-weight: 700; }
+  #rainBtn { position: fixed; top: 82px; right: 10px; background: rgba(15,23,42,.7); color: #fff; border: 1px solid rgba(255,255,255,.25); border-radius: 8px; padding: 6px 10px; font-size: 12px; z-index: 5; display: none; }
   #musicBtn { position: fixed; top: 10px; right: 10px; background: rgba(15,23,42,.7); color: #fff; border: 1px solid rgba(255,255,255,.25); border-radius: 8px; padding: 6px 10px; font-size: 12px; z-index: 5; display: none; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -59,6 +60,7 @@
 <button class="btn" id="useBtn">ABRIR</button>
 <button class="btn" id="jumpBtn">SALTAR</button>
 <button id="musicBtn">🎵 Música: sí</button>
+<button id="rainBtn">🌧️ Lluvia: sí</button>
 <button id="moliChip"></button>
 <button id="backMoli">← Molí</button>
 <div id="toast"></div>
@@ -135,6 +137,7 @@ renderer.setPixelRatio(Math.min(devicePixelRatio, isTouch0 ? 1.5 : 2));   // en 
 const SHADOWS = !isTouch0 || /[?&]sombras/.test(location.search);       // en celulares van desactivadas (manchas negras); ?sombras las activa
 renderer.shadowMap.enabled = SHADOWS;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.15;   // colores más suaves
 document.body.appendChild(renderer.domElement);
 
 // luz: cielo/suelo + sol cálido con sombras que siguen al jugador
@@ -228,7 +231,7 @@ function plaque(text, x, y, z, rotY, w = 0.62, h = 0.2) {         // cartelito p
   g.fillStyle = '#ffffff'; g.textAlign = 'center'; g.textBaseline = 'middle';
   let fs = 56; do { g.font = 'bold ' + fs + 'px sans-serif'; fs -= 2; } while (g.measureText(text).width > 290 && fs > 18);
   g.fillText(text, 160, 55);
-  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(c) }));
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), toneMapped: false }));
   m.position.set(x, y, z); m.rotation.y = rotY; scene.add(m); return m;
 }
 function flat(w, d, x, z, color, y = 0.03, h = 0.06) {
@@ -378,7 +381,7 @@ function drawTag(t) {
 function moliTag(text, x, y, z) {
   const c = document.createElement('canvas'); c.width = 512; c.height = 160;
   const t = { text, g: c.getContext('2d'), tex: new THREE.CanvasTexture(c) };
-  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: t.tex, transparent: true, depthWrite: false }));
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: t.tex, transparent: true, depthWrite: false, toneMapped: false }));
   sp.scale.set(1.05, 0.33, 1); sp.position.set(x, y, z); scene.add(sp);
   t.sp = sp; t.y = y; t.ph = Math.random() * 6; drawTag(t); moliTags.push(t); return sp;
 }
@@ -436,6 +439,40 @@ function drawLocker26(mine, name) {                             // 13 x 2 locker
   return new THREE.CanvasTexture(c);
 }
 const locker26Tex = drawLocker26(0, '');
+function softTex(base, n, amp, lines) {                           // textura suave: color base con grano leve (y juntas opcionales)
+  const c = document.createElement('canvas'); c.width = c.height = n; const g = c.getContext('2d');
+  g.fillStyle = base; g.fillRect(0, 0, n, n);
+  for (let i = 0; i < n * n / 18; i++) { const v = Math.random() < 0.5 ? 255 : 0; g.fillStyle = `rgba(${v},${v},${v},${Math.random() * amp})`; g.fillRect(Math.random() * n, Math.random() * n, 1 + Math.random() * 2, 1 + Math.random() * 2); }
+  if (lines) { g.fillStyle = lines; g.fillRect(0, 0, n, 2); g.fillRect(0, 0, 2, n); }
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 4; return t;
+}
+const TEX = {
+  plaster: softTex('#ffffff', 128, 0.05),                          // paredes: pintura con grano muy leve
+  vinyl: softTex('#e9e6df', 128, 0.06, 'rgba(120,115,105,.35)'),    // piso vinílico en baldosas de 60 cm
+  ceiling: softTex('#f4f3ef', 128, 0.07, 'rgba(150,150,150,.45)'),  // techo de placas
+  wood: (function () { const c = document.createElement('canvas'); c.width = 256; c.height = 64; const g = c.getContext('2d');
+    g.fillStyle = '#b07a3c'; g.fillRect(0, 0, 256, 64);
+    for (let i = 0; i < 40; i++) { g.strokeStyle = `rgba(${Math.random() < 0.5 ? '90,50,20' : '210,160,100'},${0.15 + Math.random() * 0.2})`; g.lineWidth = 1 + Math.random() * 2; g.beginPath(); const y = Math.random() * 64; g.moveTo(0, y); g.bezierCurveTo(80, y + Math.random() * 8 - 4, 170, y + Math.random() * 8 - 4, 256, y); g.stroke(); }
+    const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t; })()
+};
+function corkTex() {                                              // corcho con letrero «Ciencia» y la hoja de la unidad
+  const c = document.createElement('canvas'); c.width = 1024; c.height = 300; const g = c.getContext('2d');
+  g.fillStyle = '#c8955a'; g.fillRect(0, 0, 1024, 300);
+  for (let i = 0; i < 2600; i++) { g.fillStyle = ['#a8743e', '#d9a96c', '#b98247', '#8f5f2e'][i % 4]; g.fillRect(Math.random() * 1024, Math.random() * 300, 2 + Math.random() * 3, 2 + Math.random() * 3); }
+  const pin = (x, y, col) => { g.fillStyle = col; g.beginPath(); g.arc(x, y, 7, 0, 6.3); g.fill(); g.fillStyle = 'rgba(255,255,255,.6)'; g.beginPath(); g.arc(x - 2, y - 2, 2.5, 0, 6.3); g.fill(); };
+  g.fillStyle = '#8b5a2b'; g.fillRect(372, 16, 280, 72); g.strokeStyle = '#5b3716'; g.lineWidth = 6; g.strokeRect(372, 16, 280, 72);   // letrero de corcho
+  g.fillStyle = '#fef3c7'; g.font = 'bold 52px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('🔬 Ciencia', 512, 54);
+  pin(386, 30, '#ef4444'); pin(638, 30, '#3b82f6');
+  g.save(); g.translate(512, 196); g.rotate(-0.012);                   // hoja pegada
+  g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(-326, -82, 660, 176); g.fillStyle = '#fffef7'; g.fillRect(-330, -86, 660, 176);
+  g.fillStyle = '#1f2937'; g.textAlign = 'left'; g.font = 'bold 26px sans-serif';
+  g.fillText('La unidad a trabajar es:', -306, -52);
+  g.fillStyle = '#0f766e'; g.font = 'bold 26px sans-serif'; g.fillText('Unidad 7 · Microorganismos en acción', -306, -16);
+  g.fillStyle = '#1f2937'; g.font = 'bold 26px sans-serif'; g.fillText('El propósito de la unidad es:', -306, 26);
+  g.strokeStyle = '#94a3b8'; g.lineWidth = 2; [56, 80].forEach(y => { g.beginPath(); g.moveTo(-306, y); g.lineTo(306, y); g.stroke(); });
+  g.restore(); pin(200, 116, '#22c55e'); pin(824, 116, '#f59e0b');
+  return new THREE.CanvasTexture(c);
+}
 function screenTex(kind) {                                        // lo que el proyector proyecta en el ecran
   const c = document.createElement('canvas'); c.width = 1024; c.height = 440; const g = c.getContext('2d');
   const gr = g.createRadialGradient(512, 220, 40, 512, 220, 560);
@@ -525,16 +562,19 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
     { const [lx, lz] = P(uL - 0.27, Dp / 2 - T), pl = new THREE.Mesh(lockerGeo, new THREE.MeshLambertMaterial({ map: locker26Tex }));
       pl.scale.set(LL, 1.4, 1); pl.position.set(lx, fy + 0.78, lz); pl.rotation.y = Math.atan2(-uvec[0], -uvec[1]); scene.add(pl);
       const th = pl.rotation.y;
+      const cork = new THREE.Mesh(new THREE.PlaneGeometry(LL, 1.22), new THREE.MeshLambertMaterial({ map: corkTex(), polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));   // mural de corcho encima de los lockers
+      { const [cx2, cz2] = P(Wc / 2 - T - 0.045, Dp / 2 - T); cork.position.set(cx2, fy + 2.2, cz2); cork.rotation.y = pl.rotation.y; scene.add(cork); }
+      boxAt(Wc / 2 - T - 0.01, Dp / 2 - T, 1.56, 0.02, 1.3, LL + 0.1, 0x7c4a21, false);   // (el corcho va 2,5 cm delante: sin parpadeo)                        // marco de madera
       SALON6[rname] = { plane: pl, LL, fy, x: lx, z: lz, ax: [Math.cos(th), -Math.sin(th)], nrm: [Math.sin(th), Math.cos(th)], rot: th }; }
     // mesa del profesor: junto a la pizarra, pegada a la pared del fondo, con el folder "Mis notas" (para el docente)
-    { const du = -(Wc / 2 - T) + 0.72, ds = Dp - 2 * T - 1.05;                          // el profesor mira a las mesitas; su silla queda contra la pared
-      boxAt(du, ds, 0, 1.2, 0.72, 0.68, 0x8b5a2b, true);                                 // cuerpo de la mesa
-      boxAt(du, ds, 0.72, 1.3, 0.05, 0.76, 0xa16207, false);                             // tablero
-      boxAt(du, ds + 0.62, 0.42, 0.44, 0.05, 0.44, 0x1f2937, false); boxAt(du, ds + 0.84, 0.62, 0.44, 0.42, 0.05, 0x1f2937, false);   // silla del docente (respaldo a la pared)
-      boxAt(du - 0.25, ds, 0.77, 0.32, 0.03, 0.24, 0x0284c7, false);                    // folder azul "Mis notas"
-      boxAt(du + 0.3, ds + 0.05, 0.77, 0.26, 0.06, 0.2, 0x16a34a, false);               // libro
-      { const [tx, tz] = P(du - 0.25, ds); moliTag('Mis notas', tx, fy + 1.45, tz); }
-      const [fx, fz] = P(du, ds - 0.6);
+    { const du = -(Wc / 2 - T) + 1.05, ds = Dp - 2 * T - 1.0;                           // mesa del profesor mirando a las mesitas de los niños; su silla contra la pared de la pizarra
+      boxAt(du, ds, 0, 0.68, 0.72, 1.2, 0x8b5a2b, true);                                 // cuerpo de la mesa
+      { const [tx, tz] = P(du, ds), top = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.05, 1.3), new THREE.MeshLambertMaterial({ map: TEX.wood })); top.position.set(tx, fy + 0.745, tz); top.rotation.y = rotU; scene.add(top); }   // tablero de madera
+      boxAt(du - 0.66, ds, 0.42, 0.44, 0.05, 0.44, 0x1f2937, false); boxAt(du - 0.88, ds, 0.62, 0.05, 0.42, 0.44, 0x1f2937, false);   // silla del docente (respaldo hacia la pared)
+      boxAt(du, ds - 0.28, 0.77, 0.24, 0.03, 0.32, 0x0284c7, false);                    // folder azul "Mis notas"
+      boxAt(du + 0.05, ds + 0.32, 0.77, 0.2, 0.06, 0.26, 0x16a34a, false);              // libro
+      { const [tx, tz] = P(du, ds - 0.28); moliTag('Mis notas', tx, fy + 1.45, tz); }
+      const [fx, fz] = P(du + 0.75, ds);
       addUse('Mis notas', fx, fz, fy, () => { if (ME && ME.teacher) openMoli('reg'); else if (ME) openBooks('n'); else toast('🔑 Entra con tu DNI en Molí para ver tus notas'); }, 'Abrir'); }
     // junto a la ventana: mesita rectangular mediana con laptop, parlante y su silla
     { const wu = 0.2, ws = 0.32;
@@ -544,10 +584,13 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
       boxAt(wu + 0.32, ws - 0.02, 0.74, 0.14, 0.22, 0.14, 0x1f2937, false);              // parlante
       boxAt(wu + 0.32, ws + 0.055, 0.81, 0.08, 0.08, 0.01, 0x6b7280, false);
       const [cx2, cz2] = P(wu, ws + 0.62); chair(cx2, cz2, svec[0], svec[1], Math.atan2(svec[0], svec[1]), fy); }
-    // el proyector proyecta "Refuerzo · mapas de refuerzo"; al tocar la pizarra se abren los refuerzos de Molí
-    { const [sx, sz] = P(-(Wc / 2 - T - 0.29), Dp / 2 - T), scr = new THREE.Mesh(new THREE.PlaneGeometry(3.38, 1.43), new THREE.MeshBasicMaterial({ map: screenTex('ref') }));
-      scr.position.set(sx, fy + 1.72, sz); scr.rotation.y = Math.atan2(uvec[0], uvec[1]); scene.add(scr);
-      const [ux, uz] = P(-(Wc / 2 - T - 1.2), Dp / 2 - T); addUse('Pizarra: mapas de refuerzo', ux, uz, fy, () => openMoli('mis'), 'Ver');
+    { const iw = Wc - 2 * T, id = Dp - 2 * T, [mx, mz] = P(0, id / 2), ry = Math.atan2(uvec[0], uvec[1]) + Math.PI / 2;   // piso vinílico y techo de placas
+      const fl = TEX.vinyl.clone(); fl.needsUpdate = true; fl.repeat.set(iw / 0.6, id / 0.6);
+      const cl = TEX.ceiling.clone(); cl.needsUpdate = true; cl.repeat.set(iw / 0.6, id / 0.6);
+      const f = new THREE.Mesh(new THREE.PlaneGeometry(iw, id), new THREE.MeshLambertMaterial({ map: fl, polygonOffset: true, polygonOffsetFactor: -1 })); f.rotation.set(-Math.PI / 2, 0, ry, 'YXZ'); f.position.set(mx, fy + 0.006, mz); f.receiveShadow = true; scene.add(f);
+      const ce = new THREE.Mesh(new THREE.PlaneGeometry(iw, id), new THREE.MeshLambertMaterial({ map: cl })); ce.rotation.set(Math.PI / 2, 0, ry, 'YXZ'); ce.position.set(mx, fy + RH - 0.012, mz); scene.add(ce); }
+    // pizarra: al tocarla se abren los mapas de refuerzo de Molí (sin imagen proyectada)
+    { const [ux, uz] = P(-(Wc / 2 - T - 1.2), Dp / 2 - T); addUse('Pizarra: mapas de refuerzo', ux, uz, fy, () => openMoli('mis'), 'Ver');
       const [gx, gz] = P(-(Wc / 2 - T - 0.6), Dp / 2 - T); moliTag('Mapas de refuerzo', gx, fy + 2.75, gz); }
     // 5 grupos: dos a cada lado (adelante y atrás) y uno al centro
     const G5 = [[-1.5, 1.6], [2.25, 1.6], [-1.5, 6.0], [2.25, 6.0], [0.4, 3.8]];
@@ -565,8 +608,9 @@ function furnish(kind, cx, cz, rot, fy, w, d, door, role, rname) {
       });
       const [x, z] = P(uu, ss), yR = fy + 2.05;                                       // pita colgando y un cohete de papel "GRUPO n"
       const str = new THREE.Mesh(new THREE.BoxGeometry(0.012, top - 0.06 - (yR + 0.42), 0.012), strMat); str.position.set(x, (top - 0.06 + yR + 0.42) / 2, z); scene.add(str);
-      const rk = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.6), new THREE.MeshLambertMaterial({ map: rocketTex(gi + 1), transparent: true, alphaTest: 0.1, side: THREE.DoubleSide }));   // cohete de papel plano
-      rk.position.set(x, yR + 0.12, z); rk.rotation.y = Math.atan2(uvec[0], uvec[1]); scene.add(rk);
+      const rkMat = new THREE.MeshLambertMaterial({ map: rocketTex(gi + 1), transparent: true, alphaTest: 0.1 });
+      [0, Math.PI].forEach(a => { const rk = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.6), rkMat);   // cohete de papel plano, se lee bien por los dos lados
+        rk.position.set(x, yR + 0.12, z); rk.rotation.y = Math.atan2(uvec[0], uvec[1]) + a; scene.add(rk); });
     });
     // 4 ventiladores colgados en las esquinas, mirando al centro
     const cu = 0.4, cs = (Dp - 2 * T) / 2;
@@ -649,7 +693,13 @@ function room(name, level, cx, fl, cz, w, d, o = {}) {
         if (o.special === '6B') ops.push({ type: 'swin', u: len * 0.18, w: len * 0.45, name: 'Ventana ' + name });   // ventana corrediza al pasillo
         else ops.push({ type: 'window', u: len * 0.18, w: len * 0.45 });
       }
-    } else if (side === opp && !o.noOpp && o.special !== '6B') { ops.push({ type: 'window', u: 0, w: len * 0.7 }); if (closed) fakeWin(isX, sg, 0, len * 0.7); }   // los sextos: al fondo sólo muro
+    } else if (side === opp && !o.noOpp && o.special !== '6B') { ops.push({ type: 'window', u: 0, w: len * 0.7 }); if (closed) fakeWin(isX, sg, 0, len * 0.7); }
+    else if (side === opp && o.special === '6B') {                       // los sextos: al fondo, una fila de ventanitas altas y el letrero «Área de Ciencia»
+      for (let k = 0; k < 6; k++) ops.push({ type: 'window', u: -len / 2 + 0.95 + k * (len - 1.9) / 5, w: 0.9, y0: 2.08 });
+      const lx = isX ? sg * (w / 2 - T - 0.012) : 0, lz = isX ? 0 : sg * (d / 2 - T - 0.012), [px, pz] = lw(cx, cz, rot, lx, lz);
+      const nx = isX ? -sg : 0, nz = isX ? 0 : -sg, nwx = nx * Math.cos(rot) + nz * Math.sin(rot), nwz = -nx * Math.sin(rot) + nz * Math.cos(rot);
+      plaque('Área de Ciencia', px, y0 + 1.72, pz, Math.atan2(nwx, nwz), 1.7, 0.4);
+    }
     (o.extra || []).forEach(e => { if (e.side === side) ops.push({ type: 'door', u: e.u, w: 1.2, name: e.name }); });
     // los muros de extremo van lisos (solo muro, sin ventanas)
     buildWall(cx, cz, rot, isX ? sg * (w / 2 - T / 2) : 0, isX ? 0 : sg * (d / 2 - T / 2), isX ? 'z' : 'x', len, y0, ops, col,
@@ -1192,7 +1242,7 @@ function buildInstanced(items, material, geo, cast = true) {
   m.instanceMatrix.needsUpdate = true; if (m.instanceColor) m.instanceColor.needsUpdate = true;
   m.castShadow = cast; m.receiveShadow = true; m.frustumCulled = false; scene.add(m);
 }
-buildInstanced(solidItems, new THREE.MeshLambertMaterial({ color: 0xffffff }));
+buildInstanced(solidItems, new THREE.MeshLambertMaterial({ color: 0xffffff, map: TEX.plaster }));
 const furnMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
 const hexGeo = (function () {                                     // una mesita: trapecio (1/6 del hexágono sin la punta; al centro queda un mini hexágono vacío)
   const ri = 0.3, pt = (r, t) => new THREE.Vector2(r * Math.sin(t), r * Math.cos(t)), a = Math.PI / 3;
@@ -1413,9 +1463,9 @@ function checkLocker() {                                          // al acercart
   inside(0.05, 0.3, 0.22, -0.07, -0.12, 0x16a34a);                // cuaderno verde
   inside(0.03, 0.32, 0.24, 0.02, -0.11, 0xf59e0b);                // folder de exit tickets
   addUse('Mi locker ' + String(n).padStart(2, '0'), cx + s.nrm[0] * 0.6, cz + s.nrm[1] * 0.6, s.fy, openLocker, 'Abrir');
-  moliTag('Mi locker ' + String(n).padStart(2, '0'), cx + s.nrm[0] * 0.3, s.fy + 1.85, cz + s.nrm[1] * 0.3);
+  moliTag('Mi locker ' + String(n).padStart(2, '0'), cx + s.nrm[0] * 0.45, s.fy + 1.62, cz + s.nrm[1] * 0.45);
   myLocker = { n, glow };
-  toast('🔒 Tu locker es el N° ' + String(n).padStart(2, '0') + ', ' + firstName() + ' (el que brilla)', 5);
+  toast('🔒 Tu locker es el N° ' + String(n).padStart(2, '0') + (firstName() ? ', ' + firstName() : '') + ' (el que brilla)', 5);
 }
 function setUi(on) { uiOpen = on; for (const k in keys) keys[k] = false; joy.x = joy.y = 0; joyId = lookId = null; knob.style.left = knob.style.top = '40px'; if (on && document.exitPointerLock) document.exitPointerLock(); music.duck(on); }
 function openLocker() {
@@ -1468,7 +1518,7 @@ refreshChip();
 musicBtn.addEventListener('click', () => { musicBtn.textContent = '🎵 Música: ' + (music.toggle() ? 'sí' : 'no'); });
 document.getElementById('go').addEventListener('click', () => {
   startEl.style.display = 'none'; P.started = true;
-  musicBtn.style.display = 'block'; music.start(); chipEl.style.display = 'block'; backMoli.style.display = 'block';
+  musicBtn.style.display = 'block'; rainBtn.style.display = 'block'; music.start(); chipEl.style.display = 'block'; backMoli.style.display = 'block';
   refreshChip(); if (myRoom() && seatInRoom(myRoom())) toast('🪑 ¡Hola ' + firstName() + '! Estás sentado en tu salón ' + myRoom() + '. Camina para levantarte y ve a los lockers.', 5);
   if (isTouch) { for (const id of ['joy', 'useBtn', 'jumpBtn']) document.getElementById(id).style.display = 'block'; }
   else renderer.domElement.requestPointerLock && renderer.domElement.requestPointerLock();
@@ -1517,6 +1567,84 @@ addEventListener('touchend', e => {
 addEventListener('touchcancel', () => { joyId = lookId = null; joy.x = joy.y = 0; });
 addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
 
+// ===================================================================
+//  LLUVIA: gotas alrededor del jugador; no caen bajo techos ni pasadizos
+// ===================================================================
+let rainOn = true;
+const RG = { x0: -64, z0: -66, w: 124, h: 96 }, roofTop = new Float32Array(RG.w * RG.h).fill(-1);
+(function () {                                                    // altura del techo más alto sobre cada celda de 1 m
+  const surf = floors.filter(f => f.y >= 2.2).concat(roofs);
+  for (let iz = 0; iz < RG.h; iz++) for (let ix = 0; ix < RG.w; ix++) {
+    const x = RG.x0 + ix + 0.5, z = RG.z0 + iz + 0.5; let top = -1;
+    for (const f of surf) { if (f.y <= top) continue; const dx = x - f.x, dz = z - f.z, lx = dx * f.c - dz * f.s, lz = dx * f.s + dz * f.c; if (Math.abs(lx) <= f.hw && Math.abs(lz) <= f.hd) top = f.y; }
+    roofTop[iz * RG.w + ix] = top;
+  }
+})();
+const RAIN_N = isTouch0 ? 700 : 1500, RAIN_R = 22, RAIN_H = 22, RAIN_V = 14, RAIN_W = 1.2;
+const rainXYZ = new Float32Array(RAIN_N * 3), rainPos = new Float32Array(RAIN_N * 6);
+for (let i = 0; i < RAIN_N; i++) { rainXYZ[i * 3] = (Math.random() * 2 - 1) * RAIN_R; rainXYZ[i * 3 + 1] = Math.random() * RAIN_H; rainXYZ[i * 3 + 2] = (Math.random() * 2 - 1) * RAIN_R; }
+const rainGeo = new THREE.BufferGeometry(); rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPos, 3));
+const rain = new THREE.LineSegments(rainGeo, new THREE.LineBasicMaterial({ color: 0xc7d7ee, transparent: true, opacity: 0.45, depthWrite: false })); rain.frustumCulled = false; scene.add(rain);
+function updateRain(dt) {
+  rain.visible = rainOn; if (!rainOn) return;
+  const wrap = (v, c) => c + ((v - c + RAIN_R) % (2 * RAIN_R) + 2 * RAIN_R) % (2 * RAIN_R) - RAIN_R;
+  for (let i = 0; i < RAIN_N; i++) {
+    let x = rainXYZ[i * 3] + RAIN_W * dt, y = rainXYZ[i * 3 + 1] - RAIN_V * dt, z = rainXYZ[i * 3 + 2];
+    if (y < -1) y += RAIN_H; x = wrap(x, P.x); z = wrap(z, P.z);
+    rainXYZ[i * 3] = x; rainXYZ[i * 3 + 1] = y; rainXYZ[i * 3 + 2] = z;
+    const ix = Math.floor(x - RG.x0), iz = Math.floor(z - RG.z0), o = i * 6;
+    if (ix >= 0 && ix < RG.w && iz >= 0 && iz < RG.h && y < roofTop[iz * RG.w + ix]) { rainPos[o + 1] = rainPos[o + 4] = -100; continue; }   // bajo techo: no se ve
+    rainPos[o] = x; rainPos[o + 1] = y; rainPos[o + 2] = z; rainPos[o + 3] = x - RAIN_W * 0.04; rainPos[o + 4] = y + 0.6; rainPos[o + 5] = z;
+  }
+  rainGeo.attributes.position.needsUpdate = true;
+}
+const rainBtn = document.getElementById('rainBtn'), skyTop = sky.material.uniforms.top.value.clone(), skyMid = sky.material.uniforms.mid.value.clone();
+function setRain(on) {                                            // con lluvia el cielo se pone un poco gris
+  rainOn = on; rainBtn.textContent = '🌧️ Lluvia: ' + (on ? 'sí' : 'no');
+  sky.material.uniforms.top.value.copy(skyTop).lerp(new THREE.Color(0x8a9bb0), on ? 0.55 : 0);
+  sky.material.uniforms.mid.value.copy(skyMid).lerp(new THREE.Color(0xb3c0cf), on ? 0.55 : 0);
+  clouds.children.forEach(c => c.material.color.setHex(on ? 0xc4ccd6 : 0xffffff));
+}
+rainBtn.addEventListener('click', () => setRain(!rainOn)); setRain(true);
+
+// ===================================================================
+//  ESTUDIANTES en el patio (polo blanco y buzo celeste): caminan, juegan o están parados. Se ven a lo lejos, sin detalle
+// ===================================================================
+const kids = [];
+const KID_PARTS = [                                               // [ancho, alto, fondo, y, color]
+  [0.3, 0.42, 0.18, 0.21, 0x7dd3fc],     // pantalón del buzo (celeste)
+  [0.36, 0.42, 0.22, 0.63, 0xf8fafc],    // polo blanco
+  [0.24, 0.24, 0.24, 0.98, 0xe0b48f],    // cabeza
+  [0.26, 0.08, 0.26, 1.12, 0x2b2118]     // pelo
+];
+const kidMeshes = KID_PARTS.map(([w, h, d, , c]) => { const m = new THREE.InstancedMesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({ color: c }), 40); m.frustumCulled = false; scene.add(m); return m; });
+const armMesh = new THREE.InstancedMesh(new THREE.BoxGeometry(0.08, 0.36, 0.08), new THREE.MeshLambertMaterial({ color: 0x7dd3fc }), 80); armMesh.frustumCulled = false; scene.add(armMesh);
+(function () {
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const add = (k) => { k.ph = Math.random() * 6; k.s = rnd(0.85, 1.05); kids.push(k); };
+  for (let i = 0; i < 8; i++) add({ mode: 'walk', cx: rnd(-10, 6), cz: rnd(-19, -8), r: rnd(3, 7), w: rnd(0.12, 0.22) * (Math.random() < 0.5 ? -1 : 1) });   // caminan en la cancha
+  for (let i = 0; i < 6; i++) add({ mode: 'play', cx: -2 + Math.cos(i) * 2.5, cz: -13 + Math.sin(i * 1.7) * 3, r: rnd(1.2, 2.5), w: rnd(0.6, 1.0) });      // juegan (corren y saltan)
+  for (let i = 0; i < 6; i++) add({ mode: 'stand', x: rnd(-14, 10), z: rnd(-22, -5), yaw: rnd(0, 6.3) });                                               // parados conversando
+  for (let i = 0; i < 6; i++) add({ mode: 'walk', cx: rnd(26, 40), cz: rnd(-48, -32), r: rnd(3, 6), w: rnd(0.12, 0.2) });                               // patio de abajo
+  for (let i = 0; i < 4; i++) add({ mode: 'stand', x: rnd(24, 42), z: rnd(-50, -30), yaw: rnd(0, 6.3) });
+})();
+const kM = new THREE.Matrix4(), kQ = new THREE.Quaternion(), kE = new THREE.Euler(), kV = new THREE.Vector3(), kS = new THREE.Vector3();
+function updateKids(t) {
+  kids.forEach((k, i) => {
+    let x, z, yaw, hop = 0, swing = 0;
+    if (k.mode === 'stand') { x = k.x; z = k.z; yaw = k.yaw + Math.sin(t * 0.4 + k.ph) * 0.4; }
+    else { const a = t * k.w + k.ph; x = k.cx + Math.cos(a) * k.r; z = k.cz + Math.sin(a) * k.r; yaw = Math.atan2(-Math.sin(a) * Math.sign(k.w), Math.cos(a) * Math.sign(k.w)); swing = Math.sin(t * (k.mode === 'play' ? 11 : 6) + k.ph) * 0.5;
+      if (k.mode === 'play') hop = Math.max(0, Math.sin(t * 5 + k.ph)) * 0.25; }
+    const gy = groundY(x, z, 0.5) + hop;
+    KID_PARTS.forEach(([, , , py], j) => { kE.set(0, yaw, 0); kQ.setFromEuler(kE); kV.set(x, gy + py * k.s, z); kS.set(k.s, k.s, k.s); kM.compose(kV, kQ, kS); kidMeshes[j].setMatrixAt(i, kM); });
+    [-1, 1].forEach((sd, j) => {                                     // brazos que se balancean
+      kE.set(swing * sd, yaw, 0, 'YXZ'); kQ.setFromEuler(kE);
+      kV.set(x + Math.cos(yaw) * 0.22 * sd * k.s, gy + 0.66 * k.s, z - Math.sin(yaw) * 0.22 * sd * k.s); kS.set(k.s, k.s, k.s); kM.compose(kV, kQ, kS); armMesh.setMatrixAt(i * 2 + j, kM);
+    });
+  });
+  kidMeshes.forEach(m => { m.count = kids.length; m.instanceMatrix.needsUpdate = true; }); armMesh.count = kids.length * 2; armMesh.instanceMatrix.needsUpdate = true;
+}
+
 const roomLamp = new THREE.PointLight(0xfff4e0, 0, 8, 1.5); scene.add(roomLamp);
 function updateRoomLamp() {                                        // la luz del salón donde está el jugador
   let best = null, bd = 30;
@@ -1545,6 +1673,7 @@ function loop(now) {
   if (myLocker) myLocker.glow.material.opacity = 0.25 + 0.2 * Math.sin(now / 300);
   sky.position.copy(camera.position); const tNow = now / 1000; spinners.forEach(f => { if (f.on) f.b.rotation.z += Math.min(dt, 0.05) * 14; });
   sun.position.set(P.x + SUN_DIR.x * 120, SUN_DIR.y * 120, P.z + SUN_DIR.z * 120); sun.target.position.set(P.x, 0, P.z);
+  updateRain(Math.min(dt, 0.05)); updateKids(now / 1000);
   clouds.children.forEach(g => { g.position.x += g.userData.v * Math.min(dt, 0.1); if (g.position.x > 440) g.position.x = -440; });
   renderer.render(scene, camera);
 }

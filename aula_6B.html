@@ -1029,7 +1029,7 @@ function buildInstanced(items, material, geo, cast = true) {
   m.instanceMatrix.needsUpdate = true; if (m.instanceColor) m.instanceColor.needsUpdate = true;
   m.castShadow = cast; m.receiveShadow = true; m.frustumCulled = false; scene.add(m); return m;
 }
-buildInstanced(solidItems, new THREE.MeshLambertMaterial({ color: 0xffffff }));
+buildInstanced(solidItems, new THREE.MeshLambertMaterial({ color: 0xffffff })).userData.noInk = true;   // paredes y marcos sin contorno: las paredes quedan lisas
 const furnMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
 const hexGeo = (function () {                                     // una mesita: trapecio (1/6 del hexágono sin la punta; al centro queda un mini hexágono vacío)
   const ri = 0.3, pt = (r, t) => new THREE.Vector2(r * Math.sin(t), r * Math.cos(t)), a = Math.PI / 3;

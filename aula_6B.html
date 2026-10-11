@@ -1804,7 +1804,7 @@ async function go(dir) {
   try {
     const cur = STOPS[TOUR.i]; hideTitle(); if (cur.leave) await cur.leave();
     TOUR.i = (TOUR.i + dir + STOPS.length) % STOPS.length; showStop();
-    const st = STOPS[TOUR.i]; await fly(st, dir); if (st.title) showTitle(st.title, TOUR.i); if (st.enter) await st.enter(); else await guiar();   // al llegar: el nombre de la escena, el objeto se abre y Molí explica
+    const st = STOPS[TOUR.i]; if (MO.tut) moliIr(st, Math.min(2000, 900 + TOUR.pos.distanceTo(fromOf(st)) * 150) * 1.08); await fly(st, dir); if (!MO.tut && TOUR.i === 0) moli.accion('saludar', -1); if (st.title) showTitle(st.title, TOUR.i); if (st.enter) await st.enter(); else await guiar();   // al llegar: el nombre de la escena, el objeto se abre y Molí explica
   } finally { TOUR.busy = false; }
   if (TOUR.q) { const q = TOUR.q; TOUR.q = 0; go(q); }
 }
@@ -1855,8 +1855,8 @@ function crearMoli(THREE, opt = {}) {
     es.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); });
   } catch (e) { env = null; }
   const PM = (o) => new THREE.MeshPhysicalMaterial(Object.assign({ envMap: env, metalness: 0 }, o));
-  const WHITE = PM({ color: 0xf3f2ef, roughness: 0.42, clearcoat: 0.55, clearcoatRoughness: 0.24, envMapIntensity: 0.62 });
-  const NAVY = PM({ color: 0x1b295e, roughness: 0.38, clearcoat: 0.6, clearcoatRoughness: 0.25, envMapIntensity: 0.5 });
+  const WHITE = PM({ color: 0xe5ded1, roughness: 0.52, clearcoat: 0.3, clearcoatRoughness: 0.32, envMapIntensity: 0.28 });   // marfil cálido satinado
+  const NAVY = PM({ color: 0x17245a, roughness: 0.4, clearcoat: 0.55, clearcoatRoughness: 0.25, envMapIntensity: 0.45 });
   const NAVYD = PM({ color: 0x0d163d, roughness: 0.45, envMapIntensity: 0.3 });
   const VISOR = PM({ color: 0x0b1438, roughness: 0.16, clearcoat: 1, clearcoatRoughness: 0.05, envMapIntensity: 0.62 });
   const SEAM = PM({ color: 0xaeb7c7, roughness: 0.5, envMapIntensity: 0.3 });
@@ -1934,15 +1934,15 @@ function crearMoli(THREE, opt = {}) {
   const head = new THREE.Group(); head.position.y = 0.45; headPivot.add(head);
 
   // ---- casco: superelipsoide (más redondito arriba) con el hueco del visor adelante ----
-  const HS = [0.6, 0.47, 0.52], VI = { y: -0.07, bx: 0.47, by: 0.31, r: 0.18, d: 0.075, w: 0.032 };
+  const HS = [0.6, 0.5, 0.53], VI = { y: -0.08, bx: 0.44, by: 0.29, r: 0.2, d: 0.075, w: 0.032 };
   const sp = (v, p) => Math.sign(v) * Math.pow(Math.abs(v), p);
   const sdRR = (x, y) => { const qx = Math.abs(x) - VI.bx + VI.r, qy = Math.abs(y - VI.y) - VI.by + VI.r; return Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - VI.r; };
   const HW = 96, HH = 72;                                             // resolución del casco (borde del visor bien liso)
   const helmet = () => {
     const g = new THREE.SphereGeometry(1, HW, HH); g.rotateY(-Math.PI / 2);      // la costura queda atrás
     const q = g.attributes.position;
-    for (let i = 0; i < q.count; i++) { const x = q.getX(i), y = q.getY(i), z = q.getZ(i), yy = sp(y, 0.62), k = 1 - 0.1 * Math.max(0, yy) ** 2 - 0.035 * Math.max(0, -yy) ** 2;
-      q.setXYZ(i, sp(x, 0.55) * k * HS[0], yy * HS[1], sp(z, 0.55) * k * HS[2]); }
+    for (let i = 0; i < q.count; i++) { const x = q.getX(i), y = q.getY(i), z = q.getZ(i), yy = sp(y, 0.7), k = 1 - 0.13 * Math.max(0, yy) ** 2 - 0.04 * Math.max(0, -yy) ** 2;
+      q.setXYZ(i, sp(x, 0.6) * k * HS[0], yy * HS[1], sp(z, 0.62) * k * HS[2]); }
     return g;
   };
   const shell = helmet(), base0 = shell.clone();
@@ -1980,23 +1980,23 @@ function crearMoli(THREE, opt = {}) {
   });
   // ---- cuello, cuerpito (frijolito blanco con una línea), hombros y base azul noche ----
   part(new THREE.CylinderGeometry(0.115, 0.135, 0.12, 32), NAVY, body, [0, 0.8, 0]);
-  const torsoR = (y) => { const s = Math.max(-1, Math.min(1, (y - 0.545) / 0.215)), a = Math.asin(s); return 0.37 * Math.pow(Math.cos(a), 0.6) * (1 - 0.06 * s); };
+  const torsoR = (y) => { const s = Math.max(-1, Math.min(1, (y - 0.545) / 0.215)), a = Math.asin(s); return 0.4 * Math.pow(Math.cos(a), 0.72) * (1 - 0.07 * s); };
   part(lathe(k => { const a = -Math.PI / 2 + Math.PI * k, y = 0.545 + 0.215 * Math.sin(a); return [torsoR(y), y]; }, 32, 56), WHITE, body);
   part(new THREE.TorusGeometry(torsoR(0.45) + 0.001, 0.0065, 8, 72), SEAM, body, [0, 0.45, 0], [Math.PI / 2, 0, 0]);
   part(lathe(k => { if (k < 0.82) { const a = Math.PI / 2 * (1 - k / 0.82); return [0.235 * Math.pow(Math.cos(a), 0.8), 0.37 - 0.16 * Math.sin(a)]; }
     const u = (k - 0.82) / 0.18; return [0.235 - 0.07 * u, 0.37 + 0.03 * Math.sin(u * Math.PI / 2)]; }, 28, 56), NAVY, body);
   part(new THREE.TorusGeometry(0.06, 0.013, 10, 48), LED, body, [0, 0.215, 0], [Math.PI / 2, 0, 0]);
   const baseGlow = glow(body, [0, 0.18, 0], 0.34, 0.6);
-  [-1, 1].forEach(sx => part(new THREE.SphereGeometry(0.09, 24, 18), NAVY, body, [0.325 * sx, 0.665, 0.01]));
+  [-1, 1].forEach(sx => part(new THREE.SphereGeometry(0.1, 24, 18), NAVY, body, [0.35 * sx, 0.655, 0.01]));
   // ---- bracitos (frijolito blanco) y manitos azul noche: palma, 3 deditos y pulgar ----
-  const armGeo = lathe(k => { const y = -0.385 + 0.43 * k; return [0.112 * Math.pow(Math.sin(Math.PI * k), 0.42) * (0.84 + 0.16 * k), y]; }, 28, 36);
+  const armGeo = lathe(k => { const y = -0.39 + 0.44 * k; return [0.135 * Math.pow(Math.sin(Math.PI * k), 0.4) * (0.8 + 0.2 * k), y]; }, 28, 36);   // brazo gordito (frijol)
   const arms = [-1, 1].map(sx => {
-    const sh = new THREE.Group(); sh.position.set(0.335 * sx, 0.665, 0.01); body.add(sh);
+    const sh = new THREE.Group(); sh.position.set(0.37 * sx, 0.655, 0.01); body.add(sh);
     part(armGeo, WHITE, sh, [0.008 * sx, 0, 0]);
-    const hand = new THREE.Group(); hand.position.set(0.012 * sx, -0.415, 0.006); sh.add(hand);
-    part(new THREE.SphereGeometry(0.088, 24, 18), NAVY, hand, [0, 0, 0], null, [1, 0.92, 0.84]);
-    [-1, 0, 1].forEach(j => part(new THREE.SphereGeometry(0.037, 14, 12), NAVY, hand, [0.014 * sx * (1 - Math.abs(j)), -0.078, j * 0.043 + 0.004], [0, 0, 0.12 * j * sx], [1, 1.42, 1]));
-    part(new THREE.SphereGeometry(0.035, 14, 12), NAVY, hand, [-0.06 * sx, -0.026, 0.054], [0, 0, -0.6 * sx], [1, 1.35, 1]);
+    const hand = new THREE.Group(); hand.position.set(0.014 * sx, -0.43, 0.008); sh.add(hand);
+    part(new THREE.SphereGeometry(0.1, 24, 18), NAVY, hand, [0, 0, 0], null, [1, 0.92, 0.84]);
+    [-1, 0, 1].forEach(j => part(new THREE.SphereGeometry(0.042, 14, 12), NAVY, hand, [0.016 * sx * (1 - Math.abs(j)), -0.088, j * 0.049 + 0.004], [0, 0, 0.12 * j * sx], [1, 1.4, 1]));
+    part(new THREE.SphereGeometry(0.04, 14, 12), NAVY, hand, [-0.068 * sx, -0.03, 0.06], [0, 0, -0.6 * sx], [1, 1.35, 1]);
     return { sh, hand, sx, a: 0.42, v: 0, f: 0 };
   });
   flush();
@@ -2092,16 +2092,18 @@ function crearMoli(THREE, opt = {}) {
 // ==MOLI-END==
 
 // ===================================================================
-//  MOLÍ GUÍA: vive en su propia capa (encima del salón: nunca choca con las mesas ni con los lockers), abajo a la
-//  derecha. Entra volando, se inclina cuando la cámara gira, mira lo que estás viendo y, en el primer recorrido,
-//  explica cada lugar con su globo de texto.
+//  MOLÍ GUÍA: está DENTRO del aula, flotando en su sitio (si algo está delante, lo tapa). En cada lugar se pone a un
+//  costado de lo que se ve, y cuando la cámara cambia de lugar él también vuela al siguiente. En el primer
+//  recorrido explica cada lugar con su globo de texto.
 // ===================================================================
-const moliScene = new THREE.Scene(), moliCam = new THREE.PerspectiveCamera(28, innerWidth / innerHeight, 0.1, 40);
-moliCam.position.set(0, 0, 8); moliCam.lookAt(0, 0, 0);
-moliScene.add(new THREE.HemisphereLight(0xffffff, 0xc4ccd8, 0.62));
-{ const k = new THREE.DirectionalLight(0xffffff, 0.72); k.position.set(-2, 4, 5); moliScene.add(k);
-  const r = new THREE.DirectionalLight(0x9fd6ff, 0.75); r.position.set(3, 2.5, -4); moliScene.add(r); }
+const moliScene = new THREE.Scene();                                  // sus propias luces; se dibuja con la cámara del aula respetando lo que está adelante
+moliScene.add(new THREE.HemisphereLight(0xfffdf8, 0x7f8ba3, 0.55));
+const mKey = new THREE.DirectionalLight(0xfff8ee, 0.8), mRim = new THREE.DirectionalLight(0x9fd6ff, 0.45), mAim = new THREE.Object3D();
+moliScene.add(mKey, mRim, mAim); mKey.target = mAim; mRim.target = mAim;
 const moli = crearMoli(THREE, { renderer }); moliScene.add(moli.root);
+const MSC = 0.24;                                                     // tamaño de Molí en el aula (≈ 47 cm)
+moli.root.scale.setScalar(MSC);
+const moliFloor = moli.root.children.find((c, i) => i > 0 && c.isGroup);   // su aro de luz (va en el piso o la mesa que tiene debajo)
 const nombre = firstName();
 const GUIA = [
   '¡Hola' + (nombre ? ' <b>' + nombre + '</b>' : '') + '! 👋 Soy <b>Molí</b>, tu guía. Este es tu salón <b>6° B</b>. Toca <b>▶</b> o la derecha de la pantalla y te muestro cada lugar.',
@@ -2112,14 +2114,39 @@ const GUIA = [
   'Esta es la <b>mesa del profesor</b>. En su folder azul están <b>tus notas</b>. 📂',
   'Y en la <b>pizarra</b> el proyector abre el <b>Laboratorio de Molí</b>: ¡juegos y experimentos de ciencia! 🧪 ¡Ya conoces tu salón! Usa ◀ ▶ para volver cuando quieras.'
 ];
-const MO = { hide: true, k: 1, kv: 0, s: 1, x: 0, y: 0, said: {}, talking: null, tut: true, f0: new THREE.Vector3(), mov: 0 };
-function moliLayout() {                                               // tamaño y lugar según la pantalla (≈ 42 % del alto)
-  moliCam.aspect = innerWidth / innerHeight; moliCam.updateProjectionMatrix();
-  const hh = 8 * Math.tan(14 * Math.PI / 180), hw = hh * moliCam.aspect;
-  MO.s = Math.min(hh * 2 * 0.42 / 1.95, hw * 2 * 0.2 / 1.4);
-  MO.x = hw - 0.98 * MO.s; MO.y = -hh + 0.2 * MO.s;
+const clampN = (v, a, b) => Math.max(a, Math.min(b, v));
+const MO = { pos: new THREE.Vector3(R6B.cx + 3.4, R6B.y0 + 2.3, R6B.cz + 3.6), vel: new THREE.Vector3(), target: new THREE.Vector3(), ground: R6B.y0,
+  yaw: -1.2, mov: 0, flying: false, trip: 0, said: {}, talking: null, tut: true };
+MO.target.copy(MO.pos);
+// ---- dónde se pone Molí en cada lugar: a un costado de lo que se ve, sin meterse en mesas ni paredes ----
+let rayT = null;
+const rayTargets = () => rayT || (rayT = (() => { const a = []; scene.traverse(o => { const m = o.material;
+  if (o.isMesh && o !== sky && o.visible && m && !Array.isArray(m) && !m.transparent && !m.isShaderMaterial && m !== INK_BOX && m !== INK_NRM) a.push(o); }); return a; })());
+const rc = new THREE.Raycaster(), tCam = new THREE.PerspectiveCamera(), tv = new THREE.Vector3(), down = new THREE.Vector3(0, -1, 0);
+function spotFor(st) {
+  const from = fromOf(st), dist = from.distanceTo(st.look), T = rayTargets();
+  tCam.fov = baseFov; tCam.aspect = innerWidth / innerHeight; tCam.near = 0.05; tCam.far = 50; tCam.updateProjectionMatrix();
+  tCam.position.copy(from); tCam.lookAt(st.look); tCam.updateMatrixWorld();
+  const ray = (x, y) => { const d = tv.set(x, y, 0.5).unproject(tCam).sub(from).normalize().clone(); rc.set(from, d); rc.near = 0; rc.far = 4; const h = rc.intersectObjects(T, false)[0]; return [d, h ? h.distance : 4]; };
+  let best = null, bestD = -1;
+  for (const [x, y] of [[0.58, -0.28], [0.6, 0.04], [-0.58, -0.28], [-0.6, 0.04], [0.35, 0.32]]) {
+    const [d, h0] = ray(x, y), h = Math.min(h0, ray(x + 0.1, y)[1], ray(x - 0.1, y)[1], ray(x, y - 0.15)[1]);
+    const D = Math.min(1.4, dist * 1.05, h - 0.3);
+    if (D > bestD) { bestD = D; best = from.clone().addScaledVector(d, Math.max(0.6, D)); }
+    if (D >= 0.8) break;
+  }
+  best.x = clampN(best.x, R6B.cx - 3.5, R6B.cx + 3.5); best.z = clampN(best.z, R6B.cz - 4.0, R6B.cz + 4.0); best.y = clampN(best.y, R6B.y0 + 0.45, R6B.y0 + 2.6);
+  rc.set(best, down); rc.far = 4; const g = rc.intersectObjects(T, false)[0];
+  return { pos: new THREE.Vector3(best.x, best.y - 0.95 * MSC, best.z), ground: g ? g.point.y : R6B.y0 };   // (pos = debajo de sus pies)
 }
-moliLayout(); addEventListener('resize', moliLayout);
+function moliIr(st, ms) {                                             // vuela en arco hasta su sitio del siguiente lugar (junto con la cámara)
+  const sp = spotFor(st), p0 = MO.target.clone(), p1 = sp.pos, mid = p0.clone().lerp(p1, 0.5), g0 = MO.ground, id = ++MO.trip;
+  mid.y += Math.min(0.6, 0.15 + p0.distanceTo(p1) * 0.12); MO.flying = true;
+  return tween(ms, k => { if (MO.trip !== id) return; const a = 1 - k;
+    MO.target.set(a * a * p0.x + 2 * a * k * mid.x + k * k * p1.x, a * a * p0.y + 2 * a * k * mid.y + k * k * p1.y, a * a * p0.z + 2 * a * k * mid.z + k * k * p1.z);
+    MO.ground = g0 + (sp.ground - g0) * k; }, ease).then(() => { if (MO.trip === id) MO.flying = false; });
+}
+addEventListener('resize', () => { if (!TOUR.busy) setTimeout(() => moliIr(MO.tut ? STOPS[TOUR.i] : STOPS[0], 700), 50); });
 const talkEl = document.getElementById('moliTalk');
 function decir(html) {                                               // globo con texto que se escribe solo; termina al acabar + una pausa (o al tocar ▶)
   if (MO.talking) MO.talking.fin();
@@ -2132,47 +2159,53 @@ function decir(html) {                                               // globo co
   });
 }
 function callar() { if (MO.talking) MO.talking.fin(); talkEl.classList.remove('on'); }
-async function guiar() {                                             // en el primer recorrido: espera el título y Molí explica el lugar
+async function guiar() {                                             // en el primer recorrido: espera el título, que Molí llegue, y explica el lugar
   await titleGate;
   const i = TOUR.i; if (!MO.tut || MO.said[i]) return; MO.said[i] = true;
-  const lejos = MO.k > 0.5; MO.hide = false; if (lejos) await wait(420);
-  moli.accion(i === 0 ? 'saludar' : 'señalar', -1); moli.expr('feliz'); setTimeout(() => moli.expr('normal'), 1100);
+  for (let k = 0; k < 40 && MO.flying; k++) await wait(100);
+  if (TOUR.i !== i) return;
+  const lado = tv.copy(MO.pos).project(camera).x > 0 ? -1 : 1;         // señala hacia lo que se ve
+  moli.accion(i === 0 ? 'saludar' : 'señalar', lado); moli.expr('feliz'); setTimeout(() => moli.expr('normal'), 1100);
   await decir(GUIA[i]);
-  if (i === GUIA.length - 1) { MO.tut = false; moli.accion('girar'); moli.expr('feliz'); setTimeout(() => moli.expr('normal'), 1600); }
+  if (Object.keys(MO.said).length >= GUIA.length) {                  // terminó el tutorial: Molí se queda en el salón (en la vista de «Mi aula»)
+    MO.tut = false; moli.accion('girar'); moli.expr('feliz'); setTimeout(() => moli.expr('normal'), 1600);
+    setTimeout(() => moliIr(STOPS[0], 2400), 1300);
+  }
 }
-// Molí se va a un costado mientras algo está agrandado, y vuelve al cerrarse
-new MutationObserver(() => { const open = document.body.classList.contains('open'); MO.hide = open; if (open) callar(); }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
-const moliSpring = (x, v, to, k, d, dt) => { v += (to - x) * k * dt; v *= Math.exp(-d * dt); return [x + v * dt, v]; };
-const camF = new THREE.Vector3(), lookV = new THREE.Vector3(), headV = new THREE.Vector3();
+new MutationObserver(() => { if (document.body.classList.contains('open')) callar(); }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+const camF = new THREE.Vector3(), camR = new THREE.Vector3(), lookV = new THREE.Vector3(), headV = new THREE.Vector3(), dpos = new THREE.Vector3(), lv1 = new THREE.Vector3(), lv2 = new THREE.Vector3();
 animHooks.push((t, dt) => {
-  camera.getWorldDirection(camF);                                    // cuánto gira la cámara: Molí se inclina y sus bracitos quedan atrás
-  const turn = MO.f0.lengthSq() ? Math.atan2(MO.f0.z * camF.x - MO.f0.x * camF.z, MO.f0.x * camF.x + MO.f0.z * camF.z) : 0; MO.f0.copy(camF);
-  MO.mov += (Math.max(-1.6, Math.min(1.6, dt > 0 ? turn / dt * 0.9 : 0)) - MO.mov) * Math.min(1, dt * 5);
-  [MO.k, MO.kv] = moliSpring(MO.k, MO.kv, MO.hide ? 1 : 0, 55, 9, dt);   // entra y sale con resorte (desde la derecha, en arco)
-  const k = MO.k, kk = Math.min(1, Math.max(0, k));
-  moli.root.position.set(MO.x + k * 2.6 * MO.s, MO.y + Math.sin(kk * Math.PI) * 0.35 * MO.s, 0);
-  moli.root.scale.setScalar(MO.s); moli.root.rotation.y = -0.38 + k * 0.6;
-  if (MO.talking) lookV.copy(moliCam.position); else lookV.set(0, 0.5, 2.5);   // te mira cuando habla; si no, mira lo que se ve
-  moli.mirar(lookV); moli.update(t, dt, -MO.mov);
-  if (talkEl.classList.contains('on')) {                              // el globo sale a la izquierda de su cabeza
-    headV.set(0, 2.02, 0).applyMatrix4(moli.root.matrixWorld).project(moliCam);   // arriba de su cabeza: no tapa lo que está al centro
+  if (dt <= 0) return;
+  MO.vel.addScaledVector(dpos.copy(MO.target).sub(MO.pos), 60 * dt).multiplyScalar(Math.exp(-11 * dt)); MO.pos.addScaledVector(MO.vel, dt);   // sigue su camino con un resorte
+  moli.root.position.copy(MO.pos);
+  camera.getWorldDirection(camF); camR.crossVectors(camF, camera.up).normalize();
+  MO.mov += (clampN(MO.vel.dot(camR) * 2.2, -1.6, 1.6) - MO.mov) * Math.min(1, dt * 6);   // se inclina según cómo se mueve
+  const sp = Math.hypot(MO.vel.x, MO.vel.z); let want = Math.atan2(camera.position.x - MO.pos.x, camera.position.z - MO.pos.z);
+  if (sp > 0.5) { let fw = Math.atan2(MO.vel.x, MO.vel.z) - want; fw = Math.atan2(Math.sin(fw), Math.cos(fw)); want += fw * Math.min(0.6, (sp - 0.5) * 0.7); }   // al volar mira hacia donde va
+  let dy = want - MO.yaw; dy = Math.atan2(Math.sin(dy), Math.cos(dy)); MO.yaw += dy * Math.min(1, dt * 5); moli.root.rotation.y = MO.yaw;
+  const st = STOPS[TOUR.i];
+  lookV.copy(MO.talking || !st || !MO.flying ? camera.position : st.look); moli.mirar(lookV);
+  mAim.position.copy(MO.pos);                                          // sus luces van con la cámara: siempre se le ve bien la carita
+  mKey.position.copy(MO.pos).add(lv1.set(-1.6, 3, 2.5).applyQuaternion(camera.quaternion));
+  mRim.position.copy(MO.pos).add(lv2.set(2, 1.6, -3).applyQuaternion(camera.quaternion));
+  if (moliFloor) { const h = MO.pos.y - MO.ground; moliFloor.position.y = -h / MSC; moliFloor.visible = h > -0.05 && h < 1.4; }
+  moli.update(t, dt, MO.mov);
+  if (talkEl.classList.contains('on')) {                              // el globo sale arriba de su cabeza
+    headV.set(0, 2.02, 0).applyMatrix4(moli.root.matrixWorld).project(camera);
     const x = (headV.x + 1) / 2 * innerWidth, y = (1 - headV.y) / 2 * innerHeight, w = talkEl.offsetWidth, h = talkEl.offsetHeight;
-    const left = Math.max(8, Math.min(innerWidth - w - 8, x - w + 56)), top = Math.max(8, y - h - 12);
+    const left = Math.max(8, Math.min(innerWidth - w - 8, x - w + 56)), top = Math.max(8, Math.min(innerHeight - h - 70, y - h - 12));
     talkEl.style.left = left + 'px'; talkEl.style.top = top + 'px'; talkEl.style.setProperty('--tail', Math.max(16, Math.min(w - 36, left + w - x - 10)) + 'px');
   }
 });
-afterRender.push(() => {                                             // Molí se dibuja encima del salón (su propia capa)
-  if (MO.hide && MO.k > 0.985) return;
-  renderer.autoClear = false; renderer.clearDepth(); renderer.render(moliScene, moliCam); renderer.autoClear = true;
-});
-(function arrancar() {                                               // empieza con «Mi aula» cuando ya se mueve fluido (después de preparar todo)
+afterRender.push(() => { renderer.autoClear = false; renderer.render(moliScene, camera); renderer.autoClear = true; });   // Molí dentro del aula (con la misma cámara)
+try { renderer.compile(scene, camera); renderer.compile(moliScene, camera); } catch (e) {}   // prepara todos los shaders al cargar: sin tirones cuando algo aparece por primera vez
+(function arrancar() {                                               // empieza con «Mi aula» cuando ya se mueve fluido; Molí entra volando desde la puerta
   const t0 = performance.now(); let n = 0, last = t0;
   const tick = (now) => { n = now - last < 90 ? n + 1 : 0; last = now;
-    if (n >= 4 || now - t0 > 4000) setTimeout(() => { if (TOUR.i === 0 && !TOUR.busy) { showTitle(STOPS[0].title, 0); guiar(); } }, 250);
+    if (n >= 4 || now - t0 > 4000) setTimeout(() => { if (TOUR.i === 0 && !TOUR.busy) { moliIr(STOPS[0], 2200); showTitle(STOPS[0].title, 0); guiar(); } }, 250);
     else requestAnimationFrame(tick); };
   requestAnimationFrame(tick);
-})();      // al empezar: Molí llega volando y saluda
-try { renderer.compile(scene, camera); renderer.compile(moliScene, moliCam); } catch (e) {}   // prepara todos los shaders al cargar: sin tirones cuando algo aparece por primera vez
+})();
 window.G = { P, update, doors, colliders, floors, camera, renderer, scene, toggle, nearestDoor, keys, joy, spinners, rockets, TOUR, STOPS, go, moli, MO };
 </script>
 </body>

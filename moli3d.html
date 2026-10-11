@@ -53,8 +53,8 @@ function crearMoli(THREE, opt = {}) {
     es.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); });
   } catch (e) { env = null; }
   const PM = (o) => new THREE.MeshPhysicalMaterial(Object.assign({ envMap: env, metalness: 0 }, o));
-  const WHITE = PM({ color: 0xf3f2ef, roughness: 0.42, clearcoat: 0.55, clearcoatRoughness: 0.24, envMapIntensity: 0.62 });
-  const NAVY = PM({ color: 0x1b295e, roughness: 0.38, clearcoat: 0.6, clearcoatRoughness: 0.25, envMapIntensity: 0.5 });
+  const WHITE = PM({ color: 0xe5ded1, roughness: 0.52, clearcoat: 0.3, clearcoatRoughness: 0.32, envMapIntensity: 0.28 });   // marfil cálido satinado
+  const NAVY = PM({ color: 0x17245a, roughness: 0.4, clearcoat: 0.55, clearcoatRoughness: 0.25, envMapIntensity: 0.45 });
   const NAVYD = PM({ color: 0x0d163d, roughness: 0.45, envMapIntensity: 0.3 });
   const VISOR = PM({ color: 0x0b1438, roughness: 0.16, clearcoat: 1, clearcoatRoughness: 0.05, envMapIntensity: 0.62 });
   const SEAM = PM({ color: 0xaeb7c7, roughness: 0.5, envMapIntensity: 0.3 });
@@ -132,15 +132,15 @@ function crearMoli(THREE, opt = {}) {
   const head = new THREE.Group(); head.position.y = 0.45; headPivot.add(head);
 
   // ---- casco: superelipsoide (más redondito arriba) con el hueco del visor adelante ----
-  const HS = [0.6, 0.47, 0.52], VI = { y: -0.07, bx: 0.47, by: 0.31, r: 0.18, d: 0.075, w: 0.032 };
+  const HS = [0.6, 0.5, 0.53], VI = { y: -0.08, bx: 0.44, by: 0.29, r: 0.2, d: 0.075, w: 0.032 };
   const sp = (v, p) => Math.sign(v) * Math.pow(Math.abs(v), p);
   const sdRR = (x, y) => { const qx = Math.abs(x) - VI.bx + VI.r, qy = Math.abs(y - VI.y) - VI.by + VI.r; return Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - VI.r; };
   const HW = 96, HH = 72;                                             // resolución del casco (borde del visor bien liso)
   const helmet = () => {
     const g = new THREE.SphereGeometry(1, HW, HH); g.rotateY(-Math.PI / 2);      // la costura queda atrás
     const q = g.attributes.position;
-    for (let i = 0; i < q.count; i++) { const x = q.getX(i), y = q.getY(i), z = q.getZ(i), yy = sp(y, 0.62), k = 1 - 0.1 * Math.max(0, yy) ** 2 - 0.035 * Math.max(0, -yy) ** 2;
-      q.setXYZ(i, sp(x, 0.55) * k * HS[0], yy * HS[1], sp(z, 0.55) * k * HS[2]); }
+    for (let i = 0; i < q.count; i++) { const x = q.getX(i), y = q.getY(i), z = q.getZ(i), yy = sp(y, 0.7), k = 1 - 0.13 * Math.max(0, yy) ** 2 - 0.04 * Math.max(0, -yy) ** 2;
+      q.setXYZ(i, sp(x, 0.6) * k * HS[0], yy * HS[1], sp(z, 0.62) * k * HS[2]); }
     return g;
   };
   const shell = helmet(), base0 = shell.clone();
@@ -178,23 +178,23 @@ function crearMoli(THREE, opt = {}) {
   });
   // ---- cuello, cuerpito (frijolito blanco con una línea), hombros y base azul noche ----
   part(new THREE.CylinderGeometry(0.115, 0.135, 0.12, 32), NAVY, body, [0, 0.8, 0]);
-  const torsoR = (y) => { const s = Math.max(-1, Math.min(1, (y - 0.545) / 0.215)), a = Math.asin(s); return 0.37 * Math.pow(Math.cos(a), 0.6) * (1 - 0.06 * s); };
+  const torsoR = (y) => { const s = Math.max(-1, Math.min(1, (y - 0.545) / 0.215)), a = Math.asin(s); return 0.4 * Math.pow(Math.cos(a), 0.72) * (1 - 0.07 * s); };
   part(lathe(k => { const a = -Math.PI / 2 + Math.PI * k, y = 0.545 + 0.215 * Math.sin(a); return [torsoR(y), y]; }, 32, 56), WHITE, body);
   part(new THREE.TorusGeometry(torsoR(0.45) + 0.001, 0.0065, 8, 72), SEAM, body, [0, 0.45, 0], [Math.PI / 2, 0, 0]);
   part(lathe(k => { if (k < 0.82) { const a = Math.PI / 2 * (1 - k / 0.82); return [0.235 * Math.pow(Math.cos(a), 0.8), 0.37 - 0.16 * Math.sin(a)]; }
     const u = (k - 0.82) / 0.18; return [0.235 - 0.07 * u, 0.37 + 0.03 * Math.sin(u * Math.PI / 2)]; }, 28, 56), NAVY, body);
   part(new THREE.TorusGeometry(0.06, 0.013, 10, 48), LED, body, [0, 0.215, 0], [Math.PI / 2, 0, 0]);
   const baseGlow = glow(body, [0, 0.18, 0], 0.34, 0.6);
-  [-1, 1].forEach(sx => part(new THREE.SphereGeometry(0.09, 24, 18), NAVY, body, [0.325 * sx, 0.665, 0.01]));
+  [-1, 1].forEach(sx => part(new THREE.SphereGeometry(0.1, 24, 18), NAVY, body, [0.35 * sx, 0.655, 0.01]));
   // ---- bracitos (frijolito blanco) y manitos azul noche: palma, 3 deditos y pulgar ----
-  const armGeo = lathe(k => { const y = -0.385 + 0.43 * k; return [0.112 * Math.pow(Math.sin(Math.PI * k), 0.42) * (0.84 + 0.16 * k), y]; }, 28, 36);
+  const armGeo = lathe(k => { const y = -0.39 + 0.44 * k; return [0.135 * Math.pow(Math.sin(Math.PI * k), 0.4) * (0.8 + 0.2 * k), y]; }, 28, 36);   // brazo gordito (frijol)
   const arms = [-1, 1].map(sx => {
-    const sh = new THREE.Group(); sh.position.set(0.335 * sx, 0.665, 0.01); body.add(sh);
+    const sh = new THREE.Group(); sh.position.set(0.37 * sx, 0.655, 0.01); body.add(sh);
     part(armGeo, WHITE, sh, [0.008 * sx, 0, 0]);
-    const hand = new THREE.Group(); hand.position.set(0.012 * sx, -0.415, 0.006); sh.add(hand);
-    part(new THREE.SphereGeometry(0.088, 24, 18), NAVY, hand, [0, 0, 0], null, [1, 0.92, 0.84]);
-    [-1, 0, 1].forEach(j => part(new THREE.SphereGeometry(0.037, 14, 12), NAVY, hand, [0.014 * sx * (1 - Math.abs(j)), -0.078, j * 0.043 + 0.004], [0, 0, 0.12 * j * sx], [1, 1.42, 1]));
-    part(new THREE.SphereGeometry(0.035, 14, 12), NAVY, hand, [-0.06 * sx, -0.026, 0.054], [0, 0, -0.6 * sx], [1, 1.35, 1]);
+    const hand = new THREE.Group(); hand.position.set(0.014 * sx, -0.43, 0.008); sh.add(hand);
+    part(new THREE.SphereGeometry(0.1, 24, 18), NAVY, hand, [0, 0, 0], null, [1, 0.92, 0.84]);
+    [-1, 0, 1].forEach(j => part(new THREE.SphereGeometry(0.042, 14, 12), NAVY, hand, [0.016 * sx * (1 - Math.abs(j)), -0.088, j * 0.049 + 0.004], [0, 0, 0.12 * j * sx], [1, 1.4, 1]));
+    part(new THREE.SphereGeometry(0.04, 14, 12), NAVY, hand, [-0.068 * sx, -0.03, 0.06], [0, 0, -0.6 * sx], [1, 1.35, 1]);
     return { sh, hand, sx, a: 0.42, v: 0, f: 0 };
   });
   flush();
@@ -295,9 +295,9 @@ function crearMoli(THREE, opt = {}) {
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.setSize(innerWidth, innerHeight); document.body.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(28, innerWidth / innerHeight, 0.1, 50);
-scene.add(new THREE.HemisphereLight(0xffffff, 0xc4ccd8, 0.62));
-const key = new THREE.DirectionalLight(0xffffff, 0.72); key.position.set(-2, 4, 5); scene.add(key);
-const rim = new THREE.DirectionalLight(0x9fd6ff, 0.75); rim.position.set(3, 2.5, -4); scene.add(rim);
+scene.add(new THREE.HemisphereLight(0xfffdf8, 0x7f8ba3, 0.55));
+const key = new THREE.DirectionalLight(0xfff8ee, 0.8); key.position.set(-2.5, 4, 4); scene.add(key);
+const rim = new THREE.DirectionalLight(0x9fd6ff, 0.45); rim.position.set(3, 2.5, -4); scene.add(rim);
 const moli = crearMoli(THREE, { renderer }); scene.add(moli.root);
 function place() { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); }
 camera.position.set(0, 1.15, 5.6); camera.lookAt(0, 0.86, 0); place(); addEventListener('resize', place);

@@ -65,21 +65,22 @@
   @keyframes shine { to { left: 120%; } }
   /* ---- título de escena (como en los videojuegos) ---- */
   #title { position: fixed; left: 0; right: 0; top: 50%; transform: translateY(-62%); z-index: 40; pointer-events: none; display: none; text-align: center; color: #fff; }
-  #title .band { position: absolute; left: 0; right: 0; top: -34px; bottom: -30px; background: linear-gradient(90deg, transparent, rgba(16,12,40,.62) 22%, rgba(16,12,40,.62) 78%, transparent);
-    transform: scaleY(0); animation: band .55s cubic-bezier(.2,.9,.3,1) forwards; }
+  #title .card { position: relative; display: inline-block; padding: 16px 70px 14px; }            /* la franja sólo del tamaño del título */
+  #title .band { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(28,32,78,0), rgba(28,32,78,.74) 18%, rgba(28,32,78,.74) 82%, rgba(28,32,78,0));
+    transform: scaleX(0); animation: band .6s cubic-bezier(.2,.9,.3,1) forwards; }
   #title .sub { position: relative; white-space: nowrap; font: 800 clamp(11px, 1.6vw, 15px)/1 "Trebuchet MS", system-ui, sans-serif; letter-spacing: .55em; color: #ffd27a; text-transform: uppercase;
     opacity: 0; animation: fadeUp .6s .25s ease-out forwards; text-shadow: 0 2px 8px rgba(0,0,0,.6); }
   #title .main { position: relative; display: inline-block; white-space: nowrap; margin: 8px 0 6px; font: 900 clamp(26px, 5vw, 58px)/1.1 "Trebuchet MS", system-ui, sans-serif; color: #fff;
     letter-spacing: .06em; opacity: 0; text-shadow: 0 3px 0 #2b2547, 0 0 22px rgba(79,143,247,.95), 0 0 46px rgba(255,138,61,.5); animation: titleIn 1.1s .35s cubic-bezier(.16,.9,.3,1) forwards; overflow: hidden; padding: 0 6px; }
   #title .deco { position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; }
-  #title .deco i { display: block; height: 2px; width: min(30vw, 260px); background: linear-gradient(90deg, transparent, #ffd27a); transform: scaleX(0); animation: grow .8s .55s cubic-bezier(.2,.9,.3,1) forwards; }
+  #title .deco i { display: block; height: 2px; width: min(14vw, 120px); background: linear-gradient(90deg, transparent, #ffd27a); transform: scaleX(0); animation: grow .8s .55s cubic-bezier(.2,.9,.3,1) forwards; }
   #title .deco i.r { background: linear-gradient(90deg, #ffd27a, transparent); }
   #title .deco i.l { transform-origin: right; } #title .deco i.r { transform-origin: left; }
   #title .deco b { width: 9px; height: 9px; background: #ffd27a; transform: rotate(45deg) scale(0); animation: gem .5s .8s cubic-bezier(.34,1.56,.64,1) forwards; box-shadow: 0 0 12px #ffd27a; }
   #title .shine { position: absolute; top: 0; bottom: 0; left: -30%; width: 18%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.35), transparent); animation: sweep 1.2s 1s ease-in-out forwards; }
   #title.out { animation: titleOut .8s ease-in forwards; }
   #title.out .main { animation: none; opacity: 1; }
-  @keyframes band { to { transform: scaleY(1); } }
+  @keyframes band { to { transform: scaleX(1); } }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
   @keyframes titleIn { 0% { opacity: 0; transform: scale(1.35); filter: blur(10px); } 60% { opacity: 1; filter: blur(0); } 100% { opacity: 1; transform: none; filter: blur(0); } }
   @keyframes grow { to { transform: scaleX(1); } }
@@ -1739,7 +1740,7 @@ async function closeBook(o) {
   await Promise.all([...lv.map((l, i) => wait((lv.length - 1 - i) * 90).then(() => { const a0 = l.rotation.z; return tween(420, k => { l.rotation.z = a0 * (1 - k); }, inCubic); })), wait(160).then(() => hingeTo(o, 0, 520, outBack))]);
 }
 const STOPS = [
-  { name: '🏫 Mi salón 6B', pf: 1, look: FOCUS.pizarra.look.clone().add(new THREE.Vector3(0, -0.45, 0)), from: FOCUS.corcho.look.clone().lerp(FOCUS.corcho.from, 0.3).setY(FOCUS.corcho.look.y - 0.55) },   // desde el fondo (junto a los lockers), debajo de los cohetes
+  { name: '🏫 Mi aula', title: 'Mi aula', pf: 1, look: FOCUS.pizarra.look.clone().add(new THREE.Vector3(0, -0.45, 0)), from: FOCUS.corcho.look.clone().lerp(FOCUS.corcho.from, 0.3).setY(FOCUS.corcho.look.y - 0.55) },   // desde el fondo (junto a los lockers), debajo de los cohetes
   { name: '📗 Mi mesa', title: 'Mis sesiones de unidad', ...FOCUS.mesa,
     async enter() { await openBook(this.obj); await expand('cuaderno', this.obj); },
     async leave() { await shrink(this.obj); await closeBook(this.obj); } },
@@ -1783,7 +1784,7 @@ const titleEl = document.getElementById('title'); let titleT = 0, titleT2 = 0, t
 function showTitle(text, n) {                                       // nombre de la escena: franja, "ESCENA n", título grande con líneas doradas; luego se desvanece
   clearTimeout(titleT); clearTimeout(titleT2);
   titleEl.className = ''; titleEl.style.display = 'block';
-  titleEl.innerHTML = '<div class="band"></div><div class="sub">Escena ' + n + ' · 6° B</div><div class="main">' + text + '<div class="shine"></div></div><br><div class="deco"><i class="l"></i><b></b><i class="r"></i></div>';
+  titleEl.innerHTML = '<div class="card"><div class="band"></div><div class="sub">Escena ' + (n + 1) + ' · 6° B</div><div class="main">' + text + '<div class="shine"></div></div><br><div class="deco"><i class="l"></i><b></b><i class="r"></i></div></div>';
   titleOpen(); titleGate = new Promise(r => { titleOpen = r; });
   titleT = setTimeout(() => { titleEl.classList.add('out'); titleOpen(); }, 2300);                  // se queda un ratito y se va
   titleT2 = setTimeout(() => { titleEl.style.display = 'none'; }, 3150);
@@ -2164,7 +2165,13 @@ afterRender.push(() => {                                             // Molí se
   if (MO.hide && MO.k > 0.985) return;
   renderer.autoClear = false; renderer.clearDepth(); renderer.render(moliScene, moliCam); renderer.autoClear = true;
 });
-setTimeout(() => { if (TOUR.i === 0 && !TOUR.busy) guiar(); }, 700);      // al empezar: Molí llega volando y saluda
+(function arrancar() {                                               // empieza con «Mi aula» cuando ya se mueve fluido (después de preparar todo)
+  const t0 = performance.now(); let n = 0, last = t0;
+  const tick = (now) => { n = now - last < 90 ? n + 1 : 0; last = now;
+    if (n >= 4 || now - t0 > 4000) setTimeout(() => { if (TOUR.i === 0 && !TOUR.busy) { showTitle(STOPS[0].title, 0); guiar(); } }, 250);
+    else requestAnimationFrame(tick); };
+  requestAnimationFrame(tick);
+})();      // al empezar: Molí llega volando y saluda
 try { renderer.compile(scene, camera); renderer.compile(moliScene, moliCam); } catch (e) {}   // prepara todos los shaders al cargar: sin tirones cuando algo aparece por primera vez
 window.G = { P, update, doors, colliders, floors, camera, renderer, scene, toggle, nearestDoor, keys, joy, spinners, rockets, TOUR, STOPS, go, moli, MO };
 </script>

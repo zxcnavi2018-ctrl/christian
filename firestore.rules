@@ -43,7 +43,7 @@ service cloud.firestore {
     // Trabajo que envía un estudiante a la Revista Innovadora (llega «pend»: por revisar).
     // La docente publica directo («ok»): sin sección, con su estante de la Biblioteca (g = 6 a 11).
     function validRevista(d) {
-      return d.keys().hasOnly(['k', 'n', 'sec', 'u', 'ty', 't', 'd', 'f', 'link', 'th', 'img', 'st', 'at', 'rv', 'rvAt', 'g', 'kw'])
+      return d.keys().hasOnly(['k', 'n', 'sec', 'u', 'ty', 't', 'd', 'f', 'link', 'th', 'img', 'img2', 'img3', 'st', 'at', 'rv', 'rvAt', 'g', 'kw'])
         && d.keys().hasAll(['k', 'n', 'sec', 'u', 'ty', 't', 'd', 'st', 'at'])
         && d.k is string && d.k.matches('k[0-9a-f]{20}')
         && d.n is string && d.n.size() <= 60
@@ -51,12 +51,14 @@ service cloud.firestore {
         && d.u is string && d.u.size() <= 12
         && d.ty is string && d.ty.size() <= 8
         && d.t is string && d.t.size() >= 4 && d.t.size() <= 100
-        && d.d is string && d.d.size() <= 1500
+        && d.d is string && d.d.size() <= 20000
         && (!('f' in d) || (d.f is string && d.f.size() <= 600))
         && (!('kw' in d) || (d.kw is string && d.kw.size() <= 200))
         && (!('link' in d) || (d.link is string && d.link.size() <= 400 && d.link.matches('https://.*')))
         && (!('th' in d) || (d.th is string && d.th.size() <= 80000 && d.th.matches('data:image/jpeg;base64,.*')))
         && (!('img' in d) || (d.img is string && d.img.size() <= 700000))
+        && (!('img2' in d) || (d.img2 is string && d.img2.size() <= 300000 && d.img2.matches('data:image/jpeg;base64,.*')))
+        && (!('img3' in d) || (d.img3 is string && d.img3.size() <= 300000 && d.img3.matches('data:image/jpeg;base64,.*')))
         && (d.st == 'pend' || (isTeacher() && d.st == 'ok'))
         && (!('rv' in d) || (isTeacher() && d.rv is string && d.rv.size() <= 60))
         && (!('rvAt' in d) || (isTeacher() && d.rvAt is timestamp))

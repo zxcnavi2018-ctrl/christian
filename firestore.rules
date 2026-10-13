@@ -205,6 +205,17 @@ service cloud.firestore {
       allow delete: if isTeacher();
     }
 
+    // El Word original de cada trabajo de la Revista: sólo la docente y los Revisores lo descargan para revisarlo.
+    match /revdoc/{id} {
+      allow get: if isTeacher() || isRevisor();
+      allow create: if exists(/databases/$(database)/documents/revista/$(id))
+        && request.resource.data.keys().hasOnly(['n', 'b64', 'at'])
+        && request.resource.data.n is string && request.resource.data.n.size() <= 120
+        && request.resource.data.b64 is string && request.resource.data.b64.size() <= 900000
+        && request.resource.data.at is timestamp;
+      allow delete: if isTeacher();
+    }
+
     // Misiones: avance de cada estudiante (errores e intentos por actividad de todas sus misiones). Solo la docente ve la lista.
     match /mision/{id} {
       allow get: if true;

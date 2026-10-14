@@ -202,7 +202,7 @@ service cloud.firestore {
         && request.resource.data.st in ['ok', 'no', 'pend']
         && request.resource.data.get('rv', '') is string && request.resource.data.get('rv', '').size() <= 60
         && request.resource.data.get('fb', '') is string && request.resource.data.get('fb', '').size() <= 600;
-      allow delete: if isTeacher();
+      allow delete: if isTeacher() || (isRevisor() && resource.data.st == 'pend');   // el Revisor borra al devolver (sólo los que están por revisar)
     }
 
     // El Word original de cada trabajo de la Revista: sólo la docente y los Revisores lo descargan para revisarlo (se borra al aprobar o devolver).

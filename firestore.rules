@@ -40,6 +40,12 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/config/site).data.get('rev', {})
              .get(request.auth.token.email.split('-')[0], '').split('[|]')[0] == request.auth.token.email.split('@')[0].split('-')[1];
     }
+    // El Revisor no revisa los trabajos de su propia sección (los revisan los de otras secciones o la docente).
+    function revOtraSec() {
+      let p = get(/databases/$(database)/documents/config/site).data.get('rev', {})
+                .get(request.auth.token.email.split('-')[0], '').split('[|]');
+      return p.size() < 3 || p[2] == '' || resource.data.get('sec', '') != p[2];
+    }
     // Trabajo que envía un estudiante a la Revista Innovadora (llega «pend»: por revisar).
     // La docente publica directo («ok»): sin sección, con su estante de la Biblioteca (g = 6 a 11).
     function validRevista(d) {
@@ -197,12 +203,12 @@ service cloud.firestore {
       allow create: if validRevista(request.resource.data)
         && id.matches(request.resource.data.k + '-[0-9a-z]{6,14}')
         && (isTeacher() || exists(/databases/$(database)/documents/students/$(request.resource.data.k)));
-      allow update: if (isTeacher() || isRevisor())
+      allow update: if (isTeacher() || (isRevisor() && revOtraSec()))
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['st', 'rv', 'rvAt', 'fb'])
         && request.resource.data.st in ['ok', 'no', 'pend']
         && request.resource.data.get('rv', '') is string && request.resource.data.get('rv', '').size() <= 60
         && request.resource.data.get('fb', '') is string && request.resource.data.get('fb', '').size() <= 600;
-      allow delete: if isTeacher() || (isRevisor() && resource.data.st == 'pend');   // el Revisor borra al devolver (sólo los que están por revisar)
+      allow delete: if isTeacher() || (isRevisor() && resource.data.st == 'pend' && revOtraSec());   // el Revisor borra al devolver (sólo los que están por revisar)
     }
 
     // El Word original de cada trabajo de la Revista: sólo la docente y los Revisores lo descargan para revisarlo (se borra al aprobar o devolver).

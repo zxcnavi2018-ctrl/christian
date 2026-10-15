@@ -204,10 +204,11 @@ service cloud.firestore {
         && id.matches(request.resource.data.k + '-[0-9a-z]{6,14}')
         && (isTeacher() || exists(/databases/$(database)/documents/students/$(request.resource.data.k)));
       allow update: if (isTeacher() || (isRevisor() && revOtraSec()))
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['st', 'rv', 'rvAt', 'fb'])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['st', 'rv', 'rvAt', 'fb', 'rm'])
         && request.resource.data.st in ['ok', 'no', 'pend']
         && request.resource.data.get('rv', '') is string && request.resource.data.get('rv', '').size() <= 60
-        && request.resource.data.get('fb', '') is string && request.resource.data.get('fb', '').size() <= 600;
+        && request.resource.data.get('fb', '') is string && request.resource.data.get('fb', '').size() <= 600
+        && request.resource.data.get('rm', '') is string && request.resource.data.get('rm', '').size() <= 8000;   // rm: subrayados y comentarios del Revisor
       allow delete: if isTeacher() || (isRevisor() && resource.data.st == 'pend' && revOtraSec());   // el Revisor borra al devolver (sólo los que están por revisar)
     }
 
